@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "create-admin": "node --env-file=.env.local scripts/create-admin-user.ts",
     "lint": "eslint"
   },
   "dependencies": {

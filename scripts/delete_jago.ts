@@ -16,7 +16,7 @@ async function main() {
   const id = accounts[0].id
   
   await supabase.from('finance_ledger').delete().eq('account_id', id)
-  await supabase.from('transactions').delete().eq('payment_account_id', id)
+  await supabase.from('payments').delete().eq('account_id', id)
   
   const { error } = await supabase.from('accounts').delete().eq('id', id)
   if (error) console.error(error)
