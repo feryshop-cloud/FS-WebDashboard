@@ -34,6 +34,11 @@ Sistem Dashboard Admin (SaaS ERP) untuk mengelola inventori, transaksi jual beli
 
 3. **Setup Database (Supabase)**
    Jalankan query SQL yang ada di file `supabase/schema_draft.sql` ke Supabase SQL Editor Anda untuk membuat struktur tabel, trigger, enum, dan kebijakan (RLS).
+   Perubahan bertahap setelah draft awal disimpan di `supabase/migrations/`.
+   `0008_storefront_remote_settings.sql` menambahkan tabel `public.settings`
+   sebagai remote config dinamis untuk FS-Public. Tabel ini memakai `JSONB`
+   per key, RLS public read untuk client storefront, dan write tetap melalui
+   jalur server/admin.
 
 4. **Jalankan Development Server**
    ```bash
