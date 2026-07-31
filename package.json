@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postbuild": "node scripts/prepare-standalone.mjs",
     "start": "next start",
     "start:railway": "HOSTNAME=0.0.0.0 node .next/standalone/server.js",
     "create-admin": "node --env-file=.env.local scripts/create-admin-user.ts",
