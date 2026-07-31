@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-const routePrefix = process.env.NEXT_PUBLIC_BASE_PATH?.trim() || "/admin";
+const routePrefix = process.env.NEXT_PUBLIC_BASE_PATH?.trim();
 const basePath =
   routePrefix && routePrefix !== "/"
     ? `/${routePrefix.replace(/^\/+|\/+$/g, "")}`

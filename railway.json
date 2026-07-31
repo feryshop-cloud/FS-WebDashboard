@@ -6,7 +6,7 @@
   },
   "deploy": {
     "startCommand": "npm run start:railway",
-    "healthcheckPath": "/admin/api/health",
+    "healthcheckPath": "/api/health",
     "healthcheckTimeout": 100,
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 3

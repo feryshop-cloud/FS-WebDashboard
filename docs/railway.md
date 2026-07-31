@@ -2,29 +2,31 @@
 
 This app is configured for Railway with `railway.json`.
 
-## Route Prefix
+## Railway Service Domain
 
-By default, the app is served from `/admin`.
+By default, the app is served from the root of its own Railway service domain.
 
-For production behind the public storefront domain, keep this value:
-
-```text
-NEXT_PUBLIC_BASE_PATH=/admin
-```
-
-After rebuilding, routes will be prefixed automatically, for example:
+Use this setup for the normal Railway deployment:
 
 ```text
-/admin/dashboard
-/admin/login
+NEXT_PUBLIC_BASE_PATH=
 ```
 
-`NEXT_PUBLIC_BASE_PATH` is a build-time value in Next.js, so changing it requires a new deployment.
+Expected routes:
+
+```text
+/dashboard
+/login
+```
+
+Only set `NEXT_PUBLIC_BASE_PATH` when the dashboard is intentionally served
+behind a path prefix through an external reverse proxy. `NEXT_PUBLIC_BASE_PATH`
+is a build-time value in Next.js, so changing it requires a new deployment.
 
 ## Healthcheck
 
 Railway checks:
 
 ```text
-/admin/api/health
+/api/health
 ```
