@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard,
@@ -23,6 +24,8 @@ import {
   LogOut,
 } from 'lucide-react'
 import { logout } from '../../actions/logout'
+
+const SIDEBAR_LOGO_URL = '/img/logo.jpeg'
 
 const navGroups = [
   {
@@ -94,15 +97,31 @@ export default function Sidebar() {
       `}
     >
       {/* Header — Brand */}
-      <div className="h-[88px] px-6 flex items-center relative">
-        <span
-          className={`
-            font-bold text-slate-900 text-2xl tracking-tight whitespace-nowrap transition-opacity duration-300
-            ${isCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}
-          `}
+      <div className={`h-[88px] flex items-center relative ${isCollapsed ? 'justify-center px-3' : 'px-6'}`}>
+        <Link
+          href="/dashboard"
+          aria-label="Ferryshop dashboard"
+          className={`flex min-w-0 items-center ${isCollapsed ? 'justify-center' : 'gap-3'}`}
         >
-          Ferryshop
-        </span>
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-black p-1.5 ring-1 ring-slate-200 shadow-sm">
+            <Image
+              src={SIDEBAR_LOGO_URL}
+              alt="Ferryshop logo"
+              width={48}
+              height={48}
+              priority
+              className="h-full w-full object-contain"
+            />
+          </span>
+          <span
+            className={`
+              font-bold text-slate-900 text-2xl tracking-tight whitespace-nowrap transition-all duration-300
+              ${isCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100 w-auto'}
+            `}
+          >
+            Ferryshop
+          </span>
+        </Link>
 
         {/* Toggle Button */}
         <button
