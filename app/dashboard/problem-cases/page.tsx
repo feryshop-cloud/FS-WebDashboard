@@ -24,14 +24,14 @@ export default function ProblemCasesPage() {
   const loadData = async () => {
     try {
       setIsLoading(true)
-      const [casesData, dealsData, stocksData] = await Promise.all([
+      const [casesData, dealsData, stocksResult] = await Promise.all([
         getProblemCases(),
         getDeals(),
         getInventory()
       ])
       setCases(casesData || [])
       setDeals(dealsData || [])
-      setStocks(stocksData || [])
+      setStocks(stocksResult.data || [])
     } catch (err) {
       console.error(err)
     } finally {

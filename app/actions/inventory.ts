@@ -2,59 +2,164 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { InventoryFormSchema } from '@/lib/schemas'
 
 export async function getInventory() {
   const supabase = await createClient()
-  const { data, error } = await supabase.from('stocks').select('*').order('created_at', { ascending: false })
-  
+
+  const { data, error } = await supabase
+    .from('inventory')
+    .select(`
+      *,
+      games (
+        id,
+        name,
+        slug
+      )
+    `)
+    .order('created_at', { ascending: false })
+
   if (error) {
     console.error('Error fetching inventory:', error)
-    throw new Error('Gagal memuat data stok.')
+    return { data: null, error: error.message }
   }
-  
-  return data
+
+  return { data, error: null }
 }
 
-export async function addStock(formData: FormData) {
-  const category = formData.get('category') as string
-  const sku = formData.get('sku') as string
-  const name = formData.get('name') as string
-  const capital_price = parseFloat(formData.get('capital_price') as string) || 0
-  const post_price = parseFloat(formData.get('post_price') as string) || 0
-  const login_info = formData.get('login_info') as string
-
-  if (!category || !name) {
-    throw new Error('Kategori dan Nama Akun wajib diisi.')
-  }
-
+export async function getGames() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  
-  // Create a unique SKU if not provided
-  let finalSku = sku
-  if (!finalSku) {
-    finalSku = `STK-${Date.now().toString().slice(-6)}`
+
+  const { data, error } = await supabase
+    .from('games')
+    .select('id, name, slug')
+    .order('name')
+
+  if (error) {
+    console.error('Error fetching games:', error)
+    return { data: null, error: error.message }
   }
-  
-  const { error } = await supabase.from('stocks').insert({
-    category,
-    sku: finalSku,
-    name,
-    capital_price,
-    post_price,
-    current_price: post_price,
-    login_info,
-    status: 'Tersedia',
-    managed_by: user?.id || null
+
+  return { data, error: null }
+}
+
+export async function addInventoryItem(formData: FormData) {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
+  const rawData = {
+    game_id: formData.get('game_id'),
+    title_reference: formData.get('title_reference'),
+    account_specs: formData.get('account_specs'),
+    capital_price: formData.get('capital_price'),
+    asking_price: formData.get('asking_price'),
+  }
+
+  const parsed = InventoryFormSchema.safeParse(rawData)
+
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0].message }
+  }
+
+  let image_urls: string[] = []
+  const imageFiles = formData.getAll('images') as File[]
+
+  if (imageFiles.length > 0) {
+    const uploadPromises = imageFiles.map(async (file, index) => {
+      if (file.size > 0) {
+        const fileExt = file.name.split('.').pop()
+        const fileName = `${Date.now()}-${index}-${Math.random().toString(36).substring(7)}.${fileExt}`
+        const fileBody = await file.arrayBuffer()
+
+        const { error: uploadError } = await supabase.storage
+          .from('screenshots')
+          .upload(fileName, fileBody, { contentType: file.type, upsert: true })
+
+        if (uploadError) {
+          console.error('Supabase Storage Error:', uploadError)
+          throw new Error('Failed to upload screenshot.')
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from('screenshots')
+          .getPublicUrl(fileName)
+
+        return publicUrlData.publicUrl
+      }
+      return null
+    })
+
+    try {
+      const urls = await Promise.all(uploadPromises)
+      image_urls = urls.filter((url): url is string => url !== null)
+    } catch (e) {
+      return { success: false, error: 'Gagal meng-upload satu atau lebih screenshot. Silakan coba lagi.' }
+    }
+  }
+
+  const screenshot_url = image_urls.length > 0 ? image_urls[0] : ''
+
+  const { error } = await supabase.from('inventory').insert({
+    game_id: parsed.data.game_id,
+    title_reference: parsed.data.title_reference,
+    account_specs: parsed.data.account_specs,
+    capital_price: parsed.data.capital_price,
+    asking_price: parsed.data.asking_price,
+    screenshot_url: screenshot_url,
+    image_urls: image_urls,
+    status: 'UNPOSTED',
+    added_by: user.id,
   })
 
   if (error) {
-    console.error('Error adding stock:', error)
-    if (error.code === '23505') {
-      throw new Error('Kode SKU sudah digunakan, harap gunakan yang lain.')
-    }
-    throw new Error('Gagal menambahkan stok baru.')
+    console.error('Database Error:', error)
+    return { success: false, error: 'Failed to insert into database.' }
   }
 
   revalidatePath('/dashboard/inventory')
+  return { success: true }
+}
+
+export async function updateItemStatus(id: string, newStatus: 'UNPOSTED' | 'AVAILABLE' | 'SOLD') {
+  const supabase = await createClient()
+
+  const { error } = await supabase
+    .from('inventory')
+    .update({ status: newStatus, updated_at: new Date().toISOString() })
+    .eq('id', id)
+
+  if (error) {
+    console.error('Error updating status:', error)
+    return { success: false, error: 'Failed to update item status.' }
+  }
+
+  revalidatePath('/dashboard/inventory')
+  return { success: true }
+}
+
+export async function markItemAsSold(id: string, soldPrice: number) {
+  const supabase = await createClient()
+
+  const { error } = await supabase
+    .from('inventory')
+    .update({
+      status: 'SOLD',
+      sold_price: soldPrice,
+      sold_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', id)
+
+  if (error) {
+    console.error('Error marking as sold:', error)
+    return { success: false, error: 'Failed to mark item as sold.' }
+  }
+
+  revalidatePath('/dashboard/inventory')
+  revalidatePath('/dashboard')
+  return { success: true }
 }

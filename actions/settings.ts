@@ -6,37 +6,32 @@ import { revalidatePath } from 'next/cache'
 export async function addGameCategory(name: string, slug: string, image_url?: string) {
   const supabase = await createClient()
 
-  // Ensure user is authenticated and authorized (e.g., SUPER_ADMIN or ADMIN, but here we just check if user exists)
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return { success: false, error: 'Unauthorized' }
   }
 
-  // Basic validation
   if (!name || !slug) {
     return { success: false, error: 'Name and Slug are required.' }
   }
 
-  // Insert into games table
   const { error } = await supabase.from('games').insert({
     name,
     slug,
-    ...(image_url ? { image_url } : {})
+    ...(image_url ? { image_url } : {}),
   })
 
   if (error) {
     console.error('Database Error:', error)
-    // Handle unique constraint violation gracefully if possible, or generic error
     if (error.code === '23505') {
       return { success: false, error: 'Kategori game dengan slug ini sudah ada.' }
     }
     return { success: false, error: 'Gagal menambahkan kategori game.' }
   }
 
-  // Revalidate relevant paths
   revalidatePath('/dashboard/settings')
   revalidatePath('/dashboard/inventory')
-  
+
   return { success: true }
 }
 
@@ -55,7 +50,7 @@ export async function updateGameCategory(id: string, name: string, slug: string,
   const { error } = await supabase.from('games').update({
     name,
     slug,
-    image_url: image_url || null
+    image_url: image_url || null,
   }).eq('id', id)
 
   if (error) {
@@ -68,7 +63,7 @@ export async function updateGameCategory(id: string, name: string, slug: string,
 
   revalidatePath('/dashboard/settings')
   revalidatePath('/dashboard/inventory')
-  
+
   return { success: true }
 }
 
@@ -98,5 +93,21 @@ export async function deleteGameCategory(id: string) {
   revalidatePath('/dashboard/inventory')
   
   return { success: true }
+}
+
+export async function getGames() {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('games')
+    .select('id, name, slug, image_url, created_at')
+    .order('name')
+
+  if (error) {
+    console.error('Error fetching games:', error)
+    return { data: null, error: error.message }
+  }
+
+  return { data, error: null }
 }
 

@@ -9,13 +9,15 @@ import { getAccounts } from '@/app/actions/accounts'
 import type { Database } from '@/types/database.types'
 
 type Deal = any // Using any for complex join
-type Stock = Database['public']['Tables']['stocks']['Row']
+type InventoryItem = Database['public']['Tables']['inventory']['Row'] & {
+  games: { name: string; slug: string } | null
+}
 type Account = Database['public']['Tables']['accounts']['Row']
 
 export default function DealsPage() {
   const [isAddDealOpen, setIsAddDealOpen] = useState(false)
   const [deals, setDeals] = useState<Deal[]>([])
-  const [stocks, setStocks] = useState<Stock[]>([])
+  const [stocks, setStocks] = useState<InventoryItem[]>([])
   const [accounts, setAccounts] = useState<Account[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -28,13 +30,13 @@ export default function DealsPage() {
   const loadData = async () => {
     try {
       setIsLoading(true)
-      const [dealsData, stocksData, accountsData] = await Promise.all([
+      const [dealsData, stocksResult, accountsData] = await Promise.all([
         getDeals(),
         getInventory(),
         getAccounts()
       ])
       setDeals(dealsData || [])
-      setStocks((stocksData || []).filter(s => s.status === 'Tersedia')) // Only available stocks
+      setStocks((stocksResult.data || []).filter(s => s.status === 'AVAILABLE')) // Only available items
       setAccounts(accountsData || [])
     } catch (err) {
       console.error(err)
@@ -243,7 +245,7 @@ export default function DealsPage() {
                   <select name="stock_id" required className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="">-- Pilih Stok Tersedia --</option>
                     {stocks.map(stock => (
-                      <option key={stock.id} value={stock.id}>{stock.sku} - {stock.name}</option>
+                      <option key={stock.id} value={stock.id}>{stock.title_reference}</option>
                     ))}
                   </select>
                 </div>

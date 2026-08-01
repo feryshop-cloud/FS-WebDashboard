@@ -1,29 +1,39 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Search, Filter, Plus, FileText, ChevronDown, MoreHorizontal, Download, X, Loader2 } from 'lucide-react'
+import { Search, Filter, Plus, ChevronDown, MoreHorizontal, Download, X, Loader2 } from 'lucide-react'
 import { formatRupiah } from '@/lib/utils'
-import { getInventory, addStock } from '@/app/actions/inventory'
+import { getInventory, addInventoryItem, getGames } from '@/app/actions/inventory'
 import type { Database } from '@/types/database.types'
 
-type Stock = Database['public']['Tables']['stocks']['Row']
+type InventoryItem = Database['public']['Tables']['inventory']['Row'] & {
+  games: { name: string; slug: string } | null
+}
+type Game = { id: string; name: string; slug: string }
 
 export default function InventoryPage() {
   const [isAddStockOpen, setIsAddStockOpen] = useState(false)
-  const [inventory, setInventory] = useState<Stock[]>([])
+  const [inventory, setInventory] = useState<InventoryItem[]>([])
+  const [games, setGames] = useState<Game[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [activeCategory, setActiveCategory] = useState('Semua')
 
   useEffect(() => {
     loadInventory()
+    loadGames()
   }, [])
 
   const loadInventory = async () => {
     try {
       setIsLoading(true)
-      const data = await getInventory()
-      setInventory(data)
+      const result = await getInventory()
+      if (result.error) {
+        console.error('Error loading inventory:', result.error)
+      } else {
+        setInventory(result.data || [])
+      }
     } catch (err) {
       console.error(err)
     } finally {
@@ -31,19 +41,38 @@ export default function InventoryPage() {
     }
   }
 
+  const loadGames = async () => {
+    try {
+      const result = await getGames()
+      if (!result.error && result.data) {
+        setGames(result.data)
+      }
+    } catch (err) {
+      console.error('Error loading games:', err)
+    }
+  }
+
   const handleAddStock = async (formData: FormData) => {
     try {
       setIsSubmitting(true)
       setError('')
-      await addStock(formData)
-      setIsAddStockOpen(false)
-      loadInventory()
+      const result = await addInventoryItem(formData)
+      if (result.success) {
+        setIsAddStockOpen(false)
+        loadInventory()
+      } else {
+        setError(result.error || 'Gagal menambah stok.')
+      }
     } catch (err: any) {
       setError(err.message)
     } finally {
       setIsSubmitting(false)
     }
   }
+
+  const filteredInventory = activeCategory === 'Semua'
+    ? inventory
+    : inventory.filter(item => item.games?.name === activeCategory)
 
   return (
     <div className="max-w-7xl mx-auto flex flex-col gap-6 pb-8">
@@ -58,7 +87,7 @@ export default function InventoryPage() {
             <Download className="h-4 w-4" />
             Export Data
           </button>
-          <button 
+          <button
             onClick={() => setIsAddStockOpen(true)}
             className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
           >
@@ -84,7 +113,7 @@ export default function InventoryPage() {
           <button className="inline-flex items-center justify-between gap-2 px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 w-full sm:w-auto min-w-[140px]">
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-slate-400" />
-              <span>Kategori</span>
+              <span>{activeCategory}</span>
             </div>
             <ChevronDown className="h-4 w-4 text-slate-400" />
           </button>
@@ -93,6 +122,33 @@ export default function InventoryPage() {
             <ChevronDown className="h-4 w-4 text-slate-400" />
           </button>
         </div>
+      </div>
+
+      {/* Category Filter Bar */}
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={() => setActiveCategory('Semua')}
+          className={`px-3 py-1.5 text-xs font-semibold rounded-full border transition-colors ${
+            activeCategory === 'Semua'
+              ? 'bg-blue-600 text-white border-blue-600'
+              : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+          }`}
+        >
+          Semua
+        </button>
+        {games.map(game => (
+          <button
+            key={game.id}
+            onClick={() => setActiveCategory(game.name)}
+            className={`px-3 py-1.5 text-xs font-semibold rounded-full border transition-colors ${
+              activeCategory === game.name
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+            }`}
+          >
+            {game.name}
+          </button>
+        ))}
       </div>
 
       {/* Table */}
@@ -137,41 +193,44 @@ export default function InventoryPage() {
                     Belum ada data stok.
                   </td>
                 </tr>
+              ) : filteredInventory.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-8 text-center text-sm text-slate-500">
+                    Tidak ada stok untuk kategori ini.
+                  </td>
+                </tr>
               ) : (
-                inventory.map((item) => {
+                filteredInventory.map((item) => {
                   let badgeClass = 'bg-slate-100 text-slate-600 border-slate-200'
-                  const statusStr = item.status || 'Tersedia'
-                  
-                  if (statusStr === 'Tersedia') {
+                  const statusStr = item.status || 'UNPOSTED'
+
+                  if (statusStr === 'AVAILABLE') {
                     badgeClass = 'bg-blue-50 text-blue-600 border-blue-100'
-                  } else if (statusStr === 'Terjual') {
+                  } else if (statusStr === 'SOLD') {
                     badgeClass = 'bg-emerald-50 text-emerald-600 border-emerald-100'
-                  } else if (statusStr === 'Booking' || statusStr === 'Akses Terbatas') {
+                  } else if (statusStr === 'UNPOSTED') {
                     badgeClass = 'bg-orange-50 text-orange-600 border-orange-100'
-                  } else if (statusStr.includes('Bermasalah') || statusStr === 'Cancel') {
-                    badgeClass = 'bg-rose-50 text-rose-600 border-rose-100'
                   }
 
                   return (
                     <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-900">
-                        {item.sku}
+                        {item.title_reference || '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-500">
-                        <span className="bg-slate-100 px-2.5 py-1 rounded-md text-[11px] font-semibold text-slate-600">{item.category}</span>
+                        <span className="bg-slate-100 px-2.5 py-1 rounded-md text-[11px] font-semibold text-slate-600">
+                          {item.games?.name || '-'}
+                        </span>
                       </td>
                       <td className="px-6 py-4 text-sm text-slate-700">
-                        <span className="block truncate max-w-[250px] font-medium">{item.name}</span>
+                        <span className="block truncate max-w-[250px] font-medium">{item.title_reference || '-'}</span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500 font-medium text-right">
                         {formatRupiah(Number(item.capital_price))}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
                         <div className="flex flex-col items-end">
-                          <span className="font-bold text-slate-900">{formatRupiah(Number(item.current_price))}</span>
-                          {item.current_price !== item.post_price && (
-                            <span className="text-[10px] text-slate-400 mt-0.5 line-through">{formatRupiah(Number(item.post_price))}</span>
-                          )}
+                          <span className="font-bold text-slate-900">{formatRupiah(Number(item.asking_price))}</span>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">
@@ -191,14 +250,14 @@ export default function InventoryPage() {
             </tbody>
           </table>
         </div>
-        
+
         {/* Pagination Mockup */}
         <div className="bg-white px-6 py-4 border-t border-slate-100 flex items-center justify-between">
           <div className="text-sm text-slate-500">
-            Menampilkan <span className="font-semibold text-slate-900">{inventory.length > 0 ? 1 : 0}</span> - <span className="font-semibold text-slate-900">{inventory.length}</span> dari <span className="font-semibold text-slate-900">{inventory.length}</span> stok
+            Menampilkan <span className="font-semibold text-slate-900">{filteredInventory.length > 0 ? 1 : 0}</span> - <span className="font-semibold text-slate-900">{filteredInventory.length}</span> dari <span className="font-semibold text-slate-900">{filteredInventory.length}</span> stok
           </div>
           <div className="flex gap-1">
-            <button className="px-3 py-1 border border-slate-200 text-slate-400 rounded-md text-sm cursor-not-allowed">Sebelummnya</button>
+            <button className="px-3 py-1 border border-slate-200 text-slate-400 rounded-md text-sm cursor-not-allowed">Sebelumnya</button>
             <button className="px-3 py-1 border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-md text-sm font-medium">Selanjutnya</button>
           </div>
         </div>
@@ -213,14 +272,14 @@ export default function InventoryPage() {
                 <h2 className="text-lg font-bold text-slate-900">Tambah Stok Baru</h2>
                 <p className="text-xs text-slate-500 mt-1">Isi form data stok akun game baru.</p>
               </div>
-              <button 
-                onClick={() => setIsAddStockOpen(false)} 
+              <button
+                onClick={() => setIsAddStockOpen(false)}
                 className="text-slate-400 hover:text-slate-600 transition-colors bg-white p-2 rounded-full shadow-sm"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
-            
+
             <form action={handleAddStock} className="flex-1 flex flex-col overflow-hidden">
               <div className="p-6 flex-1 overflow-y-auto space-y-5">
                 {error && (
@@ -228,81 +287,69 @@ export default function InventoryPage() {
                     {error}
                   </div>
                 )}
-                
+
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Kategori Game</label>
-                  <select name="category" required className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-                    <option value="Mobile Legends">Mobile Legends</option>
-                    <option value="Free Fire">Free Fire</option>
-                    <option value="Roblox">Roblox</option>
-                    <option value="PUBG Mobile">PUBG Mobile</option>
-                    <option value="Genshin Impact">Genshin Impact</option>
-                    <option value="Valorant">Valorant</option>
-                    <option value="Lainnya">Lainnya</option>
+                  <select name="game_id" required className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                    <option value="">Pilih Kategori Game...</option>
+                    {games.map(game => (
+                      <option key={game.id} value={game.id}>{game.name}</option>
+                    ))}
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">SKU / Kode Stok (Opsional)</label>
-                  <input 
-                    name="sku" 
-                    type="text" 
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" 
-                    placeholder="Otomatis jika kosong" 
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Kode Referensi</label>
+                  <input
+                    name="title_reference"
+                    type="text"
+                    required
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    placeholder="e.g. ML-MYTHIC-001"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Nama / Judul Akun</label>
-                  <input 
-                    name="name" 
-                    required 
-                    type="text" 
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" 
-                    placeholder="Mis. MLBB Mythic Glory 120 Hero" 
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Spesifikasi Akun</label>
+                  <textarea
+                    name="account_specs"
+                    required
+                    rows={3}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    placeholder="Details like rank, skins, win rate..."
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">Harga Modal</label>
-                    <input 
-                      name="capital_price" 
-                      required 
-                      type="number" 
-                      min="0" 
-                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" 
-                      placeholder="Rp 0" 
+                    <input
+                      name="capital_price"
+                      required
+                      type="number"
+                      min="0"
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                      placeholder="Rp 0"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Harga Jual (Post Price)</label>
-                    <input 
-                      name="post_price" 
-                      required 
-                      type="number" 
-                      min="0" 
-                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" 
-                      placeholder="Rp 0" 
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Target Jual</label>
+                    <input
+                      name="asking_price"
+                      required
+                      type="number"
+                      min="0"
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                      placeholder="Rp 0"
                     />
                   </div>
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Detail Login (Email/Username)</label>
-                  <input 
-                    name="login_info" 
-                    type="text" 
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" 
-                    placeholder="Masukkan email atau username" 
-                  />
-                </div>
               </div>
-              
+
               <div className="p-6 border-t border-slate-100 bg-white">
-                <button 
-                  type="submit" 
-                  disabled={isSubmitting} 
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
                   className="w-full px-4 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
@@ -322,4 +369,3 @@ export default function InventoryPage() {
     </div>
   )
 }
-

@@ -9,15 +9,60 @@ async function main() {
   console.log('Starting seed process...')
 
   try {
-    // 1. CLEANUP
-    console.log('Cleaning up existing data...')
-    await supabase.from('finance_ledger').delete().neq('id', '00000000-0000-0000-0000-000000000000')
-    await supabase.from('payments').delete().neq('id', '00000000-0000-0000-0000-000000000000')
-    await supabase.from('deals').delete().neq('id', '00000000-0000-0000-0000-000000000000')
-    await supabase.from('stocks').delete().neq('id', '00000000-0000-0000-0000-000000000000')
-    await supabase.from('accounts').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+// 1. CLEANUP
+  console.log('Cleaning up existing data...')
+  await supabase.from('finance_ledger').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+  await supabase.from('payments').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+  await supabase.from('deals').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+  await supabase.from('stocks').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+  await supabase.from('inventory').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+  await supabase.from('accounts').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+  await supabase.from('games').delete().neq('id', '00000000-0000-0000-0000-000000000000')
 
-    // 2. SEED ACCOUNTS
+    // 2. SEED GAMES
+  console.log('Seeding Games...')
+  const gameCategories = [
+    { name: 'Mobile Legends', slug: 'mobile-legends' },
+    { name: 'Free Fire', slug: 'free-fire' },
+    { name: 'Roblox', slug: 'roblox' },
+    { name: 'PUBG Mobile', slug: 'pubg-mobile' },
+    { name: 'Genshin Impact', slug: 'genshin-impact' },
+    { name: 'Valorant', slug: 'valorant' },
+    { name: 'Lainnya', slug: 'lainnya' },
+  ]
+
+  const { error: gamesError } = await supabase.from('games').insert(
+    gameCategories.map(cat => ({
+      name: cat.name,
+      slug: cat.slug,
+    }))
+  )
+
+  if (gamesError) throw gamesError
+
+  // Fetch seeded games for inventory references
+  const { data: allGames } = await supabase.from('games').select('id, name').order('name')
+
+  // 3. SEED INVENTORY
+  console.log('Seeding Inventory...')
+  const gameMap: Record<string, string> = {}
+  if (allGames) {
+    for (const g of allGames) {
+      gameMap[g.name] = g.id
+    }
+  }
+
+  const { error: inventoryError } = await supabase.from('inventory').insert([
+    { game_id: gameMap['Mobile Legends'], title_reference: 'MLBB Mythic Glory 120 Skins', account_specs: 'Login Moonton/VK. Winrate 65%.', capital_price: 800000, asking_price: 1500000, status: 'AVAILABLE', added_by: null },
+    { game_id: gameMap['Valorant'], title_reference: 'Valorant Ascendant 3 - Kuronami Bundle', account_specs: 'Riot Games Login. Asia Pacific.', capital_price: 1200000, asking_price: 2000000, status: 'AVAILABLE', added_by: null },
+    { game_id: gameMap['Genshin Impact'], title_reference: 'Genshin AR 60 - 20 C6 5-Stars', account_specs: 'Hoyoverse Login. Asia Server. All map 100%.', capital_price: 2500000, asking_price: 4000000, status: 'AVAILABLE', added_by: null },
+    { game_id: gameMap['PUBG Mobile'], title_reference: 'PUBG Conqueror S19 - Glacier M416 Max', account_specs: 'Twitter Login. Global version.', capital_price: 1500000, asking_price: 2500000, status: 'AVAILABLE', added_by: null },
+    { game_id: gameMap['Free Fire'], title_reference: 'FF Sultan Old Account - Elite Pass S1-S5', account_specs: 'VK Login. Indo Server.', capital_price: 600000, asking_price: 1000000, status: 'AVAILABLE', added_by: null },
+  ])
+
+  if (inventoryError) throw inventoryError
+
+  // 4. SEED ACCOUNTS
     console.log('Seeding Accounts...')
     const { data: accounts, error: accountsError } = await supabase.from('accounts').insert([
       { name: 'QRIS Ferryshop', account_number: 'QRIS-001', balance: 15000000 },

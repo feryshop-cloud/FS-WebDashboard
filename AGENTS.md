@@ -6,6 +6,83 @@ tools: Read, Write, Edit, Bash, Glob, Grep
 
 You are a senior fullstack developer specializing in complete feature development across the modern TypeScript-first stack: Next.js 15+ / React 19, Node.js 22+ with Hono or tRPC, PostgreSQL with Drizzle ORM, and deployment to Vercel / Railway / Fly.io. Your primary focus is delivering cohesive, end-to-end solutions that work seamlessly from database to user interface.
 
+## Repository Shell Command Map
+
+This project is normally operated from Windows PowerShell 5.1, even when a tool labels the shell as `bash`. Do not assume GNU/Linux shell semantics. Run project commands from `game-inventori/`, not from the repository root.
+
+### Project Commands
+
+| Task | PowerShell command |
+|---|---|
+| Enter app directory | `cd D:\01_Projects\freelance\project-FS\game-inventori` |
+| Install dependencies | `npm install` |
+| Start dev server | `npm run dev` |
+| Start dev server on port | `npm run dev -- --port 3002` |
+| Production build | `npm run build` |
+| Start production server | `npm run start` |
+| Lint | `npm run lint` |
+| Create admin user | `npm run create-admin` |
+
+### Linux to PowerShell Map
+
+| Linux command | PowerShell 5.1 equivalent | Notes |
+|---|---|---|
+| `pwd` | `Get-Location` | Shows current directory. |
+| `ls` / `ls -la` | `Get-ChildItem` / `Get-ChildItem -Force` | Use `-Force` for hidden files. |
+| `cd path` | `Set-Location path` or `cd path` | `cd` works in PowerShell. |
+| `cat file` | `Get-Content file` | Use `-Raw` for whole-file text. |
+| `head -n 40 file` | `Get-Content file -TotalCount 40` | First lines. |
+| `tail -n 40 file` | `Get-Content file | Select-Object -Last 40` | Last lines. |
+| `tail -f file` | `Get-Content file -Wait` | Follow logs. |
+| `grep "text" file` | `Select-String -Path file -Pattern "text"` | Prefer `rg` when available. |
+| `grep -R "text" .` | `rg "text" .` | Fast recursive search. |
+| `find . -name "*.tsx"` | `Get-ChildItem -Recurse -Filter *.tsx` | File search by name. |
+| `rg --files` | `rg --files` | Same command, preferred for file listing. |
+| `sed -n '1,120p' file` | `Get-Content file -TotalCount 120` | For simple reads only. |
+| `wc -l file` | `(Get-Content file).Count` | Line count. |
+| `cp src dst` | `Copy-Item src dst` | Use `-Recurse` for directories. |
+| `mv src dst` | `Move-Item src dst` | Rename or move. |
+| `mkdir -p dir` | `New-Item -ItemType Directory -Force dir` | Creates parent directories. |
+| `touch file` | `New-Item -ItemType File -Force file` | Creates file if missing. |
+| `rm file` | `Remove-Item file` | File delete. |
+| `rm -rf dir` | `Remove-Item dir -Recurse -Force` | Verify path before recursive delete. |
+| `chmod +x script.sh` | Not normally needed on Windows | Use only in Linux/WSL/deploy context. |
+| `env` / `printenv` | `Get-ChildItem Env:` | Lists env vars. |
+| `echo $VAR` | `$env:VAR` | Reads env var. |
+| `export VAR=value` | `$env:VAR = "value"` | Sets env var for current session. |
+| `which node` | `Get-Command node` | Locate executable. |
+| `ps aux` | `Get-Process` | Process list. |
+| `kill -9 PID` | `Stop-Process -Id PID -Force` | Stop process. |
+| `lsof -i :3000` | `Get-NetTCPConnection -LocalPort 3000` | Check port usage. |
+| `curl URL` | `Invoke-WebRequest -Uri URL -UseBasicParsing` | `curl` may alias to `Invoke-WebRequest`. |
+| `curl -I URL` | `Invoke-WebRequest -Uri URL -Method Head` | Header check. |
+| `2>/dev/null` | `-ErrorAction SilentlyContinue` | PowerShell error suppression. |
+| `npm run lint 2>&1 \| tail -20` | `npm run lint 2>&1 \| Select-Object -Last 20` | Show the last 20 lint output lines in PowerShell. |
+| `npm run lint 2>&1 \| grep -E "inventory/page\|settings/page\|GameCategoryManager\|actions/inventory\|actions/settings\|seed\.ts\|0009_games"` | `npm run lint 2>&1 \| Select-String -Pattern "inventory/page\|settings/page\|GameCategoryManager\|actions/inventory\|actions/settings\|seed\.ts\|0009_games"` | Filter lint output with a regex in PowerShell. |
+| `cmd1 && cmd2` | `cmd1; if ($?) { cmd2 }` | `&&` is invalid in PowerShell 5.1. |
+| `cmd1 \|\| cmd2` | `cmd1; if (-not $?) { cmd2 }` | Failure fallback. |
+
+### Git Commands
+
+| Task | Command |
+|---|---|
+| Status | `git status --short` |
+| Review unstaged diff | `git diff` |
+| Review staged diff | `git diff --staged` |
+| Show recent commits | `git log --oneline -n 20` |
+| Stage file | `git add path\to\file` |
+| Commit | `git commit -m "type: message"` |
+| Pull fast-forward only | `git pull --ff-only` |
+| Push current branch | `git push` |
+
+### Safety Rules
+
+- Never commit `.env.local`.
+- Do not expose or load `SUPABASE_SERVICE_ROLE_KEY` in frontend code.
+- Prefer `rg` / `rg --files` for searches.
+- Before recursive delete or move, verify the absolute target path is inside the intended workspace.
+- Apply `supabase/schema_draft.sql` or migrations intentionally; do not run destructive DB commands just to inspect data.
+
 ## Focus Areas
 
 - **TypeScript-first stack**: shared types and Zod schemas between backend and frontend, strict mode throughout

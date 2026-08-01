@@ -4,15 +4,17 @@ import { useState, useTransition, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { addGameCategory, updateGameCategory, deleteGameCategory } from '@/actions/settings'
 import { uploadImage } from '@/actions/upload'
+import type { Database } from '@/types/database.types'
 import { Loader2, Plus, Check, Gamepad2, Edit2, Trash2 } from 'lucide-react'
 
-export function GameCategoryManager({ initialGames, errorMsg }: { initialGames: any[], errorMsg?: string }) {
+type Game = Database['public']['Tables']['games']['Row']
+
+export function GameCategoryManager({ initialGames, errorMsg }: { initialGames: Game[]; errorMsg?: string }) {
   const router = useRouter()
-  const [games, setGames] = useState<any[]>(initialGames)
+  const [games, setGames] = useState<Game[]>(initialGames)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [name, setName] = useState('')
   const [slug, setSlug] = useState('')
-  // Store the existing image URL to show when editing
   const [existingImageUrl, setExistingImageUrl] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<string | null>(null)
@@ -27,12 +29,12 @@ export function GameCategoryManager({ initialGames, errorMsg }: { initialGames: 
     }
   }
 
-  const handleEditClick = (game: any) => {
+  const handleEditClick = (game: Game) => {
     setEditingId(game.id)
     setName(game.name)
     setSlug(game.slug)
     setExistingImageUrl(game.image_url || '')
-    if (fileInputRef.current) fileInputRef.current.value = '' // Clear selected file
+    if (fileInputRef.current) fileInputRef.current.value = ''
     setError(null)
     setSuccess(false)
   }
@@ -49,20 +51,17 @@ export function GameCategoryManager({ initialGames, errorMsg }: { initialGames: 
 
   const handleDelete = (id: string) => {
     if (!window.confirm('Yakin ingin menghapus kategori ini?')) return
-    
-    // Optimistic: instantly remove from local state
+
     setGames(prev => prev.filter(g => g.id !== id))
     if (editingId === id) handleCancelEdit()
 
     startTransition(async () => {
       const result = await deleteGameCategory(id)
       if (!result.success) {
-        // Rollback: restore the list since server failed
         setGames(initialGames)
         alert(`Gagal menghapus: ${result.error}`)
       } else {
-        // Hard reload to shatter Next.js cache completely
-        window.location.reload()
+        router.refresh()
       }
     })
   }
@@ -74,12 +73,12 @@ export function GameCategoryManager({ initialGames, errorMsg }: { initialGames: 
 
     startTransition(async () => {
       let finalImageUrl = existingImageUrl
-      
+
       const file = fileInputRef.current?.files?.[0]
       if (file) {
         const formData = new FormData()
         formData.append('file', file)
-        
+
         const uploadResult = await uploadImage(formData)
         if (!uploadResult.success || !uploadResult.url) {
           setError(uploadResult.error || 'Gagal mengupload gambar.')
@@ -94,7 +93,7 @@ export function GameCategoryManager({ initialGames, errorMsg }: { initialGames: 
       } else {
         result = await addGameCategory(name, slug, finalImageUrl)
       }
-      
+
       if (result.success) {
         setSuccess(true)
         setEditingId(null)
@@ -102,8 +101,7 @@ export function GameCategoryManager({ initialGames, errorMsg }: { initialGames: 
         setSlug('')
         setExistingImageUrl('')
         if (fileInputRef.current) fileInputRef.current.value = ''
-        // Hard reload to guarantee the table fetches fresh data from the DB
-        window.location.reload()
+        router.refresh()
       } else {
         setError(result.error || 'An unexpected error occurred.')
       }
@@ -226,7 +224,7 @@ export function GameCategoryManager({ initialGames, errorMsg }: { initialGames: 
               {games.length} Total
             </span>
           </div>
-          
+
           <div className="p-0 flex-1 overflow-auto">
             {errorMsg ? (
               <div className="p-6 text-sm text-rose-600 bg-rose-50/50">
@@ -244,7 +242,7 @@ export function GameCategoryManager({ initialGames, errorMsg }: { initialGames: 
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50 text-slate-600">
-                  {games.map((game: any) => (
+                  {games.map((game: Game) => (
                     <tr key={game.id} className="hover:bg-slate-50/50 transition-colors">
                       <td className="px-3 py-2">
                         {game.image_url ? (
@@ -260,7 +258,7 @@ export function GameCategoryManager({ initialGames, errorMsg }: { initialGames: 
                         {game.slug}
                       </td>
                       <td className="px-3 py-2 text-right text-slate-400">
-                        {new Date(game.created_at).toLocaleDateString('en-GB', {
+                        {new Date(game.created_at || '').toLocaleDateString('en-GB', {
                           day: 'numeric',
                           month: 'short',
                           year: 'numeric'
@@ -268,14 +266,14 @@ export function GameCategoryManager({ initialGames, errorMsg }: { initialGames: 
                       </td>
                       <td className="px-3 py-2 text-center">
                         <div className="flex items-center justify-center gap-3">
-                          <button 
+                          <button
                             onClick={() => handleEditClick(game)}
                             className="p-1 hover:bg-slate-100 rounded-md transition-colors text-blue-500"
                             title="Edit"
                           >
                             <Edit2 className="h-4 w-4" />
                           </button>
-                          <button 
+                          <button
                             onClick={() => handleDelete(game.id)}
                             className="p-1 hover:bg-slate-100 rounded-md transition-colors text-red-500"
                             title="Hapus"
