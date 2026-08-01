@@ -19,6 +19,7 @@ CREATE OR REPLACE FUNCTION public.inventory_title_vector(
 RETURNS vector
 LANGUAGE plpgsql
 IMMUTABLE
+SET search_path = public
 AS $$
 DECLARE
   v_vec REAL[];
