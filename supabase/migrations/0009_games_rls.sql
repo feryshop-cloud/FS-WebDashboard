@@ -1,12 +1,19 @@
-ALTER TABLE games ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.games ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Allow authenticated read access"
-ON games FOR SELECT
-TO authenticated
+DROP POLICY IF EXISTS "Public can read games" ON public.games;
+DROP POLICY IF EXISTS "Allow authenticated read access" ON public.games;
+DROP POLICY IF EXISTS "Allow admin insert" ON public.games;
+DROP POLICY IF EXISTS "Allow admin update" ON public.games;
+DROP POLICY IF EXISTS "Allow admin delete" ON public.games;
+
+CREATE POLICY "Public can read games"
+ON public.games FOR SELECT
+TO anon, authenticated
 USING (true);
 
+
 CREATE POLICY "Allow admin insert"
-ON games FOR INSERT
+ON public.games FOR INSERT
 TO authenticated
 WITH CHECK (
   EXISTS (
@@ -20,8 +27,18 @@ WITH CHECK (
 );
 
 CREATE POLICY "Allow admin update"
-ON games FOR UPDATE
+ON public.games FOR UPDATE
 TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM users
+    WHERE id = auth.uid()
+    AND role_id IN (
+      SELECT id FROM roles
+      WHERE name IN ('OWNER', 'ADMIN')
+    )
+  )
+)
 WITH CHECK (
   EXISTS (
     SELECT 1 FROM users
@@ -34,9 +51,9 @@ WITH CHECK (
 );
 
 CREATE POLICY "Allow admin delete"
-ON games FOR DELETE
+ON public.games FOR DELETE
 TO authenticated
-WITH CHECK (
+USING (
   EXISTS (
     SELECT 1 FROM users
     WHERE id = auth.uid()

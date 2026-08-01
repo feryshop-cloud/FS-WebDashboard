@@ -83,6 +83,13 @@ This project is normally operated from Windows PowerShell 5.1, even when a tool 
 - Before recursive delete or move, verify the absolute target path is inside the intended workspace.
 - Apply `supabase/schema_draft.sql` or migrations intentionally; do not run destructive DB commands just to inspect data.
 
+### Storage
+
+- The game image bucket is **Railway's S3 bucket named `ample-packet-nw8fpynabfcu`**.
+- Game images/logos are served through `FS-Public/src/app/api/storage/[...key]/route.ts` (S3 SigV4 signed reads), configured via `BUCKET`, `ENDPOINT`, `REGION`, `ACCESS_KEY_ID`, `SECRET_ACCESS_KEY`.
+- The database stores relative paths like `/api/storage/games/logo/mlbb-icon.webp` that map to object keys `games/logo/...` in that bucket.
+- Do not confuse this with the Supabase `images`/`screenshots` storage buckets used by `actions/upload.ts`.
+
 ## Focus Areas
 
 - **TypeScript-first stack**: shared types and Zod schemas between backend and frontend, strict mode throughout
