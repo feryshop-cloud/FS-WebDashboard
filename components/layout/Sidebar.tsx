@@ -25,7 +25,10 @@ import {
 } from "lucide-react";
 import { logout } from "../../actions/logout";
 
-const SIDEBAR_LOGO_URL = "/img/logo.jpeg";
+const routePrefix = process.env.NEXT_PUBLIC_BASE_PATH?.trim();
+const basePath =
+  routePrefix && routePrefix !== "/" ? `/${routePrefix.replace(/^\/+|\/+$/g, "")}` : "";
+const SIDEBAR_LOGO_URL = `${basePath}/img/logo.jpeg`;
 
 const navGroups = [
   {
