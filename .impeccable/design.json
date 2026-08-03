@@ -1,0 +1,252 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-03T00:00:00.000Z",
+  "title": "Design System: Feryshop Dashboard",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Calm Blue",
+        "canonical": "#2563EB",
+        "tonalRamp": ["#1E3A8A", "#1E40AF", "#1D4ED8", "#2563EB", "#3B82F6", "#60A5FA", "#93C5FD", "#EFF6FF"]
+      },
+      "primary-deep": {
+        "role": "primary",
+        "displayName": "Calm Blue Deep",
+        "canonical": "#1D4ED8",
+        "tonalRamp": ["#1E3A8A", "#1E40AF", "#1D4ED8", "#2563EB", "#3B82F6", "#60A5FA", "#93C5FD", "#EFF6FF"]
+      },
+      "primary-halo": {
+        "role": "primary",
+        "displayName": "Calm Blue Halo",
+        "canonical": "#EFF6FF",
+        "tonalRamp": ["#1E3A8A", "#1E40AF", "#1D4ED8", "#2563EB", "#3B82F6", "#60A5FA", "#93C5FD", "#EFF6FF"]
+      },
+      "canvas": {
+        "role": "neutral",
+        "displayName": "Slate Canvas",
+        "canonical": "#F8FAFC",
+        "tonalRamp": ["#020617", "#0F172A", "#1E293B", "#334155", "#475569", "#64748B", "#94A3B8", "#F8FAFC"]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Pure White",
+        "canonical": "#FFFFFF",
+        "tonalRamp": ["#020617", "#0F172A", "#1E293B", "#475569", "#64748B", "#94A3B8", "#E2E8F0", "#FFFFFF"]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#0F172A",
+        "tonalRamp": ["#020617", "#0F172A", "#1E293B", "#334155", "#475569", "#64748B", "#94A3B8", "#E2E8F0"]
+      },
+      "ink-secondary": {
+        "role": "neutral",
+        "displayName": "Secondary Ink",
+        "canonical": "#64748B",
+        "tonalRamp": ["#020617", "#0F172A", "#1E293B", "#334155", "#475569", "#64748B", "#94A3B8", "#CBD5E1"]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#E2E8F0",
+        "tonalRamp": ["#0F172A", "#334155", "#64748B", "#94A3B8", "#CBD5E1", "#E2E8F0", "#F1F5F9", "#F8FAFC"]
+      },
+      "success": {
+        "role": "semantic",
+        "displayName": "Soft Emerald",
+        "canonical": "#059669",
+        "tonalRamp": ["#064E3B", "#065F46", "#047857", "#059669", "#10B981", "#34D399", "#6EE7B7", "#ECFDF5"]
+      },
+      "warning": {
+        "role": "semantic",
+        "displayName": "Soft Amber",
+        "canonical": "#D97706",
+        "tonalRamp": ["#78350F", "#92400E", "#B45309", "#D97706", "#F59E0B", "#FBBF24", "#FCD34D", "#FFFBEB"]
+      },
+      "danger": {
+        "role": "semantic",
+        "displayName": "Soft Red",
+        "canonical": "#DC2626",
+        "tonalRamp": ["#7F1D1D", "#991B1B", "#B91C1C", "#DC2626", "#EF4444", "#F87171", "#FCA5A5", "#FEF2F2"]
+      },
+      "violet": {
+        "role": "semantic",
+        "displayName": "Calm Violet",
+        "canonical": "#9333EA",
+        "tonalRamp": ["#581C87", "#6B21A8", "#7E22CE", "#9333EA", "#A855F7", "#C084FC", "#D8B4FE", "#FAF5FF"]
+      },
+      "orange": {
+        "role": "semantic",
+        "displayName": "Warm Orange",
+        "canonical": "#EA580C",
+        "tonalRamp": ["#7C2D12", "#9A3412", "#C2410C", "#EA580C", "#F97316", "#FB923C", "#FDBA74", "#FFF7ED"]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Page titles only. Tight tracking, bold weight."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Default interface text; tables use 13px."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Uppercase micro-labels, sidebar groups, stat labels, table headers."
+      },
+      "mono": {
+        "displayName": "Mono",
+        "purpose": "Prices, codes, and sensitive numeric values so columns align."
+      }
+    },
+    "shadows": [
+      {
+        "name": "card-rest",
+        "value": "0 1px 2px rgba(0,0,0,0.05)",
+        "purpose": "Resting elevation on cards, tables, and panels (Tailwind shadow-sm)."
+      },
+      {
+        "name": "card-hover",
+        "value": "0 4px 6px -1px rgba(0,0,0,0.10)",
+        "purpose": "Hover rise on interactive cards (shadow-md)."
+      },
+      {
+        "name": "overlay",
+        "value": "0 25px 50px -12px rgba(0,0,0,0.25)",
+        "purpose": "Modals, slide-over drawers, and dropdown menus (shadow-2xl)."
+      },
+      {
+        "name": "soft-main",
+        "value": "0 4px 20px -4px rgba(15,23,42,0.04)",
+        "purpose": "Intended main-card shadow per design docs (--shadow-soft-main)."
+      },
+      {
+        "name": "soft-hover",
+        "value": "0 8px 30px -6px rgba(15,23,42,0.08)",
+        "purpose": "Intended hover shadow per design docs (--shadow-soft-hover)."
+      },
+      {
+        "name": "soft-primary",
+        "value": "0 2px 10px -3px rgba(37,99,235,0.20)",
+        "purpose": "Intended button glow per design docs (--shadow-soft-primary)."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-in-out",
+        "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Standard easing for state transitions (sidebar, buttons, hover)."
+      },
+      {
+        "name": "duration-200",
+        "value": "200ms",
+        "purpose": "Default transition duration for interactive elements."
+      },
+      {
+        "name": "duration-300",
+        "value": "300ms",
+        "purpose": "Layout transitions (sidebar collapse, drawer slide-in)."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Calm Blue primary action; hover deepens to blue-700.",
+      "html": "<button class=\"ds-btn-primary\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 5v14M5 12h14\"/></svg>Tambah Stok</button>",
+      "css": ".ds-btn-primary { display:inline-flex; align-items:center; justify-content:center; gap:8px; border:none; cursor:pointer; border-radius:10px; background:#2563EB; color:#fff; padding:10px 24px; font-family:inherit; font-size:14px; font-weight:600; box-shadow:0 1px 2px rgba(0,0,0,.05), 0 2px 10px -3px rgba(37,99,235,.2); transition:background-color .2s; } .ds-btn-primary:hover { background:#1D4ED8; } .ds-btn-primary:focus-visible { outline:2px solid #2563EB; outline-offset:2px; } .ds-btn-primary:active { background:#1E40AF; } .ds-btn-primary:disabled { cursor:not-allowed; opacity:.7; } .ds-btn-primary svg { width:16px; height:16px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Quiet outline button for exports, filters, and cancels.",
+      "html": "<button class=\"ds-btn-secondary\">Export</button>",
+      "css": ".ds-btn-secondary { display:inline-flex; align-items:center; justify-content:center; gap:8px; cursor:pointer; border-radius:10px; border:1px solid #D1D5DB; background:#fff; color:#374151; padding:10px 20px; font-family:inherit; font-size:14px; font-weight:600; box-shadow:0 1px 2px rgba(0,0,0,.05); transition:background-color .2s; } .ds-btn-secondary:hover { background:#F9FAFB; } .ds-btn-secondary:focus-visible { outline:2px solid #2563EB; outline-offset:2px; } .ds-btn-secondary:disabled { cursor:not-allowed; opacity:.6; }"
+    },
+    {
+      "name": "Danger Button",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Destructive confirmation; red fill with tinted red glow.",
+      "html": "<button class=\"ds-btn-danger\">Hapus</button>",
+      "css": ".ds-btn-danger { display:inline-flex; align-items:center; justify-content:center; gap:8px; cursor:pointer; border:none; border-radius:10px; background:#DC2626; color:#fff; padding:10px 20px; font-family:inherit; font-size:14px; font-weight:600; box-shadow:0 1px 2px rgba(0,0,0,.05), 0 2px 10px -3px rgba(220,38,38,.2); transition:background-color .2s; } .ds-btn-danger:hover { background:#B91C1C; } .ds-btn-danger:focus-visible { outline:2px solid #DC2626; outline-offset:2px; } .ds-btn-danger:disabled { cursor:not-allowed; opacity:.7; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "White field with hairline border; Calm Blue focus ring.",
+      "html": "<label style=\"display:block;font-size:12px;font-weight:500;color:#64748B;margin-bottom:6px;\">Harga Modal</label><input class=\"ds-input\" type=\"text\" placeholder=\"Rp 500.000\">",
+      "css": ".ds-input { width:100%; box-sizing:border-box; border-radius:10px; border:1px solid #D1D5DB; background:#fff; color:#0F172A; padding:10px 16px; font-family:inherit; font-size:14px; outline:none; transition:border-color .15s, box-shadow .15s; } .ds-input::placeholder { color:#94A3B8; } .ds-input:focus { border-color:#3B82F6; box-shadow:0 0 0 2px rgba(59,130,246,.5); } .ds-input:disabled { background:#F9FAFB; color:#9CA3AF; cursor:not-allowed; }"
+    },
+    {
+      "name": "Status Badge",
+      "kind": "chip",
+      "refersTo": "badge-status",
+      "description": "Muted tinted status chip with 50-bg, 600-text, hairline ring.",
+      "html": "<span class=\"ds-badge ds-badge-success\">Tersedia</span> <span class=\"ds-badge ds-badge-warning\">Booking</span> <span class=\"ds-badge ds-badge-danger\">Bermasalah</span>",
+      "css": ".ds-badge { display:inline-flex; align-items:center; border-radius:10px; padding:4px 10px; font-family:inherit; font-size:12px; font-weight:500; line-height:1.4; } .ds-badge-success { background:#ECFDF5; color:#059669; box-shadow:inset 0 0 0 1px rgba(167,243,208,.5); } .ds-badge-warning { background:#FFFBEB; color:#D97706; box-shadow:inset 0 0 0 1px rgba(253,230,138,.5); } .ds-badge-danger { background:#FEF2F2; color:#DC2626; box-shadow:inset 0 0 0 1px rgba(254,202,202,.5); }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card-surface",
+      "description": "Pure white metric/panel card with hairline border and rest shadow.",
+      "html": "<div class=\"ds-card\"><div style=\"font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#64748B;\">Omzet</div><div style=\"margin-top:8px;font-size:24px;font-weight:700;letter-spacing:-.025em;color:#0F172A;\">Rp 12.450.000</div></div>",
+      "css": ".ds-card { border-radius:12px; border:1px solid #F1F5F9; background:#fff; padding:24px; box-shadow:0 1px 2px rgba(0,0,0,.05); }"
+    },
+    {
+      "name": "Sidebar Nav Item",
+      "kind": "nav",
+      "refersTo": "nav-item-active",
+      "description": "Collapsible rail item; active state is Calm Blue Halo fill.",
+      "html": "<nav style=\"display:flex;flex-direction:column;gap:4px;width:240px;\"><a class=\"ds-nav\" href=\"#\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect width=\"7\" height=\"9\" x=\"3\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"5\" x=\"14\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"9\" x=\"14\" y=\"12\" rx=\"1\"/><rect width=\"7\" height=\"5\" x=\"3\" y=\"16\" rx=\"1\"/></svg>Daftar Stok</a><a class=\"ds-nav\" data-active=\"true\" href=\"#\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect width=\"7\" height=\"9\" x=\"3\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"5\" x=\"14\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"9\" x=\"14\" y=\"12\" rx=\"1\"/><rect width=\"7\" height=\"5\" x=\"3\" y=\"16\" rx=\"1\"/></svg>Command Center</a></nav>",
+      "css": ".ds-nav { display:flex; align-items:center; gap:12px; border-radius:8px; padding:10px 12px; font-family:inherit; font-size:14px; font-weight:500; color:#64748B; text-decoration:none; transition:background-color .2s, color .2s; } .ds-nav svg { width:20px; height:20px; flex-shrink:0; } .ds-nav:hover { background:#F8FAFC; color:#0F172A; } .ds-nav[data-active=\"true\"] { background:#EFF6FF; color:#2563EB; } .ds-nav[data-active=\"true\"] svg { stroke-width:2; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Ledger Room",
+    "overview": "Feryshop's dashboard is designed to feel like a calm, well-run back office where every number sits in its place — quiet, orderly, and always traceable. Admins live in this interface for hours across a shift, so the system trades spectacle for stillness: an airy slate canvas (#F8FAFC) carries pure-white surfaces, a single restrained blue accent carries interaction, and status is spoken in muted, soft-tinted chips rather than loud fills. The aesthetic philosophy in the project's own design brief is a 'Human-Made Modern B2B SaaS' look: breathable, premium, and calm, explicitly built to reduce eye strain for staff who stare at tables and dashboards all day. Depth is a whisper at rest and only appears when it earns attention; monospace numeric values reinforce the audit-first discipline.",
+    "keyCharacteristics": [
+      "Single calm blue accent (blue-600) on a slate-50 / white two-layer canvas; no neon, fluorescent, or cyan tones, ever.",
+      "Soft but never pill-shaped corners: 10px controls, 12px cards, 16px imagery; rounded-full reserved for avatars, dots, and circular icon buttons.",
+      "Muted status system: 50-level tinted backgrounds with 600-level text and hairline rings.",
+      "Layered elevation: flat at rest, gentle rise on hover, hard shadow-2xl lift for overlays.",
+      "Comfortable, breathable density with generous whitespace throughout.",
+      "Thin-line lucide icons (strokeWidth 1.5) at 20px in navigation; duotone Phosphor icons for dashboard stats.",
+      "Monospace for numeric and sensitive values, reinforcing the ledger/audit identity."
+    ],
+    "rules": [
+      { "name": "The Calm Blue Rule", "body": "Calm Blue is the one primary accent, used for primary actions and active states only. No neon, fluorescent, or cyan tones appear anywhere in the system. When a module needs emphasis, it borrows Violet or Indigo — never a new blue family.", "section": "colors" },
+      { "name": "The Ledger Line Rule", "body": "Prices, codes, and sensitive values are set in monospace so columns align and codes scan. Numbers are data; they get a fixed-width home.", "section": "typography" },
+      { "name": "The Hairline Rest Rule", "body": "Surfaces are flat at rest — white card, hairline border, whisper of shadow. Depth appears only as a response to state: hover rise, or hard overlay elevation.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do build every surface as white on the slate-50 canvas with a hairline border and a whisper of shadow — the two-layer system is the whole identity.",
+      "Do use Calm Blue as the one primary accent, and deepen it on hover (#1D4ED8) and press (#1E40AF).",
+      "Do speak status through muted 50-tint chips with 600-level text and hairline rings.",
+      "Do keep corners soft: 10px controls, 12px cards, 16px imagery.",
+      "Do reserve rounded-full for avatars, dots, and circular icon buttons only.",
+      "Do set prices, codes, and sensitive values in monospace so columns align.",
+      "Do use thin 20px icons at strokeWidth 1.5 in navigation.",
+      "Do keep density comfortable: p-6 cards, p-8 gutters, 16–24px grid gaps."
+    ],
+    "donts": [
+      "Don't use neon, fluorescent, or cyan tones anywhere — the Calm Blue Rule is absolute.",
+      "Don't use rounded-full on standard buttons, cards, or inputs.",
+      "Don't leave main cards resting on heavy shadow-md/shadow-lg; flat hairline + whisper is the resting state.",
+      "Don't cramp tables or compress cell padding to fit more data.",
+      "Don't introduce new blue families for emphasis — borrow Violet or Indigo for module-level accent instead."
+    ]
+  }
+}

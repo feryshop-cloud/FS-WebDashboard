@@ -45,5 +45,11 @@ next-env.d.ts
 /diff_inventory.txt
 /diff_inventory_utf8.txt
 
-/.kilo
 opencode.json
+
+/.kilo
+/.opencode
+/.gemini
+/.agents
+/.codex
+/.kiro
