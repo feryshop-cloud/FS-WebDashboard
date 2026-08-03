@@ -39,6 +39,7 @@ const navGroups = [
     items: [
       { label: 'Daftar Stok', icon: Package, href: '/dashboard/inventory' },
       { label: 'Pembelian Stok', icon: ShoppingBag, href: '/dashboard/purchases' },
+      { label: 'Produk Top-Up', icon: ShoppingBag, href: '/dashboard/topup-products' },
     ]
   },
   {
