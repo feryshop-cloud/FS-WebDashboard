@@ -1,11 +1,11 @@
 import React from "react";
-import { Users, Gamepad2, Shield } from "lucide-react";
-import { getGames } from "@/actions/settings";
+import { Users, FolderTree, Shield } from "lucide-react";
+import { getCategories } from "@/actions/settings";
 import { GameCategoryManager } from "@/components/features/GameCategoryManager";
 import type { Database } from "@/types/database.types";
 
 export default async function SettingsPage() {
-  const { data: games, error: gamesError } = await getGames();
+  const { data: categories, error: categoriesError } = await getCategories();
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 pb-8">
@@ -27,7 +27,7 @@ export default async function SettingsPage() {
             <Shield className="h-5 w-5" /> Hak Akses / Role
           </button>
           <button className="flex items-center gap-3 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-left text-sm font-semibold text-blue-700 transition-colors">
-            <Gamepad2 className="h-5 w-5" /> Kategori Game
+            <FolderTree className="h-5 w-5" /> Kategori
           </button>
         </div>
 
@@ -141,15 +141,15 @@ export default async function SettingsPage() {
             </div>
           </div>
 
-          {/* GAME CATEGORIES SECTION */}
+          {/* CATEGORIES SECTION */}
           <div className="mt-2 overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm">
             <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-4">
-              <h2 className="text-base font-bold text-slate-800">Master Kategori Game</h2>
+              <h2 className="text-base font-bold text-slate-800">Master Kategori</h2>
             </div>
             <div className="p-6">
               <GameCategoryManager
-              initialGames={(games as unknown as Database["public"]["Tables"]["games"]["Row"][]) || []}
-                errorMsg={gamesError ? `Gagal memuat kategori: ${gamesError}` : undefined}
+                initialCategories={(categories as unknown as Database["public"]["Tables"]["categories"]["Row"][]) || []}
+                errorMsg={categoriesError ? `Gagal memuat kategori: ${categoriesError}` : undefined}
               />
             </div>
           </div>
@@ -158,3 +158,4 @@ export default async function SettingsPage() {
     </div>
   );
 }
+

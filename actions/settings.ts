@@ -3,7 +3,7 @@
 import { createClient } from "../lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
-export async function addGameCategory(name: string, slug: string, image_url?: string) {
+export async function addGameCategory(title: string, game_slug: string, logo?: string) {
   const supabase = await createClient();
 
   const {
@@ -13,22 +13,20 @@ export async function addGameCategory(name: string, slug: string, image_url?: st
     return { success: false, error: "Unauthorized" };
   }
 
-  if (!name || !slug) {
-    return { success: false, error: "Name and Slug are required." };
+  if (!title || !game_slug) {
+    return { success: false, error: "Title and Game Slug are required." };
   }
 
-  const { error } = await supabase.from("games").insert({
-    name,
-    slug,
-    ...(image_url ? { image_url } : {}),
+  const { error } = await supabase.from("categories").insert({
+    title,
+    game_slug,
+    logo: logo || null,
+    is_active: true,
   });
 
   if (error) {
     console.error("Database Error:", error);
-    if (error.code === "23505") {
-      return { success: false, error: "Kategori game dengan slug ini sudah ada." };
-    }
-    return { success: false, error: "Gagal menambahkan kategori game." };
+    return { success: false, error: "Gagal menambahkan kategori." };
   }
 
   revalidatePath("/dashboard/settings");
@@ -38,10 +36,11 @@ export async function addGameCategory(name: string, slug: string, image_url?: st
 }
 
 export async function updateGameCategory(
-  id: string,
-  name: string,
-  slug: string,
-  image_url?: string,
+  id: number,
+  title: string,
+  game_slug: string,
+  logo?: string,
+  is_active: boolean = true,
 ) {
   const supabase = await createClient();
 
@@ -52,25 +51,23 @@ export async function updateGameCategory(
     return { success: false, error: "Unauthorized" };
   }
 
-  if (!id || !name || !slug) {
-    return { success: false, error: "ID, Name, and Slug are required." };
+  if (!id || !title || !game_slug) {
+    return { success: false, error: "ID, Title, and Game Slug are required." };
   }
 
   const { error } = await supabase
-    .from("games")
+    .from("categories")
     .update({
-      name,
-      slug,
-      image_url: image_url || null,
+      title,
+      game_slug,
+      logo: logo || null,
+      is_active,
     })
     .eq("id", id);
 
   if (error) {
     console.error("Database Error:", error);
-    if (error.code === "23505") {
-      return { success: false, error: "Kategori game dengan slug ini sudah ada." };
-    }
-    return { success: false, error: "Gagal mengupdate kategori game." };
+    return { success: false, error: "Gagal mengupdate kategori." };
   }
 
   revalidatePath("/dashboard/settings");
@@ -79,8 +76,33 @@ export async function updateGameCategory(
   return { success: true };
 }
 
-export async function deleteGameCategory(id: string) {
-  // Use admin client to bypass RLS for destructive mutations
+export async function toggleGameCategoryStatus(id: number, is_active: boolean) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const { error } = await supabase
+    .from("categories")
+    .update({ is_active })
+    .eq("id", id);
+
+  if (error) {
+    console.error("Database Error:", error);
+    return { success: false, error: "Gagal mengubah status kategori." };
+  }
+
+  revalidatePath("/dashboard/settings");
+  revalidatePath("/dashboard/inventory");
+
+  return { success: true };
+}
+
+export async function deleteGameCategory(id: number) {
   const { createAdminClient } = await import("../lib/supabase/admin");
   const supabase = createAdminClient();
 
@@ -88,14 +110,14 @@ export async function deleteGameCategory(id: string) {
     return { success: false, error: "ID is required." };
   }
 
-  const { error, data } = await supabase.from("games").delete().eq("id", id).select();
+  const { error, data } = await supabase.from("categories").delete().eq("id", id).select();
 
   if (error) {
     console.error("[deleteGameCategory] DB Error:", error.message, error.code, error.details);
     return { success: false, error: `Gagal menghapus: ${error.message}` };
   }
 
-  console.log(`[deleteGameCategory] Deleted game id=${id}, rows returned:`, data?.length ?? 0);
+  console.log(`[deleteGameCategory] Deleted category id=${id}, rows returned:`, data?.length ?? 0);
 
   revalidatePath("/dashboard/settings");
   revalidatePath("/dashboard/inventory");
@@ -103,18 +125,19 @@ export async function deleteGameCategory(id: string) {
   return { success: true };
 }
 
-export async function getGames() {
+export async function getCategories() {
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from("games")
-    .select("id, name, slug, image_url, created_at")
-    .order("name");
+    .from("categories")
+    .select("id, title, game_slug, logo, is_active, sort_order, created_at")
+    .order("title");
 
   if (error) {
-    console.error("Error fetching games:", error);
+    console.error("Error fetching categories:", error);
     return { data: null, error: error.message };
   }
 
   return { data, error: null };
 }
+
