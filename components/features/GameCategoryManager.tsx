@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   addGameCategory,
@@ -28,6 +28,7 @@ export function GameCategoryManager({
 }) {
   const router = useRouter();
   const [categories, setCategories] = useState<Category[]>(initialCategories);
+  const [prevCategories, setPrevCategories] = useState(initialCategories);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [title, setTitle] = useState("");
   const [gameSlug, setGameSlug] = useState("");
@@ -38,9 +39,10 @@ export function GameCategoryManager({
   const [isPending, startTransition] = useTransition();
 
   // Keep local state in sync when server props revalidate
-  useEffect(() => {
+  if (initialCategories !== prevCategories) {
+    setPrevCategories(initialCategories);
     setCategories(initialCategories);
-  }, [initialCategories]);
+  }
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
