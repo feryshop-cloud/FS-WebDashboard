@@ -47,6 +47,7 @@ const navGroups = [
     title: "Transaksi & Deal",
     items: [
       { label: "Daftar Deal", icon: ShoppingCart, href: "/dashboard/deals" },
+      { label: "Top-Up Orders", icon: ShoppingBag, href: "/dashboard/topup-orders" },
       { label: "Tukar Tambah", icon: RefreshCw, href: "/dashboard/trade-in" },
     ],
   },
