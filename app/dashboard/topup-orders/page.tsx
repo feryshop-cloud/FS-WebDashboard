@@ -528,6 +528,17 @@ export default function TopupOrdersPage() {
                       <dd className="text-right text-slate-900">{selectedOrder.nickname}</dd>
                     </div>
                   )}
+                  {selectedOrder.account_data &&
+                    typeof selectedOrder.account_data === "object" &&
+                    Object.entries(selectedOrder.account_data as Record<string, unknown>).map(([key, val]) => {
+                      if (key === "id" || key === "server") return null; // already shown above
+                      return (
+                        <div key={key} className="flex justify-between gap-4">
+                          <dt className="text-slate-500 capitalize">{key.replace(/_/g, " ")}</dt>
+                          <dd className="text-right font-mono text-slate-900 select-all">{String(val ?? "-")}</dd>
+                        </div>
+                      );
+                    })}
                   <div className="flex justify-between gap-4">
                     <dt className="text-slate-500">Qty</dt>
                     <dd className="text-right font-medium text-slate-900">

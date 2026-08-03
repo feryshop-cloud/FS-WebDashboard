@@ -1,4 +1,4 @@
-﻿export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -555,6 +555,7 @@ export type Database = {
       }
       orders: {
         Row: {
+          account_data: Json | null
           buy_status: string
           created_at: string
           discount_price: number | null
@@ -590,6 +591,7 @@ export type Database = {
           whatsapp: string | null
         }
         Insert: {
+          account_data?: Json | null
           buy_status?: string
           created_at?: string
           discount_price?: number | null
@@ -625,6 +627,7 @@ export type Database = {
           whatsapp?: string | null
         }
         Update: {
+          account_data?: Json | null
           buy_status?: string
           created_at?: string
           discount_price?: number | null
