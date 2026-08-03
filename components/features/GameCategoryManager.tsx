@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useRef } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   addGameCategory,
@@ -8,9 +8,14 @@ import {
   deleteGameCategory,
   toggleGameCategoryStatus,
 } from "@/actions/settings";
-import { uploadImage } from "@/actions/upload";
 import type { Database } from "@/types/database.types";
 import { Loader2, Plus, Check, FolderTree, Edit2, Trash2, Power } from "lucide-react";
+import {
+  CategoryIcon,
+  CategoryIconPicker,
+  LUCIDE_PREFIX,
+  lucideIconName,
+} from "@/components/features/CategoryIconPicker";
 
 type Category = Database["public"]["Tables"]["categories"]["Row"];
 
@@ -26,12 +31,16 @@ export function GameCategoryManager({
   const [editingId, setEditingId] = useState<number | null>(null);
   const [title, setTitle] = useState("");
   const [gameSlug, setGameSlug] = useState("");
-  const [existingLogoUrl, setExistingLogoUrl] = useState("");
+  const [selectedIcon, setSelectedIcon] = useState("");
   const [isActive, setIsActive] = useState<boolean>(true);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  // Keep local state in sync when server props revalidate
+  useEffect(() => {
+    setCategories(initialCategories);
+  }, [initialCategories]);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
@@ -50,9 +59,8 @@ export function GameCategoryManager({
     setEditingId(cat.id);
     setTitle(cat.title);
     setGameSlug(cat.game_slug);
-    setExistingLogoUrl(cat.logo || "");
+    setSelectedIcon(lucideIconName(cat.logo) || "");
     setIsActive(cat.is_active ?? true);
-    if (fileInputRef.current) fileInputRef.current.value = "";
     setError(null);
     setSuccess(false);
   };
@@ -61,9 +69,8 @@ export function GameCategoryManager({
     setEditingId(null);
     setTitle("");
     setGameSlug("");
-    setExistingLogoUrl("");
+    setSelectedIcon("");
     setIsActive(true);
-    if (fileInputRef.current) fileInputRef.current.value = "";
     setError(null);
     setSuccess(false);
   };
@@ -109,26 +116,25 @@ export function GameCategoryManager({
     setSuccess(false);
 
     startTransition(async () => {
-      let finalLogoUrl = existingLogoUrl;
+      const finalLogo = selectedIcon ? `${LUCIDE_PREFIX}${selectedIcon}` : null;
 
-      const file = fileInputRef.current?.files?.[0];
-      if (file) {
-        const formData = new FormData();
-        formData.append("file", file);
-
-        const uploadResult = await uploadImage(formData);
-        if (!uploadResult.success || !uploadResult.url) {
-          setError(uploadResult.error || "Gagal mengupload gambar/logo.");
-          return;
-        }
-        finalLogoUrl = uploadResult.url;
-      }
-
-      let result;
+      let result: { success: boolean; error?: string; data?: Category | null };
       if (editingId) {
-        result = await updateGameCategory(editingId, title, gameSlug, finalLogoUrl, isActive);
+        result = await updateGameCategory(editingId, title, gameSlug, finalLogo || undefined, isActive);
+        if (result.success) {
+          setCategories((prev) =>
+            prev.map((c) =>
+              c.id === editingId
+                ? { ...c, title, game_slug: gameSlug, logo: finalLogo, is_active: isActive }
+                : c,
+            ),
+          );
+        }
       } else {
-        result = await addGameCategory(title, gameSlug, finalLogoUrl);
+        result = await addGameCategory(title, gameSlug, finalLogo || undefined);
+        if (result.success && result.data) {
+          setCategories((prev) => [...prev, result.data as Category]);
+        }
       }
 
       if (result.success) {
@@ -136,9 +142,8 @@ export function GameCategoryManager({
         setEditingId(null);
         setTitle("");
         setGameSlug("");
-        setExistingLogoUrl("");
+        setSelectedIcon("");
         setIsActive(true);
-        if (fileInputRef.current) fileInputRef.current.value = "";
         router.refresh();
       } else {
         setError(result.error || "Terjadi kesalahan saat menyimpan kategori.");
@@ -199,31 +204,7 @@ export function GameCategoryManager({
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <label className="block text-sm font-medium text-slate-700" htmlFor="imageFile">
-                  Logo / Icon (Opsional)
-                </label>
-                {existingLogoUrl && (
-                  <div className="mb-2 flex items-center gap-2 text-xs text-slate-500">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={existingLogoUrl}
-                      alt="Current logo"
-                      className="h-8 w-8 rounded border border-slate-200 object-cover"
-                    />
-                    <span className="truncate">
-                      Logo saat ini sudah ada. Upload baru untuk mengganti.
-                    </span>
-                  </div>
-                )}
-                <input
-                  id="imageFile"
-                  type="file"
-                  accept="image/*"
-                  ref={fileInputRef}
-                  className="w-full rounded-[10px] border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 transition-colors file:mr-4 file:rounded-md file:border-0 file:bg-blue-50 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-blue-700 hover:file:bg-blue-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
-                />
-              </div>
+              <CategoryIconPicker value={selectedIcon} onChange={setSelectedIcon} />
 
               {editingId && (
                 <div className="flex items-center gap-3 pt-1">
@@ -329,7 +310,14 @@ export function GameCategoryManager({
                       }`}
                     >
                       <td className="px-3 py-2">
-                        {cat.logo ? (
+                        {lucideIconName(cat.logo) ? (
+                          <div className="flex h-8 w-8 items-center justify-center rounded border border-blue-100 bg-blue-50 text-blue-600">
+                            <CategoryIcon
+                              name={lucideIconName(cat.logo)!}
+                              className="h-4 w-4"
+                            />
+                          </div>
+                        ) : cat.logo ? (
                           <>
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img

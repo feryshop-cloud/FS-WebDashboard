@@ -209,6 +209,7 @@ ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE finance_ledger ENABLE ROW LEVEL SECURITY;
 ALTER TABLE problem_cases ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
 
 -- Default Deny All except for Authenticated Admin logic
 -- (In production, these would be heavily refined using `auth.uid()` and `users.role_id`)
@@ -218,4 +219,6 @@ CREATE POLICY "Allow authenticated read access" ON deals FOR SELECT USING (auth.
 CREATE POLICY "Allow authenticated read access" ON accounts FOR SELECT USING (auth.role() = 'authenticated');
 CREATE POLICY "Allow authenticated read access" ON finance_ledger FOR SELECT USING (auth.role() = 'authenticated');
 CREATE POLICY "Allow authenticated read access" ON audit_logs FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "Allow authenticated full access" ON categories FOR ALL TO authenticated USING (true) WITH CHECK (true);
 -- Additional insert/update policies require function checks for specific role permissions
+

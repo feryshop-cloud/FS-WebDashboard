@@ -17,12 +17,16 @@ export async function addGameCategory(title: string, game_slug: string, logo?: s
     return { success: false, error: "Title and Game Slug are required." };
   }
 
-  const { error } = await supabase.from("categories").insert({
-    title,
-    game_slug,
-    logo: logo || null,
-    is_active: true,
-  });
+  const { data, error } = await supabase
+    .from("categories")
+    .insert({
+      title,
+      game_slug,
+      logo: logo || null,
+      is_active: true,
+    })
+    .select()
+    .single();
 
   if (error) {
     console.error("Database Error:", error);
@@ -32,7 +36,7 @@ export async function addGameCategory(title: string, game_slug: string, logo?: s
   revalidatePath("/dashboard/settings");
   revalidatePath("/dashboard/inventory");
 
-  return { success: true };
+  return { success: true, data };
 }
 
 export async function updateGameCategory(
