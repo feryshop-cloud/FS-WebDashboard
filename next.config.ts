@@ -2,26 +2,24 @@ import type { NextConfig } from "next";
 
 const routePrefix = process.env.NEXT_PUBLIC_BASE_PATH?.trim();
 const basePath =
-  routePrefix && routePrefix !== "/"
-    ? `/${routePrefix.replace(/^\/+|\/+$/g, "")}`
-    : undefined;
+  routePrefix && routePrefix !== "/" ? `/${routePrefix.replace(/^\/+|\/+$/g, "")}` : undefined;
 
 const nextConfig: NextConfig = {
   output: "standalone",
   ...(basePath ? { basePath } : {}),
   experimental: {
     serverActions: {
-      bodySizeLimit: '50mb'
-    }
+      bodySizeLimit: "50mb",
+    },
   },
   images: {
     unoptimized: true,
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'mahfdcsivwfpmydiyddg.supabase.co',
-        port: '',
-        pathname: '/storage/v1/object/public/**',
+        protocol: "https",
+        hostname: "mahfdcsivwfpmydiyddg.supabase.co",
+        port: "",
+        pathname: "/storage/v1/object/public/**",
       },
     ],
   },

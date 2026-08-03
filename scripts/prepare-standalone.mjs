@@ -18,10 +18,7 @@ async function copyIfExists(source, destination) {
   await cp(source, destination, { recursive: true });
 }
 
-await copyIfExists(
-  path.join(root, ".next", "static"),
-  path.join(standaloneDir, ".next", "static"),
-);
+await copyIfExists(path.join(root, ".next", "static"), path.join(standaloneDir, ".next", "static"));
 
 await copyIfExists(path.join(root, "public"), path.join(standaloneDir, "public"));
 

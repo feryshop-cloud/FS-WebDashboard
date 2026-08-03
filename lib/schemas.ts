@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const LoginSchema = z.object({
   email: z
@@ -13,11 +13,11 @@ export const InventoryFormSchema = z.object({
   game_id: z
     .string({ message: "Game category is required." })
     .uuid({ message: "Invalid Game category selected." }),
-  
+
   title_reference: z
     .string({ message: "Internal reference code is required." })
     .min(3, { message: "Reference code must be at least 3 characters." }),
-  
+
   account_specs: z
     .string({ message: "Account specifications are required." })
     .min(10, { message: "Please provide more detailed account specifications." }),
@@ -37,7 +37,7 @@ export const InventoryFormSchema = z.object({
   screenshot_url: z
     .string({ message: "Screenshot upload is required." })
     .url({ message: "Invalid image URL." })
-    .optional(), 
+    .optional(),
 });
 
 export type LoginFormData = z.infer<typeof LoginSchema>;

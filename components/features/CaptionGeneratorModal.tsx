@@ -1,101 +1,115 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { updateItemStatus } from '@/actions/inventory'
-import { Copy, Check, X, Loader2 } from 'lucide-react'
+import { useState } from "react";
+import { updateItemStatus } from "@/actions/inventory";
+import { Copy, Check, X, Loader2 } from "lucide-react";
+import { InventoryItemWithGame } from "@/types/database";
 
-export function CaptionGeneratorModal({ item, isOpen, onClose }: { item: any, isOpen: boolean, onClose: () => void }) {
- const [copied, setCopied] = useState(false)
- const [isUpdating, setIsUpdating] = useState(false)
+export function CaptionGeneratorModal({
+  item,
+  isOpen,
+  onClose,
+}: {
+  item: InventoryItemWithGame | null;
+  isOpen: boolean;
+  onClose: () => void;
+}) {
+  const [copied, setCopied] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
- if (!isOpen || !item) return null
+  if (!isOpen || !item) return null;
 
- const formatCurrency = (amount: number) => {
- return new Intl.NumberFormat('id-ID', {
- style: 'currency',
- currency: 'IDR',
- minimumFractionDigits: 0,
- maximumFractionDigits: 0
- }).format(amount)
- }
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
 
- const captionText = `[Game] ${item.games?.name || 'Game'} Account Available!\nRef: ${item.title_reference}\n\nSpecs:\n${item.account_specs}\n\nHarga: ${formatCurrency(item.asking_price)}\n\nDM for details!`
+  const captionText = `[Game] ${item.games?.name || "Game"} Account Available!\nRef: ${item.title_reference}\n\nSpecs:\n${item.account_specs}\n\nHarga: ${formatCurrency(item.asking_price)}\n\nDM for details!`;
 
- const handleCopy = async () => {
- try {
- await navigator.clipboard.writeText(captionText)
- setCopied(true)
- } catch (err) {
- console.error('Failed to copy', err)
- }
- }
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(captionText);
+      setCopied(true);
+    } catch (err) {
+      console.error("Failed to copy", err);
+    }
+  };
 
- const handleMarkAvailable = async () => {
- setIsUpdating(true)
- await updateItemStatus(item.id, 'AVAILABLE')
- setIsUpdating(false)
- setCopied(false)
- onClose()
- }
+  const handleMarkAvailable = async () => {
+    setIsUpdating(true);
+    await updateItemStatus(item.id, "AVAILABLE");
+    setIsUpdating(false);
+    setCopied(false);
+    onClose();
+  };
 
- const handleClose = () => {
- setCopied(false)
- onClose()
- }
+  const handleClose = () => {
+    setCopied(false);
+    onClose();
+  };
 
- return (
- <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
- <div className="bg-white rounded-[10px] w-full max-w-lg overflow-hidden border border-slate-200 flex flex-col animate-in fade-in zoom-in-95 duration-200">
- <div className="flex justify-between items-center p-6 border-b border-slate-200 bg-slate-50/50">
- <h2 className="text-lg font-semibold text-slate-900">Buat Caption</h2>
- <button onClick={handleClose} className="text-slate-400 hover:text-slate-600 transition-colors p-1.5 rounded-[10px] hover:bg-slate-200">
- <X className="h-5 w-5" />
- </button>
- </div>
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm">
+      <div className="animate-in fade-in zoom-in-95 flex w-full max-w-lg flex-col overflow-hidden rounded-[10px] border border-slate-200 bg-white duration-200">
+        <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50/50 p-6">
+          <h2 className="text-lg font-semibold text-slate-900">Buat Caption</h2>
+          <button
+            onClick={handleClose}
+            className="rounded-[10px] p-1.5 text-slate-400 transition-colors hover:bg-slate-200 hover:text-slate-600"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
 
- <div className="p-6 space-y-6 flex-1 overflow-auto">
- <div className="bg-slate-50 p-5 rounded-[10px] border border-slate-200 whitespace-pre-wrap text-sm text-slate-700 font-normal leading-relaxed">
- {captionText}
- </div>
- 
- {!copied ? (
- <button
- onClick={handleCopy}
- className="w-full flex items-center justify-center space-x-2 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-[10px] transition-all font-medium"
- >
- <Copy className="h-5 w-5" />
- <span>Salin</span>
- </button>
- ) : (
- <div className="bg-blue-50/50 border border-blue-100 rounded-[10px] p-6 text-center space-y-4 animate-in fade-in slide-in-from-bottom-2">
- <div className="flex justify-center text-blue-600 mb-2">
- <Check className="h-10 w-10 bg-blue-100 p-2 rounded-[10px] " />
- </div>
- <div>
- <p className="font-semibold text-slate-900">Caption disalin!</p>
- <p className="text-sm text-slate-500 mt-1">Apakah kamu ingin menandai akun ini sebagai SIAP JUAL (AVAILABLE)?</p>
- </div>
- <div className="flex space-x-3 pt-2">
- <button
- onClick={handleClose}
- disabled={isUpdating}
- className="flex-1 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-[10px] hover:bg-slate-50 transition-colors font-medium text-sm disabled:opacity-50 "
- >
- Tidak, Tetap Belum Posting
- </button>
- <button
- onClick={handleMarkAvailable}
- disabled={isUpdating}
- className="flex-1 flex items-center justify-center py-2.5 bg-emerald-600 text-white rounded-[10px] hover:bg-emerald-700 transition-colors font-medium text-sm disabled:opacity-70"
- >
- {isUpdating ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : null}
- Ya, Tandai Siap Jual
- </button>
- </div>
- </div>
- )}
- </div>
- </div>
- </div>
- )
+        <div className="flex-1 space-y-6 overflow-auto p-6">
+          <div className="rounded-[10px] border border-slate-200 bg-slate-50 p-5 text-sm leading-relaxed font-normal whitespace-pre-wrap text-slate-700">
+            {captionText}
+          </div>
+
+          {!copied ? (
+            <button
+              onClick={handleCopy}
+              className="flex w-full items-center justify-center space-x-2 rounded-[10px] bg-blue-600 py-3 font-medium text-white transition-all hover:bg-blue-700"
+            >
+              <Copy className="h-5 w-5" />
+              <span>Salin</span>
+            </button>
+          ) : (
+            <div className="animate-in fade-in slide-in-from-bottom-2 space-y-4 rounded-[10px] border border-blue-100 bg-blue-50/50 p-6 text-center">
+              <div className="mb-2 flex justify-center text-blue-600">
+                <Check className="h-10 w-10 rounded-[10px] bg-blue-100 p-2" />
+              </div>
+              <div>
+                <p className="font-semibold text-slate-900">Caption disalin!</p>
+                <p className="mt-1 text-sm text-slate-500">
+                  Apakah kamu ingin menandai akun ini sebagai SIAP JUAL (AVAILABLE)?
+                </p>
+              </div>
+              <div className="flex space-x-3 pt-2">
+                <button
+                  onClick={handleClose}
+                  disabled={isUpdating}
+                  className="flex-1 rounded-[10px] border border-slate-200 bg-white py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-50"
+                >
+                  Tidak, Tetap Belum Posting
+                </button>
+                <button
+                  onClick={handleMarkAvailable}
+                  disabled={isUpdating}
+                  className="flex flex-1 items-center justify-center rounded-[10px] bg-emerald-600 py-2.5 text-sm font-medium text-white transition-colors hover:bg-emerald-700 disabled:opacity-70"
+                >
+                  {isUpdating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                  Ya, Tandai Siap Jual
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }

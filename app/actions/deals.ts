@@ -1,115 +1,117 @@
-'use server'
+"use server";
 
-import { createClient } from '@/lib/supabase/server'
-import { revalidatePath } from 'next/cache'
+import { createClient } from "@/lib/supabase/server";
+import { revalidatePath } from "next/cache";
 
 export async function getDeals() {
-  const supabase = await createClient()
+  const supabase = await createClient();
   const { data, error } = await supabase
-    .from('deals')
-    .select(`
+    .from("deals")
+    .select(
+      `
       *,
       customers (name),
       deal_items (
         stocks (name)
       )
-    `)
-    .eq('deal_type', 'Penjualan')
-    .order('created_at', { ascending: false })
-  
+    `,
+    )
+    .eq("deal_type", "Penjualan")
+    .order("created_at", { ascending: false });
+
   if (error) {
-    console.error('Error fetching deals:', error)
-    throw new Error('Gagal memuat data transaksi.')
+    console.error("Error fetching deals:", error);
+    throw new Error("Gagal memuat data transaksi.");
   }
-  
-  return data
+
+  return data;
 }
 
 export async function createPenjualan(formData: FormData) {
-  const customer_name = formData.get('customer_name') as string
-  const customer_phone = (formData.get('customer_phone') as string) || ''
-  const stock_id = formData.get('stock_id') as string
-  const price = parseFloat(formData.get('price') as string)
-  const payment_amount = parseFloat(formData.get('payment_amount') as string) || 0
-  const account_id = formData.get('account_id') as string
+  const customer_name = formData.get("customer_name") as string;
+  const customer_phone = (formData.get("customer_phone") as string) || "";
+  const stock_id = formData.get("stock_id") as string;
+  const price = parseFloat(formData.get("price") as string);
+  const payment_amount = parseFloat(formData.get("payment_amount") as string) || 0;
+  const account_id = formData.get("account_id") as string;
 
   if (!customer_name || !stock_id || !price) {
-    throw new Error('Nama customer, stok, dan harga deal wajib diisi.')
+    throw new Error("Nama customer, stok, dan harga deal wajib diisi.");
   }
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
-    throw new Error('Sesi tidak valid. Silakan login kembali.')
+    throw new Error("Sesi tidak valid. Silakan login kembali.");
   }
 
   // 1. Find or create customer
-  let customerId: string
+  let customerId: string;
   const { data: existingCustomer } = await supabase
-    .from('customers')
-    .select('id')
-    .eq('name', customer_name)
-    .maybeSingle()
+    .from("customers")
+    .select("id")
+    .eq("name", customer_name)
+    .maybeSingle();
 
   if (existingCustomer) {
-    customerId = existingCustomer.id
+    customerId = existingCustomer.id;
   } else {
     const { data: newCustomer, error: customerErr } = await supabase
-      .from('customers')
+      .from("customers")
       .insert({ name: customer_name, phone: customer_phone })
       .select()
-      .single()
-    if (customerErr) throw customerErr
-    customerId = newCustomer.id
+      .single();
+    if (customerErr) throw customerErr;
+    customerId = newCustomer.id;
   }
 
   // 2. Insert Deal (exclude remaining_balance and payment_percentage)
-  const dealNumber = `DEAL-${Date.now()}`
+  const dealNumber = `DEAL-${Date.now()}`;
   const { data: deal, error: dealErr } = await supabase
-    .from('deals')
+    .from("deals")
     .insert({
       deal_number: dealNumber,
       customer_id: customerId,
-      deal_type: 'Penjualan',
+      deal_type: "Penjualan",
       total_deal_price: price,
       total_paid: 0,
-      status: 'DRAFT',
-      handled_by: user.id
+      status: "DRAFT",
+      handled_by: user.id,
     })
     .select()
-    .single()
-  if (dealErr) throw dealErr
+    .single();
+  if (dealErr) throw dealErr;
 
   // 3. Insert Deal Item
-  const { error: itemErr } = await supabase
-    .from('deal_items')
-    .insert({
-      deal_id: deal.id,
-      stock_id: stock_id,
-      price: price
-    })
-  if (itemErr) throw itemErr
+  const { error: itemErr } = await supabase.from("deal_items").insert({
+    deal_id: deal.id,
+    stock_id: stock_id,
+    price: price,
+  });
+  if (itemErr) throw itemErr;
 
   // 4. Process initial payment if any, otherwise set stock to BOOKED
   if (payment_amount > 0 && account_id) {
-    const { error: paymentErr } = await supabase.rpc('process_payment', {
+    const { error: paymentErr } = await supabase.rpc("process_payment", {
       p_deal_id: deal.id,
       p_account_id: account_id,
       p_amount: payment_amount,
-      p_notes: 'Pembayaran awal deal penjualan',
-      p_admin_id: user.id
-    })
-    if (paymentErr) throw paymentErr
+      p_notes: "Pembayaran awal deal penjualan",
+      p_admin_id: user.id,
+    });
+    if (paymentErr) throw paymentErr;
   } else {
     const { error: stockErr } = await supabase
-      .from('stocks')
-      .update({ status: 'BOOKED' } as any)
-      .eq('id', stock_id)
-    if (stockErr) throw stockErr
+      .from("stocks")
+      .update({ status: "BOOKED" })
+      .eq("id", stock_id);
+    if (stockErr) throw stockErr;
   }
 
-  revalidatePath('/dashboard/deals')
-  revalidatePath('/dashboard/inventory')
-  revalidatePath('/dashboard/accounts')
-  revalidatePath('/dashboard/ledger')
+  revalidatePath("/dashboard/deals");
+  revalidatePath("/dashboard/inventory");
+  revalidatePath("/dashboard/accounts");
+  revalidatePath("/dashboard/ledger");
 }

@@ -1,5 +1,5 @@
-import { ReactNode } from 'react'
-import Sidebar from '../../components/layout/Sidebar'
+import { ReactNode } from "react";
+import Sidebar from "../../components/layout/Sidebar";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
@@ -7,9 +7,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       <Sidebar />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col overflow-hidden transition-all duration-300">
+      <div className="flex flex-1 flex-col overflow-hidden transition-all duration-300">
         {/* Header */}
-        <header className="h-16 bg-white border-b border-slate-200 shadow-sm shrink-0 flex items-center justify-between px-6 py-3">
+        <header className="flex h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-white px-6 py-3 shadow-sm">
           <div className="flex items-center">
             {/* Reserved for far-left alignment (e.g. mobile toggle) */}
           </div>
@@ -25,5 +25,5 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         </main>
       </div>
     </div>
-  )
+  );
 }

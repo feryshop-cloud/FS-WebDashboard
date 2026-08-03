@@ -1,39 +1,38 @@
-import { createClient } from '@/lib/supabase/server'
-import { AddInventoryForm } from '@/components/features/AddInventoryForm'
-import { ArrowLeft } from 'lucide-react'
-import Link from 'next/link'
+import { createClient } from "@/lib/supabase/server";
+import { AddInventoryForm } from "@/components/features/AddInventoryForm";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
 export default async function AddInventoryPage() {
- const supabase = await createClient()
+  const supabase = await createClient();
 
- // Fetch games for the dropdown
- const { data: games, error } = await supabase
- .from('games')
- .select('id, name')
- .order('name')
+  // Fetch games for the dropdown
+  const { data: games } = await supabase.from("games").select("id, name").order("name");
 
- return (
- <div className="max-w-4xl mx-auto space-y-8">
- {/* Header */}
- <div className="flex items-center space-x-4">
- <Link 
- href="/dashboard/inventory"
- className="p-2 bg-white border border-slate-200 rounded-[10px] text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-colors "
- >
- <ArrowLeft className="h-5 w-5" />
- </Link>
- <div>
- <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Add New Account</h1>
- <p className="text-sm text-slate-500 mt-1">Input details for the newly acquired inventory.</p>
- </div>
- </div>
+  return (
+    <div className="mx-auto max-w-4xl space-y-8">
+      {/* Header */}
+      <div className="flex items-center space-x-4">
+        <Link
+          href="/dashboard/inventory"
+          className="rounded-[10px] border border-slate-200 bg-white p-2 text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-900"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Link>
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Add New Account</h1>
+          <p className="mt-1 text-sm text-slate-500">
+            Input details for the newly acquired inventory.
+          </p>
+        </div>
+      </div>
 
- {/* Form Container */}
- <div className="bg-white p-8 rounded-[10px] border border-slate-200">
- <AddInventoryForm games={games || []} />
- </div>
- </div>
- )
+      {/* Form Container */}
+      <div className="rounded-[10px] border border-slate-200 bg-white p-8">
+        <AddInventoryForm games={games || []} />
+      </div>
+    </div>
+  );
 }

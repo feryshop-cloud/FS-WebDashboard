@@ -1,99 +1,113 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect } from 'react'
-import { Plus, ArrowRightLeft, Wallet, Building2, Smartphone, QrCode, MoreHorizontal, X, Loader2 } from 'lucide-react'
-import { formatRupiah } from '@/lib/utils'
-import { getAccounts, addAccount, transferBalance } from '@/app/actions/accounts'
-import type { Database } from '@/types/database.types'
+import React, { useState, useEffect } from "react";
+import {
+  Plus,
+  ArrowRightLeft,
+  Wallet,
+  Building2,
+  Smartphone,
+  QrCode,
+  MoreHorizontal,
+  X,
+  Loader2,
+} from "lucide-react";
+import { formatRupiah } from "@/lib/utils";
+import { getErrorMessage } from "@/lib/error";
+import { getAccounts, addAccount, transferBalance } from "@/app/actions/accounts";
+import type { Database } from "@/types/database.types";
 
-type Account = Database['public']['Tables']['accounts']['Row']
+type Account = Database["public"]["Tables"]["accounts"]["Row"];
 
 export default function AccountsPage() {
-  const [isAddAccountOpen, setIsAddAccountOpen] = useState(false)
-  const [isMutasiOpen, setIsMutasiOpen] = useState(false)
-  const [accounts, setAccounts] = useState<Account[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState('')
-
-  useEffect(() => {
-    loadAccounts()
-  }, [])
+  const [isAddAccountOpen, setIsAddAccountOpen] = useState(false);
+  const [isMutasiOpen, setIsMutasiOpen] = useState(false);
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   const loadAccounts = async () => {
     try {
-      setIsLoading(true)
-      const data = await getAccounts()
-      setAccounts(data)
+      setIsLoading(true);
+      const data = await getAccounts();
+      setAccounts(data);
     } catch (err) {
-      console.error(err)
+      console.error(err);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadAccounts();
+  }, []);
 
   const handleAddAccount = async (formData: FormData) => {
     try {
-      setIsSubmitting(true)
-      setError('')
-      await addAccount(formData)
-      setIsAddAccountOpen(false)
-      loadAccounts()
-    } catch (err: any) {
-      setError(err.message)
+      setIsSubmitting(true);
+      setError("");
+      await addAccount(formData);
+      setIsAddAccountOpen(false);
+      loadAccounts();
+    } catch (err: unknown) {
+      setError(getErrorMessage(err));
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const handleMutasi = async (formData: FormData) => {
     try {
-      setIsSubmitting(true)
-      setError('')
-      await transferBalance(formData)
-      setIsMutasiOpen(false)
-      loadAccounts()
-    } catch (err: any) {
-      setError(err.message)
+      setIsSubmitting(true);
+      setError("");
+      await transferBalance(formData);
+      setIsMutasiOpen(false);
+      loadAccounts();
+    } catch (err: unknown) {
+      setError(getErrorMessage(err));
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
-  const totalBalance = accounts.reduce((sum, acc) => sum + Number(acc.balance), 0)
+  const totalBalance = accounts.reduce((sum, acc) => sum + Number(acc.balance), 0);
 
   const getIcon = (type: string) => {
-    if (type.includes('QRIS') || type.includes('QR')) return QrCode
-    if (type.includes('Bank')) return Building2
-    return Smartphone
-  }
+    if (type.includes("QRIS") || type.includes("QR")) return QrCode;
+    if (type.includes("Bank")) return Building2;
+    return Smartphone;
+  };
 
   const getColor = (type: string) => {
-    if (type.includes('QRIS')) return 'text-indigo-600 bg-indigo-50 border-indigo-100'
-    if (type.includes('Digital')) return 'text-orange-600 bg-orange-50 border-orange-100'
-    if (type.includes('Bank')) return 'text-amber-600 bg-amber-50 border-amber-100'
-    return 'text-blue-500 bg-blue-50 border-blue-100'
-  }
+    if (type.includes("QRIS")) return "text-indigo-600 bg-indigo-50 border-indigo-100";
+    if (type.includes("Digital")) return "text-orange-600 bg-orange-50 border-orange-100";
+    if (type.includes("Bank")) return "text-amber-600 bg-amber-50 border-amber-100";
+    return "text-blue-500 bg-blue-50 border-blue-100";
+  };
 
   return (
-    <div className="max-w-7xl mx-auto flex flex-col gap-6 pb-8">
+    <div className="mx-auto flex max-w-7xl flex-col gap-6 pb-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Kelola Rekening</h1>
-          <p className="text-sm text-slate-500 mt-0.5">Pantau saldo, kelola metode pembayaran, dan mutasi antar dompet.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Kelola Rekening</h1>
+          <p className="mt-0.5 text-sm text-slate-500">
+            Pantau saldo, kelola metode pembayaran, dan mutasi antar dompet.
+          </p>
         </div>
         <div className="flex items-center gap-3">
-          <button 
+          <button
             onClick={() => setIsMutasiOpen(true)}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-900"
           >
             <ArrowRightLeft className="h-4 w-4" />
             Mutasi Saldo
           </button>
-          <button 
+          <button
             onClick={() => setIsAddAccountOpen(true)}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700"
           >
             <Plus className="h-4 w-4" />
             Tambah Rekening
@@ -102,22 +116,32 @@ export default function AccountsPage() {
       </div>
 
       {/* Summary Card */}
-      <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative overflow-hidden group">
-        <svg className="absolute right-0 bottom-0 w-64 h-full opacity-[0.02] pointer-events-none group-hover:opacity-5 transition-opacity" viewBox="0 0 100 50" preserveAspectRatio="none">
-          <path d="M0,50 L0,30 Q25,50 50,20 T100,10 L100,50 Z" fill="#2563eb"/>
+      <div className="group relative flex flex-col items-start justify-between gap-4 overflow-hidden rounded-xl border border-slate-100 bg-white p-6 shadow-sm sm:flex-row sm:items-center">
+        <svg
+          className="pointer-events-none absolute right-0 bottom-0 h-full w-64 opacity-[0.02] transition-opacity group-hover:opacity-5"
+          viewBox="0 0 100 50"
+          preserveAspectRatio="none"
+        >
+          <path d="M0,50 L0,30 Q25,50 50,20 T100,10 L100,50 Z" fill="#2563eb" />
         </svg>
         <div className="relative z-10 flex items-center gap-4">
-          <div className="h-12 w-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full border border-blue-100 bg-blue-50 text-blue-600">
             <Wallet className="h-6 w-6" />
           </div>
           <div>
-            <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Total Saldo Kas</h2>
-            <p className="text-3xl font-bold text-slate-900 tracking-tight mt-1">{formatRupiah(totalBalance)}</p>
+            <h2 className="text-sm font-semibold tracking-wider text-slate-500 uppercase">
+              Total Saldo Kas
+            </h2>
+            <p className="mt-1 text-3xl font-bold tracking-tight text-slate-900">
+              {formatRupiah(totalBalance)}
+            </p>
           </div>
         </div>
-        <div className="relative z-10 bg-slate-50 border border-slate-100 rounded-lg px-4 py-2 flex flex-col items-end">
-          <span className="text-xs text-slate-500 font-medium">Jumlah Rekening Aktif</span>
-          <span className="text-lg font-bold text-slate-800">{accounts.filter(a => a.is_active).length}</span>
+        <div className="relative z-10 flex flex-col items-end rounded-lg border border-slate-100 bg-slate-50 px-4 py-2">
+          <span className="text-xs font-medium text-slate-500">Jumlah Rekening Aktif</span>
+          <span className="text-lg font-bold text-slate-800">
+            {accounts.filter((a) => a.is_active).length}
+          </span>
         </div>
       </div>
 
@@ -127,44 +151,59 @@ export default function AccountsPage() {
           <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {accounts.map((account) => {
-            const IconComponent = getIcon(account.type)
-            const colorClass = getColor(account.type)
+            const IconComponent = getIcon(account.type);
+            const colorClass = getColor(account.type);
             return (
-              <div key={account.id} className="bg-white border border-slate-100 shadow-sm rounded-xl p-5 hover:shadow-md transition-shadow relative group">
+              <div
+                key={account.id}
+                className="group relative rounded-xl border border-slate-100 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+              >
                 <div className="absolute top-4 right-4">
-                  <button className="p-1.5 text-slate-400 hover:text-blue-600 rounded-md hover:bg-blue-50 transition-colors">
+                  <button className="rounded-md p-1.5 text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-600">
                     <MoreHorizontal className="h-5 w-5" />
                   </button>
                 </div>
-                
-                <div className="flex items-center gap-3 mb-4">
-                  <div className={`h-10 w-10 rounded-full flex items-center justify-center border ${colorClass}`}>
+
+                <div className="mb-4 flex items-center gap-3">
+                  <div
+                    className={`flex h-10 w-10 items-center justify-center rounded-full border ${colorClass}`}
+                  >
                     <IconComponent className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-slate-900 leading-tight">{account.name}</h3>
-                    <p className="text-xs text-slate-500 font-medium">{account.type}</p>
+                    <h3 className="text-base leading-tight font-bold text-slate-900">
+                      {account.name}
+                    </h3>
+                    <p className="text-xs font-medium text-slate-500">{account.type}</p>
                   </div>
                 </div>
 
-                <div className="bg-slate-50 border border-slate-100 rounded-lg p-3 mb-4">
-                  <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mb-0.5">Nomor Rekening / ID</p>
-                  <p className="text-sm font-semibold text-slate-700 tracking-wide font-mono">{account.account_number || '-'}</p>
+                <div className="mb-4 rounded-lg border border-slate-100 bg-slate-50 p-3">
+                  <p className="mb-0.5 text-[10px] font-medium tracking-wider text-slate-400 uppercase">
+                    Nomor Rekening / ID
+                  </p>
+                  <p className="font-mono text-sm font-semibold tracking-wide text-slate-700">
+                    {account.account_number || "-"}
+                  </p>
                 </div>
 
                 <div className="flex items-end justify-between border-t border-slate-100 pt-4">
                   <div>
-                    <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mb-0.5">Saldo Terkini</p>
-                    <p className="text-xl font-bold text-slate-900 tracking-tight">{formatRupiah(Number(account.balance))}</p>
+                    <p className="mb-0.5 text-[10px] font-medium tracking-wider text-slate-400 uppercase">
+                      Saldo Terkini
+                    </p>
+                    <p className="text-xl font-bold tracking-tight text-slate-900">
+                      {formatRupiah(Number(account.balance))}
+                    </p>
                   </div>
-                  <button className="text-xs font-semibold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors">
+                  <button className="rounded-md bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-600 transition-colors hover:bg-blue-100 hover:text-blue-700">
                     Riwayat
                   </button>
                 </div>
               </div>
-            )
+            );
           })}
         </div>
       )}
@@ -172,29 +211,49 @@ export default function AccountsPage() {
       {/* Add Account Modal (Slide-over Drawer) */}
       {isAddAccountOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm">
-          <div className="bg-white h-full w-full max-w-md shadow-2xl animate-in slide-in-from-right duration-300 flex flex-col">
-            <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+          <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-white shadow-2xl duration-300">
+            <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-6 py-5">
               <div>
                 <h2 className="text-lg font-bold text-slate-900">Tambah Rekening Baru</h2>
-                <p className="text-xs text-slate-500 mt-1">Isi form untuk menambah rekening atau metode pembayaran baru.</p>
+                <p className="mt-1 text-xs text-slate-500">
+                  Isi form untuk menambah rekening atau metode pembayaran baru.
+                </p>
               </div>
-              <button 
-                onClick={() => setIsAddAccountOpen(false)} 
-                className="text-slate-400 hover:text-slate-600 transition-colors bg-white p-2 rounded-full shadow-sm"
+              <button
+                onClick={() => setIsAddAccountOpen(false)}
+                className="rounded-full bg-white p-2 text-slate-400 shadow-sm transition-colors hover:text-slate-600"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <form action={handleAddAccount} className="flex-1 flex flex-col overflow-hidden">
-              <div className="p-6 flex-1 overflow-y-auto space-y-5">
-                {error && <div className="p-3 bg-rose-50 text-rose-600 text-sm rounded-lg border border-rose-100">{error}</div>}
+            <form action={handleAddAccount} className="flex flex-1 flex-col overflow-hidden">
+              <div className="flex-1 space-y-5 overflow-y-auto p-6">
+                {error && (
+                  <div className="rounded-lg border border-rose-100 bg-rose-50 p-3 text-sm text-rose-600">
+                    {error}
+                  </div>
+                )}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Nama Rekening</label>
-                  <input name="name" required type="text" className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" placeholder="Mis. BCA Fery" />
+                  <label className="mb-1 block text-sm font-medium text-slate-700">
+                    Nama Rekening
+                  </label>
+                  <input
+                    name="name"
+                    required
+                    type="text"
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    placeholder="Mis. BCA Fery"
+                  />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Tipe Rekening</label>
-                  <select name="type" required className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                  <label className="mb-1 block text-sm font-medium text-slate-700">
+                    Tipe Rekening
+                  </label>
+                  <select
+                    name="type"
+                    required
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  >
                     <option value="Bank Konvensional">Bank Konvensional</option>
                     <option value="Bank Digital">Bank Digital</option>
                     <option value="E-Wallet">E-Wallet</option>
@@ -202,12 +261,23 @@ export default function AccountsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Nomor Rekening / ID</label>
-                  <input name="account_number" type="text" className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" placeholder="Mis. 1234567890" />
+                  <label className="mb-1 block text-sm font-medium text-slate-700">
+                    Nomor Rekening / ID
+                  </label>
+                  <input
+                    name="account_number"
+                    type="text"
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    placeholder="Mis. 1234567890"
+                  />
                 </div>
               </div>
-              <div className="p-6 border-t border-slate-100 bg-white">
-                <button type="submit" disabled={isSubmitting} className="w-full px-4 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm disabled:opacity-50 flex items-center justify-center gap-2">
+              <div className="border-t border-slate-100 bg-white p-6">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-blue-700 disabled:opacity-50"
+                >
                   {isSubmitting ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -226,50 +296,85 @@ export default function AccountsPage() {
       {/* Mutasi Modal (Slide-over Drawer) */}
       {isMutasiOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm">
-          <div className="bg-white h-full w-full max-w-md shadow-2xl animate-in slide-in-from-right duration-300 flex flex-col">
-            <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+          <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-white shadow-2xl duration-300">
+            <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-6 py-5">
               <div>
                 <h2 className="text-lg font-bold text-slate-900">Mutasi Saldo</h2>
-                <p className="text-xs text-slate-500 mt-1">Pindahkan saldo antar rekening atau dompet digital.</p>
+                <p className="mt-1 text-xs text-slate-500">
+                  Pindahkan saldo antar rekening atau dompet digital.
+                </p>
               </div>
-              <button 
-                onClick={() => setIsMutasiOpen(false)} 
-                className="text-slate-400 hover:text-slate-600 transition-colors bg-white p-2 rounded-full shadow-sm"
+              <button
+                onClick={() => setIsMutasiOpen(false)}
+                className="rounded-full bg-white p-2 text-slate-400 shadow-sm transition-colors hover:text-slate-600"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <form action={handleMutasi} className="flex-1 flex flex-col overflow-hidden">
-              <div className="p-6 flex-1 overflow-y-auto space-y-5">
-                {error && <div className="p-3 bg-rose-50 text-rose-600 text-sm rounded-lg border border-rose-100">{error}</div>}
+            <form action={handleMutasi} className="flex flex-1 flex-col overflow-hidden">
+              <div className="flex-1 space-y-5 overflow-y-auto p-6">
+                {error && (
+                  <div className="rounded-lg border border-rose-100 bg-rose-50 p-3 text-sm text-rose-600">
+                    {error}
+                  </div>
+                )}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Dari Rekening</label>
-                  <select name="from_account_id" required className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-                    {accounts.map(acc => (
-                      <option key={acc.id} value={acc.id}>{acc.name} - {formatRupiah(Number(acc.balance))}</option>
+                  <label className="mb-1 block text-sm font-medium text-slate-700">
+                    Dari Rekening
+                  </label>
+                  <select
+                    name="from_account_id"
+                    required
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  >
+                    {accounts.map((acc) => (
+                      <option key={acc.id} value={acc.id}>
+                        {acc.name} - {formatRupiah(Number(acc.balance))}
+                      </option>
                     ))}
                   </select>
                 </div>
-                <div className="flex justify-center -my-2 relative z-10">
-                  <div className="bg-slate-100 rounded-full p-1 border border-white">
-                    <ArrowRightLeft className="h-4 w-4 text-slate-500 rotate-90" />
+                <div className="relative z-10 -my-2 flex justify-center">
+                  <div className="rounded-full border border-white bg-slate-100 p-1">
+                    <ArrowRightLeft className="h-4 w-4 rotate-90 text-slate-500" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Ke Rekening</label>
-                  <select name="to_account_id" required className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-                    {accounts.map(acc => (
-                      <option key={acc.id} value={acc.id}>{acc.name}</option>
+                  <label className="mb-1 block text-sm font-medium text-slate-700">
+                    Ke Rekening
+                  </label>
+                  <select
+                    name="to_account_id"
+                    required
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  >
+                    {accounts.map((acc) => (
+                      <option key={acc.id} value={acc.id}>
+                        {acc.name}
+                      </option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Nominal Mutasi</label>
-                  <input name="amount" type="number" required min="1" className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" placeholder="Rp 0" />
+                  <label className="mb-1 block text-sm font-medium text-slate-700">
+                    Nominal Mutasi
+                  </label>
+                  <input
+                    name="amount"
+                    type="number"
+                    required
+                    min="1"
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    placeholder="Rp 0"
+                  />
                 </div>
               </div>
-              <div className="p-6 border-t border-slate-100 bg-white">
-                <button type="submit" disabled={isSubmitting} className="w-full px-4 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm disabled:opacity-50 flex items-center justify-center gap-2">
+              <div className="border-t border-slate-100 bg-white p-6">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-blue-700 disabled:opacity-50"
+                >
                   {isSubmitting ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -285,6 +390,5 @@ export default function AccountsPage() {
         </div>
       )}
     </div>
-  )
+  );
 }
-

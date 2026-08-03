@@ -1,87 +1,84 @@
-'use client'
+"use client";
 
-import { useState, useTransition } from 'react'
-import { MoreVertical, Edit2, Trash2, Loader2, AlertTriangle, Eye } from 'lucide-react'
-import { Stock } from '@/types/database'
-import { deleteStock } from '@/actions/stocks'
-import { EditStockModal } from './EditStockModal'
-import { ViewStockModal } from './ViewStockModal'
+import { useState, useTransition } from "react";
+import { MoreVertical, Edit2, Trash2, Loader2, AlertTriangle, Eye } from "lucide-react";
+import { Stock, Game } from "@/types/database";
+import { deleteStock } from "@/actions/stocks";
+import { EditStockModal } from "./EditStockModal";
+import { ViewStockModal } from "./ViewStockModal";
 
 interface StockRowActionsProps {
-  stock: Stock
-  categories?: any[]
+  stock: Stock;
+  categories?: Game[];
 }
 
 export function StockRowActions({ stock, categories = [] }: StockRowActionsProps) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false)
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  
-  const [isPending, startTransition] = useTransition()
-  const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
+  const [isPending, startTransition] = useTransition();
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   const handleDelete = () => {
-    setDeleteError(null)
+    setDeleteError(null);
     startTransition(async () => {
-      const { success, error } = await deleteStock(stock.id)
+      const { success, error } = await deleteStock(stock.id);
       if (!success) {
-        setDeleteError(error || 'Gagal menghapus stok.')
+        setDeleteError(error || "Gagal menghapus stok.");
       } else {
-        setIsDeleteDialogOpen(false)
-        setIsMenuOpen(false)
+        setIsDeleteDialogOpen(false);
+        setIsMenuOpen(false);
       }
-    })
-  }
+    });
+  };
 
   return (
     <div className="relative flex justify-end">
-      <button 
+      <button
         onClick={toggleMenu}
-        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-[10px] transition-colors"
+        className="rounded-[10px] p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
       >
-        <MoreVertical className="w-5 h-5" />
+        <MoreVertical className="h-5 w-5" />
       </button>
 
       {isMenuOpen && (
         <>
-          <div 
-            className="fixed inset-0 z-10" 
-            onClick={() => setIsMenuOpen(false)} 
-          />
-          <div className="absolute right-0 mt-10 w-48 bg-white rounded-[10px] shadow-lg border border-gray-100 py-1 z-20 animate-in fade-in zoom-in-95">
+          <div className="fixed inset-0 z-10" onClick={() => setIsMenuOpen(false)} />
+          <div className="animate-in fade-in zoom-in-95 absolute right-0 z-20 mt-10 w-48 rounded-[10px] border border-gray-100 bg-white py-1 shadow-lg">
             <button
               onClick={() => {
-                setIsMenuOpen(false)
-                setIsViewModalOpen(true)
+                setIsMenuOpen(false);
+                setIsViewModalOpen(true);
               }}
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+              className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
             >
-              <Eye className="w-4 h-4 text-emerald-500" />
+              <Eye className="h-4 w-4 text-emerald-500" />
               Lihat Detail
             </button>
-            <div className="h-px bg-gray-100 my-1" />
+            <div className="my-1 h-px bg-gray-100" />
             <button
               onClick={() => {
-                setIsMenuOpen(false)
-                setIsEditModalOpen(true)
+                setIsMenuOpen(false);
+                setIsEditModalOpen(true);
               }}
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+              className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
             >
-              <Edit2 className="w-4 h-4 text-blue-500" />
+              <Edit2 className="h-4 w-4 text-blue-500" />
               Edit Data
             </button>
-            <div className="h-px bg-gray-100 my-1" />
+            <div className="my-1 h-px bg-gray-100" />
             <button
               onClick={() => {
-                setIsMenuOpen(false)
-                setIsDeleteDialogOpen(true)
+                setIsMenuOpen(false);
+                setIsDeleteDialogOpen(true);
               }}
-              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+              className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="h-4 w-4" />
               Hapus Stok
             </button>
           </div>
@@ -89,16 +86,16 @@ export function StockRowActions({ stock, categories = [] }: StockRowActionsProps
       )}
 
       {/* View Modal */}
-      <ViewStockModal 
-        stock={stock} 
-        isOpen={isViewModalOpen} 
-        onClose={() => setIsViewModalOpen(false)} 
+      <ViewStockModal
+        stock={stock}
+        isOpen={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
       />
 
       {/* Edit Modal */}
-      <EditStockModal 
-        stock={stock} 
-        isOpen={isEditModalOpen} 
+      <EditStockModal
+        stock={stock}
+        isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         categories={categories}
       />
@@ -106,48 +103,52 @@ export function StockRowActions({ stock, categories = [] }: StockRowActionsProps
       {/* Delete Confirmation Dialog */}
       {isDeleteDialogOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" onClick={!isPending ? () => setIsDeleteDialogOpen(false) : undefined} />
-          <div className="relative w-full max-w-md bg-white rounded-[10px] shadow-2xl p-6 overflow-hidden flex flex-col animate-in fade-in zoom-in-95">
-            <div className="flex items-center gap-3 mb-4 text-red-600">
-              <div className="p-2 bg-red-100 rounded-[10px]">
-                <AlertTriangle className="w-6 h-6" />
+          <div
+            className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm"
+            onClick={!isPending ? () => setIsDeleteDialogOpen(false) : undefined}
+          />
+          <div className="animate-in fade-in zoom-in-95 relative flex w-full max-w-md flex-col overflow-hidden rounded-[10px] bg-white p-6 shadow-2xl">
+            <div className="mb-4 flex items-center gap-3 text-red-600">
+              <div className="rounded-[10px] bg-red-100 p-2">
+                <AlertTriangle className="h-6 w-6" />
               </div>
               <h2 className="text-xl font-bold">Hapus Stok?</h2>
             </div>
-            
-            <p className="text-gray-600 text-sm mb-6">
-              Anda yakin ingin menghapus stok <strong>{stock.name}</strong>? Tindakan ini tidak dapat dibatalkan.
+
+            <p className="mb-6 text-sm text-gray-600">
+              Anda yakin ingin menghapus stok <strong>{stock.name}</strong>? Tindakan ini tidak
+              dapat dibatalkan.
             </p>
 
             {deleteError && (
-              <div className="mb-6 p-3 bg-red-50 border border-red-100 text-red-700 text-xs rounded-[10px] font-medium">
+              <div className="mb-6 rounded-[10px] border border-red-100 bg-red-50 p-3 text-xs font-medium text-red-700">
                 ⚠️ {deleteError}
               </div>
             )}
 
             <div className="flex justify-end gap-3">
-              <button 
+              <button
                 onClick={() => {
-                  setIsDeleteDialogOpen(false)
-                  setDeleteError(null)
+                  setIsDeleteDialogOpen(false);
+                  setDeleteError(null);
                 }}
                 disabled={isPending}
-                className="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-[10px] transition-all"
+                className="rounded-[10px] border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition-all hover:bg-gray-50"
               >
                 Batal
               </button>
-              <button 
+              <button
                 onClick={handleDelete}
                 disabled={isPending}
-                className="px-4 py-2 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-[10px] transition-all shadow-sm shadow-red-200 disabled:opacity-70 flex items-center gap-2"
+                className="flex items-center gap-2 rounded-[10px] bg-red-600 px-4 py-2 text-sm font-bold text-white shadow-sm shadow-red-200 transition-all hover:bg-red-700 disabled:opacity-70"
               >
-                {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                {isPending ? 'Menghapus...' : 'Ya, Hapus'}
+                {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+                {isPending ? "Menghapus..." : "Ya, Hapus"}
               </button>
             </div>
           </div>
         </div>
       )}
     </div>
-  )
+  );
 }

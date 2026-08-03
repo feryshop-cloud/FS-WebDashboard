@@ -1,81 +1,99 @@
-'use client'
+"use client";
 
-import { useState, useTransition } from 'react'
-import { AddPaymentModal } from '@/components/deals/AddPaymentModal'
-import { Plus, ArrowLeft, XCircle, AlertTriangle, Loader2 } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { Account, DealStatus } from '@/types/database'
-import { cancelDeal } from '@/actions/deals'
+import { useState, useTransition } from "react";
+import { AddPaymentModal } from "@/components/deals/AddPaymentModal";
+import { Plus, ArrowLeft, XCircle, AlertTriangle, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Account, DealStatus } from "@/types/database";
+import { cancelDeal } from "@/actions/deals";
 
 interface DealDetailHeaderProps {
-  dealId: string
-  stockId: string
-  status: DealStatus
-  remainingBalance: number
-  accounts: Account[]
+  dealId: string;
+  stockId: string;
+  status: DealStatus;
+  remainingBalance: number;
+  accounts: Account[];
 }
 
-export function DealDetailHeader({ dealId, stockId, status, remainingBalance, accounts }: DealDetailHeaderProps) {
-  const router = useRouter()
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false)
-  const [isPending, startTransition] = useTransition()
-  const [cancelError, setCancelError] = useState<string | null>(null)
+export function DealDetailHeader({
+  dealId,
+  stockId,
+  status,
+  remainingBalance,
+  accounts,
+}: DealDetailHeaderProps) {
+  const router = useRouter();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const [cancelError, setCancelError] = useState<string | null>(null);
 
-  const isCancellable = remainingBalance > 0 && status !== 'CANCELLED_BY_BUYER' && status !== 'CANCELLED_BY_SELLER' && status !== 'COMPLETED' && status !== 'PROBLEM'
+  const isCancellable =
+    remainingBalance > 0 &&
+    status !== "CANCELLED_BY_BUYER" &&
+    status !== "CANCELLED_BY_SELLER" &&
+    status !== "COMPLETED" &&
+    status !== "PROBLEM";
 
   const handleCancelDeal = () => {
-    setCancelError(null)
+    setCancelError(null);
     startTransition(async () => {
-      const { success, error } = await cancelDeal(dealId, stockId)
+      const { success, error } = await cancelDeal(dealId, stockId);
       if (!success) {
-        setCancelError(error || 'Gagal membatalkan transaksi.')
+        setCancelError(error || "Gagal membatalkan transaksi.");
       } else {
-        setIsCancelModalOpen(false)
-        router.refresh()
+        setIsCancelModalOpen(false);
+        router.refresh();
       }
-    })
-  }
+    });
+  };
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+      <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div className="flex items-center gap-4">
-          <Link href="/dashboard/deals" className="p-2 bg-white border border-gray-200 text-gray-600 hover:text-gray-900 rounded-[10px] shadow-sm transition-colors">
-            <ArrowLeft className="w-5 h-5" />
+          <Link
+            href="/dashboard/deals"
+            className="rounded-[10px] border border-gray-200 bg-white p-2 text-gray-600 shadow-sm transition-colors hover:text-gray-900"
+          >
+            <ArrowLeft className="h-5 w-5" />
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Deal Details</h1>
-            <p className="text-sm text-gray-500 mt-1">View history and manage payments for this deal.</p>
+            <h1 className="text-2xl font-bold tracking-tight text-gray-900">Deal Details</h1>
+            <p className="mt-1 text-sm text-gray-500">
+              View history and manage payments for this deal.
+            </p>
           </div>
         </div>
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+        <div className="flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row">
           {isCancellable && (
             <button
               onClick={() => setIsCancelModalOpen(true)}
-              className="flex items-center justify-center gap-2 bg-white hover:bg-red-50 text-red-600 border border-red-200 px-4 py-2.5 rounded-[10px] font-semibold transition-all w-full sm:w-auto"
+              className="flex w-full items-center justify-center gap-2 rounded-[10px] border border-red-200 bg-white px-4 py-2.5 font-semibold text-red-600 transition-all hover:bg-red-50 sm:w-auto"
             >
-              <XCircle className="w-5 h-5" />
+              <XCircle className="h-5 w-5" />
               Batalkan Transaksi
             </button>
           )}
 
-          {remainingBalance > 0 && status !== 'CANCELLED_BY_BUYER' && status !== 'CANCELLED_BY_SELLER' && (
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white px-5 py-2.5 rounded-[10px] font-semibold transition-all shadow-sm shadow-emerald-200 hover:shadow-md hover:shadow-emerald-200 w-full sm:w-auto"
-            >
-              <Plus className="w-5 h-5" />
-              Input Next Payment
-            </button>
-          )}
+          {remainingBalance > 0 &&
+            status !== "CANCELLED_BY_BUYER" &&
+            status !== "CANCELLED_BY_SELLER" && (
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="flex w-full items-center justify-center gap-2 rounded-[10px] bg-emerald-600 px-5 py-2.5 font-semibold text-white shadow-sm shadow-emerald-200 transition-all hover:bg-emerald-700 hover:shadow-md hover:shadow-emerald-200 active:bg-emerald-800 sm:w-auto"
+              >
+                <Plus className="h-5 w-5" />
+                Input Next Payment
+              </button>
+            )}
         </div>
       </div>
 
-      <AddPaymentModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
+      <AddPaymentModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
         dealId={dealId}
         remainingBalance={remainingBalance}
         accounts={accounts}
@@ -84,48 +102,52 @@ export function DealDetailHeader({ dealId, stockId, status, remainingBalance, ac
       {/* Cancel Confirmation Modal */}
       {isCancelModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" onClick={!isPending ? () => setIsCancelModalOpen(false) : undefined} />
-          <div className="relative w-full max-w-md bg-white rounded-[10px] shadow-2xl p-6 overflow-hidden flex flex-col animate-in fade-in zoom-in-95">
-            <div className="flex items-center gap-3 mb-4 text-red-600">
-              <div className="p-2 bg-red-100 rounded-[10px]">
-                <AlertTriangle className="w-6 h-6" />
+          <div
+            className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm"
+            onClick={!isPending ? () => setIsCancelModalOpen(false) : undefined}
+          />
+          <div className="animate-in fade-in zoom-in-95 relative flex w-full max-w-md flex-col overflow-hidden rounded-[10px] bg-white p-6 shadow-2xl">
+            <div className="mb-4 flex items-center gap-3 text-red-600">
+              <div className="rounded-[10px] bg-red-100 p-2">
+                <AlertTriangle className="h-6 w-6" />
               </div>
               <h2 className="text-xl font-bold">Batalkan Transaksi?</h2>
             </div>
-            
-            <p className="text-gray-600 text-sm mb-6">
-              Anda yakin ingin membatalkan deal ini? Status deal akan menjadi <strong>Batal</strong> dan stok akun akan dikembalikan ke status <strong>Tersedia</strong> di inventori.
+
+            <p className="mb-6 text-sm text-gray-600">
+              Anda yakin ingin membatalkan deal ini? Status deal akan menjadi <strong>Batal</strong>{" "}
+              dan stok akun akan dikembalikan ke status <strong>Tersedia</strong> di inventori.
             </p>
 
             {cancelError && (
-              <div className="mb-6 p-3 bg-red-50 border border-red-100 text-red-700 text-xs rounded-[10px] font-medium">
+              <div className="mb-6 rounded-[10px] border border-red-100 bg-red-50 p-3 text-xs font-medium text-red-700">
                 ⚠️ {cancelError}
               </div>
             )}
 
             <div className="flex justify-end gap-3">
-              <button 
+              <button
                 onClick={() => {
-                  setIsCancelModalOpen(false)
-                  setCancelError(null)
+                  setIsCancelModalOpen(false);
+                  setCancelError(null);
                 }}
                 disabled={isPending}
-                className="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-[10px] transition-all"
+                className="rounded-[10px] border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition-all hover:bg-gray-50"
               >
                 Kembali
               </button>
-              <button 
+              <button
                 onClick={handleCancelDeal}
                 disabled={isPending}
-                className="px-4 py-2 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-[10px] transition-all shadow-sm shadow-red-200 disabled:opacity-70 flex items-center gap-2"
+                className="flex items-center gap-2 rounded-[10px] bg-red-600 px-4 py-2 text-sm font-bold text-white shadow-sm shadow-red-200 transition-all hover:bg-red-700 disabled:opacity-70"
               >
-                {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                {isPending ? 'Membatalkan...' : 'Ya, Batalkan Transaksi'}
+                {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+                {isPending ? "Membatalkan..." : "Ya, Batalkan Transaksi"}
               </button>
             </div>
           </div>
         </div>
       )}
     </>
-  )
+  );
 }

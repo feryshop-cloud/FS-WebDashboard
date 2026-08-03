@@ -1,13 +1,15 @@
-'use server'
+"use server";
 
-import { createClient } from '@/lib/supabase/server'
-import { revalidatePath } from 'next/cache'
+import { createClient } from "@/lib/supabase/server";
+import type { DealStatus, StockStatus } from "@/types/database";
+import { revalidatePath } from "next/cache";
 
 export async function getTradeInDeals() {
-  const supabase = await createClient()
+  const supabase = await createClient();
   const { data, error } = await supabase
-    .from('deals')
-    .select(`
+    .from("deals")
+    .select(
+      `
       *,
       customers (name),
       deal_items (
@@ -17,266 +19,269 @@ export async function getTradeInDeals() {
         description,
         estimated_value
       )
-    `)
-    .eq('deal_type', 'Tukar Tambah')
-    .order('created_at', { ascending: false })
-  
+    `,
+    )
+    .eq("deal_type", "Tukar Tambah")
+    .order("created_at", { ascending: false });
+
   if (error) {
-    console.error('Error fetching trade in deals:', error)
-    throw new Error('Gagal memuat data transaksi Tukar Tambah.')
+    console.error("Error fetching trade in deals:", error);
+    throw new Error("Gagal memuat data transaksi Tukar Tambah.");
   }
-  
-  return data
+
+  return data;
 }
 
 export async function createTukarTambah(formData: FormData) {
-  const customer_name = formData.get('customer_name') as string
-  const customer_phone = (formData.get('customer_phone') as string) || ''
-  const stock_out_id = formData.get('stock_out_id') as string
-  const price_out = parseFloat(formData.get('price_out') as string)
-  
-  const tt_desc = formData.get('tt_desc') as string
-  const tt_value = parseFloat(formData.get('tt_value') as string)
-  
-  const payment_amount = parseFloat(formData.get('payment_amount') as string) || 0
-  const payment_direction = formData.get('payment_direction') as string // 'IN' or 'OUT'
-  const account_id = formData.get('account_id') as string
+  const customer_name = formData.get("customer_name") as string;
+  const customer_phone = (formData.get("customer_phone") as string) || "";
+  const stock_out_id = formData.get("stock_out_id") as string;
+  const price_out = parseFloat(formData.get("price_out") as string);
+
+  const tt_desc = formData.get("tt_desc") as string;
+  const tt_value = parseFloat(formData.get("tt_value") as string);
+
+  const payment_amount = parseFloat(formData.get("payment_amount") as string) || 0;
+  const payment_direction = formData.get("payment_direction") as string; // 'IN' or 'OUT'
+  const account_id = formData.get("account_id") as string;
 
   if (!customer_name || !stock_out_id || !price_out || !tt_desc || !tt_value) {
-    throw new Error('Data customer, stok keluar, dan aset tukar tambah wajib diisi lengkap.')
+    throw new Error("Data customer, stok keluar, dan aset tukar tambah wajib diisi lengkap.");
   }
 
   if (payment_amount > 0 && !account_id) {
-    throw new Error('Rekening tujuan/sumber wajib dipilih untuk transaksi dengan uang tunai.')
+    throw new Error("Rekening tujuan/sumber wajib dipilih untuk transaksi dengan uang tunai.");
   }
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
-    throw new Error('Sesi tidak valid. Silakan login kembali.')
+    throw new Error("Sesi tidak valid. Silakan login kembali.");
   }
 
   // 1. Find or create customer
-  let customerId: string
+  let customerId: string;
   const { data: existingCustomer } = await supabase
-    .from('customers')
-    .select('id')
-    .eq('name', customer_name)
-    .maybeSingle()
+    .from("customers")
+    .select("id")
+    .eq("name", customer_name)
+    .maybeSingle();
 
   if (existingCustomer) {
-    customerId = existingCustomer.id
+    customerId = existingCustomer.id;
   } else {
     const { data: newCustomer, error: customerErr } = await supabase
-      .from('customers')
+      .from("customers")
       .insert({ name: customer_name, phone: customer_phone })
       .select()
-      .single()
-    if (customerErr) throw customerErr
-    customerId = newCustomer.id
+      .single();
+    if (customerErr) throw customerErr;
+    customerId = newCustomer.id;
   }
 
   // 2. Insert Deal (exclude remaining_balance and payment_percentage)
-  const dealNumber = `DEAL-${Date.now()}`
-  const initialPercentage = (tt_value / price_out) * 100
-  let initialDealStatus = 'DRAFT'
-  let initialStockStatus = 'AVAILABLE'
+  const dealNumber = `DEAL-${Date.now()}`;
+  const initialPercentage = (tt_value / price_out) * 100;
+  let initialDealStatus: DealStatus = "DRAFT";
+  let initialStockStatus: StockStatus = "AVAILABLE";
 
   if (initialPercentage >= 100) {
-    initialDealStatus = 'PAID'
-    initialStockStatus = 'SOLD'
+    initialDealStatus = "PAID";
+    initialStockStatus = "SOLD";
   } else if (initialPercentage >= 70) {
-    initialDealStatus = 'LIMITED_ACCESS'
-    initialStockStatus = 'LIMITED_ACCESS'
+    initialDealStatus = "LIMITED_ACCESS";
+    initialStockStatus = "LIMITED_ACCESS";
   } else if (initialPercentage >= 20) {
-    initialDealStatus = 'BOOKED'
-    initialStockStatus = 'BOOKED'
+    initialDealStatus = "BOOKED";
+    initialStockStatus = "BOOKED";
   }
 
   const { data: deal, error: dealErr } = await supabase
-    .from('deals')
+    .from("deals")
     .insert({
       deal_number: dealNumber,
       customer_id: customerId,
-      deal_type: 'Tukar Tambah',
+      deal_type: "Tukar Tambah",
       total_deal_price: price_out,
       total_paid: tt_value,
       status: initialDealStatus,
-      handled_by: user.id
+      handled_by: user.id,
     })
     .select()
-    .single()
-  if (dealErr) throw dealErr
+    .single();
+  if (dealErr) throw dealErr;
 
   // 3. Insert Deal Item
-  const { error: itemErr } = await supabase
-    .from('deal_items')
-    .insert({
-      deal_id: deal.id,
-      stock_id: stock_out_id,
-      price: price_out
-    })
-  if (itemErr) throw itemErr
+  const { error: itemErr } = await supabase.from("deal_items").insert({
+    deal_id: deal.id,
+    stock_id: stock_out_id,
+    price: price_out,
+  });
+  if (itemErr) throw itemErr;
 
   // 4. Insert Trade-in Item
-  const { error: ttErr } = await supabase
-    .from('trade_in_items')
-    .insert({
-      deal_id: deal.id,
-      description: tt_desc,
-      estimated_value: tt_value
-    })
-  if (ttErr) throw ttErr
+  const { error: ttErr } = await supabase.from("trade_in_items").insert({
+    deal_id: deal.id,
+    description: tt_desc,
+    estimated_value: tt_value,
+  });
+  if (ttErr) throw ttErr;
 
   // 5. Update outgoing stock status initially
   const { error: initialStockErr } = await supabase
-    .from('stocks')
-    .update({ 
+    .from("stocks")
+    .update({
       status: initialStockStatus,
-      sold_date: initialStockStatus === 'SOLD' ? new Date().toISOString() : null,
-      booking_date: ['BOOKED', 'LIMITED_ACCESS', 'SOLD'].includes(initialStockStatus) ? new Date().toISOString() : null
-    } as any)
-    .eq('id', stock_out_id)
-  if (initialStockErr) throw initialStockErr
+      sold_date: initialStockStatus === "SOLD" ? new Date().toISOString() : null,
+      booking_date: (["BOOKED", "LIMITED_ACCESS", "SOLD"] as StockStatus[]).includes(initialStockStatus)
+        ? new Date().toISOString()
+        : null,
+    })
+    .eq("id", stock_out_id);
+  if (initialStockErr) throw initialStockErr;
 
   // 6. Handle cash payment if any
   if (payment_amount > 0 && account_id) {
-    if (payment_direction === 'IN') {
+    if (payment_direction === "IN") {
       // Customer pays shop cash: standard process_payment RPC
-      const { error: paymentErr } = await supabase.rpc('process_payment', {
+      const { error: paymentErr } = await supabase.rpc("process_payment", {
         p_deal_id: deal.id,
         p_account_id: account_id,
         p_amount: payment_amount,
         p_notes: `Tukar Tambah - Pembayaran Awal (${tt_desc})`,
-        p_admin_id: user.id
-      })
-      if (paymentErr) throw paymentErr
+        p_admin_id: user.id,
+      });
+      if (paymentErr) throw paymentErr;
     } else {
       // Shop pays customer cash (OUT)
       // Insert Payment
-      const { data: payment, error: payErr } = await supabase
-        .from('payments')
+      const { error: payErr } = await supabase
+        .from("payments")
         .insert({
           deal_id: deal.id,
           account_id: account_id,
           amount: payment_amount,
-          payment_type: 'OUT',
-          status: 'COMPLETED',
+          payment_type: "OUT",
+          status: "COMPLETED",
           notes: `Tukar Tambah - Kembalian Tunai (${tt_desc})`,
-          handled_by: user.id
+          handled_by: user.id,
         })
         .select()
-        .single()
-      if (payErr) throw payErr
+        .single();
+      if (payErr) throw payErr;
 
       // Insert Finance Ledger
-      const { error: ledgerErr } = await supabase
-        .from('finance_ledger')
-        .insert({
-          account_id: account_id,
-          transaction_type: 'PAYMENT_OUT',
-          amount: -payment_amount,
-          notes: `Tukar Tambah - Kembalian Tunai (${tt_desc})`,
-          ref_id: deal.id,
-          created_by: user.id
-        })
-      if (ledgerErr) throw ledgerErr
+      const { error: ledgerErr } = await supabase.from("finance_ledger").insert({
+        account_id: account_id,
+        transaction_type: "PAYMENT_OUT",
+        amount: -payment_amount,
+        notes: `Tukar Tambah - Kembalian Tunai (${tt_desc})`,
+        ref_id: deal.id,
+        created_by: user.id,
+      });
+      if (ledgerErr) throw ledgerErr;
 
       // Deduct Account Balance
       const { data: account, error: accFetchErr } = await supabase
-        .from('accounts')
-        .select('balance')
-        .eq('id', account_id)
-        .single()
-      if (accFetchErr) throw accFetchErr
+        .from("accounts")
+        .select("balance")
+        .eq("id", account_id)
+        .single();
+      if (accFetchErr) throw accFetchErr;
 
       const { error: accUpdateErr } = await supabase
-        .from('accounts')
+        .from("accounts")
         .update({ balance: Number(account.balance) - payment_amount })
-        .eq('id', account_id)
-      if (accUpdateErr) throw accUpdateErr
+        .eq("id", account_id);
+      if (accUpdateErr) throw accUpdateErr;
 
       // Re-calculate deal status with net payment
-      const netPaid = tt_value - payment_amount
-      const netPercentage = (netPaid / price_out) * 100
-      let finalDealStatus = 'DRAFT'
-      let finalStockStatus = 'AVAILABLE'
+      const netPaid = tt_value - payment_amount;
+      const netPercentage = (netPaid / price_out) * 100;
+      let finalDealStatus: DealStatus = "DRAFT";
+      let finalStockStatus: StockStatus = "AVAILABLE";
 
       if (netPercentage >= 100) {
-        finalDealStatus = 'PAID'
-        finalStockStatus = 'SOLD'
+        finalDealStatus = "PAID";
+        finalStockStatus = "SOLD";
       } else if (netPercentage >= 70) {
-        finalDealStatus = 'LIMITED_ACCESS'
-        finalStockStatus = 'LIMITED_ACCESS'
+        finalDealStatus = "LIMITED_ACCESS";
+        finalStockStatus = "LIMITED_ACCESS";
       } else if (netPercentage >= 20) {
-        finalDealStatus = 'BOOKED'
-        finalStockStatus = 'BOOKED'
+        finalDealStatus = "BOOKED";
+        finalStockStatus = "BOOKED";
       }
 
       // Update Deal (exclude remaining_balance and payment_percentage)
       const { error: dealUpdateErr } = await supabase
-        .from('deals')
+        .from("deals")
         .update({
           total_paid: netPaid,
-          status: finalDealStatus
+          status: finalDealStatus,
         })
-        .eq('id', deal.id)
-      if (dealUpdateErr) throw dealUpdateErr
+        .eq("id", deal.id);
+      if (dealUpdateErr) throw dealUpdateErr;
 
       // Update Stock
       const { error: stockUpdateErr } = await supabase
-        .from('stocks')
+        .from("stocks")
         .update({
           status: finalStockStatus,
-          sold_date: finalStockStatus === 'SOLD' ? new Date().toISOString() : null,
-          booking_date: ['BOOKED', 'LIMITED_ACCESS', 'SOLD'].includes(finalStockStatus) ? new Date().toISOString() : null
-        } as any)
-        .eq('id', stock_out_id)
-      if (stockUpdateErr) throw stockUpdateErr
+          sold_date: finalStockStatus === "SOLD" ? new Date().toISOString() : null,
+          booking_date: (["BOOKED", "LIMITED_ACCESS", "SOLD"] as StockStatus[]).includes(finalStockStatus)
+            ? new Date().toISOString()
+            : null,
+        })
+        .eq("id", stock_out_id);
+      if (stockUpdateErr) throw stockUpdateErr;
     }
   } else {
     // If no payment, remaining_balance = price_out - tt_value
-    const netPaid = tt_value
-    const netPercentage = (netPaid / price_out) * 100
-    let finalDealStatus = 'DRAFT'
-    let finalStockStatus = 'AVAILABLE'
+    const netPaid = tt_value;
+    const netPercentage = (netPaid / price_out) * 100;
+    let finalDealStatus: DealStatus = "DRAFT";
+    let finalStockStatus: StockStatus = "AVAILABLE";
 
     if (netPercentage >= 100) {
-      finalDealStatus = 'PAID'
-      finalStockStatus = 'SOLD'
+      finalDealStatus = "PAID";
+      finalStockStatus = "SOLD";
     } else if (netPercentage >= 70) {
-      finalDealStatus = 'LIMITED_ACCESS'
-      finalStockStatus = 'LIMITED_ACCESS'
+      finalDealStatus = "LIMITED_ACCESS";
+      finalStockStatus = "LIMITED_ACCESS";
     } else if (netPercentage >= 20) {
-      finalDealStatus = 'BOOKED'
-      finalStockStatus = 'BOOKED'
+      finalDealStatus = "BOOKED";
+      finalStockStatus = "BOOKED";
     }
 
     // Update Deal (exclude remaining_balance and payment_percentage)
     const { error: dealUpdateErr } = await supabase
-      .from('deals')
+      .from("deals")
       .update({
         total_paid: netPaid,
-        status: finalDealStatus
+        status: finalDealStatus,
       })
-      .eq('id', deal.id)
-    if (dealUpdateErr) throw dealUpdateErr
+      .eq("id", deal.id);
+    if (dealUpdateErr) throw dealUpdateErr;
 
     // Update Stock
     const { error: stockUpdateErr } = await supabase
-      .from('stocks')
+      .from("stocks")
       .update({
-        status: finalStockStatus,
-        sold_date: finalStockStatus === 'SOLD' ? new Date().toISOString() : null,
-        booking_date: ['BOOKED', 'LIMITED_ACCESS', 'SOLD'].includes(finalStockStatus) ? new Date().toISOString() : null
-      } as any)
-      .eq('id', stock_out_id)
-    if (stockUpdateErr) throw stockUpdateErr
+      status: finalStockStatus,
+      sold_date: finalStockStatus === "SOLD" ? new Date().toISOString() : null,
+      booking_date: (["BOOKED", "LIMITED_ACCESS", "SOLD"] as StockStatus[]).includes(finalStockStatus)
+        ? new Date().toISOString()
+        : null,
+    })
+      .eq("id", stock_out_id);
+    if (stockUpdateErr) throw stockUpdateErr;
   }
 
-  revalidatePath('/dashboard/trade-in')
-  revalidatePath('/dashboard/deals')
-  revalidatePath('/dashboard/inventory')
-  revalidatePath('/dashboard/accounts')
-  revalidatePath('/dashboard/ledger')
+  revalidatePath("/dashboard/trade-in");
+  revalidatePath("/dashboard/deals");
+  revalidatePath("/dashboard/inventory");
+  revalidatePath("/dashboard/accounts");
+  revalidatePath("/dashboard/ledger");
 }

@@ -1,43 +1,42 @@
-'use client'
+"use client";
 
-import { useState, useTransition } from 'react'
-import { login } from '@/actions/auth'
-import { Mail, Lock, Loader2, Eye, EyeOff } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { useState, useTransition } from "react";
+import { login } from "@/actions/auth";
+import { Mail, Lock, Loader2, Eye, EyeOff } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-  const [error, setError] = useState<string | null>(null)
-  const [isPending, startTransition] = useTransition()
-  const [showPassword, setShowPassword] = useState(false)
-  const router = useRouter()
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+  const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setError(null)
-    const formData = new FormData(e.currentTarget)
+    e.preventDefault();
+    setError(null);
+    const formData = new FormData(e.currentTarget);
 
     startTransition(async () => {
-      const result = await login(formData)
+      const result = await login(formData);
       if (result?.success) {
-        router.push('/dashboard')
+        router.push("/dashboard");
       } else {
-        setError(result?.error || 'Terjadi kesalahan. Silakan coba lagi.')
+        setError(result?.error || "Terjadi kesalahan. Silakan coba lagi.");
       }
-    })
-  }
+    });
+  };
 
   return (
-    <div className="h-screen w-full flex overflow-hidden bg-white">
-
+    <div className="flex h-screen w-full overflow-hidden bg-white">
       {/* ====== LEFT PANEL: VISUAL BRANDING ====== */}
       <div
-        className="hidden lg:flex w-1/2 relative flex-col justify-end overflow-hidden"
-        style={{ backgroundColor: '#1e40af' }}
+        className="relative hidden w-1/2 flex-col justify-end overflow-hidden lg:flex"
+        style={{ backgroundColor: "#1e40af" }}
       >
         {/* Abstract wavy gradient overlay */}
         <div className="absolute inset-0 flex items-center justify-center">
           <svg
-            className="w-[600px] h-[600px] opacity-40"
+            className="h-[600px] w-[600px] opacity-40"
             viewBox="0 0 600 600"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -67,7 +66,7 @@ export default function LoginPage() {
 
         {/* Subtle wavy line pattern */}
         <svg
-          className="absolute inset-0 w-full h-full opacity-[0.04]"
+          className="absolute inset-0 h-full w-full opacity-[0.04]"
           viewBox="0 0 800 800"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -84,61 +83,61 @@ export default function LoginPage() {
 
         {/* Decorative asterisk top-left */}
         <div className="absolute top-12 left-12 z-10">
-          <svg className="w-10 h-10 text-white/70" viewBox="0 0 40 40" fill="currentColor">
+          <svg className="h-10 w-10 text-white/70" viewBox="0 0 40 40" fill="currentColor">
             <path d="M20 2 L22 16 L36 12 L24 20 L36 28 L22 24 L20 38 L18 24 L4 28 L16 20 L4 12 L18 16 Z" />
           </svg>
         </div>
 
         {/* Bottom content */}
         <div className="relative z-10 px-14 pb-16">
-          <p className="text-blue-300/80 text-sm font-medium tracking-wide mb-4">
+          <p className="mb-4 text-sm font-medium tracking-wide text-blue-300/80">
             Sistem Mutasi Ferryshop
           </p>
-          <h2 className="text-white text-[32px] font-bold leading-tight max-w-[380px]">
+          <h2 className="max-w-[380px] text-[32px] leading-tight font-bold text-white">
             Pusat Data Stok
             <br />& Kas Terpadu
-            <br />Ferryshop
+            <br />
+            Ferryshop
           </h2>
-          <p className="text-white/40 text-sm mt-5 max-w-[340px] leading-relaxed">
+          <p className="mt-5 max-w-[340px] text-sm leading-relaxed text-white/40">
             Sistem mutasi khusus untuk efisiensi operasional Admin Ferryshop.
           </p>
         </div>
       </div>
 
       {/* ====== RIGHT PANEL: FORM ====== */}
-      <div className="w-full lg:w-1/2 flex flex-col justify-center px-10 sm:px-16 lg:px-20 py-12">
-        <div className="w-full max-w-[420px] mx-auto">
-
+      <div className="flex w-full flex-col justify-center px-10 py-12 sm:px-16 lg:w-1/2 lg:px-20">
+        <div className="mx-auto w-full max-w-[420px]">
           {/* Decorative asterisk */}
           <div className="mb-8">
-            <svg className="w-8 h-8" viewBox="0 0 40 40" fill="#2563EB">
+            <svg className="h-8 w-8" viewBox="0 0 40 40" fill="#2563EB">
               <path d="M20 2 L22 16 L36 12 L24 20 L36 28 L22 24 L20 38 L18 24 L4 28 L16 20 L4 12 L18 16 Z" />
             </svg>
           </div>
 
           {/* Header */}
-          <h1 className="text-[28px] font-bold text-slate-900 tracking-tight leading-tight">
+          <h1 className="text-[28px] leading-tight font-bold tracking-tight text-slate-900">
             Masuk Admin
           </h1>
-          <p className="text-sm text-slate-500 mt-3 leading-relaxed max-w-[360px]">
+          <p className="mt-3 max-w-[360px] text-sm leading-relaxed text-slate-500">
             Silakan masukkan kredensial untuk melanjutkan ke dashboard.
           </p>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="mt-10 space-y-5">
             {error && (
-              <div className="p-3 text-sm text-rose-600 bg-rose-50 rounded-xl ring-1 ring-rose-200">
+              <div className="rounded-xl bg-rose-50 p-3 text-sm text-rose-600 ring-1 ring-rose-200">
                 {error}
               </div>
             )}
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5" htmlFor="email">
+              <label className="mb-1.5 block text-sm font-medium text-slate-700" htmlFor="email">
                 Alamat Email
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
                   <Mail className="h-[18px] w-[18px] text-slate-400" strokeWidth={1.5} />
                 </div>
                 <input
@@ -147,7 +146,7 @@ export default function LoginPage() {
                   type="email"
                   autoComplete="email"
                   required
-                  className="block w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 text-sm text-slate-900 placeholder-slate-400 transition-colors"
+                  className="block w-full rounded-xl border border-slate-200 bg-white py-3 pr-4 pl-11 text-sm text-slate-900 placeholder-slate-400 transition-colors focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                   placeholder="admin@ferryshop.com"
                 />
               </div>
@@ -155,26 +154,26 @@ export default function LoginPage() {
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5" htmlFor="password">
+              <label className="mb-1.5 block text-sm font-medium text-slate-700" htmlFor="password">
                 Kata Sandi
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
                   <Lock className="h-[18px] w-[18px] text-slate-400" strokeWidth={1.5} />
                 </div>
                 <input
                   id="password"
                   name="password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   required
-                  className="block w-full pl-11 pr-11 py-3 border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 text-sm text-slate-900 placeholder-slate-400 transition-colors"
+                  className="block w-full rounded-xl border border-slate-200 bg-white py-3 pr-11 pl-11 text-sm text-slate-900 placeholder-slate-400 transition-colors focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                   placeholder="••••••••"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+                  className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 transition-colors hover:text-slate-600"
                 >
                   {showPassword ? (
                     <EyeOff className="h-[18px] w-[18px]" strokeWidth={1.5} />
@@ -187,7 +186,7 @@ export default function LoginPage() {
 
             {/* Remember + Forgot */}
             <div className="flex items-center justify-between pt-1">
-              <label className="flex items-center gap-2 cursor-pointer">
+              <label className="flex cursor-pointer items-center gap-2">
                 <input
                   type="checkbox"
                   className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500/20"
@@ -197,7 +196,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 className="text-sm font-medium transition-colors"
-                style={{ color: '#2563EB' }}
+                style={{ color: "#2563EB" }}
               >
                 Lupa password?
               </button>
@@ -207,24 +206,18 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isPending}
-              className="w-full flex justify-center items-center py-3.5 px-4 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-200"
+              className="flex w-full items-center justify-center rounded-xl bg-blue-600 px-4 py-3.5 text-sm font-semibold text-white transition-all duration-200 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-70"
             >
-              {isPending ? (
-                <Loader2 className="animate-spin h-5 w-5" />
-              ) : (
-                'Masuk'
-              )}
+              {isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : "Masuk"}
             </button>
           </form>
 
           {/* Footer */}
-          <p className="text-sm text-slate-500 text-center mt-10">
-            Belum punya akun?{' '}
-            <span className="font-semibold text-blue-600">Hubungi Admin.</span>
+          <p className="mt-10 text-center text-sm text-slate-500">
+            Belum punya akun? <span className="font-semibold text-blue-600">Hubungi Admin.</span>
           </p>
         </div>
       </div>
-
     </div>
-  )
+  );
 }

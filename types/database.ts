@@ -2,13 +2,40 @@
 // ENUMS
 // ============================================================================
 
-export type UserRole = 'OWNER' | 'ADMIN' | 'VIEWER';
-export type StockStatus = 'AVAILABLE' | 'BOOKED' | 'LIMITED_ACCESS' | 'SOLD' | 'ON_HOLD' | 'PROBLEM_ACTION' | 'PROBLEM_PERMANENT' | 'CANCELLED';
-export type PurchasePaymentStatus = 'LUNAS' | 'PENDING';
-export type DealStatus = 'DRAFT' | 'BOOKED' | 'LIMITED_ACCESS' | 'PAID' | 'CANCELLED_BY_BUYER' | 'CANCELLED_BY_SELLER' | 'REFUND_PARTIAL' | 'REFUND_FULL' | 'PROBLEM' | 'COMPLETED';
-export type PaymentStatus = 'PENDING' | 'COMPLETED' | 'FAILED' | 'REFUNDED';
-export type PaymentType = 'IN' | 'OUT';
-export type LedgerTransactionType = 'PAYMENT_IN' | 'PAYMENT_OUT' | 'REFUND' | 'CASHBACK' | 'TRANSFER_IN' | 'TRANSFER_OUT' | 'STOCK_PURCHASE' | 'ADJUSTMENT';
+export type UserRole = "OWNER" | "ADMIN" | "VIEWER";
+export type StockStatus =
+  | "AVAILABLE"
+  | "BOOKED"
+  | "LIMITED_ACCESS"
+  | "SOLD"
+  | "ON_HOLD"
+  | "PROBLEM_ACTION"
+  | "PROBLEM_PERMANENT"
+  | "CANCELLED";
+export type PurchasePaymentStatus = "LUNAS" | "PENDING";
+export type DealStatus =
+  | "DRAFT"
+  | "BOOKED"
+  | "LIMITED_ACCESS"
+  | "PAID"
+  | "CANCELLED_BY_BUYER"
+  | "CANCELLED_BY_SELLER"
+  | "REFUND_PARTIAL"
+  | "REFUND_FULL"
+  | "PROBLEM"
+  | "COMPLETED";
+export type PaymentStatus = "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";
+export type PaymentType = "IN" | "OUT";
+export type LedgerTransactionType =
+  | "PAYMENT_IN"
+  | "PAYMENT_OUT"
+  | "REFUND"
+  | "CASHBACK"
+  | "TRANSFER_IN"
+  | "TRANSFER_OUT"
+  | "STOCK_PURCHASE"
+  | "ADJUSTMENT";
+export type InventoryStatus = "UNPOSTED" | "AVAILABLE" | "SOLD";
 
 // ============================================================================
 // INTERFACES
@@ -17,7 +44,7 @@ export type LedgerTransactionType = 'PAYMENT_IN' | 'PAYMENT_OUT' | 'REFUND' | 'C
 export interface Role {
   id: string; // UUID
   name: string;
-  permissions: Record<string, any>; // JSONB
+  permissions: Record<string, JsonValue>; // JSONB
   created_at: string;
   updated_at: string;
 }
@@ -50,29 +77,29 @@ export interface Stock {
   username: string | null;
   password: string | null;
   backup_code: string | null;
-  
+
   capital_price: number;
   post_price: number;
   promo_price: number | null;
   current_price: number;
-  
+
   status: StockStatus;
   purchase_payment_status: PurchasePaymentStatus;
   payment_account_id: string | null;
-  
+
   purchase_date: string | null;
   post_date: string | null;
   booking_date: string | null;
   sold_date: string | null;
-  
+
   seller_info: string | null;
   buyer_info: string | null;
   internal_notes: string | null;
-  
+
   images: string[];
-  
+
   admin_id: string | null;
-  
+
   created_at: string;
   updated_at: string;
 }
@@ -82,20 +109,20 @@ export interface Deal {
   deal_number: string;
   customer_name: string;
   customer_contact: string | null;
-  
+
   stock_id: string;
-  
+
   deal_price: number;
   total_paid: number;
   remaining_balance: number;
   payment_percentage: number;
-  
+
   status: DealStatus;
   due_date: string | null;
   notes: string | null;
-  
+
   admin_id: string | null;
-  
+
   created_at: string;
   updated_at: string;
 }
@@ -104,16 +131,16 @@ export interface Payment {
   id: string; // UUID
   deal_id: string;
   account_id: string;
-  
+
   amount: number;
   payment_type: PaymentType;
   status: PaymentStatus;
-  
+
   proof_url: string | null;
   notes: string | null;
-  
+
   admin_id: string | null;
-  
+
   created_at: string;
   updated_at: string;
 }
@@ -121,17 +148,17 @@ export interface Payment {
 export interface FinanceLedger {
   id: string; // UUID
   account_id: string;
-  
+
   transaction_type: LedgerTransactionType;
   amount: number; // Positive for IN, Negative for OUT
-  
+
   deal_id: string | null;
   payment_id: string | null;
   stock_id: string | null;
-  
+
   description: string | null;
   admin_id: string | null;
-  
+
   created_at: string;
 }
 
@@ -141,14 +168,14 @@ export interface AuditLog {
   role_name: string | null;
   action: string;
   module: string;
-  
-  old_data: Record<string, any> | null;
-  new_data: Record<string, any> | null;
-  
+
+  old_data: Record<string, JsonValue> | null;
+  new_data: Record<string, JsonValue> | null;
+
   related_id: string | null;
   description: string | null;
   ip_address: string | null;
-  
+
   created_at: string;
 }
 
@@ -160,6 +187,9 @@ export interface DealWithRelations extends Deal {
   stock?: Stock;
   payments?: Payment[];
   admin?: PublicUser;
+  customers?: { name: string | null; phone?: string | null } | null;
+  deal_items?: Array<{ stock_id?: string | null; stocks?: Partial<Stock> | null }>;
+  total_deal_price?: number | null;
 }
 
 export interface PaymentWithRelations extends Payment {
@@ -170,8 +200,82 @@ export interface PaymentWithRelations extends Payment {
 
 export interface LedgerWithRelations extends FinanceLedger {
   account?: Account;
+  accounts?: Pick<Account, "name"> | null;
   deal?: Deal;
   payment?: Payment;
   stock?: Stock;
   admin?: PublicUser;
+  notes?: string | null;
+  ref_id?: string | null;
+}
+
+export type JsonValue =
+  string | number | boolean | null | { [key: string]: JsonValue } | JsonValue[];
+
+export interface Game {
+  id: string;
+  name: string;
+  slug?: string;
+  image_url?: string | null;
+  is_active?: boolean;
+}
+
+export interface InventoryItemWithGame {
+  id: string;
+  title_reference: string | null;
+  name?: string | null;
+  sku?: string | null;
+  account_specs?: string | null;
+  capital_price?: number;
+  asking_price: number;
+  sold_price?: number | null;
+  status: InventoryStatus;
+  created_at: string;
+  sold_at?: string | null;
+  image_urls?: string[];
+  screenshot_url?: string | null;
+  games?: Game | null;
+}
+
+export interface PurchaseWithRelations {
+  id: string;
+  game_id?: string;
+  account_id?: string;
+  purchase_date?: string;
+  status?: string;
+  sku?: string | null;
+  name?: string | null;
+  category?: string | null;
+  seller_info?: string | null;
+  capital_price?: number;
+  purchase_payment_status?: PurchasePaymentStatus | null;
+  created_at?: string;
+  games?: Game | null;
+  accounts?: Account | null;
+  [key: string]: unknown;
+}
+
+export interface TradeInWithRelations {
+  id: string;
+  deal_number?: string;
+  total_paid?: number;
+  total_deal_price?: number | null;
+  deal_items?: Array<{ stocks?: Stock | null }>;
+  trade_in_items?: unknown[];
+  [key: string]: unknown;
+}
+
+export interface ProblemCaseWithRelations {
+  id: string;
+  case_number?: string;
+  title?: string;
+  status?: string;
+  issue_type?: string;
+  created_at?: string;
+  deals?: { deal_number?: string | null } | null;
+  stocks?: { sku?: string | null; name?: string | null } | null;
+  customers?: { name?: string | null } | null;
+  deal?: Deal | null;
+  stock?: Stock | null;
+  [key: string]: unknown;
 }
