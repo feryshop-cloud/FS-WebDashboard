@@ -1,15 +1,18 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Users, FolderTree, Shield, RefreshCw } from "lucide-react";
-import { getCategories, getUsersList, getRolesList } from "@/actions/settings";
+import { useState, useEffect } from "react";
+import { Users, FolderTree, Shield, RefreshCw, Gamepad2 } from "lucide-react";
+import { getCategories, getUsersList, getRolesList, getGamesList } from "@/actions/settings";
 import { GameCategoryManager } from "@/components/features/GameCategoryManager";
+import { GameManager } from "@/components/features/GameManager";
 import { UserManagementTab } from "@/components/settings/UserManagementTab";
 import { RoleManagementTab } from "@/components/settings/RoleManagementTab";
 import type { Database } from "@/types/database.types";
 
+type ActiveTab = "users" | "roles" | "categories" | "games";
+
 export default function SettingsPage() {
-  const [activeTab, setActiveTab] = useState<"users" | "roles" | "categories">("users");
+  const [activeTab, setActiveTab] = useState<ActiveTab>("users");
 
   const [categories, setCategories] = useState<unknown[]>([]);
   const [categoriesError, setCategoriesError] = useState<string>("");
@@ -20,15 +23,19 @@ export default function SettingsPage() {
   const [roles, setRoles] = useState<unknown[]>([]);
   const [rolesError, setRolesError] = useState<string>("");
 
+  const [games, setGames] = useState<unknown[]>([]);
+  const [gamesError, setGamesError] = useState<string>("");
+
   const [isLoading, setIsLoading] = useState(true);
 
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const [catRes, userRes, roleRes] = await Promise.all([
+      const [catRes, userRes, roleRes, gameRes] = await Promise.all([
         getCategories(),
         getUsersList(),
         getRolesList(),
+        getGamesList(),
       ]);
 
       if (catRes.error) setCategoriesError(catRes.error);
@@ -39,6 +46,9 @@ export default function SettingsPage() {
 
       if (roleRes.error) setRolesError(roleRes.error);
       else setRoles(roleRes.data || []);
+
+      if (gameRes.error) setGamesError(gameRes.error);
+      else setGames(gameRes.data || []);
     } catch (err) {
       console.error("Error loading settings data:", err);
     } finally {
@@ -47,9 +57,24 @@ export default function SettingsPage() {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadData();
+    let isMounted = true;
+    const init = async () => {
+      if (isMounted) {
+        await loadData();
+      }
+    };
+    init();
+    return () => {
+      isMounted = false;
+    };
   }, []);
+
+  const navItems: { id: ActiveTab; label: string; icon: React.ReactNode }[] = [
+    { id: "users", label: "Manajemen User", icon: <Users className="h-5 w-5" /> },
+    { id: "roles", label: "Hak Akses / Role", icon: <Shield className="h-5 w-5" /> },
+    { id: "games", label: "Master Game", icon: <Gamepad2 className="h-5 w-5" /> },
+    { id: "categories", label: "Kategori", icon: <FolderTree className="h-5 w-5" /> },
+  ];
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 pb-8">
@@ -58,7 +83,7 @@ export default function SettingsPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">Pengaturan Sistem</h1>
           <p className="mt-0.5 text-sm text-slate-500">
-            Konfigurasi user, role & hak akses, dan data master kategori Feryshop.
+            Konfigurasi user, role & hak akses, master game, dan kategori Feryshop.
           </p>
         </div>
         <button
@@ -73,37 +98,21 @@ export default function SettingsPage() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
         {/* Sidebar Nav */}
-        <div className="flex flex-col gap-2 lg:col-span-3">
-          <button
-            onClick={() => setActiveTab("users")}
-            className={`flex items-center gap-3 rounded-lg px-4 py-3 text-left text-sm font-medium transition-colors ${
-              activeTab === "users"
-                ? "border border-blue-100 bg-blue-50 font-semibold text-blue-700 shadow-sm"
-                : "text-slate-600 hover:bg-slate-50"
-            }`}
-          >
-            <Users className="h-5 w-5" /> Manajemen User
-          </button>
-          <button
-            onClick={() => setActiveTab("roles")}
-            className={`flex items-center gap-3 rounded-lg px-4 py-3 text-left text-sm font-medium transition-colors ${
-              activeTab === "roles"
-                ? "border border-blue-100 bg-blue-50 font-semibold text-blue-700 shadow-sm"
-                : "text-slate-600 hover:bg-slate-50"
-            }`}
-          >
-            <Shield className="h-5 w-5" /> Hak Akses / Role
-          </button>
-          <button
-            onClick={() => setActiveTab("categories")}
-            className={`flex items-center gap-3 rounded-lg px-4 py-3 text-left text-sm font-medium transition-colors ${
-              activeTab === "categories"
-                ? "border border-blue-100 bg-blue-50 font-semibold text-blue-700 shadow-sm"
-                : "text-slate-600 hover:bg-slate-50"
-            }`}
-          >
-            <FolderTree className="h-5 w-5" /> Kategori
-          </button>
+        <div className="flex flex-col gap-1 lg:col-span-3">
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`flex items-center gap-3 rounded-lg px-4 py-3 text-left text-sm font-medium transition-colors ${
+                activeTab === item.id
+                  ? "border border-blue-100 bg-blue-50 font-semibold text-blue-700 shadow-sm"
+                  : "text-slate-600 hover:bg-slate-50"
+              }`}
+            >
+              {item.icon}
+              {item.label}
+            </button>
+          ))}
         </div>
 
         {/* Content Area */}
@@ -125,23 +134,22 @@ export default function SettingsPage() {
             />
           )}
 
+          {activeTab === "games" && (
+            <GameManager
+              initialGames={
+                (games as unknown as Database["public"]["Tables"]["games"]["Row"][]) || []
+              }
+              errorMsg={gamesError ? `Gagal memuat game: ${gamesError}` : undefined}
+            />
+          )}
+
           {activeTab === "categories" && (
-            <div className="overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm">
-              <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-4">
-                <h2 className="text-base font-bold text-slate-800">Master Kategori Game</h2>
-              </div>
-              <div className="p-6">
-                <GameCategoryManager
-                  initialCategories={
-                    (categories as unknown as Database["public"]["Tables"]["categories"]["Row"][]) ||
-                    []
-                  }
-                  errorMsg={
-                    categoriesError ? `Gagal memuat kategori: ${categoriesError}` : undefined
-                  }
-                />
-              </div>
-            </div>
+            <GameCategoryManager
+              initialCategories={
+                (categories as unknown as Database["public"]["Tables"]["categories"]["Row"][]) || []
+              }
+              errorMsg={categoriesError ? `Gagal memuat kategori: ${categoriesError}` : undefined}
+            />
           )}
         </div>
       </div>
