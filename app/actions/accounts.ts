@@ -125,3 +125,22 @@ export async function updateAccount(id: string, formData: FormData) {
   });
 }
 
+export async function deleteAccount(id: string) {
+  return runAction("deleteAccount", async () => {
+    if (!id) {
+      throw new Error("ID rekening wajib diisi.");
+    }
+
+    const supabase = await createClient();
+
+    const { error } = await supabase.from("accounts").delete().eq("id", id);
+
+    if (error) {
+      logger.error("Error deleting account", { error });
+      throw new Error("Gagal menghapus rekening. Rekening mungkin terikat dengan riwayat transaksi.");
+    }
+
+    revalidatePath("/dashboard/accounts");
+  });
+}
+

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Plus,
   ArrowRightLeft,
@@ -12,10 +12,18 @@ import {
   MoreHorizontal,
   X,
   Loader2,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
 import { getErrorMessage } from "@/lib/error";
-import { getAccounts, addAccount, transferBalance } from "@/app/actions/accounts";
+import {
+  getAccounts,
+  addAccount,
+  updateAccount,
+  deleteAccount,
+  transferBalance,
+} from "@/app/actions/accounts";
 import type { Database } from "@/types/database.types";
 
 type Account = Database["public"]["Tables"]["accounts"]["Row"];
@@ -23,10 +31,15 @@ type Account = Database["public"]["Tables"]["accounts"]["Row"];
 export default function AccountsPage() {
   const [isAddAccountOpen, setIsAddAccountOpen] = useState(false);
   const [isMutasiOpen, setIsMutasiOpen] = useState(false);
+  const [editingAccount, setEditingAccount] = useState<Account | null>(null);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const loadAccounts = async () => {
     try {
@@ -41,8 +54,30 @@ export default function AccountsPage() {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadAccounts();
+    let isMounted = true;
+    getAccounts()
+      .then((data) => {
+        if (isMounted) setAccounts(data);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpenMenuId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleAddAccount = async (formData: FormData) => {
@@ -56,6 +91,37 @@ export default function AccountsPage() {
       setError(getErrorMessage(err));
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleUpdateAccount = async (formData: FormData) => {
+    if (!editingAccount) return;
+    try {
+      setIsSubmitting(true);
+      setError("");
+      await updateAccount(editingAccount.id, formData);
+      setEditingAccount(null);
+      loadAccounts();
+    } catch (err: unknown) {
+      setError(getErrorMessage(err));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteAccount = async (account: Account) => {
+    if (!confirm(`Apakah Anda yakin ingin menghapus rekening "${account.name}"?`)) return;
+
+    try {
+      setIsDeletingId(account.id);
+      setError("");
+      await deleteAccount(account.id);
+      setOpenMenuId(null);
+      loadAccounts();
+    } catch (err: unknown) {
+      alert(getErrorMessage(err));
+    } finally {
+      setIsDeletingId(null);
     }
   };
 
@@ -100,15 +166,21 @@ export default function AccountsPage() {
         </div>
         <div className="flex items-center gap-3">
           <button
-            onClick={() => setIsMutasiOpen(true)}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-900"
+            onClick={() => {
+              setError("");
+              setIsMutasiOpen(true);
+            }}
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:text-slate-900"
           >
             <ArrowRightLeft className="h-4 w-4" />
             Mutasi Saldo
           </button>
           <button
-            onClick={() => setIsAddAccountOpen(true)}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700"
+            onClick={() => {
+              setError("");
+              setIsAddAccountOpen(true);
+            }}
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-transparent bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700"
           >
             <Plus className="h-4 w-4" />
             Tambah Rekening
@@ -117,7 +189,7 @@ export default function AccountsPage() {
       </div>
 
       {/* Summary Card */}
-      <div className="group relative flex flex-col items-start justify-between gap-4 overflow-hidden rounded-xl border border-slate-100 bg-white p-6 shadow-sm sm:flex-row sm:items-center">
+      <div className="group relative flex flex-col items-start justify-between gap-4 overflow-hidden rounded-2xl border border-slate-100 bg-white p-6 shadow-sm sm:flex-row sm:items-center">
         <svg
           className="pointer-events-none absolute right-0 bottom-0 h-full w-64 opacity-[0.02] transition-opacity group-hover:opacity-5"
           viewBox="0 0 100 50"
@@ -126,11 +198,11 @@ export default function AccountsPage() {
           <path d="M0,50 L0,30 Q25,50 50,20 T100,10 L100,50 Z" fill="#2563eb" />
         </svg>
         <div className="relative z-10 flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full border border-blue-100 bg-blue-50 text-blue-600">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-blue-100 bg-blue-50 text-blue-600">
             <Wallet className="h-6 w-6" />
           </div>
           <div>
-            <h2 className="text-sm font-semibold tracking-wider text-slate-500 uppercase">
+            <h2 className="text-xs font-semibold tracking-wider text-slate-400 uppercase">
               Total Saldo Kas
             </h2>
             <p className="mt-1 text-3xl font-bold tracking-tight text-slate-900">
@@ -138,7 +210,7 @@ export default function AccountsPage() {
             </p>
           </div>
         </div>
-        <div className="relative z-10 flex flex-col items-end rounded-lg border border-slate-100 bg-slate-50 px-4 py-2">
+        <div className="relative z-10 flex flex-col items-end rounded-xl border border-slate-100 bg-slate-50 px-4 py-2">
           <span className="text-xs font-medium text-slate-500">Jumlah Rekening Aktif</span>
           <span className="text-lg font-bold text-slate-800">
             {accounts.filter((a) => a.is_active).length}
@@ -148,51 +220,108 @@ export default function AccountsPage() {
 
       {/* Grid of Accounts */}
       {isLoading ? (
-        <div className="flex items-center justify-center py-12">
+        <div className="flex items-center justify-center py-16">
           <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
           {accounts.map((account) => {
             const IconComponent = getIcon(account.type);
             const colorClass = getColor(account.type);
+            const isMenuOpen = openMenuId === account.id;
+
             return (
               <div
                 key={account.id}
-                className="group relative rounded-xl border border-slate-100 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+                className="group relative flex flex-col justify-between rounded-2xl border border-slate-100 bg-white p-5 shadow-sm transition-all hover:border-slate-200 hover:shadow-md"
               >
-                <div className="absolute top-4 right-4">
-                  <button className="rounded-md p-1.5 text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-600">
-                    <MoreHorizontal className="h-5 w-5" />
-                  </button>
-                </div>
+                <div>
+                  {/* Card Header & Action Dropdown */}
+                  <div className="flex items-start justify-between gap-2 mb-4">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`flex h-11 w-11 items-center justify-center rounded-2xl border ${colorClass}`}
+                      >
+                        <IconComponent className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <h3 className="text-base leading-tight font-bold text-slate-900">
+                            {account.name}
+                          </h3>
+                          {!account.is_active && (
+                            <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-400">
+                              Nonaktif
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs font-medium text-slate-500">{account.type}</p>
+                      </div>
+                    </div>
 
-                <div className="mb-4 flex items-center gap-3">
-                  <div
-                    className={`flex h-10 w-10 items-center justify-center rounded-full border ${colorClass}`}
-                  >
-                    <IconComponent className="h-5 w-5" />
+                    {/* Action Menu Toggle Button */}
+                    <div className="relative">
+                      <button
+                        onClick={() => setOpenMenuId(isMenuOpen ? null : account.id)}
+                        title="Opsi Rekening"
+                        className={`rounded-lg p-1.5 transition-colors ${
+                          isMenuOpen
+                            ? "bg-slate-100 text-slate-900"
+                            : "text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                        }`}
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                      </button>
+
+                      {/* Dropdown Menu */}
+                      {isMenuOpen && (
+                        <div
+                          ref={menuRef}
+                          className="absolute right-0 top-8 z-30 w-44 rounded-xl border border-slate-100 bg-white p-1.5 shadow-xl animate-in fade-in slide-in-from-top-2 duration-150"
+                        >
+                          <button
+                            onClick={() => {
+                              setOpenMenuId(null);
+                              setError("");
+                              setEditingAccount(account);
+                            }}
+                            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                          >
+                            <Pencil className="h-3.5 w-3.5 text-blue-600" />
+                            Edit Rekening
+                          </button>
+                          <button
+                            onClick={() => handleDeleteAccount(account)}
+                            disabled={isDeletingId === account.id}
+                            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 transition-colors disabled:opacity-50"
+                          >
+                            {isDeletingId === account.id ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin text-rose-600" />
+                            ) : (
+                              <Trash2 className="h-3.5 w-3.5 text-rose-600" />
+                            )}
+                            Hapus Rekening
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-base leading-tight font-bold text-slate-900">
-                      {account.name}
-                    </h3>
-                    <p className="text-xs font-medium text-slate-500">{account.type}</p>
+
+                  {/* Account Number */}
+                  <div className="mb-4 rounded-xl border border-slate-100 bg-slate-50/70 p-3">
+                    <p className="mb-0.5 text-[10px] font-semibold tracking-wider text-slate-400 uppercase">
+                      Nomor Rekening / ID
+                    </p>
+                    <p className="font-mono text-sm font-semibold tracking-wide text-slate-700">
+                      {account.account_number || "-"}
+                    </p>
                   </div>
                 </div>
 
-                <div className="mb-4 rounded-lg border border-slate-100 bg-slate-50 p-3">
-                  <p className="mb-0.5 text-[10px] font-medium tracking-wider text-slate-400 uppercase">
-                    Nomor Rekening / ID
-                  </p>
-                  <p className="font-mono text-sm font-semibold tracking-wide text-slate-700">
-                    {account.account_number || "-"}
-                  </p>
-                </div>
-
+                {/* Balance Footer */}
                 <div className="flex items-end justify-between border-t border-slate-100 pt-4">
                   <div>
-                    <p className="mb-0.5 text-[10px] font-medium tracking-wider text-slate-400 uppercase">
+                    <p className="mb-0.5 text-[10px] font-semibold tracking-wider text-slate-400 uppercase">
                       Saldo Terkini
                     </p>
                     <p className="text-xl font-bold tracking-tight text-slate-900">
@@ -201,7 +330,7 @@ export default function AccountsPage() {
                   </div>
                   <Link
                     href={`/dashboard/ledger?accountId=${account.id}`}
-                    className="rounded-md bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-600 transition-colors hover:bg-blue-100 hover:text-blue-700"
+                    className="rounded-xl bg-blue-50 px-3.5 py-1.5 text-xs font-semibold text-blue-600 transition-colors hover:bg-blue-100 hover:text-blue-700"
                   >
                     Riwayat
                   </Link>
@@ -212,51 +341,51 @@ export default function AccountsPage() {
         </div>
       )}
 
-      {/* Add Account Modal (Slide-over Drawer) */}
+      {/* Add Account Modal */}
       {isAddAccountOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm">
-          <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-white shadow-2xl duration-300">
-            <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-6 py-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm">
+          <div className="flex h-full w-full max-w-md flex-col bg-white shadow-2xl animate-in slide-in-from-right duration-200">
+            <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-5">
               <div>
-                <h2 className="text-lg font-bold text-slate-900">Tambah Rekening Baru</h2>
-                <p className="mt-1 text-xs text-slate-500">
+                <h2 className="text-base font-bold text-slate-900">Tambah Rekening Baru</h2>
+                <p className="mt-0.5 text-xs text-slate-500">
                   Isi form untuk menambah rekening atau metode pembayaran baru.
                 </p>
               </div>
               <button
                 onClick={() => setIsAddAccountOpen(false)}
-                className="rounded-full bg-white p-2 text-slate-400 shadow-sm transition-colors hover:text-slate-600"
+                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
             <form action={handleAddAccount} className="flex flex-1 flex-col overflow-hidden">
-              <div className="flex-1 space-y-5 overflow-y-auto p-6">
+              <div className="flex-1 space-y-4 overflow-y-auto p-6">
                 {error && (
-                  <div className="rounded-lg border border-rose-100 bg-rose-50 p-3 text-sm text-rose-600">
+                  <div className="rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs font-medium text-rose-700">
                     {error}
                   </div>
                 )}
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">
-                    Nama Rekening
+                  <label className="mb-1 block text-xs font-medium text-slate-700">
+                    Nama Rekening <span className="text-rose-500">*</span>
                   </label>
                   <input
                     name="name"
                     required
                     type="text"
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                    placeholder="Mis. BCA Fery"
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                    placeholder="Misal: BCA Fery, QRIS Toko"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">
-                    Tipe Rekening
+                  <label className="mb-1 block text-xs font-medium text-slate-700">
+                    Tipe Rekening <span className="text-rose-500">*</span>
                   </label>
                   <select
                     name="type"
                     required
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                   >
                     <option value="Bank Konvensional">Bank Konvensional</option>
                     <option value="Bank Digital">Bank Digital</option>
@@ -265,26 +394,33 @@ export default function AccountsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">
+                  <label className="mb-1 block text-xs font-medium text-slate-700">
                     Nomor Rekening / ID
                   </label>
                   <input
                     name="account_number"
                     type="text"
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                    placeholder="Mis. 1234567890"
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none font-mono"
+                    placeholder="Misal: 1234567890"
                   />
                 </div>
               </div>
-              <div className="border-t border-slate-100 bg-white p-6">
+              <div className="flex items-center justify-end gap-3 border-t border-slate-100 bg-slate-50/50 p-6">
+                <button
+                  type="button"
+                  onClick={() => setIsAddAccountOpen(false)}
+                  className="rounded-lg px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100"
+                >
+                  Batal
+                </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-blue-700 disabled:opacity-50"
+                  className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
                       <span>Menyimpan...</span>
                     </>
                   ) : (
@@ -297,39 +433,145 @@ export default function AccountsPage() {
         </div>
       )}
 
-      {/* Mutasi Modal (Slide-over Drawer) */}
-      {isMutasiOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm">
-          <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-white shadow-2xl duration-300">
-            <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-6 py-5">
+      {/* Edit Account Modal */}
+      {editingAccount && (
+        <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm">
+          <div className="flex h-full w-full max-w-md flex-col bg-white shadow-2xl animate-in slide-in-from-right duration-200">
+            <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-5">
               <div>
-                <h2 className="text-lg font-bold text-slate-900">Mutasi Saldo</h2>
-                <p className="mt-1 text-xs text-slate-500">
+                <h2 className="text-base font-bold text-slate-900">Edit Rekening</h2>
+                <p className="mt-0.5 text-xs text-slate-500">
+                  Ubah rincian nama, tipe, nomor rekening, atau status aktif.
+                </p>
+              </div>
+              <button
+                onClick={() => setEditingAccount(null)}
+                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <form action={handleUpdateAccount} className="flex flex-1 flex-col overflow-hidden">
+              <div className="flex-1 space-y-4 overflow-y-auto p-6">
+                {error && (
+                  <div className="rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs font-medium text-rose-700">
+                    {error}
+                  </div>
+                )}
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-slate-700">
+                    Nama Rekening <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    name="name"
+                    required
+                    defaultValue={editingAccount.name}
+                    type="text"
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-slate-700">
+                    Tipe Rekening <span className="text-rose-500">*</span>
+                  </label>
+                  <select
+                    name="type"
+                    required
+                    defaultValue={editingAccount.type}
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                  >
+                    <option value="Bank Konvensional">Bank Konvensional</option>
+                    <option value="Bank Digital">Bank Digital</option>
+                    <option value="E-Wallet">E-Wallet</option>
+                    <option value="E-Wallet/QRIS">E-Wallet/QRIS</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-slate-700">
+                    Nomor Rekening / ID
+                  </label>
+                  <input
+                    name="account_number"
+                    type="text"
+                    defaultValue={editingAccount.account_number || ""}
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none font-mono"
+                  />
+                </div>
+                <div className="flex items-center gap-2 pt-2">
+                  <input
+                    type="checkbox"
+                    id="is_active"
+                    name="is_active"
+                    value="true"
+                    defaultChecked={editingAccount.is_active}
+                    className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <label htmlFor="is_active" className="text-xs font-medium text-slate-700">
+                    Rekening Aktif (Dapat digunakan untuk transaksi & mutasi)
+                  </label>
+                </div>
+              </div>
+              <div className="flex items-center justify-end gap-3 border-t border-slate-100 bg-slate-50/50 p-6">
+                <button
+                  type="button"
+                  onClick={() => setEditingAccount(null)}
+                  className="rounded-lg px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      <span>Menyimpan...</span>
+                    </>
+                  ) : (
+                    <span>Update Rekening</span>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Mutasi Modal */}
+      {isMutasiOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm">
+          <div className="flex h-full w-full max-w-md flex-col bg-white shadow-2xl animate-in slide-in-from-right duration-200">
+            <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-5">
+              <div>
+                <h2 className="text-base font-bold text-slate-900">Mutasi Saldo</h2>
+                <p className="mt-0.5 text-xs text-slate-500">
                   Pindahkan saldo antar rekening atau dompet digital.
                 </p>
               </div>
               <button
                 onClick={() => setIsMutasiOpen(false)}
-                className="rounded-full bg-white p-2 text-slate-400 shadow-sm transition-colors hover:text-slate-600"
+                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
             <form action={handleMutasi} className="flex flex-1 flex-col overflow-hidden">
-              <div className="flex-1 space-y-5 overflow-y-auto p-6">
+              <div className="flex-1 space-y-4 overflow-y-auto p-6">
                 {error && (
-                  <div className="rounded-lg border border-rose-100 bg-rose-50 p-3 text-sm text-rose-600">
+                  <div className="rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs font-medium text-rose-700">
                     {error}
                   </div>
                 )}
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">
-                    Dari Rekening
+                  <label className="mb-1 block text-xs font-medium text-slate-700">
+                    Dari Rekening <span className="text-rose-500">*</span>
                   </label>
                   <select
                     name="from_account_id"
                     required
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                   >
                     {accounts.map((acc) => (
                       <option key={acc.id} value={acc.id}>
@@ -338,19 +580,19 @@ export default function AccountsPage() {
                     ))}
                   </select>
                 </div>
-                <div className="relative z-10 -my-2 flex justify-center">
-                  <div className="rounded-full border border-white bg-slate-100 p-1">
-                    <ArrowRightLeft className="h-4 w-4 rotate-90 text-slate-500" />
+                <div className="relative z-10 -my-1 flex justify-center">
+                  <div className="rounded-full border border-white bg-slate-100 p-1 text-slate-500">
+                    <ArrowRightLeft className="h-3.5 w-3.5 rotate-90" />
                   </div>
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">
-                    Ke Rekening
+                  <label className="mb-1 block text-xs font-medium text-slate-700">
+                    Ke Rekening <span className="text-rose-500">*</span>
                   </label>
                   <select
                     name="to_account_id"
                     required
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                   >
                     {accounts.map((acc) => (
                       <option key={acc.id} value={acc.id}>
@@ -360,28 +602,35 @@ export default function AccountsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">
-                    Nominal Mutasi
+                  <label className="mb-1 block text-xs font-medium text-slate-700">
+                    Nominal Mutasi <span className="text-rose-500">*</span>
                   </label>
                   <input
                     name="amount"
                     type="number"
                     required
                     min="1"
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                     placeholder="Rp 0"
                   />
                 </div>
               </div>
-              <div className="border-t border-slate-100 bg-white p-6">
+              <div className="flex items-center justify-end gap-3 border-t border-slate-100 bg-slate-50/50 p-6">
+                <button
+                  type="button"
+                  onClick={() => setIsMutasiOpen(false)}
+                  className="rounded-lg px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100"
+                >
+                  Batal
+                </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-blue-700 disabled:opacity-50"
+                  className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
                       <span>Memproses...</span>
                     </>
                   ) : (
