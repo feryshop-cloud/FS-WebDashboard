@@ -45,6 +45,7 @@ export interface Role {
   id: string; // UUID
   name: string;
   permissions: Record<string, JsonValue>; // JSONB
+  description?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -62,6 +63,7 @@ export interface Account {
   id: string; // UUID
   name: string;
   account_number: string | null;
+  type?: string;
   image_url?: string | null;
   balance: number;
   is_active: boolean;
@@ -77,6 +79,13 @@ export interface Stock {
   username: string | null;
   password: string | null;
   backup_code: string | null;
+
+  sku?: string | null;
+  account_detail?: string | null;
+  login_info?: string | null;
+  password_info?: string | null;
+  notes?: string | null;
+  managed_by?: string | null;
 
   capital_price: number;
   post_price: number;
@@ -110,6 +119,11 @@ export interface Deal {
   customer_name: string;
   customer_contact: string | null;
 
+  customer_id?: string | null;
+  deal_type?: string;
+  total_deal_price?: number | null;
+  handled_by?: string | null;
+
   stock_id: string;
 
   deal_price: number;
@@ -136,6 +150,7 @@ export interface Payment {
   payment_type: PaymentType;
   status: PaymentStatus;
 
+  handled_by?: string | null;
   proof_url: string | null;
   notes: string | null;
 
@@ -155,6 +170,10 @@ export interface FinanceLedger {
   deal_id: string | null;
   payment_id: string | null;
   stock_id: string | null;
+
+  notes?: string | null;
+  ref_id?: string | null;
+  created_by?: string | null;
 
   description: string | null;
   admin_id: string | null;

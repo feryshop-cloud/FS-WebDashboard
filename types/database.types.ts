@@ -495,6 +495,7 @@ export type Database = {
           id: string
           image_urls: string[]
           screenshot_url: string | null
+          search_vector: unknown
           sold_at: string | null
           sold_price: number | null
           status: Database["public"]["Enums"]["inventory_status"]
@@ -512,6 +513,7 @@ export type Database = {
           id?: string
           image_urls?: string[]
           screenshot_url?: string | null
+          search_vector?: unknown
           sold_at?: string | null
           sold_price?: number | null
           status?: Database["public"]["Enums"]["inventory_status"]
@@ -529,6 +531,7 @@ export type Database = {
           id?: string
           image_urls?: string[]
           screenshot_url?: string | null
+          search_vector?: unknown
           sold_at?: string | null
           sold_price?: number | null
           status?: Database["public"]["Enums"]["inventory_status"]
@@ -1423,21 +1426,29 @@ export type Database = {
           query_text: string
         }
         Returns: {
-          account_specs: string
-          added_by: string
+          account_specs: string | null
+          added_by: string | null
           asking_price: number
           capital_price: number
           created_at: string
           game_id: string
           id: string
           image_urls: string[]
-          screenshot_url: string
-          sold_at: string
-          sold_price: number
+          screenshot_url: string | null
+          search_vector: unknown
+          sold_at: string | null
+          sold_price: number | null
           status: Database["public"]["Enums"]["inventory_status"]
-          title_reference: string
+          title_reference: string | null
+          title_reference_vector: string | null
           updated_at: string
         }[]
+        SetofOptions: {
+          from: "*"
+          to: "inventory"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
     }
     Enums: {
