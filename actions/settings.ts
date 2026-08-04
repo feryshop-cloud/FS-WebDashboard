@@ -231,6 +231,10 @@ export async function updateUserRole(userId: string, roleId: string) {
     return { success: false, error: "Unauthorized" };
   }
 
+  if (currentUser.id === userId) {
+    return { success: false, error: "Anda tidak dapat mengubah role akun Anda sendiri." };
+  }
+
   const { error } = await supabase
     .from("users")
     .update({
@@ -256,6 +260,10 @@ export async function toggleUserStatus(userId: string, currentStatus: string) {
   } = await supabase.auth.getUser();
   if (!currentUser) {
     return { success: false, error: "Unauthorized" };
+  }
+
+  if (currentUser.id === userId) {
+    return { success: false, error: "Anda tidak dapat mengubah status akun Anda sendiri." };
   }
 
   const newStatus = currentStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE";

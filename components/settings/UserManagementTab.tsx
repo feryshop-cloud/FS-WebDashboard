@@ -32,6 +32,7 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [formError, setFormError] = useState("");
+  const [actionError, setActionError] = useState("");
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -47,24 +48,36 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
   );
 
   const handleRoleChange = async (userId: string, newRoleId: string) => {
+    setActionError("");
     try {
       setUpdatingUserId(userId);
-      await updateUserRole(userId, newRoleId);
+      const res = await updateUserRole(userId, newRoleId);
+      if (res && !res.success) {
+        setActionError(res.error || "Gagal mengubah role pengguna.");
+        return;
+      }
       onRefresh();
     } catch (err) {
       console.error(err);
+      setActionError("Gagal mengubah role pengguna.");
     } finally {
       setUpdatingUserId(null);
     }
   };
 
   const handleToggleStatus = async (userId: string, currentStatus: string | null) => {
+    setActionError("");
     try {
       setUpdatingUserId(userId);
-      await toggleUserStatus(userId, currentStatus || "ACTIVE");
+      const res = await toggleUserStatus(userId, currentStatus || "ACTIVE");
+      if (res && !res.success) {
+        setActionError(res.error || "Gagal mengubah status pengguna.");
+        return;
+      }
       onRefresh();
     } catch (err) {
       console.error(err);
+      setActionError("Gagal mengubah status pengguna.");
     } finally {
       setUpdatingUserId(null);
     }
@@ -131,9 +144,9 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
 
       {/* Users Table */}
       <div className="overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm">
-        {errorMsg && (
-          <div className="border-b border-rose-100 bg-rose-50 p-4 text-sm text-rose-700">
-            {errorMsg}
+        {(errorMsg || actionError) && (
+          <div className="border-b border-rose-100 bg-rose-50 p-4 text-sm font-medium text-rose-700">
+            {errorMsg || actionError}
           </div>
         )}
 
