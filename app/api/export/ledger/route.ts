@@ -7,6 +7,8 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const accountId = searchParams.get("accountId");
     const type = searchParams.get("type");
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
 
     const supabase = await createClient();
 
@@ -35,6 +37,13 @@ export async function GET(request: Request) {
       query = query.gt("amount", 0);
     } else if (type === "OUT") {
       query = query.lt("amount", 0);
+    }
+
+    if (startDate) {
+      query = query.gte("created_at", startDate);
+    }
+    if (endDate) {
+      query = query.lte("created_at", endDate);
     }
 
     const { data: ledgerData, error } = await query;
