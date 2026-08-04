@@ -1,27 +1,70 @@
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey =
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+if (!supabaseUrl) {
+  console.error(
+    "MISSING NEXT_PUBLIC_SUPABASE_URL. Set it in .env.local before running the seed.",
+  );
+  process.exit(1);
+}
+
+if (!serviceRoleKey) {
+  console.error(
+    "MISSING SUPABASE_SERVICE_ROLE_KEY. The seed requires the service-role key because it " +
+      "re-seeds data (RLS bypass) and calls the process_payment RPC, which is only granted to " +
+      "authenticated/service_role. Do NOT fall back to the anon key.",
+  );
+  process.exit(1);
+}
+
+const supabase = createClient(supabaseUrl, serviceRoleKey, {
+  auth: { persistSession: false },
+});
+
+// FK-safe cleanup order (children before parents). deal_items.stock_id is ON
+// DELETE RESTRICT, so stocks can only be removed after deal_items/trade_in_items/
+// problem_cases/stock_histories are gone. users/public_users are intentionally
+// left untouched (audit_logs and auth.users reference them).
+const CLEANUP_TABLES = [
+  "finance_ledger",
+  "payments",
+  "deal_items",
+  "trade_in_items",
+  "problem_cases",
+  "stock_histories",
+  "deals",
+  "stocks",
+  "inventory",
+  "accounts",
+  "games",
+] as const;
+
+async function deleteAll(table: string) {
+  const { error } = await supabase
+    .from(table)
+    .delete()
+    .neq("id", "00000000-0000-0000-0000-000000000000");
+  if (error) throw new Error(`Cleanup failed on ${table}: ${error.message}`);
+}
+
+async function insertRows<T extends Record<string, unknown>>(table: string, rows: T[]) {
+  const { data, error } = await supabase
+    .from(table)
+    .insert(rows as never)
+    .select();
+  if (error) throw new Error(`Seed failed on ${table}: ${error.message}`);
+  return data;
+}
 
 async function main() {
-  console.log("Starting seed process...");
-
   try {
     // 1. CLEANUP
     console.log("Cleaning up existing data...");
-    await supabase
-      .from("finance_ledger")
-      .delete()
-      .neq("id", "00000000-0000-0000-0000-000000000000");
-    await supabase.from("payments").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-    await supabase.from("deals").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-    await supabase.from("stocks").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-    await supabase.from("inventory").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-    await supabase.from("accounts").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-    await supabase.from("games").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+    for (const table of CLEANUP_TABLES) {
+      await deleteAll(table);
+    }
 
     // 2. SEED GAMES
     console.log("Seeding Games...");
@@ -34,29 +77,20 @@ async function main() {
       { name: "Valorant", slug: "valorant" },
       { name: "Lainnya", slug: "lainnya" },
     ];
+    await insertRows("games", gameCategories);
 
-    const { error: gamesError } = await supabase.from("games").insert(
-      gameCategories.map((cat) => ({
-        name: cat.name,
-        slug: cat.slug,
-      })),
-    );
-
-    if (gamesError) throw gamesError;
-
-    // Fetch seeded games for inventory references
-    const { data: allGames } = await supabase.from("games").select("id, name").order("name");
+    const { data: allGames } = await supabase
+      .from("games")
+      .select("id, name")
+      .order("name");
+    const gameMap: Record<string, string> = {};
+    for (const g of allGames ?? []) {
+      gameMap[g.name] = g.id;
+    }
 
     // 3. SEED INVENTORY
     console.log("Seeding Inventory...");
-    const gameMap: Record<string, string> = {};
-    if (allGames) {
-      for (const g of allGames) {
-        gameMap[g.name] = g.id;
-      }
-    }
-
-    const { error: inventoryError } = await supabase.from("inventory").insert([
+    const inventoryRows = [
       {
         game_id: gameMap["Mobile Legends"],
         title_reference: "MLBB Mythic Glory 120 Skins",
@@ -102,141 +136,138 @@ async function main() {
         status: "AVAILABLE",
         added_by: null,
       },
-    ]);
-
-    if (inventoryError) throw inventoryError;
+    ];
+    await insertRows("inventory", inventoryRows);
 
     // 4. SEED ACCOUNTS
     console.log("Seeding Accounts...");
-    const { data: accounts, error: accountsError } = await supabase
-      .from("accounts")
-      .insert([
-        { name: "QRIS Ferryshop", account_number: "QRIS-001", balance: 15000000 },
-        { name: "Seabank", account_number: "9012345678", balance: 5000000 },
-        { name: "Bank Jago", account_number: "1029384756", balance: 2500000 },
-        { name: "DANA", account_number: "081234567891", balance: 1000000 },
-        { name: "OVO", account_number: "081234567892", balance: 1500000 },
-        { name: "GoPay", account_number: "081234567893", balance: 2000000 },
-        { name: "Mandiri", account_number: "142001234567", balance: 10000000 },
-      ])
-      .select();
+    const accounts = await insertRows("accounts", [
+      { name: "QRIS Ferryshop", account_number: "QRIS-001", balance: 15000000 },
+      { name: "Seabank", account_number: "9012345678", balance: 5000000 },
+      { name: "Bank Jago", account_number: "1029384756", balance: 2500000 },
+      { name: "DANA", account_number: "081234567891", balance: 1000000 },
+      { name: "OVO", account_number: "081234567892", balance: 1500000 },
+      { name: "GoPay", account_number: "081234567893", balance: 2000000 },
+      { name: "Mandiri", account_number: "142001234567", balance: 10000000 },
+    ]);
 
-    if (accountsError) throw accountsError;
-    const qrisAccount = accounts.find((a) => a.name === "QRIS Ferryshop")!;
-    const seabankAccount = accounts.find((a) => a.name === "Seabank")!;
-
-    // Seed initial balance to ledger for accounts to match their balance
-    for (const acc of accounts) {
-      await supabase.from("finance_ledger").insert({
-        account_id: acc.id,
-        transaction_type: "ADJUSTMENT",
-        amount: acc.balance,
-        description: `Initial balance for ${acc.name}`,
-      });
+    const qrisAccount = accounts.find((a) => a.name === "QRIS Ferryshop");
+    const seabankAccount = accounts.find((a) => a.name === "Seabank");
+    if (!qrisAccount || !seabankAccount) {
+      throw new Error("Seeded accounts not found after insert");
     }
 
-    // 3. SEED STOCKS
+    for (const acc of accounts) {
+      await insertRows("finance_ledger", [
+        {
+          account_id: acc.id,
+          transaction_type: "ADJUSTMENT",
+          amount: acc.balance,
+          description: `Initial balance for ${acc.name}`,
+        },
+      ]);
+    }
+
+    // 5. SEED STOCKS
     console.log("Seeding Stocks...");
-    const { data: stocks, error: stocksError } = await supabase
-      .from("stocks")
-      .insert([
-        {
-          category: "Mobile Legends",
-          name: "MLBB Mythic Glory 120 Skins (Zodiac+Legend)",
-          username: "admin_mlbb",
-          password: "mlbbpassword",
-          account_details: "Login Moonton/VK. Winrate 65%.",
-          capital_price: 800000,
-          post_price: 1500000,
-          current_price: 1500000,
-          status: "AVAILABLE",
-          purchase_payment_status: "LUNAS",
-          images: [
-            "https://picsum.photos/seed/ml1/800/600",
-            "https://picsum.photos/seed/ml2/800/600",
-            "https://picsum.photos/seed/ml3/800/600",
-            "https://picsum.photos/seed/ml4/800/600",
-            "https://picsum.photos/seed/ml5/800/600",
-          ],
-        },
-        {
-          category: "Valorant",
-          name: "Valorant Ascendant 3 - Kuronami Bundle",
-          username: "valo_admin",
-          password: "valopassword",
-          account_details: "Riot Games Login. Asia Pacific.",
-          capital_price: 1200000,
-          post_price: 2000000,
-          current_price: 2000000,
-          status: "AVAILABLE",
-          purchase_payment_status: "LUNAS",
-          images: [
-            "https://picsum.photos/seed/val1/800/600",
-            "https://picsum.photos/seed/val2/800/600",
-            "https://picsum.photos/seed/val3/800/600",
-          ],
-        },
-        {
-          category: "Genshin Impact",
-          name: "Genshin AR 60 - 20 C6 5-Stars",
-          username: "genshin_admin",
-          password: "genshinpassword",
-          account_details: "Hoyoverse Login. Asia Server. All map 100%.",
-          capital_price: 2500000,
-          post_price: 4000000,
-          current_price: 4000000,
-          status: "AVAILABLE",
-          purchase_payment_status: "LUNAS",
-          images: [
-            "https://picsum.photos/seed/gi1/800/600",
-            "https://picsum.photos/seed/gi2/800/600",
-            "https://picsum.photos/seed/gi3/800/600",
-            "https://picsum.photos/seed/gi4/800/600",
-          ],
-        },
-        {
-          category: "PUBG Mobile",
-          name: "PUBG Conqueror S19 - Glacier M416 Max",
-          username: "pubg_admin",
-          password: "pubgpassword",
-          account_details: "Twitter Login. Global version.",
-          capital_price: 1500000,
-          post_price: 2500000,
-          current_price: 2500000,
-          status: "AVAILABLE",
-          purchase_payment_status: "LUNAS",
-          images: [
-            "https://picsum.photos/seed/pubg1/800/600",
-            "https://picsum.photos/seed/pubg2/800/600",
-          ],
-        },
-        {
-          category: "Free Fire",
-          name: "FF Sultan Old Account - Elite Pass S1-S5",
-          username: "ff_admin",
-          password: "ffpassword",
-          account_details: "VK Login. Indo Server.",
-          capital_price: 600000,
-          post_price: 1000000,
-          current_price: 1000000,
-          status: "AVAILABLE",
-          purchase_payment_status: "LUNAS",
-          images: [
-            "https://picsum.photos/seed/ff1/800/600",
-            "https://picsum.photos/seed/ff2/800/600",
-            "https://picsum.photos/seed/ff3/800/600",
-          ],
-        },
-      ])
-      .select();
+    const stocks = await insertRows("stocks", [
+      {
+        category: "Mobile Legends",
+        name: "MLBB Mythic Glory 120 Skins (Zodiac+Legend)",
+        username: "admin_mlbb",
+        password: "mlbbpassword",
+        account_details: "Login Moonton/VK. Winrate 65%.",
+        capital_price: 800000,
+        post_price: 1500000,
+        current_price: 1500000,
+        status: "AVAILABLE",
+        purchase_payment_status: "LUNAS",
+        images: [
+          "https://picsum.photos/seed/ml1/800/600",
+          "https://picsum.photos/seed/ml2/800/600",
+          "https://picsum.photos/seed/ml3/800/600",
+          "https://picsum.photos/seed/ml4/800/600",
+          "https://picsum.photos/seed/ml5/800/600",
+        ],
+      },
+      {
+        category: "Valorant",
+        name: "Valorant Ascendant 3 - Kuronami Bundle",
+        username: "valo_admin",
+        password: "valopassword",
+        account_details: "Riot Games Login. Asia Pacific.",
+        capital_price: 1200000,
+        post_price: 2000000,
+        current_price: 2000000,
+        status: "AVAILABLE",
+        purchase_payment_status: "LUNAS",
+        images: [
+          "https://picsum.photos/seed/val1/800/600",
+          "https://picsum.photos/seed/val2/800/600",
+          "https://picsum.photos/seed/val3/800/600",
+        ],
+      },
+      {
+        category: "Genshin Impact",
+        name: "Genshin AR 60 - 20 C6 5-Stars",
+        username: "genshin_admin",
+        password: "genshinpassword",
+        account_details: "Hoyoverse Login. Asia Server. All map 100%.",
+        capital_price: 2500000,
+        post_price: 4000000,
+        current_price: 4000000,
+        status: "AVAILABLE",
+        purchase_payment_status: "LUNAS",
+        images: [
+          "https://picsum.photos/seed/gi1/800/600",
+          "https://picsum.photos/seed/gi2/800/600",
+          "https://picsum.photos/seed/gi3/800/600",
+          "https://picsum.photos/seed/gi4/800/600",
+        ],
+      },
+      {
+        category: "PUBG Mobile",
+        name: "PUBG Conqueror S19 - Glacier M416 Max",
+        username: "pubg_admin",
+        password: "pubgpassword",
+        account_details: "Twitter Login. Global version.",
+        capital_price: 1500000,
+        post_price: 2500000,
+        current_price: 2500000,
+        status: "AVAILABLE",
+        purchase_payment_status: "LUNAS",
+        images: [
+          "https://picsum.photos/seed/pubg1/800/600",
+          "https://picsum.photos/seed/pubg2/800/600",
+        ],
+      },
+      {
+        category: "Free Fire",
+        name: "FF Sultan Old Account - Elite Pass S1-S5",
+        username: "ff_admin",
+        password: "ffpassword",
+        account_details: "VK Login. Indo Server.",
+        capital_price: 600000,
+        post_price: 1000000,
+        current_price: 1000000,
+        status: "AVAILABLE",
+        purchase_payment_status: "LUNAS",
+        images: [
+          "https://picsum.photos/seed/ff1/800/600",
+          "https://picsum.photos/seed/ff2/800/600",
+          "https://picsum.photos/seed/ff3/800/600",
+        ],
+      },
+    ]);
 
-    if (stocksError) throw stocksError;
+    const mlbbStock = stocks.find((s) => s.category === "Mobile Legends");
+    const valoStock = stocks.find((s) => s.category === "Valorant");
+    const genshinStock = stocks.find((s) => s.category === "Genshin Impact");
+    if (!mlbbStock || !valoStock || !genshinStock) {
+      throw new Error("Seeded stocks not found after insert");
+    }
 
-    const mlbbStock = stocks[0];
-    const valoStock = stocks[1];
-    const genshinStock = stocks[2];
-
-    // 4. SEED TRANSACTIONS
+    // 6. SEED TRANSACTIONS
     console.log("Seeding Transactions...");
 
     // Deal 1: Lunas (MLBB)
@@ -247,21 +278,22 @@ async function main() {
         stock_id: mlbbStock.id,
         customer_name: "Budi Santoso",
         customer_contact: "081234567890",
-        deal_price: 1400000, // Sold for 1.4m (negotiated from 1.5m)
+        deal_price: 1400000,
         remaining_balance: 1400000,
         status: "DRAFT",
       })
       .select()
       .single();
-    if (deal1Err) throw deal1Err;
+    if (deal1Err || !deal1) throw new Error(`Deal 1 insert failed: ${deal1Err?.message}`);
 
-    await supabase.rpc("process_payment", {
+    const { error: payment1Err } = await supabase.rpc("process_payment", {
       p_deal_id: deal1.id,
       p_account_id: qrisAccount.id,
       p_amount: 1400000,
       p_notes: "Lunas via QRIS",
       p_admin_id: null,
     });
+    if (payment1Err) throw new Error(`Payment 1 failed: ${payment1Err.message}`);
 
     // Deal 2: Lunas (Valorant)
     const { data: deal2, error: deal2Err } = await supabase
@@ -277,15 +309,16 @@ async function main() {
       })
       .select()
       .single();
-    if (deal2Err) throw deal2Err;
+    if (deal2Err || !deal2) throw new Error(`Deal 2 insert failed: ${deal2Err?.message}`);
 
-    await supabase.rpc("process_payment", {
+    const { error: payment2Err } = await supabase.rpc("process_payment", {
       p_deal_id: deal2.id,
       p_account_id: seabankAccount.id,
       p_amount: 2000000,
       p_notes: "Transfer Seabank Lunas",
       p_admin_id: null,
     });
+    if (payment2Err) throw new Error(`Payment 2 failed: ${payment2Err.message}`);
 
     // Deal 3: Booking/DP (Genshin)
     const { data: deal3, error: deal3Err } = await supabase
@@ -301,19 +334,21 @@ async function main() {
       })
       .select()
       .single();
-    if (deal3Err) throw deal3Err;
+    if (deal3Err || !deal3) throw new Error(`Deal 3 insert failed: ${deal3Err?.message}`);
 
-    await supabase.rpc("process_payment", {
+    const { error: payment3Err } = await supabase.rpc("process_payment", {
       p_deal_id: deal3.id,
       p_account_id: qrisAccount.id,
-      p_amount: 1000000, // DP of 1m
+      p_amount: 1000000,
       p_notes: "DP 1 Juta",
       p_admin_id: null,
     });
+    if (payment3Err) throw new Error(`Payment 3 failed: ${payment3Err.message}`);
 
     console.log("Database successfully seeded with realistic data!");
   } catch (err) {
     console.error("Seeding error:", err);
+    process.exitCode = 1;
   }
 }
 
