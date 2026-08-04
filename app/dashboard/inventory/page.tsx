@@ -82,8 +82,13 @@ export default function InventoryPage() {
         const game = games.find((g) => g.name === activeCategory);
         if (game) params.set("gameId", game.id);
       }
+      const routePrefix = process.env.NEXT_PUBLIC_BASE_PATH?.trim();
+      const basePath =
+        routePrefix && routePrefix !== "/"
+          ? `/${routePrefix.replace(/^\/+|\/+$/g, "")}`
+          : "";
 
-      const response = await fetch(`/api/export/inventory?${params.toString()}`);
+      const response = await fetch(`${basePath}/api/export/inventory?${params.toString()}`);
       if (!response.ok) {
         throw new Error("Gagal mengekspor data");
       }

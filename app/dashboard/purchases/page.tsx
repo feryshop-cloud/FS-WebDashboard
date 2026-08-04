@@ -10,10 +10,11 @@ import {
   X,
   Loader2,
   Download,
+  Trash2,
 } from "lucide-react";
 import { formatRupiah, formatDate } from "@/lib/utils";
 import { getErrorMessage } from "@/lib/error";
-import { getPurchases, purchaseStock, getGames } from "@/actions/purchases";
+import { getPurchases, purchaseStock, getGames, deletePurchase } from "@/actions/purchases";
 import { getAccounts } from "@/app/actions/accounts";
 
 import { PurchaseWithRelations } from "@/types/database";
@@ -133,6 +134,22 @@ export default function PurchasesPage() {
 
     return matchesSearch && matchesStatus;
   });
+
+  const handleDeletePurchase = async (id: string, name?: string | null) => {
+    if (!window.confirm(`Apakah Anda yakin ingin menghapus data pembelian stok "${name || ""}"?`)) {
+      return;
+    }
+    try {
+      const res = await deletePurchase(id);
+      if (res.error) {
+        alert("Gagal menghapus: " + res.error);
+      } else {
+        loadData();
+      }
+    } catch (err: unknown) {
+      alert("Terjadi kesalahan: " + getErrorMessage(err));
+    }
+  };
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 pb-8">
@@ -335,8 +352,12 @@ export default function PurchasesPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-center text-sm font-medium whitespace-nowrap">
-                        <button className="rounded-md p-1 text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-600">
-                          <MoreHorizontal className="h-5 w-5" />
+                        <button
+                          onClick={() => handleDeletePurchase(purchase.id, purchase.name)}
+                          title="Hapus Pembelian"
+                          className="rounded-md p-1.5 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
+                        >
+                          <Trash2 className="h-4 w-4" />
                         </button>
                       </td>
                     </tr>

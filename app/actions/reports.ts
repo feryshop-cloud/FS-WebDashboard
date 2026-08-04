@@ -4,12 +4,12 @@ import { createClient } from "@/lib/supabase/server";
 import { logger } from "@/lib/logger";
 import { runAction } from "@/lib/logging/server-action";
 
-export async function getProfitLossReport() {
+export async function getProfitLossReport(startDate?: string, endDate?: string) {
   return runAction("getProfitLossReport", async () => {
     const supabase = await createClient();
 
     // 1. Get Income from deals
-    const { data: deals, error: dealsError } = await supabase
+    let dealsQuery = supabase
       .from("deals")
       .select(
         `
@@ -20,6 +20,15 @@ export async function getProfitLossReport() {
       )
       .in("status", ["BOOKED", "LIMITED_ACCESS", "PAID", "COMPLETED"]);
 
+    if (startDate) {
+      dealsQuery = dealsQuery.gte("created_at", startDate);
+    }
+    if (endDate) {
+      dealsQuery = dealsQuery.lte("created_at", endDate);
+    }
+
+    const { data: deals, error: dealsError } = await dealsQuery;
+
     if (dealsError) {
       logger.error("Error fetching deals for P&L", { error: dealsError });
       return null;
@@ -29,7 +38,7 @@ export async function getProfitLossReport() {
     let tukarTambah = 0;
     let totalHpp = 0;
 
-    deals.forEach((deal: Record<string, unknown>) => {
+    (deals || []).forEach((deal: Record<string, unknown>) => {
       const price = Number(deal.total_deal_price || 0);
       if (deal.deal_type === "Penjualan") {
         penjualanLunas += price;
@@ -51,10 +60,19 @@ export async function getProfitLossReport() {
     });
 
     // 2. Get Expenses from Ledger
-    const { data: ledger, error: ledgerError } = await supabase
+    let ledgerQuery = supabase
       .from("finance_ledger")
       .select("transaction_type, amount")
       .in("transaction_type", ["PAYMENT_OUT", "REFUND"]);
+
+    if (startDate) {
+      ledgerQuery = ledgerQuery.gte("created_at", startDate);
+    }
+    if (endDate) {
+      ledgerQuery = ledgerQuery.lte("created_at", endDate);
+    }
+
+    const { data: ledger, error: ledgerError } = await ledgerQuery;
 
     if (ledgerError) {
       logger.error("Error fetching ledger for P&L", { error: ledgerError });
@@ -64,7 +82,7 @@ export async function getProfitLossReport() {
     let biayaOperasional = 0;
     let biayaRefund = 0;
 
-    ledger.forEach((tx: Record<string, unknown>) => {
+    (ledger || []).forEach((tx: Record<string, unknown>) => {
       // Amounts in ledger for out are usually negative, we use Math.abs to sum them as expenses
       const amt = Math.abs(Number(tx.amount || 0));
       if (tx.transaction_type === "PAYMENT_OUT") {

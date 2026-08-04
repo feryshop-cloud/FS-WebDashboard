@@ -10,10 +10,11 @@ import {
   AlertTriangle,
   X,
   Loader2,
+  Trash2,
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { getErrorMessage } from "@/lib/error";
-import { getProblemCases, createProblemCase } from "@/app/actions/problem-cases";
+import { getProblemCases, createProblemCase, deleteProblemCase } from "@/app/actions/problem-cases";
 import { getDeals } from "@/app/actions/deals";
 import { getInventory } from "@/app/actions/inventory";
 import {
@@ -66,6 +67,18 @@ export default function ProblemCasesPage() {
       setError(getErrorMessage(err));
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteCase = async (id: string, caseNumber?: string) => {
+    if (!window.confirm(`Apakah Anda yakin ingin menghapus problem case "${caseNumber || ""}"?`)) {
+      return;
+    }
+    try {
+      await deleteProblemCase(id);
+      loadData();
+    } catch (err: unknown) {
+      alert("Gagal menghapus problem case: " + getErrorMessage(err));
     }
   };
 
@@ -223,8 +236,12 @@ export default function ProblemCasesPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-center text-sm font-medium whitespace-nowrap">
-                        <button className="rounded-md p-1 text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-600">
-                          <MoreHorizontal className="h-5 w-5" />
+                        <button
+                          onClick={() => handleDeleteCase(c.id, c.case_number)}
+                          title="Hapus Case"
+                          className="rounded-md p-1.5 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
+                        >
+                          <Trash2 className="h-4 w-4" />
                         </button>
                       </td>
                     </tr>

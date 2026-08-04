@@ -105,3 +105,29 @@ export async function createProblemCase(formData: FormData) {
     revalidatePath("/dashboard/problem-cases");
   });
 }
+
+export async function deleteProblemCase(id: string) {
+  return runAction("deleteProblemCase", async () => {
+    const supabase = await createClient();
+
+    const { error } = await supabase.from("problem_cases").delete().eq("id", id);
+    if (error) {
+      logger.error("Error deleting problem case", { error });
+      throw new Error("Gagal menghapus problem case: " + error.message);
+    }
+
+    const { data: userData } = await supabase.auth.getUser();
+    if (userData.user) {
+      await supabase.from("audit_logs").insert([
+        {
+          user_id: userData.user.id,
+          module: "Akun Bermasalah",
+          action: "DELETE",
+          description: `Menghapus tiket problem case ID: ${id}`,
+        },
+      ]);
+    }
+
+    revalidatePath("/dashboard/problem-cases");
+  });
+}

@@ -121,3 +121,33 @@ export async function createPenjualan(formData: FormData) {
     revalidatePath("/dashboard/ledger");
   });
 }
+
+export async function deleteDeal(id: string) {
+  return runAction("deleteDeal", async () => {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      throw new Error("Sesi tidak valid. Silakan login kembali.");
+    }
+
+    // 1. Delete deal items first
+    const { error: itemsErr } = await supabase.from("deal_items").delete().eq("deal_id", id);
+    if (itemsErr) {
+      logger.error("Error deleting deal items", { error: itemsErr });
+    }
+
+    // 2. Delete deal
+    const { error } = await supabase.from("deals").delete().eq("id", id);
+    if (error) {
+      logger.error("Error deleting deal", { error });
+      throw new Error("Gagal menghapus transaksi deal: " + error.message);
+    }
+
+    revalidatePath("/dashboard/deals");
+    revalidatePath("/dashboard/inventory");
+    revalidatePath("/dashboard/accounts");
+    revalidatePath("/dashboard/ledger");
+  });
+}

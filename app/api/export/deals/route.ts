@@ -9,12 +9,19 @@ export async function GET(request: Request) {
 
     const supabase = await createClient();
 
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     let query = supabase
       .from("deals")
       .select(
         `
         *,
-        games ( name )
+        stocks ( name, capital_price )
       `,
       )
       .order("created_at", { ascending: false });
@@ -42,13 +49,13 @@ export async function GET(request: Request) {
     ];
 
     const rows = (dealsData || []).map((item: Record<string, unknown>) => [
-      item.reference_id || (typeof item.id === "string" ? item.id.substring(0, 8) : "-"),
-      (item.games as { name?: string })?.name || "-",
-      item.client_name || item.buyer_name || "-",
+      item.deal_number || (typeof item.id === "string" ? item.id.substring(0, 8) : "-"),
+      (item.stocks as { name?: string })?.name || "-",
+      item.customer_name || "-",
       item.status || "-",
-      item.capital_price || 0,
-      item.selling_price || 0,
-      Number(item.selling_price || 0) - Number(item.capital_price || 0),
+      (item.stocks as { capital_price?: number })?.capital_price || 0,
+      item.deal_price || 0,
+      Number(item.deal_price || 0) - Number((item.stocks as { capital_price?: number })?.capital_price || 0),
       formatDate(item.created_at as string),
       formatDate((item.completed_at || item.updated_at) as string),
     ]);

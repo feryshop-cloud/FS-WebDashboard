@@ -35,8 +35,13 @@ export function LedgerFilter({ accounts }: LedgerFilterProps) {
       const params = new URLSearchParams();
       if (currentAccountId) params.set("accountId", currentAccountId);
       if (currentType) params.set("type", currentType);
+      const routePrefix = process.env.NEXT_PUBLIC_BASE_PATH?.trim();
+      const basePath =
+        routePrefix && routePrefix !== "/"
+          ? `/${routePrefix.replace(/^\/+|\/+$/g, "")}`
+          : "";
 
-      const response = await fetch(`/api/export/ledger?${params.toString()}`);
+      const response = await fetch(`${basePath}/api/export/ledger?${params.toString()}`);
       if (!response.ok) {
         throw new Error("Gagal mengekspor data");
       }

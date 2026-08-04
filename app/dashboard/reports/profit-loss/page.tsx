@@ -43,18 +43,41 @@ interface ProfitLossReportData {
 export default function ProfitLossPage() {
   const [reportData, setReportData] = useState<ProfitLossReportData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [periodFilter, setPeriodFilter] = useState("ALL");
 
-  const loadData = async () => {
+  const getDateRange = (filter: string) => {
+    const now = new Date();
+    if (filter === "TODAY") {
+      const start = new Date(now.setHours(0, 0, 0, 0)).toISOString();
+      const end = new Date(now.setHours(23, 59, 59, 999)).toISOString();
+      return { startDate: start, endDate: end };
+    }
+    if (filter === "7_DAYS") {
+      const start = new Date(now.setDate(now.getDate() - 7)).toISOString();
+      return { startDate: start, endDate: undefined };
+    }
+    if (filter === "THIS_MONTH") {
+      const start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+      return { startDate: start, endDate: undefined };
+    }
+    if (filter === "THIS_YEAR") {
+      const start = new Date(now.getFullYear(), 0, 1).toISOString();
+      return { startDate: start, endDate: undefined };
+    }
+    return { startDate: undefined, endDate: undefined };
+  };
+
+  const loadData = async (filter = periodFilter) => {
     setIsLoading(true);
-    const data = await getProfitLossReport();
+    const { startDate, endDate } = getDateRange(filter);
+    const data = await getProfitLossReport(startDate, endDate);
     setReportData(data);
     setIsLoading(false);
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadData();
-  }, []);
+    loadData(periodFilter);
+  }, [periodFilter]);
 
   if (isLoading) {
     return (
@@ -90,13 +113,20 @@ export default function ProfitLossPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="inline-flex w-full items-center justify-between gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 sm:w-auto">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-slate-400" />
-              <span>Semua Waktu</span>
-            </div>
-            <ChevronDown className="ml-2 h-4 w-4 text-slate-400" />
-          </button>
+          <div className="relative inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm sm:w-auto">
+            <Calendar className="mr-2 h-4 w-4 text-slate-400" />
+            <select
+              value={periodFilter}
+              onChange={(e) => setPeriodFilter(e.target.value)}
+              className="cursor-pointer bg-transparent pr-4 font-medium text-slate-700 outline-none"
+            >
+              <option value="ALL">Semua Waktu</option>
+              <option value="TODAY">Hari Ini</option>
+              <option value="7_DAYS">7 Hari Terakhir</option>
+              <option value="THIS_MONTH">Bulan Ini</option>
+              <option value="THIS_YEAR">Tahun Ini</option>
+            </select>
+          </div>
           <button className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-900">
             <Download className="h-4 w-4" />
             Export PDF

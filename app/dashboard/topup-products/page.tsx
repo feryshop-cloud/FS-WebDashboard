@@ -7,6 +7,8 @@ import { getTopupProducts } from "@/app/actions/topup-products";
 import { AddTopupProductModal } from "@/components/topup/TopupProductModals";
 import { TopupProductRowActions } from "@/components/topup/TopupProductRowActions";
 
+import { Pagination } from "@/components/ui/Pagination";
+
 type TopupProduct = {
   id: string;
   game_slug: string;
@@ -24,17 +26,21 @@ export default function TopupProductsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [error, setError] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const itemsPerPage = 10;
 
-  const loadProducts = async () => {
+  const loadProducts = async (page = currentPage) => {
     try {
       setIsLoading(true);
       setError("");
-      const res = await getTopupProducts();
+      const res = await getTopupProducts(page, itemsPerPage);
 
       if (res.error) {
         setError(res.error);
       } else {
         setProducts((res.data as TopupProduct[]) || []);
+        setTotalCount(res.totalCount || 0);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal mengambil data produk");
@@ -44,9 +50,8 @@ export default function TopupProductsPage() {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadProducts();
-  }, []);
+    loadProducts(currentPage);
+  }, [currentPage]);
 
   const filteredProducts = products.filter(
     (p) =>
@@ -70,7 +75,7 @@ export default function TopupProductsPage() {
         </div>
         <div className="flex items-center gap-3">
           <button
-            onClick={loadProducts}
+            onClick={() => loadProducts()}
             disabled={isLoading}
             className="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-200"
           >
@@ -171,6 +176,15 @@ export default function TopupProductsPage() {
               </tbody>
             </table>
           </div>
+        )}
+        {!isLoading && products.length > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalItems={totalCount || products.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={(page) => setCurrentPage(page)}
+            itemLabel="produk"
+          />
         )}
       </div>
 

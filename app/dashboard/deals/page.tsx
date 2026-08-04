@@ -10,10 +10,11 @@ import {
   MoreHorizontal,
   X,
   Loader2,
+  Trash2,
 } from "lucide-react";
 import { formatRupiah, formatDate } from "@/lib/utils";
 import { getErrorMessage } from "@/lib/error";
-import { getDeals, createPenjualan } from "@/app/actions/deals";
+import { getDeals, createPenjualan, deleteDeal } from "@/app/actions/deals";
 import { getInventory } from "@/app/actions/inventory";
 import { getAccounts } from "@/app/actions/accounts";
 import type { Database } from "@/types/database.types";
@@ -77,8 +78,13 @@ export default function DealsPage() {
       setIsExporting(true);
       const params = new URLSearchParams();
       // Bisa tambahkan status filter di sini kalau UI Deals nanti punya state activeFilter
+      const routePrefix = process.env.NEXT_PUBLIC_BASE_PATH?.trim();
+      const basePath =
+        routePrefix && routePrefix !== "/"
+          ? `/${routePrefix.replace(/^\/+|\/+$/g, "")}`
+          : "";
 
-      const response = await fetch(`/api/export/deals?${params.toString()}`);
+      const response = await fetch(`${basePath}/api/export/deals?${params.toString()}`);
       if (!response.ok) {
         throw new Error("Gagal mengekspor data");
       }
@@ -97,6 +103,18 @@ export default function DealsPage() {
       alert(message);
     } finally {
       setIsExporting(false);
+    }
+  };
+
+  const handleDeleteDeal = async (id: string, dealNumber: string) => {
+    if (!window.confirm(`Apakah Anda yakin ingin menghapus transaksi "${dealNumber}"?`)) {
+      return;
+    }
+    try {
+      await deleteDeal(id);
+      loadData();
+    } catch (err: unknown) {
+      alert("Gagal menghapus deal: " + getErrorMessage(err));
     }
   };
 
@@ -294,8 +312,12 @@ export default function DealsPage() {
                         {formatDate(deal.created_at)}
                       </td>
                       <td className="px-6 py-4 text-center text-sm font-medium whitespace-nowrap">
-                        <button className="group/btn relative rounded-md p-1 text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-600">
-                          <MoreHorizontal className="h-5 w-5" />
+                        <button
+                          onClick={() => handleDeleteDeal(deal.id, deal.deal_number)}
+                          title="Hapus Deal"
+                          className="rounded-md p-1.5 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
+                        >
+                          <Trash2 className="h-4 w-4" />
                         </button>
                       </td>
                     </tr>

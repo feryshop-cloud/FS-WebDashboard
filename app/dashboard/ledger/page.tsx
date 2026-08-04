@@ -1,5 +1,6 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import {
   Search,
@@ -14,21 +15,29 @@ import {
 } from "lucide-react";
 import { formatRupiah, formatDate } from "@/lib/utils";
 import { getLedgers } from "@/app/actions/ledger";
+import { Pagination } from "@/components/ui/Pagination";
 import { LedgerWithRelations } from "@/types/database";
 
 type LedgerRecord = LedgerWithRelations;
 
 export default function LedgerPage() {
+  const searchParams = useSearchParams();
+  const accountId = searchParams.get("accountId") || undefined;
+
   const [ledgers, setLedgers] = useState<LedgerRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("ALL");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const itemsPerPage = 10;
 
-  const loadLedgers = async () => {
+  const loadLedgers = async (page = currentPage) => {
     try {
       setIsLoading(true);
-      const data = await getLedgers();
-      setLedgers((data as unknown as LedgerRecord[]) || []);
+      const res = await getLedgers(page, itemsPerPage, accountId);
+      setLedgers((res.data as unknown as LedgerRecord[]) || []);
+      setTotalCount(res.totalCount || 0);
     } catch (err) {
       console.error(err);
     } finally {
@@ -37,9 +46,8 @@ export default function LedgerPage() {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadLedgers();
-  }, []);
+    loadLedgers(currentPage);
+  }, [currentPage, accountId]);
 
   const filteredLedgers = ledgers.filter((item) => {
     const matchesSearch =
@@ -241,23 +249,14 @@ export default function LedgerPage() {
           </table>
         </div>
 
-        {/* Pagination Mockup */}
-        <div className="flex items-center justify-between border-t border-slate-100 bg-white px-6 py-4">
-          <div className="text-sm text-slate-500">
-            Menampilkan{" "}
-            <span className="font-semibold text-slate-900">{ledgers.length > 0 ? 1 : 0}</span> -{" "}
-            <span className="font-semibold text-slate-900">{ledgers.length}</span> dari{" "}
-            <span className="font-semibold text-slate-900">{ledgers.length}</span> mutasi
-          </div>
-          <div className="flex gap-1">
-            <button className="cursor-not-allowed rounded-md border border-slate-200 px-3 py-1 text-sm text-slate-400">
-              Sebelummnya
-            </button>
-            <button className="rounded-md border border-slate-200 px-3 py-1 text-sm font-medium text-slate-700 hover:bg-slate-50">
-              Selanjutnya
-            </button>
-          </div>
-        </div>
+        {/* Pagination */}
+        <Pagination
+          currentPage={currentPage}
+          totalItems={totalCount || ledgers.length}
+          itemsPerPage={itemsPerPage}
+          onPageChange={(page) => setCurrentPage(page)}
+          itemLabel="mutasi"
+        />
       </div>
     </div>
   );

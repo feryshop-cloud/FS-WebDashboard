@@ -15,23 +15,30 @@ export type TopupProductInput = {
   is_gangguan?: boolean;
 };
 
-export async function getTopupProducts() {
+export async function getTopupProducts(page?: number, limit?: number) {
   return runAction("getTopupProducts", async () => {
     const supabase = await createClient();
 
-    // "products" table is not in generated types, use explicit cast
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
+    let query = (supabase as any)
       .from("products")
-      .select("*")
+      .select("*", { count: "exact" })
       .order("game_slug", { ascending: true });
+
+    if (page && limit) {
+      const from = (page - 1) * limit;
+      const to = from + limit - 1;
+      query = query.range(from, to);
+    }
+
+    const { data, count, error } = await query;
 
     if (error) {
       logger.error("Error fetching topup products", { error });
-      return { data: null, error: error.message };
+      return { data: null, totalCount: 0, error: error.message };
     }
 
-    return { data, error: null };
+    return { data, totalCount: count || 0, error: null };
   });
 }
 
