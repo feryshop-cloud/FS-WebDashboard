@@ -107,8 +107,14 @@ export async function toggleGameCategoryStatus(id: number, is_active: boolean) {
 }
 
 export async function deleteGameCategory(id: number) {
-  const { createAdminClient } = await import("../lib/supabase/admin");
-  const supabase = createAdminClient();
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { success: false, error: "Unauthorized" };
+  }
 
   if (!id) {
     return { success: false, error: "ID is required." };
@@ -139,6 +145,22 @@ export async function getCategories() {
 
   if (error) {
     console.error("Error fetching categories:", error);
+    return { data: null, error: error.message };
+  }
+
+  return { data, error: null };
+}
+
+export async function getUsersList() {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("users")
+    .select("id, full_name, email, status, role_id, roles(name)")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching users:", error);
     return { data: null, error: error.message };
   }
 

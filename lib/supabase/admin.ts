@@ -1,19 +1,11 @@
-import { createClient as createSupabaseClient } from "@supabase/supabase-js";
-import type { Database } from "@/types/database.types";
-
 /**
- * Creates a Supabase admin client using the SERVICE_ROLE_KEY.
- * This bypasses all RLS policies and should ONLY be used in server actions.
+ * DEPRECATED & DISALLOWED:
+ * AI_GUARDRAILS.md Chapter 4 strictly prohibits using SUPABASE_SERVICE_ROLE_KEY
+ * inside web applications (Next.js client or server actions).
+ * Service role operations must only be executed in Supabase Edge Functions or imap-worker.
  */
-export function createAdminClient() {
-  return createSupabaseClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
-    },
+export function createAdminClient(): never {
+  throw new Error(
+    "SECURITY VIOLATION: createAdminClient() with SUPABASE_SERVICE_ROLE_KEY is prohibited in Next.js workspace per AI_GUARDRAILS.md Chapter 4. Use RLS + authenticated user client instead."
   );
 }
