@@ -83,6 +83,19 @@ This project is normally operated from Windows PowerShell 5.1, even when a tool 
 - Before recursive delete or move, verify the absolute target path is inside the intended workspace.
 - Apply `supabase/schema_draft.sql` or migrations intentionally; do not run destructive DB commands just to inspect data.
 
+### Logging & Observability
+
+- **LOG_LEVEL**: Controls structured log verbosity. Set in `.env.local`:
+  - `debug` — local development, verbose tracing
+  - `info` — production default (also the default when `NODE_ENV=production`)
+  - `warn` — only warnings and errors
+  - `error` — only errors
+- **x-request-id**: Every HTTP request gets a correlation ID (from the `x-request-id` header, or a fresh UUID). It is:
+  - Bound to the async-local request context so every `logger` call inside the handler carries it.
+  - Echoed back in the response `x-request-id` header.
+  - Included in every JSON log line as `requestId`.
+- **Log format**: JSON lines (one JSON object per line) with fields `timestamp`, `service`, `level`, `message`, `requestId` (optional), and custom attributes flattened at the top level (no `meta` nesting). See `.env.example` for the full list of environment variables.
+
 ### Storage
 
 - The game image bucket is **Railway's S3 bucket named `ample-packet-nw8fpynabfcu`**.
