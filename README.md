@@ -62,5 +62,11 @@ Sistem Dashboard Admin (SaaS ERP) untuk mengelola inventori, transaksi jual beli
 - **Tukar Tambah (Trade-in):** Merupakan gabungan dari Deal Pembelian (Aset Masuk) dan Penjualan (Aset Keluar). Semua transaksi dikaitkan satu sama lain di tabel `deal_items` dan termutasi ke dalam `finance_ledger` secara seimbang.
 - **Pembayaran (Split Payments):** Satu Deal dapat dibayar melalui beberapa akun bank secara mencicil (Booking/DP -> Lunas). Piutang terhitung secara otomatis berdasar selisih `total_deal_price` dengan akumulasi payments.
 
+## Batasan Scope vs Storefront (FS-Public)
+
+Repo ini adalah **admin ERP** (internal). **Tidak ada integrasi payment gateway** di sini — pembayaran diselesaikan eksternal (transfer bank / e-wallet, biasanya dikoordinasikan via WhatsApp) dan hanya *dicatat* oleh admin ke dalam sistem.
+
+Penyajian metode pembayaran untuk pelanggan (kode/QR QRIS, e-wallet, transfer) dan status order/pembayaran ada di repo **`FS-Public`** (storefront). Kedua repo berbagi satu database Supabase.
+
 ---
 _Dikembangkan dengan Zero-Hallucination Vibe Coding Principles._
