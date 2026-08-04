@@ -33,7 +33,7 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
   const [selectedRole, setSelectedRole] = useState<Role | null>(roles[0] || null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
-  
+
   // Modal State for New Role
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
@@ -197,7 +197,7 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
                           handleDeleteRole(r.id, r.name);
                         }}
                         title="Hapus Role Custom"
-                        className="opacity-0 transition-opacity hover:text-rose-600 group-hover:opacity-100 text-slate-400 p-1"
+                        className="p-1 text-slate-400 opacity-0 transition-opacity group-hover:opacity-100 hover:text-rose-600"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -284,8 +284,8 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
 
       {/* Modal Add Role */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md space-y-4 rounded-2xl bg-white p-6 shadow-xl">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-base font-bold text-slate-900">Tambah Role Baru</h3>
               <button
@@ -304,7 +304,7 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
 
             <form onSubmit={handleCreateRole} className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
+                <label className="mb-1 block text-xs font-medium text-slate-700">
                   Nama Role <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -312,12 +312,12 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
                   placeholder="misal: STAFF_FINANCE, CS_OFFICER"
                   value={newRoleName}
                   onChange={(e) => setNewRoleName(e.target.value)}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none uppercase"
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm uppercase focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Deskripsi</label>
+                <label className="mb-1 block text-xs font-medium text-slate-700">Deskripsi</label>
                 <textarea
                   rows={3}
                   placeholder="Keterangan tugas atau tanggung jawab role ini..."

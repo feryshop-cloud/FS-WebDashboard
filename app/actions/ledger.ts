@@ -9,7 +9,6 @@ import type { Database } from "@/types/database.types";
 
 type LedgerTransactionType = Database["public"]["Enums"]["ledger_transaction_type"];
 
-
 export async function getLedgers(page?: number, limit?: number, accountId?: string) {
   return runAction("getLedgers", async () => {
     const supabase = await createClient();
@@ -65,13 +64,15 @@ export async function addManualLedger(formData: FormData) {
     } = await supabase.auth.getUser();
 
     const { error } = await supabase.from("finance_ledger").insert({
-      amount: transaction_type === "PAYMENT_OUT" || transaction_type === "REFUND" ? -Math.abs(amount) : Math.abs(amount),
+      amount:
+        transaction_type === "PAYMENT_OUT" || transaction_type === "REFUND"
+          ? -Math.abs(amount)
+          : Math.abs(amount),
       transaction_type: transaction_type as LedgerTransactionType,
       notes: notes || "Input Kas Manual",
       account_id,
       admin_id: user?.id,
     });
-
 
     if (error) {
       logger.error("Error adding manual ledger", { error });
@@ -89,10 +90,7 @@ export async function updateLedger(id: string, formData: FormData) {
 
     const supabase = await createClient();
 
-    const { error } = await supabase
-      .from("finance_ledger")
-      .update({ notes })
-      .eq("id", id);
+    const { error } = await supabase.from("finance_ledger").update({ notes }).eq("id", id);
 
     if (error) {
       logger.error("Error updating ledger", { error });
@@ -118,4 +116,3 @@ export async function deleteLedger(id: string) {
     revalidatePath("/dashboard/accounts");
   });
 }
-

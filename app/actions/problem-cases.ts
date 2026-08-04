@@ -132,7 +132,10 @@ export async function deleteProblemCase(id: string) {
   });
 }
 
-export async function updateProblemCase(id: string, data: { status?: string; chronology?: string; issue_type?: string }) {
+export async function updateProblemCase(
+  id: string,
+  data: { status?: string; chronology?: string; issue_type?: string },
+) {
   return runAction("updateProblemCase", async () => {
     const supabase = await createClient();
 
@@ -157,4 +160,3 @@ export async function updateProblemCase(id: string, data: { status?: string; chr
     revalidatePath("/dashboard/problem-cases");
   });
 }
-

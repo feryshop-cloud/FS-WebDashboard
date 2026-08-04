@@ -1,16 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  Search,
-  Filter,
-  Plus,
-  ChevronDown,
-  X,
-  Loader2,
-  Download,
-  Trash2,
-} from "lucide-react";
+import { Search, Filter, Plus, ChevronDown, X, Loader2, Download, Trash2 } from "lucide-react";
 import { formatRupiah, formatDate } from "@/lib/utils";
 import { getErrorMessage } from "@/lib/error";
 import { getPurchases, purchaseStock, getGames, deletePurchase } from "@/actions/purchases";

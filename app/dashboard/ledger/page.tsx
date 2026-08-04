@@ -164,8 +164,7 @@ export default function LedgerPage() {
     ]);
 
     const csvContent =
-      "\uFEFF" +
-      [headers.join(","), ...rows.map((row) => row.join(","))].join("\n");
+      "\uFEFF" + [headers.join(","), ...rows.map((row) => row.join(","))].join("\n");
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
@@ -312,7 +311,7 @@ export default function LedgerPage() {
                             {formatDate(tx.created_at)}
                           </span>
                           <span
-                            className="w-24 truncate font-semibold text-slate-900 font-mono text-xs"
+                            className="w-24 truncate font-mono text-xs font-semibold text-slate-900"
                             title={tx.id}
                           >
                             {tx.id.split("-")[0]}...
@@ -393,7 +392,7 @@ export default function LedgerPage() {
       {/* Add Manual Ledger Modal */}
       {isAddManualOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm">
-          <div className="flex h-full w-full max-w-md flex-col bg-white shadow-2xl animate-in slide-in-from-right duration-200">
+          <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-white shadow-2xl duration-200">
             <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-5">
               <div>
                 <h2 className="text-base font-bold text-slate-900">Catat Kas Manual</h2>
@@ -502,7 +501,7 @@ export default function LedgerPage() {
       {/* Edit Ledger Modal */}
       {editingLedger && (
         <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm">
-          <div className="flex h-full w-full max-w-md flex-col bg-white shadow-2xl animate-in slide-in-from-right duration-200">
+          <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-white shadow-2xl duration-200">
             <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-5">
               <div>
                 <h2 className="text-base font-bold text-slate-900">Edit Catatan Transaksi</h2>
@@ -528,7 +527,7 @@ export default function LedgerPage() {
                   <label className="mb-1 block text-xs font-medium text-slate-500">
                     ID Transaksi
                   </label>
-                  <p className="font-mono text-xs font-semibold text-slate-700 bg-slate-50 p-2 rounded-lg border border-slate-200 truncate">
+                  <p className="truncate rounded-lg border border-slate-200 bg-slate-50 p-2 font-mono text-xs font-semibold text-slate-700">
                     {editingLedger.id}
                   </p>
                 </div>
@@ -537,8 +536,7 @@ export default function LedgerPage() {
                     Tipe Transaksi & Nominal
                   </label>
                   <p className="text-sm font-bold text-slate-900">
-                    {editingLedger.transaction_type} (
-                    {formatRupiah(Number(editingLedger.amount))})
+                    {editingLedger.transaction_type} ({formatRupiah(Number(editingLedger.amount))})
                   </p>
                 </div>
                 <div>

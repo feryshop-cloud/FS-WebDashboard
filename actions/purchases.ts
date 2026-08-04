@@ -105,7 +105,9 @@ export async function getGames(): Promise<{
   }
 }
 
-export async function deletePurchase(id: string): Promise<{ success: boolean; error: string | null }> {
+export async function deletePurchase(
+  id: string,
+): Promise<{ success: boolean; error: string | null }> {
   try {
     const supabase = await createClient();
 
@@ -163,4 +165,3 @@ export async function updatePurchase(
     return { success: false, error: getErrorMessage(error) };
   }
 }
-

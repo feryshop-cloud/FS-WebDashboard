@@ -346,7 +346,8 @@ async function main() {
       {
         case_number: `CASE-${new Date().toISOString().slice(2, 7).replace("-", "")}-001`,
         issue_type: "Akun Tidak Bisa Login",
-        chronology: "Buyer melaporkan akun MLBB tidak bisa login setelah transfer. Moonton kemungkinan ganti password.",
+        chronology:
+          "Buyer melaporkan akun MLBB tidak bisa login setelah transfer. Moonton kemungkinan ganti password.",
         stock_id: mlbbStock.id,
         deal_id: deal1.id,
         status: "OPEN",
@@ -354,13 +355,13 @@ async function main() {
       {
         case_number: `CASE-${new Date().toISOString().slice(2, 7).replace("-", "")}-002`,
         issue_type: "Buyer Klaim Akun Berbeda",
-        chronology: "Buyer mengklaim akun Valorant yang diterima berbeda dari listing. Sedang diverifikasi.",
+        chronology:
+          "Buyer mengklaim akun Valorant yang diterima berbeda dari listing. Sedang diverifikasi.",
         stock_id: valoStock.id,
         deal_id: deal2.id,
         status: "IN_PROGRESS",
       },
     ]);
-
 
     console.log("Database successfully seeded with realistic data!");
   } catch (err) {

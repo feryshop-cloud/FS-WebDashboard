@@ -237,7 +237,7 @@ export default function AccountsPage() {
               >
                 <div>
                   {/* Card Header & Action Dropdown */}
-                  <div className="flex items-start justify-between gap-2 mb-4">
+                  <div className="mb-4 flex items-start justify-between gap-2">
                     <div className="flex items-center gap-3">
                       <div
                         className={`flex h-11 w-11 items-center justify-center rounded-2xl border ${colorClass}`}
@@ -277,7 +277,7 @@ export default function AccountsPage() {
                       {isMenuOpen && (
                         <div
                           ref={menuRef}
-                          className="absolute right-0 top-8 z-30 w-44 rounded-xl border border-slate-100 bg-white p-1.5 shadow-xl animate-in fade-in slide-in-from-top-2 duration-150"
+                          className="animate-in fade-in slide-in-from-top-2 absolute top-8 right-0 z-30 w-44 rounded-xl border border-slate-100 bg-white p-1.5 shadow-xl duration-150"
                         >
                           <button
                             onClick={() => {
@@ -285,7 +285,7 @@ export default function AccountsPage() {
                               setError("");
                               setEditingAccount(account);
                             }}
-                            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50"
                           >
                             <Pencil className="h-3.5 w-3.5 text-blue-600" />
                             Edit Rekening
@@ -293,7 +293,7 @@ export default function AccountsPage() {
                           <button
                             onClick={() => handleDeleteAccount(account)}
                             disabled={isDeletingId === account.id}
-                            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 transition-colors disabled:opacity-50"
+                            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-rose-600 transition-colors hover:bg-rose-50 disabled:opacity-50"
                           >
                             {isDeletingId === account.id ? (
                               <Loader2 className="h-3.5 w-3.5 animate-spin text-rose-600" />
@@ -344,7 +344,7 @@ export default function AccountsPage() {
       {/* Add Account Modal */}
       {isAddAccountOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm">
-          <div className="flex h-full w-full max-w-md flex-col bg-white shadow-2xl animate-in slide-in-from-right duration-200">
+          <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-white shadow-2xl duration-200">
             <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-5">
               <div>
                 <h2 className="text-base font-bold text-slate-900">Tambah Rekening Baru</h2>
@@ -400,7 +400,7 @@ export default function AccountsPage() {
                   <input
                     name="account_number"
                     type="text"
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none font-mono"
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 font-mono text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                     placeholder="Misal: 1234567890"
                   />
                 </div>
@@ -436,7 +436,7 @@ export default function AccountsPage() {
       {/* Edit Account Modal */}
       {editingAccount && (
         <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm">
-          <div className="flex h-full w-full max-w-md flex-col bg-white shadow-2xl animate-in slide-in-from-right duration-200">
+          <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-white shadow-2xl duration-200">
             <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-5">
               <div>
                 <h2 className="text-base font-bold text-slate-900">Edit Rekening</h2>
@@ -494,7 +494,7 @@ export default function AccountsPage() {
                     name="account_number"
                     type="text"
                     defaultValue={editingAccount.account_number || ""}
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none font-mono"
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 font-mono text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                   />
                 </div>
                 <div className="flex items-center gap-2 pt-2">
@@ -542,7 +542,7 @@ export default function AccountsPage() {
       {/* Mutasi Modal */}
       {isMutasiOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm">
-          <div className="flex h-full w-full max-w-md flex-col bg-white shadow-2xl animate-in slide-in-from-right duration-200">
+          <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-white shadow-2xl duration-200">
             <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-5">
               <div>
                 <h2 className="text-base font-bold text-slate-900">Mutasi Saldo</h2>

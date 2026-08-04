@@ -2,22 +2,9 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import {
-  addGame,
-  updateGame,
-  toggleGameStatus,
-} from "@/actions/settings";
+import { addGame, updateGame, toggleGameStatus } from "@/actions/settings";
 import type { Database } from "@/types/database.types";
-import {
-  Loader2,
-  Plus,
-  Check,
-  Edit2,
-  Power,
-  Gamepad2,
-  Star,
-  X,
-} from "lucide-react";
+import { Loader2, Plus, Check, Edit2, Power, Gamepad2, Star, X } from "lucide-react";
 import { DynamicInputBuilder, DynamicField } from "@/components/features/DynamicInputBuilder";
 
 type Game = Database["public"]["Tables"]["games"]["Row"];
@@ -207,7 +194,7 @@ export function GameManager({
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <div className="space-y-1.5">
                 <label
-                  className="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                  className="block text-xs font-semibold tracking-wide text-slate-600 uppercase"
                   htmlFor="game-name"
                 >
                   Nama Game
@@ -219,13 +206,13 @@ export function GameManager({
                   value={name}
                   onChange={handleNameChange}
                   placeholder="e.g. Mobile Legends"
-                  className="w-full rounded-[10px] border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-none"
+                  className="w-full rounded-[10px] border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 transition-colors placeholder:text-slate-400 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-none"
                 />
               </div>
 
               <div className="space-y-1.5">
                 <label
-                  className="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                  className="block text-xs font-semibold tracking-wide text-slate-600 uppercase"
                   htmlFor="game-slug"
                 >
                   Slug
@@ -237,12 +224,12 @@ export function GameManager({
                   value={slug}
                   onChange={(e) => setSlug(e.target.value)}
                   placeholder="mobile-legends"
-                  className="w-full rounded-[10px] border border-slate-200 bg-white px-3.5 py-2.5 font-mono text-sm text-slate-700 placeholder:font-sans placeholder:text-slate-400 transition-colors focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-none"
+                  className="w-full rounded-[10px] border border-slate-200 bg-white px-3.5 py-2.5 font-mono text-sm text-slate-700 transition-colors placeholder:font-sans placeholder:text-slate-400 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-none"
                 />
               </div>
 
               {editingId && (
-                <div className="flex flex-col gap-2.5 justify-end">
+                <div className="flex flex-col justify-end gap-2.5">
                   <label className="flex cursor-pointer items-center gap-2.5">
                     <div className="relative inline-flex items-center">
                       <input
@@ -325,13 +312,23 @@ export function GameManager({
             <div className="bg-rose-50/50 p-6 text-sm text-rose-600">{errorMsg}</div>
           ) : games.length > 0 ? (
             <table className="w-full text-left text-sm">
-              <thead className="border-b border-slate-100 bg-slate-50/70 text-xs font-semibold uppercase tracking-wider text-slate-500">
+              <thead className="border-b border-slate-100 bg-slate-50/70 text-xs font-semibold tracking-wider text-slate-500 uppercase">
                 <tr>
-                  <th scope="col" className="px-5 py-3.5">Nama Game</th>
-                  <th scope="col" className="px-5 py-3.5">Slug</th>
-                  <th scope="col" className="px-5 py-3.5 text-center">Field Input</th>
-                  <th scope="col" className="px-5 py-3.5 text-center">Status</th>
-                  <th scope="col" className="px-5 py-3.5 text-center">Aksi</th>
+                  <th scope="col" className="px-5 py-3.5">
+                    Nama Game
+                  </th>
+                  <th scope="col" className="px-5 py-3.5">
+                    Slug
+                  </th>
+                  <th scope="col" className="px-5 py-3.5 text-center">
+                    Field Input
+                  </th>
+                  <th scope="col" className="px-5 py-3.5 text-center">
+                    Status
+                  </th>
+                  <th scope="col" className="px-5 py-3.5 text-center">
+                    Aksi
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-600">
@@ -346,7 +343,10 @@ export function GameManager({
                         <div className="flex items-center gap-2">
                           <span className="font-medium text-slate-900">{game.name}</span>
                           {game.is_popular && (
-                            <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" strokeWidth={1} />
+                            <Star
+                              className="h-3.5 w-3.5 fill-amber-400 text-amber-400"
+                              strokeWidth={1}
+                            />
                           )}
                         </div>
                       </td>
@@ -366,7 +366,9 @@ export function GameManager({
                         <button
                           onClick={() => handleToggleStatus(game)}
                           disabled={isPending}
-                          title={game.is_active ? "Klik untuk menonaktifkan" : "Klik untuk mengaktifkan"}
+                          title={
+                            game.is_active ? "Klik untuk menonaktifkan" : "Klik untuk mengaktifkan"
+                          }
                           className="inline-flex items-center gap-1 focus:outline-none"
                         >
                           {game.is_active ? (

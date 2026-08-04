@@ -137,10 +137,11 @@ export async function deleteAccount(id: string) {
 
     if (error) {
       logger.error("Error deleting account", { error });
-      throw new Error("Gagal menghapus rekening. Rekening mungkin terikat dengan riwayat transaksi.");
+      throw new Error(
+        "Gagal menghapus rekening. Rekening mungkin terikat dengan riwayat transaksi.",
+      );
     }
 
     revalidatePath("/dashboard/accounts");
   });
 }
-

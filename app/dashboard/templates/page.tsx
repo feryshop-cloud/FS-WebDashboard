@@ -1,7 +1,18 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Copy, Edit, Check, LayoutTemplate, Search, Save, X, Plus, Trash2, Loader2 } from "lucide-react";
+import {
+  Copy,
+  Edit,
+  Check,
+  LayoutTemplate,
+  Search,
+  Save,
+  X,
+  Plus,
+  Trash2,
+  Loader2,
+} from "lucide-react";
 import { getTemplates, addTemplate, updateTemplate, deleteTemplate } from "@/app/actions/templates";
 
 interface TemplateItem {
@@ -262,7 +273,7 @@ export default function TemplatesPage() {
 
       {/* Add Modal */}
       {isAddOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-base font-bold text-slate-900">Tambah Template Baru</h3>
@@ -275,7 +286,9 @@ export default function TemplatesPage() {
             </div>
             <form onSubmit={handleAddSubmit} className="mt-4 flex flex-col gap-4">
               <div>
-                <label className="mb-1 block text-xs font-semibold text-slate-700">Nama Template</label>
+                <label className="mb-1 block text-xs font-semibold text-slate-700">
+                  Nama Template
+                </label>
                 <input
                   name="name"
                   required
@@ -284,7 +297,9 @@ export default function TemplatesPage() {
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-semibold text-slate-700">Kategori / Tipe</label>
+                <label className="mb-1 block text-xs font-semibold text-slate-700">
+                  Kategori / Tipe
+                </label>
                 <select
                   name="type"
                   required
@@ -297,7 +312,9 @@ export default function TemplatesPage() {
                 </select>
               </div>
               <div>
-                <label className="mb-1 block text-xs font-semibold text-slate-700">Isi Teks Template</label>
+                <label className="mb-1 block text-xs font-semibold text-slate-700">
+                  Isi Teks Template
+                </label>
                 <textarea
                   name="content"
                   required

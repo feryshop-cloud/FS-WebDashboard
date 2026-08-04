@@ -43,7 +43,10 @@ export async function addGameCategory(
 
   // Also update instructions in games table if exists
   if (instructions) {
-    await supabase.from("games").update({ instructions: instructions as Json }).eq("slug", game_slug);
+    await supabase
+      .from("games")
+      .update({ instructions: instructions as Json })
+      .eq("slug", game_slug);
   }
 
   revalidatePath("/dashboard/settings");
@@ -90,7 +93,10 @@ export async function updateGameCategory(
 
   // Update instructions in games table
   if (instructions) {
-    await supabase.from("games").update({ instructions: instructions as Json }).eq("slug", game_slug);
+    await supabase
+      .from("games")
+      .update({ instructions: instructions as Json })
+      .eq("slug", game_slug);
   }
 
   revalidatePath("/dashboard/settings");
@@ -179,7 +185,9 @@ export async function getGamesList() {
 
   const { data, error } = await supabase
     .from("games")
-    .select("id, name, slug, logo, image_url, is_active, is_popular, sort_order, instructions, created_at")
+    .select(
+      "id, name, slug, logo, image_url, is_active, is_popular, sort_order, instructions, created_at",
+    )
     .order("sort_order", { ascending: true });
 
   if (error) {
@@ -190,27 +198,25 @@ export async function getGamesList() {
   return { data, error: null };
 }
 
-export async function addGame(
-  name: string,
-  slug: string,
-  logo?: string,
-  instructions?: unknown[],
-) {
+export async function addGame(name: string, slug: string, logo?: string, instructions?: unknown[]) {
   const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) return { success: false, error: "Unauthorized" };
 
   if (!name || !slug) return { success: false, error: "Nama dan slug wajib diisi." };
 
-  const mappedInputFields = instructions && Array.isArray(instructions)
-    ? (instructions as Record<string, unknown>[]).map((f) => ({
-        name: (f.name as string) || (f.id as string) || "field",
-        type: (f.type as string) || "text",
-        label: (f.label as string) || (f.name as string) || "Field",
-        placeholder: (f.placeholder as string) || "",
-      }))
-    : [];
+  const mappedInputFields =
+    instructions && Array.isArray(instructions)
+      ? (instructions as Record<string, unknown>[]).map((f) => ({
+          name: (f.name as string) || (f.id as string) || "field",
+          type: (f.type as string) || "text",
+          label: (f.label as string) || (f.name as string) || "Field",
+          placeholder: (f.placeholder as string) || "",
+        }))
+      : [];
 
   const finalInstructions = {
     fields: instructions || [],
@@ -220,7 +226,13 @@ export async function addGame(
 
   const { data, error } = await supabase
     .from("games")
-    .insert({ name, slug, logo: logo || null, instructions: finalInstructions as Json, is_active: true })
+    .insert({
+      name,
+      slug,
+      logo: logo || null,
+      instructions: finalInstructions as Json,
+      is_active: true,
+    })
     .select()
     .single();
 
@@ -245,7 +257,9 @@ export async function updateGame(
 ) {
   const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) return { success: false, error: "Unauthorized" };
 
   if (!id || !name || !slug) return { success: false, error: "ID, nama, dan slug wajib diisi." };
@@ -303,7 +317,9 @@ export async function updateGame(
 export async function toggleGameStatus(id: string, is_active: boolean) {
   const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) return { success: false, error: "Unauthorized" };
 
   const { error } = await supabase

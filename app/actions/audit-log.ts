@@ -14,7 +14,6 @@ export async function getAuditLogs() {
           *,
           public_users (full_name)
         `,
-
       )
       .order("created_at", { ascending: false })
       .limit(100);

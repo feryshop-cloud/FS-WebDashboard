@@ -46,9 +46,14 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
   // Global Keyboard Shortcut: '/' or 'Ctrl+K' to focus search input
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.key === "/" || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k")) && document.activeElement !== searchInputRef.current) {
+      if (
+        (e.key === "/" || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k")) &&
+        document.activeElement !== searchInputRef.current
+      ) {
         // Prevent typing '/' into input when focusing
-        const isInputOrTextarea = ["INPUT", "TEXTAREA"].includes((document.activeElement?.tagName || "").toUpperCase());
+        const isInputOrTextarea = ["INPUT", "TEXTAREA"].includes(
+          (document.activeElement?.tagName || "").toUpperCase(),
+        );
         if (!isInputOrTextarea) {
           e.preventDefault();
           searchInputRef.current?.focus();
@@ -144,7 +149,9 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative max-w-md flex-1">
           <div className="group relative">
-            <Search className={`absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 transition-colors ${searchQuery ? "text-blue-600" : "text-slate-400 group-focus-within:text-blue-600"}`} />
+            <Search
+              className={`absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 transition-colors ${searchQuery ? "text-blue-600" : "text-slate-400 group-focus-within:text-blue-600"}`}
+            />
             <input
               ref={searchInputRef}
               type="text"
@@ -207,7 +214,9 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
         {searchQuery.trim() !== "" && (
           <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-2.5 text-xs text-slate-500">
             <span>
-              Menampilkan <strong className="font-semibold text-slate-900">{filteredUsers.length}</strong> dari <strong className="font-semibold text-slate-900">{users.length}</strong> pengguna
+              Menampilkan{" "}
+              <strong className="font-semibold text-slate-900">{filteredUsers.length}</strong> dari{" "}
+              <strong className="font-semibold text-slate-900">{users.length}</strong> pengguna
             </span>
             <button
               onClick={() => setSearchQuery("")}
@@ -237,7 +246,9 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
                         <SearchX className="h-6 w-6" />
                       </div>
                       <p className="text-sm font-semibold text-slate-900">
-                        {searchQuery ? `Tidak ada pengguna yang cocok dengan "${searchQuery}"` : "Belum ada pengguna ditemukan"}
+                        {searchQuery
+                          ? `Tidak ada pengguna yang cocok dengan "${searchQuery}"`
+                          : "Belum ada pengguna ditemukan"}
                       </p>
                       {searchQuery && (
                         <button

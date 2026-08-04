@@ -1,16 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  Search,
-  Filter,
-  Plus,
-  FileText,
-  ChevronDown,
-  X,
-  Loader2,
-  Trash2,
-} from "lucide-react";
+import { Search, Filter, Plus, FileText, ChevronDown, X, Loader2, Trash2 } from "lucide-react";
 import { formatRupiah, formatDate } from "@/lib/utils";
 import { getErrorMessage } from "@/lib/error";
 import { getDeals, createPenjualan, deleteDeal } from "@/app/actions/deals";
@@ -79,9 +70,7 @@ export default function DealsPage() {
       // Bisa tambahkan status filter di sini kalau UI Deals nanti punya state activeFilter
       const routePrefix = process.env.NEXT_PUBLIC_BASE_PATH?.trim();
       const basePath =
-        routePrefix && routePrefix !== "/"
-          ? `/${routePrefix.replace(/^\/+|\/+$/g, "")}`
-          : "";
+        routePrefix && routePrefix !== "/" ? `/${routePrefix.replace(/^\/+|\/+$/g, "")}` : "";
 
       const response = await fetch(`${basePath}/api/export/deals?${params.toString()}`);
       if (!response.ok) {

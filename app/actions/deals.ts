@@ -178,4 +178,3 @@ export async function updateDeal(id: string, data: DealUpdate) {
     revalidatePath("/dashboard/ledger");
   });
 }
-

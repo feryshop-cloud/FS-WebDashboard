@@ -84,9 +84,7 @@ export default function InventoryPage() {
       }
       const routePrefix = process.env.NEXT_PUBLIC_BASE_PATH?.trim();
       const basePath =
-        routePrefix && routePrefix !== "/"
-          ? `/${routePrefix.replace(/^\/+|\/+$/g, "")}`
-          : "";
+        routePrefix && routePrefix !== "/" ? `/${routePrefix.replace(/^\/+|\/+$/g, "")}` : "";
 
       const response = await fetch(`${basePath}/api/export/inventory?${params.toString()}`);
       if (!response.ok) {

@@ -55,7 +55,8 @@ export async function GET(request: Request) {
       item.status || "-",
       (item.stocks as { capital_price?: number })?.capital_price || 0,
       item.deal_price || 0,
-      Number(item.deal_price || 0) - Number((item.stocks as { capital_price?: number })?.capital_price || 0),
+      Number(item.deal_price || 0) -
+        Number((item.stocks as { capital_price?: number })?.capital_price || 0),
       formatDate(item.created_at as string),
       formatDate((item.completed_at || item.updated_at) as string),
     ]);

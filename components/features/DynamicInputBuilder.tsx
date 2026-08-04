@@ -155,7 +155,9 @@ export function DynamicInputBuilder({ fields, onChange }: DynamicInputBuilderPro
       <div className="flex items-center justify-between border-b border-slate-100 pb-3">
         <div className="flex items-center gap-2">
           <Settings2 className="h-4 w-4 text-blue-600" />
-          <h4 className="text-sm font-semibold text-slate-800">Field Input Dinamis (User Account)</h4>
+          <h4 className="text-sm font-semibold text-slate-800">
+            Field Input Dinamis (User Account)
+          </h4>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="text-xs text-slate-400">Preset:</span>
@@ -179,7 +181,7 @@ export function DynamicInputBuilder({ fields, onChange }: DynamicInputBuilderPro
       {/* Field List */}
       <div className="space-y-2">
         {fields.length === 0 ? (
-          <p className="py-2 text-center text-xs italic text-slate-400">
+          <p className="py-2 text-center text-xs text-slate-400 italic">
             Belum ada input dinamis yang dikonfigurasi. Menggunakan default (User ID + Server).
           </p>
         ) : (
@@ -195,11 +197,11 @@ export function DynamicInputBuilder({ fields, onChange }: DynamicInputBuilderPro
               <div className="flex flex-col gap-0.5">
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-slate-800">{field.label}</span>
-                  <span className="rounded bg-slate-200 px-1.5 py-0.2 text-[10px] text-slate-600">
+                  <span className="py-0.2 rounded bg-slate-200 px-1.5 text-[10px] text-slate-600">
                     key: {field.name || field.id}
                   </span>
                   {field.required && (
-                    <span className="rounded bg-amber-100 px-1.5 py-0.2 text-[10px] font-medium text-amber-700">
+                    <span className="py-0.2 rounded bg-amber-100 px-1.5 text-[10px] font-medium text-amber-700">
                       Wajib
                     </span>
                   )}
@@ -245,14 +247,18 @@ export function DynamicInputBuilder({ fields, onChange }: DynamicInputBuilderPro
       </div>
 
       {/* Editor Form */}
-      <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50/50 p-3 space-y-3">
+      <div className="space-y-3 rounded-lg border border-dashed border-slate-300 bg-slate-50/50 p-3">
         <h5 className="text-xs font-semibold text-slate-700">
-          {editingIndex !== null ? `Edit Field: ${fields[editingIndex].label}` : "Tambah Field Baru"}
+          {editingIndex !== null
+            ? `Edit Field: ${fields[editingIndex].label}`
+            : "Tambah Field Baru"}
         </h5>
 
         <div className="grid grid-cols-2 gap-2">
           <div>
-            <label className="block text-[11px] font-medium text-slate-600">ID / Key (e.g. id, server)</label>
+            <label className="block text-[11px] font-medium text-slate-600">
+              ID / Key (e.g. id, server)
+            </label>
             <input
               type="text"
               value={formData.name}
@@ -264,7 +270,7 @@ export function DynamicInputBuilder({ fields, onChange }: DynamicInputBuilderPro
                 })
               }
               placeholder="e.g. zone_id"
-              className="w-full rounded border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 focus:ring-1 focus:ring-blue-500 focus:outline-none"
             />
           </div>
 
@@ -275,7 +281,7 @@ export function DynamicInputBuilder({ fields, onChange }: DynamicInputBuilderPro
               value={formData.label}
               onChange={(e) => setFormData({ ...formData, label: e.target.value })}
               placeholder="e.g. Zone ID / Server"
-              className="w-full rounded border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 focus:ring-1 focus:ring-blue-500 focus:outline-none"
             />
           </div>
         </div>
@@ -288,7 +294,7 @@ export function DynamicInputBuilder({ fields, onChange }: DynamicInputBuilderPro
               value={formData.placeholder}
               onChange={(e) => setFormData({ ...formData, placeholder: e.target.value })}
               placeholder="e.g. Masukkan Zone ID"
-              className="w-full rounded border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 focus:ring-1 focus:ring-blue-500 focus:outline-none"
             />
           </div>
 
@@ -296,8 +302,10 @@ export function DynamicInputBuilder({ fields, onChange }: DynamicInputBuilderPro
             <label className="block text-[11px] font-medium text-slate-600">Tipe Field</label>
             <select
               value={formData.type}
-              onChange={(e) => setFormData({ ...formData, type: e.target.value as DynamicField["type"] })}
-              className="w-full rounded border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              onChange={(e) =>
+                setFormData({ ...formData, type: e.target.value as DynamicField["type"] })
+              }
+              className="w-full rounded border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 focus:ring-1 focus:ring-blue-500 focus:outline-none"
             >
               <option value="text">Teks biasa</option>
               <option value="number">Angka saja</option>
@@ -308,30 +316,34 @@ export function DynamicInputBuilder({ fields, onChange }: DynamicInputBuilderPro
 
         <div className="grid grid-cols-2 gap-2">
           <div>
-            <label className="block text-[11px] font-medium text-slate-600">Regex Validasi (Opsional)</label>
+            <label className="block text-[11px] font-medium text-slate-600">
+              Regex Validasi (Opsional)
+            </label>
             <input
               type="text"
               value={formData.regex || ""}
               onChange={(e) => setFormData({ ...formData, regex: e.target.value })}
               placeholder="e.g. ^[0-9]+$"
-              className="w-full rounded border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 focus:ring-1 focus:ring-blue-500 focus:outline-none"
             />
           </div>
 
           <div>
-            <label className="block text-[11px] font-medium text-slate-600">Pesan Error Validasi</label>
+            <label className="block text-[11px] font-medium text-slate-600">
+              Pesan Error Validasi
+            </label>
             <input
               type="text"
               value={formData.errorMessage || ""}
               onChange={(e) => setFormData({ ...formData, errorMessage: e.target.value })}
               placeholder="e.g. Format tidak valid"
-              className="w-full rounded border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 focus:ring-1 focus:ring-blue-500 focus:outline-none"
             />
           </div>
         </div>
 
         <div className="flex items-center justify-between pt-1">
-          <label className="flex items-center gap-1.5 text-xs text-slate-700 cursor-pointer">
+          <label className="flex cursor-pointer items-center gap-1.5 text-xs text-slate-700">
             <input
               type="checkbox"
               checked={formData.required}
