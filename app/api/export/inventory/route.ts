@@ -1,11 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import {
-  generateExcelBuffer,
-  formatRupiah,
-  formatDate,
-  createExcelResponse,
-} from "@/lib/export-utils";
+import { generateExcelBuffer, formatDate, createExcelResponse } from "@/lib/export-utils";
 
 export async function GET(request: Request) {
   try {
@@ -26,7 +21,7 @@ export async function GET(request: Request) {
       .order("created_at", { ascending: false });
 
     if (status) {
-      query = query.eq("status", status as any);
+      query = query.eq("status", status as "AVAILABLE");
     }
 
     if (gameId) {
@@ -51,27 +46,25 @@ export async function GET(request: Request) {
       "Tanggal Terjual",
     ];
 
-    const rows = (inventoryData || []).map((item: any) => [
+    const rows = (inventoryData || []).map((item: Record<string, unknown>) => [
       item.title_reference || "-",
-      item.games?.name || "-",
+      (item.games as { name?: string })?.name || "-",
       item.status || "-",
       item.capital_price || 0,
       item.asking_price || 0,
       item.sold_price || "",
       item.notes || "",
-      formatDate(item.created_at),
-      formatDate(item.sold_at),
+      formatDate(item.created_at as string),
+      formatDate(item.sold_at as string),
     ]);
 
     const buffer = generateExcelBuffer(rows, headers, "Laporan Stok");
 
     const filename = `Laporan_Inventory_${new Date().toISOString().split("T")[0]}.xlsx`;
     return createExcelResponse(buffer, filename);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Export Inventory Error:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to export inventory" },
-      { status: 500 },
-    );
+    const message = error instanceof Error ? error.message : "Failed to export inventory";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

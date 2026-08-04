@@ -1,11 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import {
-  generateExcelBuffer,
-  formatRupiah,
-  formatDate,
-  createExcelResponse,
-} from "@/lib/export-utils";
+import { generateExcelBuffer, formatDate, createExcelResponse } from "@/lib/export-utils";
 
 export async function GET(request: Request) {
   try {
@@ -51,9 +46,9 @@ export async function GET(request: Request) {
       "Status",
     ];
 
-    const rows = (ledgerData || []).map((item: any) => [
-      formatDate(item.created_at),
-      item.accounts?.name || "-",
+    const rows = (ledgerData || []).map((item: Record<string, unknown>) => [
+      formatDate(item.created_at as string),
+      (item.accounts as { name?: string })?.name || "-",
       item.type === "IN" ? "Masuk" : "Keluar",
       item.amount || 0,
       item.description || "-",
@@ -65,11 +60,9 @@ export async function GET(request: Request) {
 
     const filename = `Laporan_Ledger_${new Date().toISOString().split("T")[0]}.xlsx`;
     return createExcelResponse(buffer, filename);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Export Ledger Error:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to export ledger" },
-      { status: 500 },
-    );
+    const message = error instanceof Error ? error.message : "Failed to export ledger";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

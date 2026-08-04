@@ -8,7 +8,7 @@ type Role = {
   id: string;
   name: string;
   description: string | null;
-  permissions?: any;
+  permissions?: unknown;
 };
 
 interface RoleManagementTabProps {
@@ -34,7 +34,7 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
 
   const activePermissions: Record<string, boolean> =
     typeof selectedRole?.permissions === "object" && selectedRole?.permissions !== null
-      ? selectedRole.permissions
+      ? (selectedRole.permissions as Record<string, boolean>)
       : {};
 
   const handleTogglePermission = (key: string) => {

@@ -91,9 +91,10 @@ export default function DealsPage() {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      alert(error.message || "Gagal mengunduh Excel");
+      const message = error instanceof Error ? error.message : "Gagal mengunduh Excel";
+      alert(message);
     } finally {
       setIsExporting(false);
     }

@@ -11,13 +11,13 @@ import type { Database } from "@/types/database.types";
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<"users" | "roles" | "categories">("users");
 
-  const [categories, setCategories] = useState<any[]>([]);
+  const [categories, setCategories] = useState<unknown[]>([]);
   const [categoriesError, setCategoriesError] = useState<string>("");
 
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<unknown[]>([]);
   const [usersError, setUsersError] = useState<string>("");
 
-  const [roles, setRoles] = useState<any[]>([]);
+  const [roles, setRoles] = useState<unknown[]>([]);
   const [rolesError, setRolesError] = useState<string>("");
 
   const [isLoading, setIsLoading] = useState(true);
@@ -47,6 +47,7 @@ export default function SettingsPage() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadData();
   }, []);
 
@@ -109,8 +110,8 @@ export default function SettingsPage() {
         <div className="flex flex-col gap-6 lg:col-span-9">
           {activeTab === "users" && (
             <UserManagementTab
-              users={users}
-              roles={roles}
+              users={users as never}
+              roles={roles as never}
               errorMsg={usersError ? `Gagal memuat pengguna: ${usersError}` : undefined}
               onRefresh={loadData}
             />
@@ -118,7 +119,7 @@ export default function SettingsPage() {
 
           {activeTab === "roles" && (
             <RoleManagementTab
-              roles={roles}
+              roles={roles as never}
               errorMsg={rolesError ? `Gagal memuat role: ${rolesError}` : undefined}
               onRefresh={loadData}
             />

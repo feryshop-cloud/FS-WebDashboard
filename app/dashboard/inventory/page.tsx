@@ -1,16 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  Search,
-  Filter,
-  Plus,
-  ChevronDown,
-  MoreHorizontal,
-  Download,
-  X,
-  Loader2,
-} from "lucide-react";
+import { Search, Filter, Plus, ChevronDown, Download, X, Loader2 } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
 import { getInventory, addInventoryItem, getGames } from "@/app/actions/inventory";
 import { InventoryRowActions } from "@/components/inventory/InventoryRowActions";
@@ -108,9 +99,10 @@ export default function InventoryPage() {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      alert(error.message || "Gagal mengunduh Excel");
+      const message = error instanceof Error ? error.message : "Gagal mengunduh Excel";
+      alert(message);
     } finally {
       setIsExporting(false);
     }

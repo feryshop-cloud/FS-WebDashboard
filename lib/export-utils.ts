@@ -1,14 +1,14 @@
 import * as xlsx from "xlsx";
 
 /**
- * Konversi array of objects menjadi buffer Excel (.xlsx)
+ * Konversi array of objects/arrays menjadi buffer Excel (.xlsx)
  * @param data Array data yang akan di-export (tiap baris adalah satu object/array)
  * @param headers Nama kolom (opsional)
  * @param sheetName Nama Sheet (default "Sheet1")
  * @returns Buffer
  */
 export function generateExcelBuffer(
-  data: any[],
+  data: unknown[],
   headers?: string[],
   sheetName: string = "Sheet1",
 ): Buffer {
@@ -20,7 +20,7 @@ export function generateExcelBuffer(
   const isMatrix = headers || (data.length > 0 && Array.isArray(data[0]));
 
   const worksheet = isMatrix
-    ? xlsx.utils.aoa_to_sheet(worksheetData)
+    ? xlsx.utils.aoa_to_sheet(worksheetData as unknown[][])
     : xlsx.utils.json_to_sheet(data);
 
   // Buat workbook baru dan append sheet
@@ -43,7 +43,7 @@ export function generateExcelBuffer(
  * Fungsi helper untuk download dari browser (Client Side / API Route Return)
  */
 export function createExcelResponse(buffer: Buffer, filename: string): Response {
-  return new Response(buffer as any, {
+  return new Response(buffer as BodyInit, {
     headers: {
       "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       "Content-Disposition": `attachment; filename="${filename}"`,
@@ -71,7 +71,7 @@ export function formatDate(dateString: string | null | undefined): string {
       hour: "2-digit",
       minute: "2-digit",
     });
-  } catch (e) {
+  } catch {
     return dateString;
   }
 }

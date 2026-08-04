@@ -56,9 +56,10 @@ export function LedgerFilter({ accounts }: LedgerFilterProps) {
       document.body.removeChild(link);
 
       alert("Berhasil mengekspor Laporan Ledger");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      alert(error.message || "Gagal mengunduh Excel");
+      const message = error instanceof Error ? error.message : "Gagal mengunduh Excel";
+      alert(message);
     } finally {
       setIsExporting(false);
     }

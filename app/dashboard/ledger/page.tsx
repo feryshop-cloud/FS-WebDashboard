@@ -4,9 +4,7 @@ import React, { useState, useEffect } from "react";
 import {
   Search,
   Filter,
-  Calendar,
   FileText,
-  ChevronDown,
   MoreHorizontal,
   ArrowUpRight,
   ArrowDownRight,
@@ -50,10 +48,9 @@ export default function LedgerPage() {
       item.notes?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.ref_id?.toLowerCase().includes(searchTerm.toLowerCase());
 
+    const record = item as unknown as Record<string, unknown>;
     const matchesType =
-      typeFilter === "ALL" ||
-      (item as any).type === typeFilter ||
-      (item as any).transaction_type === typeFilter;
+      typeFilter === "ALL" || record.type === typeFilter || record.transaction_type === typeFilter;
 
     return matchesSearch && matchesType;
   });

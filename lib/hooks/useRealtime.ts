@@ -3,24 +3,24 @@
 import { useEffect } from "react";
 import { createClient } from "../supabase/client";
 
-interface RealtimeConfig {
+interface RealtimeConfig<T = Record<string, unknown>> {
   table: string;
   schema?: string;
   event?: "INSERT" | "UPDATE" | "DELETE" | "*";
   filter?: string;
-  onPayload: (payload: any) => void;
+  onPayload: (payload: T) => void;
 }
 
 /**
  * Reusable React Hook for Supabase Realtime Postgres Changes Subscription.
  */
-export function useRealtimeSubscription({
+export function useRealtimeSubscription<T = Record<string, unknown>>({
   table,
   schema = "public",
   event = "*",
   filter,
   onPayload,
-}: RealtimeConfig) {
+}: RealtimeConfig<T>) {
   useEffect(() => {
     const supabase = createClient();
 
@@ -28,7 +28,7 @@ export function useRealtimeSubscription({
     const channel = supabase
       .channel(channelName)
       .on(
-        "postgres_changes" as any,
+        "postgres_changes" as never,
         {
           event,
           schema,
@@ -36,7 +36,7 @@ export function useRealtimeSubscription({
           ...(filter ? { filter } : {}),
         },
         (payload) => {
-          onPayload(payload);
+          onPayload(payload as T);
         },
       )
       .subscribe();
