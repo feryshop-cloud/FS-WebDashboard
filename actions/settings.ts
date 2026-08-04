@@ -156,7 +156,7 @@ export async function getUsersList() {
 
   const { data, error } = await supabase
     .from("users")
-    .select("id, full_name, email, status, role_id, roles(name)")
+    .select("id, full_name, is_active, role_id, created_at, roles(id, name, description)")
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -166,4 +166,139 @@ export async function getUsersList() {
 
   return { data, error: null };
 }
+
+export async function getRolesList() {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("roles")
+    .select("id, name, description, permissions, created_at")
+    .order("name");
+
+  if (error) {
+    console.error("Error fetching roles:", error);
+    return { data: null, error: error.message };
+  }
+
+  return { data, error: null };
+}
+
+export async function createAdminUser(formData: FormData) {
+  const supabase = await createClient();
+
+  const {
+    data: { user: currentUser },
+  } = await supabase.auth.getUser();
+  if (!currentUser) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const id = formData.get("id") as string;
+  const full_name = formData.get("full_name") as string;
+  const role_id = formData.get("role_id") as string;
+
+  if (!id || !full_name) {
+    return { success: false, error: "ID (User ID/Email) dan Nama Lengkap wajib diisi." };
+  }
+
+  const { error } = await supabase.from("users").insert({
+    id,
+    full_name,
+    email: id.includes("@") ? id : `${id}@feryshop.com`,
+    role_id: role_id || null,
+    status: "Aktif",
+  });
+
+  if (error) {
+    console.error("Database Error creating user:", error);
+    return { success: false, error: error.message || "Gagal membuat pengguna." };
+  }
+
+  revalidatePath("/dashboard/settings");
+  return { success: true };
+}
+
+export async function updateUserRole(userId: string, roleId: string) {
+  const supabase = await createClient();
+
+  const {
+    data: { user: currentUser },
+  } = await supabase.auth.getUser();
+  if (!currentUser) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const { error } = await supabase
+    .from("users")
+    .update({
+      role_id: roleId || null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", userId);
+
+  if (error) {
+    console.error("Database Error updating user role:", error);
+    return { success: false, error: error.message || "Gagal meng-update role pengguna." };
+  }
+
+  revalidatePath("/dashboard/settings");
+  return { success: true };
+}
+
+export async function toggleUserStatus(userId: string, currentStatus: string) {
+  const supabase = await createClient();
+
+  const {
+    data: { user: currentUser },
+  } = await supabase.auth.getUser();
+  if (!currentUser) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const newStatus = currentStatus === "Aktif" ? "Nonaktif" : "Aktif";
+
+  const { error } = await supabase
+    .from("users")
+    .update({
+      status: newStatus,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", userId);
+
+  if (error) {
+    console.error("Database Error toggling user status:", error);
+    return { success: false, error: error.message || "Gagal mengubah status pengguna." };
+  }
+
+  revalidatePath("/dashboard/settings");
+  return { success: true };
+}
+
+export async function updateRolePermissions(roleId: string, permissions: Record<string, boolean>) {
+  const supabase = await createClient();
+
+  const {
+    data: { user: currentUser },
+  } = await supabase.auth.getUser();
+  if (!currentUser) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const { error } = await supabase
+    .from("roles")
+    .update({
+      permissions,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", roleId);
+
+  if (error) {
+    console.error("Database Error updating role permissions:", error);
+    return { success: false, error: error.message || "Gagal meng-update hak akses role." };
+  }
+
+  revalidatePath("/dashboard/settings");
+  return { success: true };
+}
+
 
