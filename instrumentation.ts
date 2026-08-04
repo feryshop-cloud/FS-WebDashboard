@@ -6,10 +6,16 @@ export function onRequestError(
   err: unknown,
   request: { path: string; method: string; headers: Headers },
 ) {
+  const headers = request.headers as unknown;
+  const requestId =
+    headers instanceof Headers
+      ? headers.get("x-request-id")
+      : (headers as Record<string, string> | undefined)?.["x-request-id"];
+
   logger.error("request error", {
     error: err,
     path: request.path,
     method: request.method,
-    requestId: request.headers.get("x-request-id") ?? undefined,
+    requestId: requestId ?? undefined,
   });
 }

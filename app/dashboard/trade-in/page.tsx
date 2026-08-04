@@ -37,6 +37,7 @@ export default function TradeInPage() {
   // Form states for dynamic cash calc
   const [priceOut, setPriceOut] = useState(0);
   const [ttValue, setTtValue] = useState(0);
+  const [paymentAmount, setPaymentAmount] = useState(0);
 
   const loadData = async () => {
     try {
@@ -349,7 +350,11 @@ export default function TradeInPage() {
                       type="number"
                       min="1"
                       value={priceOut || ""}
-                      onChange={(e) => setPriceOut(Number(e.target.value))}
+                      onChange={(e) => {
+                        const val = Number(e.target.value);
+                        setPriceOut(val);
+                        setPaymentAmount(Math.abs(val - ttValue));
+                      }}
                       className="w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                       placeholder="Rp 0"
                     />
@@ -385,7 +390,11 @@ export default function TradeInPage() {
                       type="number"
                       min="1"
                       value={ttValue || ""}
-                      onChange={(e) => setTtValue(Number(e.target.value))}
+                      onChange={(e) => {
+                        const val = Number(e.target.value);
+                        setTtValue(val);
+                        setPaymentAmount(Math.abs(priceOut - val));
+                      }}
                       className="w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                       placeholder="Rp 0"
                     />
@@ -431,7 +440,8 @@ export default function TradeInPage() {
                           name="payment_amount"
                           type="number"
                           min="0"
-                          defaultValue={Math.abs(selisih)}
+                          value={paymentAmount || ""}
+                          onChange={(e) => setPaymentAmount(Number(e.target.value))}
                           className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                           placeholder="Rp 0"
                         />
@@ -442,6 +452,7 @@ export default function TradeInPage() {
                         </label>
                         <select
                           name="account_id"
+                          required={paymentAmount > 0}
                           className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         >
                           <option value="">-- Rekening (Wajib jika ada tunai) --</option>
