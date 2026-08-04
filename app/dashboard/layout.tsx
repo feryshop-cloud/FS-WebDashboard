@@ -1,10 +1,30 @@
 import { ReactNode } from "react";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { getCurrentRole } from "@/lib/auth/role";
+import { isAdminRole } from "@/lib/roles";
 import Sidebar from "../../components/layout/Sidebar";
 
-export default function DashboardLayout({ children }: { children: ReactNode }) {
+export default async function DashboardLayout({ children }: { children: ReactNode }) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const role = await getCurrentRole();
+
+  if (!isAdminRole(role)) {
+    redirect("/login");
+  }
+
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50">
-      <Sidebar />
+      <Sidebar role={role} />
 
       {/* Main Content Area */}
       <div className="flex flex-1 flex-col overflow-hidden transition-all duration-300">
@@ -15,7 +35,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           </div>
 
           <div className="flex items-center">
-            {/* Profile completely removed for extreme minimalism */}
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold tracking-wide text-slate-600">
+              {role}
+            </span>
           </div>
         </header>
 

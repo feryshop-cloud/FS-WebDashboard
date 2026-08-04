@@ -22,15 +22,24 @@ import {
   ChevronLeft,
   ChevronRight,
   LogOut,
+  type LucideIcon,
 } from "lucide-react";
 import { logout } from "../../actions/logout";
+import { ADMIN_ROLES, type AdminRole } from "@/lib/roles";
 
 const routePrefix = process.env.NEXT_PUBLIC_BASE_PATH?.trim();
 const basePath =
   routePrefix && routePrefix !== "/" ? `/${routePrefix.replace(/^\/+|\/+$/g, "")}` : "";
 const SIDEBAR_LOGO_URL = `${basePath}/img/logo.jpeg`;
 
-const navGroups = [
+type NavItem = {
+  label: string;
+  icon: LucideIcon;
+  href: string;
+  roles?: AdminRole[];
+};
+
+const navGroups: { title: string; items: NavItem[] }[] = [
   {
     title: "Utama",
     items: [{ label: "Command Center", icon: LayoutDashboard, href: "/dashboard" }],
@@ -85,9 +94,16 @@ const navGroups = [
   },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ role }: { role: AdminRole }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const pathname = usePathname();
+
+  const visibleGroups = navGroups
+    .map((group) => ({
+      ...group,
+      items: group.items.filter((item) => (item.roles ?? ADMIN_ROLES).includes(role)),
+    }))
+    .filter((group) => group.items.length > 0);
 
   return (
     <aside
@@ -135,7 +151,7 @@ export default function Sidebar() {
 
       {/* Navigation */}
       <nav className="hide-scrollbar flex-1 space-y-6 overflow-x-hidden overflow-y-auto px-3 py-4">
-        {navGroups.map((group, idx) => (
+        {visibleGroups.map((group, idx) => (
           <div key={idx} className="space-y-1">
             {/* Group Title */}
             {!isCollapsed && (
