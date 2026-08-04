@@ -1,16 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  Search,
-  Plus,
-  Filter,
-  AlertTriangle,
-  X,
-  Loader2,
-  Trash2,
-  Eye,
-} from "lucide-react";
+import { Search, Plus, Filter, AlertTriangle, X, Loader2, Trash2, Eye } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { getErrorMessage } from "@/lib/error";
 import {
@@ -355,7 +346,9 @@ export default function ProblemCasesPage() {
             <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-5">
               <div>
                 <h2 className="text-base font-bold text-slate-900">Buat Case Baru</h2>
-                <p className="mt-0.5 text-xs text-slate-500">Catat masalah untuk ditindaklanjuti.</p>
+                <p className="mt-0.5 text-xs text-slate-500">
+                  Catat masalah untuk ditindaklanjuti.
+                </p>
               </div>
               <button
                 onClick={() => setIsAddOpen(false)}
@@ -527,7 +520,7 @@ export default function ProblemCasesPage() {
                     required
                     value={editIssueType}
                     onChange={(e) => setEditIssueType(e.target.value)}
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none font-semibold text-slate-900"
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                   />
                 </div>
 
@@ -551,7 +544,7 @@ export default function ProblemCasesPage() {
                   </select>
                 </div>
 
-                <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3 space-y-1">
+                <div className="space-y-1 rounded-xl border border-slate-100 bg-slate-50/70 p-3">
                   <p className="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">
                     Objek Terkait
                   </p>
@@ -577,7 +570,7 @@ export default function ProblemCasesPage() {
                     rows={5}
                     value={editChronology}
                     onChange={(e) => setEditChronology(e.target.value)}
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none text-slate-700"
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                     placeholder="Catatan penanganan case..."
                   />
                 </div>
