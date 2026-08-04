@@ -29,6 +29,7 @@ export default function InventoryPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [activeCategory, setActiveCategory] = useState("Semua");
+  const [isExporting, setIsExporting] = useState(false);
 
   const loadInventory = async () => {
     try {
@@ -81,6 +82,37 @@ export default function InventoryPage() {
     }
   };
 
+  const handleExportExcel = async () => {
+    try {
+      setIsExporting(true);
+      const params = new URLSearchParams();
+      // If we wanted to pass gameId, we'd need to find it from activeCategory
+      if (activeCategory !== "Semua") {
+        const game = games.find((g) => g.name === activeCategory);
+        if (game) params.set("gameId", game.id);
+      }
+      
+      const response = await fetch(`/api/export/inventory?${params.toString()}`);
+      if (!response.ok) {
+        throw new Error("Gagal mengekspor data");
+      }
+      
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `Laporan_Inventory_${new Date().toISOString().split("T")[0]}.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error: any) {
+      console.error(error);
+      alert(error.message || "Gagal mengunduh Excel");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   const filteredInventory =
     activeCategory === "Semua"
       ? inventory
@@ -97,9 +129,17 @@ export default function InventoryPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-900">
-            <Download className="h-4 w-4" />
-            Export Data
+          <button 
+            onClick={handleExportExcel}
+            disabled={isExporting}
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-900 disabled:opacity-50"
+          >
+            {isExporting ? (
+              <Loader2 className="h-4 w-4 animate-spin text-slate-500" />
+            ) : (
+              <Download className="h-4 w-4" />
+            )}
+            {isExporting ? "Mengekspor..." : "Export Data"}
           </button>
           <button
             onClick={() => setIsAddStockOpen(true)}

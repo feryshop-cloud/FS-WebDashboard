@@ -1,10 +1,27 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { formatLog } from "@/lib/logging/format";
 
 export async function proxy(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
-    request,
+  const incomingId = request.headers.get("x-request-id");
+  const requestId = incomingId || crypto.randomUUID();
+
+  const supabaseResponse = NextResponse.next({
+    request: {
+      headers: new Headers({
+        ...Object.fromEntries(request.headers.entries()),
+        "x-request-id": requestId,
+      }),
+    },
   });
+  supabaseResponse.headers.set("x-request-id", requestId);
+
+  console.log(
+    formatLog("info", "request start", {
+      method: request.method,
+      path: request.nextUrl.pathname,
+    }, { service: "game-inventori", requestId }),
+  );
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -15,10 +32,6 @@ export async function proxy(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-          supabaseResponse = NextResponse.next({
-            request,
-          });
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options),
           );

@@ -33,6 +33,7 @@ export default function DealsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [isExporting, setIsExporting] = useState(false);
 
   const loadData = async () => {
     try {
@@ -71,6 +72,33 @@ export default function DealsPage() {
     }
   };
 
+  const handleExportExcel = async () => {
+    try {
+      setIsExporting(true);
+      const params = new URLSearchParams();
+      // Bisa tambahkan status filter di sini kalau UI Deals nanti punya state activeFilter
+      
+      const response = await fetch(`/api/export/deals?${params.toString()}`);
+      if (!response.ok) {
+        throw new Error("Gagal mengekspor data");
+      }
+      
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `Laporan_Deals_${new Date().toISOString().split("T")[0]}.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error: any) {
+      console.error(error);
+      alert(error.message || "Gagal mengunduh Excel");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 pb-8">
       {/* Header */}
@@ -84,9 +112,17 @@ export default function DealsPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-900">
-            <FileText className="h-4 w-4" />
-            Export CSV
+          <button 
+            onClick={handleExportExcel}
+            disabled={isExporting}
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-900 disabled:opacity-50"
+          >
+            {isExporting ? (
+              <Loader2 className="h-4 w-4 animate-spin text-slate-500" />
+            ) : (
+              <FileText className="h-4 w-4" />
+            )}
+            {isExporting ? "Mengekspor..." : "Export Excel"}
           </button>
           <button
             onClick={() => setIsAddDealOpen(true)}

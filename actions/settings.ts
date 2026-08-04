@@ -1,5 +1,6 @@
 "use server";
 
+import { logger } from "@/lib/logger";
 import { createClient } from "../lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
@@ -29,7 +30,7 @@ export async function addGameCategory(title: string, game_slug: string, logo?: s
     .single();
 
   if (error) {
-    console.error("Database Error:", error);
+    logger.error("Database Error", { error });
     return { success: false, error: "Gagal menambahkan kategori." };
   }
 
@@ -70,7 +71,7 @@ export async function updateGameCategory(
     .eq("id", id);
 
   if (error) {
-    console.error("Database Error:", error);
+    logger.error("Database Error", { error });
     return { success: false, error: "Gagal mengupdate kategori." };
   }
 
@@ -96,7 +97,7 @@ export async function toggleGameCategoryStatus(id: number, is_active: boolean) {
     .eq("id", id);
 
   if (error) {
-    console.error("Database Error:", error);
+    logger.error("Database Error", { error });
     return { success: false, error: "Gagal mengubah status kategori." };
   }
 
@@ -123,11 +124,11 @@ export async function deleteGameCategory(id: number) {
   const { error, data } = await supabase.from("categories").delete().eq("id", id).select();
 
   if (error) {
-    console.error("[deleteGameCategory] DB Error:", error.message, error.code, error.details);
+    logger.error("[deleteGameCategory] DB Error", { message: error.message, code: error.code, details: error.details });
     return { success: false, error: `Gagal menghapus: ${error.message}` };
   }
 
-  console.log(`[deleteGameCategory] Deleted category id=${id}, rows returned:`, data?.length ?? 0);
+  logger.info(`[deleteGameCategory] Deleted category id=${id}, rows returned`, { count: data?.length ?? 0 });
 
   revalidatePath("/dashboard/settings");
   revalidatePath("/dashboard/inventory");
@@ -144,7 +145,7 @@ export async function getCategories() {
     .order("title");
 
   if (error) {
-    console.error("Error fetching categories:", error);
+    logger.error("Error fetching categories", { error });
     return { data: null, error: error.message };
   }
 
@@ -160,7 +161,7 @@ export async function getUsersList() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("Error fetching users:", error);
+    logger.error("Error fetching users", { error });
     return { data: null, error: error.message };
   }
 
@@ -176,7 +177,7 @@ export async function getRolesList() {
     .order("name");
 
   if (error) {
-    console.error("Error fetching roles:", error);
+    logger.error("Error fetching roles", { error });
     return { data: null, error: error.message };
   }
 
@@ -202,7 +203,7 @@ export async function updateUserRole(userId: string, roleId: string) {
     .eq("id", userId);
 
   if (error) {
-    console.error("Database Error updating user role:", error);
+    logger.error("Database Error updating user role", { error });
     return { success: false, error: error.message || "Gagal meng-update role pengguna." };
   }
 
@@ -231,7 +232,7 @@ export async function toggleUserStatus(userId: string, currentStatus: string) {
     .eq("id", userId);
 
   if (error) {
-    console.error("Database Error toggling user status:", error);
+    logger.error("Database Error toggling user status", { error });
     return { success: false, error: error.message || "Gagal mengubah status pengguna." };
   }
 
@@ -276,12 +277,12 @@ export async function createAdminUser(
         // ignore non-JSON error body
       }
     }
-    console.error("[createAdminUser] Error:", error);
+    logger.error("[createAdminUser] Error", { error });
     return { success: false, error: message };
   }
 
   if (!data?.id) {
-    console.error("[createAdminUser] No user id returned:", data);
+    logger.error("[createAdminUser] No user id returned", { data });
     return { success: false, error: "Gagal membuat pengguna." };
   }
 
@@ -308,7 +309,7 @@ export async function updateRolePermissions(roleId: string, permissions: Record<
     .eq("id", roleId);
 
   if (error) {
-    console.error("Database Error updating role permissions:", error);
+    logger.error("Database Error updating role permissions", { error });
     return { success: false, error: error.message || "Gagal meng-update hak akses role." };
   }
 

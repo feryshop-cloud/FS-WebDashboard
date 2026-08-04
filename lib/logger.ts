@@ -1,42 +1,46 @@
 /**
  * Structured Logger for game-inventori (Admin ERP)
  * Outputs structured JSON logs suitable for Railway / Cloudwatch stdout aggregation.
+ *
+ * Level filtering: controlled by LOG_LEVEL (debug|info|warn|error), default info in prod, debug in dev.
+ * Error values passed via meta are serialized with name/message/stack/cause.
+ * When running inside a request context (see runAction), each line carries `requestId`.
  */
+import {
+  formatLog,
+  isLevelEnabled,
+  resolveLogLevel,
+  serializeError,
+  type LogLevel,
+} from "@/lib/logging/format";
+import { getRequestId } from "@/lib/logging/request-context";
 
-type LogLevel = "info" | "warn" | "error" | "debug";
+const SERVICE = "game-inventori";
+const configuredLevel = resolveLogLevel();
 
-interface LogPayload {
-  message: string;
-  level: LogLevel;
-  service: string;
-  timestamp: string;
-  meta?: Record<string, unknown>;
-}
-
-function formatLog(level: LogLevel, message: string, meta?: Record<string, unknown>): string {
-  const payload: LogPayload = {
-    timestamp: new Date().toISOString(),
-    service: "game-inventori",
-    level,
-    message,
-    ...(meta ? { meta } : {}),
-  };
-  return JSON.stringify(payload);
+function write(level: LogLevel, message: string, meta?: Record<string, unknown>): void {
+  if (!isLevelEnabled(configuredLevel, level)) return;
+  const line = formatLog(level, message, meta, {
+    service: SERVICE,
+    requestId: getRequestId(),
+  });
+  if (level === "error") console.error(line);
+  else if (level === "warn") console.warn(line);
+  else console.log(line);
 }
 
 export const logger = {
+  debug(message: string, meta?: Record<string, unknown>) {
+    write("debug", message, meta);
+  },
   info(message: string, meta?: Record<string, unknown>) {
-    console.log(formatLog("info", message, meta));
+    write("info", message, meta);
   },
   warn(message: string, meta?: Record<string, unknown>) {
-    console.warn(formatLog("warn", message, meta));
+    write("warn", message, meta);
   },
   error(message: string, meta?: Record<string, unknown>) {
-    console.error(formatLog("error", message, meta));
+    write("error", message, meta);
   },
-  debug(message: string, meta?: Record<string, unknown>) {
-    if (process.env.NODE_ENV !== "production") {
-      console.debug(formatLog("debug", message, meta));
-    }
-  },
+  serializeError,
 };

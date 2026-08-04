@@ -1,17 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Account } from "@/types/database";
+// No sonner import
 
 interface LedgerFilterProps {
   accounts: Account[];
 }
 
-import { ChevronDown, Download, Calendar, Search } from "lucide-react";
+import { ChevronDown, Download, Calendar, Search, Loader2 } from "lucide-react";
 
 export function LedgerFilter({ accounts }: LedgerFilterProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isExporting, setIsExporting] = useState(false);
 
   const currentAccountId = searchParams.get("accountId") || "";
   const currentType = searchParams.get("type") || "";
@@ -26,10 +29,42 @@ export function LedgerFilter({ accounts }: LedgerFilterProps) {
     router.push(`/dashboard/ledger?${params.toString()}`);
   }
 
+  async function handleExportExcel() {
+    try {
+      setIsExporting(true);
+      const params = new URLSearchParams();
+      if (currentAccountId) params.set("accountId", currentAccountId);
+      if (currentType) params.set("type", currentType);
+      
+      const response = await fetch(`/api/export/ledger?${params.toString()}`);
+      if (!response.ok) {
+        throw new Error("Gagal mengekspor data");
+      }
+      
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      // Gunakan regex untuk extract filename dari content-disposition jika ada, 
+      // tapi untuk amannya kita define hardcode nama file sebagai fallback.
+      link.setAttribute("download", `Laporan_Ledger_${new Date().toISOString().split("T")[0]}.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      alert("Berhasil mengekspor Laporan Ledger");
+    } catch (error: any) {
+      console.error(error);
+      alert(error.message || "Gagal mengunduh Excel");
+    } finally {
+      setIsExporting(false);
+    }
+  }
+
   const selectClass =
     "w-full xl:w-[180px] shrink-0 border border-slate-200 rounded-md bg-white px-3 py-2 text-sm text-slate-700 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none appearance-none cursor-pointer";
   const buttonClass =
-    "flex items-center gap-2 border border-slate-200 rounded-md px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors";
+    "flex items-center gap-2 border border-slate-200 rounded-md px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed";
 
   return (
     <div className="mb-6 w-full rounded-md border border-slate-100 bg-white p-5 shadow-sm">
@@ -91,9 +126,17 @@ export function LedgerFilter({ accounts }: LedgerFilterProps) {
             Range filter
           </button>
 
-          <button className={`${buttonClass} h-10 shrink-0 whitespace-nowrap`}>
-            <Download className="h-4 w-4 text-emerald-600" />
-            Excel
+          <button 
+            onClick={handleExportExcel}
+            disabled={isExporting}
+            className={`${buttonClass} h-10 shrink-0 whitespace-nowrap`}
+          >
+            {isExporting ? (
+              <Loader2 className="h-4 w-4 text-emerald-600 animate-spin" />
+            ) : (
+              <Download className="h-4 w-4 text-emerald-600" />
+            )}
+            {isExporting ? "Mengekspor..." : "Excel"}
           </button>
         </div>
       </div>

@@ -1,5 +1,6 @@
 "use server";
 
+import { logger } from "@/lib/logger";
 import { createClient } from "../lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { InventoryFormSchema } from "../lib/schemas";
@@ -21,7 +22,7 @@ export async function getInventory() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("Error fetching inventory:", error);
+    logger.error("Error fetching inventory", { error });
     return { data: null, error: error.message };
   }
 
@@ -67,7 +68,7 @@ export async function addInventoryItem(formData: FormData) {
           .upload(fileName, fileBody, { contentType: file.type, upsert: true });
 
         if (uploadError) {
-          console.error("Supabase Storage Error:", uploadError);
+          logger.error("Supabase Storage Error", { error: uploadError });
           throw new Error("Failed to upload screenshot.");
         }
 
@@ -104,7 +105,7 @@ export async function addInventoryItem(formData: FormData) {
   });
 
   if (error) {
-    console.error("Database Error:", error);
+    logger.error("Database Error", { error });
     return { success: false, error: "Failed to insert into database." };
   }
 
@@ -121,7 +122,7 @@ export async function updateItemStatus(id: string, newStatus: "UNPOSTED" | "AVAI
     .eq("id", id);
 
   if (error) {
-    console.error("Error updating status:", error);
+    logger.error("Error updating status", { error });
     return { success: false, error: "Failed to update item status." };
   }
 
@@ -143,7 +144,7 @@ export async function markItemAsSold(id: string, soldPrice: number) {
     .eq("id", id);
 
   if (error) {
-    console.error("Error marking as sold:", error);
+    logger.error("Error marking as sold", { error });
     return { success: false, error: "Failed to mark item as sold." };
   }
 

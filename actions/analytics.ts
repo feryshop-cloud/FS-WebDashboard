@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { getErrorMessage } from "@/lib/error";
+import { logger } from "@/lib/logger";
 
 export async function getTotalBalance(): Promise<{ data: number; error: string | null }> {
   try {
@@ -13,7 +14,7 @@ export async function getTotalBalance(): Promise<{ data: number; error: string |
     const total = data.reduce((sum, account) => sum + (account.balance || 0), 0);
     return { data: total, error: null };
   } catch (error: unknown) {
-    console.error("Error fetching total balance:", error);
+    logger.error("Error fetching total balance", { error });
     return { data: 0, error: getErrorMessage(error) };
   }
 }
@@ -45,7 +46,7 @@ export async function getInventoryStats(): Promise<{
 
     return { data: stats, error: null };
   } catch (error: unknown) {
-    console.error("Error fetching inventory stats:", error);
+    logger.error("Error fetching inventory stats", { error });
     return { data: {}, error: getErrorMessage(error) };
   }
 }
@@ -105,7 +106,7 @@ export async function getFinancialSummary(): Promise<{
       error: null,
     };
   } catch (error: unknown) {
-    console.error("Error fetching financial summary:", error);
+    logger.error("Error fetching financial summary", { error });
     return {
       data: { omzet: 0, profit: 0, piutang: 0 },
       error: getErrorMessage(error),
@@ -134,7 +135,7 @@ export async function getRecentLedger(
 
     return { data: data || [], error: null };
   } catch (error: unknown) {
-    console.error("Error fetching recent ledger:", error);
+    logger.error("Error fetching recent ledger", { error });
     return { data: [], error: getErrorMessage(error) };
   }
 }

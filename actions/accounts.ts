@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { logger } from "@/lib/logger";
 import { Account } from "@/types/database";
 import { revalidatePath } from "next/cache";
 
@@ -15,7 +16,7 @@ export async function getAccounts(): Promise<{ data: Account[] | null; error: st
     if (error) throw error;
     return { data: data as unknown as Account[], error: null };
   } catch (error) {
-    console.error("Error fetching accounts:", error);
+    logger.error("Error fetching accounts", { error });
     return {
       data: null,
       error: (error as { message?: string }).message || "An unexpected error occurred",
@@ -46,7 +47,7 @@ export async function createAccount(
     revalidatePath("/dashboard/accounts", "page");
     return { data: data as unknown as Account, error: null };
   } catch (error) {
-    console.error("Error creating account:", error);
+    logger.error("Error creating account", { error });
     return {
       data: null,
       error: (error as { message?: string }).message || "An unexpected error occurred",
@@ -97,7 +98,7 @@ export async function transferFunds(
 
     return { success: true, error: null };
   } catch (error) {
-    console.error("Error in transferFunds:", error);
+    logger.error("Error in transferFunds", { error });
     return {
       success: false,
       error: (error as { message?: string }).message || "Gagal memproses transfer",

@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { logger } from "@/lib/logger";
 import { LoginSchema } from "@/lib/schemas";
 
 export async function login(formData: FormData): Promise<{ success: boolean; error?: string }> {
@@ -27,7 +28,7 @@ export async function login(formData: FormData): Promise<{ success: boolean; err
 
     return { success: true };
   } catch (error) {
-    console.error("Error logging in:", error);
+    logger.error("Error logging in", { error });
     return {
       success: false,
       error: (error as { message?: string }).message || "An unexpected error occurred",

@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { getErrorMessage } from "@/lib/error";
+import { logger } from "@/lib/logger";
 import { revalidatePath } from "next/cache";
 import { Game, PurchasePaymentStatus, PurchaseWithRelations } from "@/types/database";
 
@@ -58,7 +59,7 @@ export async function purchaseStock(data: {
 
     return { success: true, stockId: stockId as string, error: null };
   } catch (error: unknown) {
-    console.error("Error purchasing stock:", error);
+    logger.error("Error purchasing stock", { error });
     return { success: false, error: getErrorMessage(error) };
   }
 }
@@ -83,7 +84,7 @@ export async function getPurchases(): Promise<{
 
     return { data: (data || []) as PurchaseWithRelations[], error: null };
   } catch (error: unknown) {
-    console.error("Error fetching purchases:", error);
+    logger.error("Error fetching purchases", { error });
     return { data: [], error: getErrorMessage(error) };
   }
 }
@@ -99,7 +100,7 @@ export async function getGames(): Promise<{
     if (error) throw error;
     return { data: data || [], error: null };
   } catch (error: unknown) {
-    console.error("Error fetching games:", error);
+    logger.error("Error fetching games", { error });
     return { data: [], error: getErrorMessage(error) };
   }
 }

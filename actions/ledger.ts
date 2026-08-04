@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { getErrorMessage } from "@/lib/error";
+import { logger } from "@/lib/logger";
 import { LedgerWithRelations } from "@/types/database";
 
 export async function getLedgerEntries(filters?: {
@@ -46,7 +47,7 @@ export async function getLedgerEntries(filters?: {
       error: null,
     };
   } catch (error: unknown) {
-    console.error("Error fetching ledger entries:", error);
+    logger.error("Error fetching ledger entries", { error });
     return { data: null, error: getErrorMessage(error) };
   }
 }

@@ -5,6 +5,8 @@ import { getErrorMessage } from "@/lib/error";
 import { PurchasePaymentStatus, Stock, StockStatus } from "@/types/database";
 import type { Database } from "@/types/database.types";
 import { revalidatePath } from "next/cache";
+import { logger } from "@/lib/logger";
+import { runAction } from "@/lib/logging/server-action";
 
 type StockRow = Database["public"]["Tables"]["stocks"]["Row"];
 type StockInsert = Database["public"]["Tables"]["stocks"]["Insert"];
@@ -41,197 +43,209 @@ function mapStockRow(row: StockRow): Stock {
 }
 
 export async function getStocks(): Promise<{ data: Stock[] | null; error: string | null }> {
-  try {
-    const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("stocks")
-      .select("*")
-      .order("created_at", { ascending: false });
+  return runAction("getStocks", async () => {
+    try {
+      const supabase = await createClient();
+      const { data, error } = await supabase
+        .from("stocks")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-    if (error) throw error;
+      if (error) throw error;
 
-    const mapped = (data || []).map(mapStockRow);
+      const mapped = (data || []).map(mapStockRow);
 
-    return { data: mapped, error: null };
-  } catch (error: unknown) {
-    console.error("Error fetching stocks:", error);
-    return { data: null, error: getErrorMessage(error) };
-  }
+      return { data: mapped, error: null };
+    } catch (error: unknown) {
+      logger.error("Error fetching stocks", { error });
+      return { data: null, error: getErrorMessage(error) };
+    }
+  });
 }
 
 export async function getAvailableStocks(): Promise<{
   data: Stock[] | null;
   error: string | null;
 }> {
-  try {
-    const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("stocks")
-      .select("*")
-      .eq("status", "AVAILABLE")
-      .order("created_at", { ascending: false });
+  return runAction("getAvailableStocks", async () => {
+    try {
+      const supabase = await createClient();
+      const { data, error } = await supabase
+        .from("stocks")
+        .select("*")
+        .eq("status", "AVAILABLE")
+        .order("created_at", { ascending: false });
 
-    if (error) throw error;
+      if (error) throw error;
 
-    const mapped = (data || []).map(mapStockRow);
+      const mapped = (data || []).map(mapStockRow);
 
-    return { data: mapped, error: null };
-  } catch (error: unknown) {
-    console.error("Error fetching available stocks:", error);
-    return { data: null, error: getErrorMessage(error) };
-  }
+      return { data: mapped, error: null };
+    } catch (error: unknown) {
+      logger.error("Error fetching available stocks", { error });
+      return { data: null, error: getErrorMessage(error) };
+    }
+  });
 }
 
 export async function createStock(
   stockData: Partial<Stock>,
 ): Promise<{ data: Stock | null; error: string | null }> {
-  try {
-    const supabase = await createClient();
-    const stockWithSku = stockData as Partial<Stock> & { sku?: string };
+  return runAction("createStock", async () => {
+    try {
+      const supabase = await createClient();
+      const stockWithSku = stockData as Partial<Stock> & { sku?: string };
 
-    const dbInsertData: StockInsert = {
-      category: stockData.category || "",
-      name: stockData.name || "",
-      account_detail: stockData.account_details || null,
-      login_info: stockData.username || null,
-      password_info: stockData.password || null,
-      backup_code: stockData.backup_code || null,
-      capital_price: stockData.capital_price ?? 0,
-      post_price: stockData.post_price ?? 0,
-      current_price: stockData.current_price ?? 0,
-      status: stockData.status || "AVAILABLE",
-      seller_info: stockData.seller_info || null,
-      notes: stockData.internal_notes || null,
-      managed_by: stockData.admin_id || null,
-      sku: stockWithSku.sku || `STK-${Date.now()}`,
-      images: stockData.images || [],
-    };
+      const dbInsertData: StockInsert = {
+        category: stockData.category || "",
+        name: stockData.name || "",
+        account_detail: stockData.account_details || null,
+        login_info: stockData.username || null,
+        password_info: stockData.password || null,
+        backup_code: stockData.backup_code || null,
+        capital_price: stockData.capital_price ?? 0,
+        post_price: stockData.post_price ?? 0,
+        current_price: stockData.current_price ?? 0,
+        status: stockData.status || "AVAILABLE",
+        seller_info: stockData.seller_info || null,
+        notes: stockData.internal_notes || null,
+        managed_by: stockData.admin_id || null,
+        sku: stockWithSku.sku || `STK-${Date.now()}`,
+        images: stockData.images || [],
+      };
 
-    const { data, error } = await supabase
-      .from("stocks")
-      .insert(dbInsertData)
-      .select()
-      .single();
+      const { data, error } = await supabase
+        .from("stocks")
+        .insert(dbInsertData)
+        .select()
+        .single();
 
-    if (error) throw error;
+      if (error) throw error;
 
-    const mapped = mapStockRow(data);
+      const mapped = mapStockRow(data);
 
-    revalidatePath("/dashboard/inventory");
-    return { data: mapped, error: null };
-  } catch (error: unknown) {
-    console.error("Error creating stock:", error);
-    return { data: null, error: getErrorMessage(error) };
-  }
+      revalidatePath("/dashboard/inventory");
+      return { data: mapped, error: null };
+    } catch (error: unknown) {
+      logger.error("Error creating stock", { error });
+      return { data: null, error: getErrorMessage(error) };
+    }
+  });
 }
 
 export async function updateStockStatus(
   id: string,
   status: StockStatus,
 ): Promise<{ data: Stock | null; error: string | null }> {
-  try {
-    const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("stocks")
-      .update({ status, updated_at: new Date().toISOString() })
-      .eq("id", id)
-      .select()
-      .single();
+  return runAction("updateStockStatus", async () => {
+    try {
+      const supabase = await createClient();
+      const { data, error } = await supabase
+        .from("stocks")
+        .update({ status, updated_at: new Date().toISOString() })
+        .eq("id", id)
+        .select()
+        .single();
 
-    if (error) throw error;
+      if (error) throw error;
 
-    const mapped = mapStockRow(data);
+      const mapped = mapStockRow(data);
 
-    revalidatePath("/dashboard/inventory");
-    return { data: mapped, error: null };
-  } catch (error: unknown) {
-    console.error("Error updating stock status:", error);
-    return { data: null, error: getErrorMessage(error) };
-  }
+      revalidatePath("/dashboard/inventory");
+      return { data: mapped, error: null };
+    } catch (error: unknown) {
+      logger.error("Error updating stock status", { error });
+      return { data: null, error: getErrorMessage(error) };
+    }
+  });
 }
 
 export async function updateStock(
   id: string,
   stockData: Partial<Stock>,
 ): Promise<{ data: Stock | null; error: string | null }> {
-  try {
-    const supabase = await createClient();
+  return runAction("updateStock", async () => {
+    try {
+      const supabase = await createClient();
 
-    const dbUpdateData: StockUpdate = {};
-    if (stockData.category !== undefined) dbUpdateData.category = stockData.category;
-    if (stockData.name !== undefined) dbUpdateData.name = stockData.name;
-    if (stockData.account_details !== undefined)
-      dbUpdateData.account_detail = stockData.account_details;
-    if (stockData.username !== undefined) dbUpdateData.login_info = stockData.username;
-    if (stockData.password !== undefined) dbUpdateData.password_info = stockData.password;
-    if (stockData.backup_code !== undefined) dbUpdateData.backup_code = stockData.backup_code;
-    if (stockData.capital_price !== undefined) dbUpdateData.capital_price = stockData.capital_price;
-    if (stockData.post_price !== undefined) dbUpdateData.post_price = stockData.post_price;
-    if (stockData.current_price !== undefined) dbUpdateData.current_price = stockData.current_price;
-    if (stockData.status !== undefined) dbUpdateData.status = stockData.status;
-    if (stockData.seller_info !== undefined) dbUpdateData.seller_info = stockData.seller_info;
-    if (stockData.internal_notes !== undefined) dbUpdateData.notes = stockData.internal_notes;
-    if (stockData.admin_id !== undefined) dbUpdateData.managed_by = stockData.admin_id;
-    if (stockData.images !== undefined) dbUpdateData.images = stockData.images;
+      const dbUpdateData: StockUpdate = {};
+      if (stockData.category !== undefined) dbUpdateData.category = stockData.category;
+      if (stockData.name !== undefined) dbUpdateData.name = stockData.name;
+      if (stockData.account_details !== undefined)
+        dbUpdateData.account_detail = stockData.account_details;
+      if (stockData.username !== undefined) dbUpdateData.login_info = stockData.username;
+      if (stockData.password !== undefined) dbUpdateData.password_info = stockData.password;
+      if (stockData.backup_code !== undefined) dbUpdateData.backup_code = stockData.backup_code;
+      if (stockData.capital_price !== undefined) dbUpdateData.capital_price = stockData.capital_price;
+      if (stockData.post_price !== undefined) dbUpdateData.post_price = stockData.post_price;
+      if (stockData.current_price !== undefined) dbUpdateData.current_price = stockData.current_price;
+      if (stockData.status !== undefined) dbUpdateData.status = stockData.status;
+      if (stockData.seller_info !== undefined) dbUpdateData.seller_info = stockData.seller_info;
+      if (stockData.internal_notes !== undefined) dbUpdateData.notes = stockData.internal_notes;
+      if (stockData.admin_id !== undefined) dbUpdateData.managed_by = stockData.admin_id;
+      if (stockData.images !== undefined) dbUpdateData.images = stockData.images;
 
-    dbUpdateData.updated_at = new Date().toISOString();
+      dbUpdateData.updated_at = new Date().toISOString();
 
-    const { data, error } = await supabase
-      .from("stocks")
-      .update(dbUpdateData)
-      .eq("id", id)
-      .select()
-      .single();
+      const { data, error } = await supabase
+        .from("stocks")
+        .update(dbUpdateData)
+        .eq("id", id)
+        .select()
+        .single();
 
-    if (error) throw error;
+      if (error) throw error;
 
-    const mapped = mapStockRow(data);
+      const mapped = mapStockRow(data);
 
-    revalidatePath("/dashboard/inventory");
-    return { data: mapped, error: null };
-  } catch (error: unknown) {
-    console.error("Error updating stock:", error);
-    return { data: null, error: getErrorMessage(error) };
-  }
+      revalidatePath("/dashboard/inventory");
+      return { data: mapped, error: null };
+    } catch (error: unknown) {
+      logger.error("Error updating stock", { error });
+      return { data: null, error: getErrorMessage(error) };
+    }
+  });
 }
 
 export async function deleteStock(id: string): Promise<{ success: boolean; error: string | null }> {
-  try {
-    const supabase = await createClient();
+  return runAction("deleteStock", async () => {
+    try {
+      const supabase = await createClient();
 
-    // First check the stock's status
-    const { data: stock, error: fetchError } = await supabase
-      .from("stocks")
-      .select("status")
-      .eq("id", id)
-      .single();
+      // First check the stock's status
+      const { data: stock, error: fetchError } = await supabase
+        .from("stocks")
+        .select("status")
+        .eq("id", id)
+        .single();
 
-    if (fetchError) throw fetchError;
+      if (fetchError) throw fetchError;
 
-    if (stock.status === "SOLD") {
-      return {
-        success: false,
-        error: "Cannot delete a stock that has already been sold (TERJUAL).",
-      };
-    }
-
-    const { error } = await supabase.from("stocks").delete().eq("id", id);
-
-    if (error) {
-      if (error.code === "23503") {
-        // Foreign key constraint violation
+      if (stock.status === "SOLD") {
         return {
           success: false,
-          error: "Cannot delete this stock because it is already linked to a Deal/Transaction.",
+          error: "Cannot delete a stock that has already been sold (TERJUAL).",
         };
       }
-      throw error;
-    }
 
-    revalidatePath("/dashboard/inventory");
-    return { success: true, error: null };
-  } catch (error: unknown) {
-    console.error("Error deleting stock:", error);
-    return { success: false, error: getErrorMessage(error) };
-  }
+      const { error } = await supabase.from("stocks").delete().eq("id", id);
+
+      if (error) {
+        if (error.code === "23503") {
+          // Foreign key constraint violation
+          return {
+            success: false,
+            error: "Cannot delete this stock because it is already linked to a Deal/Transaction.",
+          };
+        }
+        throw error;
+      }
+
+      revalidatePath("/dashboard/inventory");
+      return { success: true, error: null };
+    } catch (error: unknown) {
+      logger.error("Error deleting stock", { error });
+      return { success: false, error: getErrorMessage(error) };
+    }
+  });
 }

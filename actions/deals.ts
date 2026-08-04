@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { getErrorMessage } from "@/lib/error";
+import { logger } from "@/lib/logger";
 import {
   DealWithRelations,
   Deal,
@@ -136,7 +137,7 @@ export async function getDeals(): Promise<{
     const mapped = ((data || []) as DealQueryRow[]).map(mapRowToDealWithRelations);
     return { data: mapped, error: null };
   } catch (error: unknown) {
-    console.error("Error fetching deals:", error);
+    logger.error("Error fetching deals", { error });
     return { data: null, error: getErrorMessage(error) };
   }
 }
@@ -155,7 +156,7 @@ export async function getDealById(
     if (error) throw error;
     return { data: mapRowToDealWithRelations(data as DealQueryRow), error: null };
   } catch (error: unknown) {
-    console.error("Error fetching deal:", error);
+    logger.error("Error fetching deal", { error });
     return { data: null, error: getErrorMessage(error) };
   }
 }
@@ -250,7 +251,7 @@ export async function createDeal(
     revalidatePath("/dashboard/deals", "page");
     return { data: mappedDeal, error: null };
   } catch (error: unknown) {
-    console.error("Error creating deal:", error);
+    logger.error("Error creating deal", { error });
     return { data: null, error: getErrorMessage(error) };
   }
 }
@@ -290,7 +291,7 @@ export async function addPayment(
     revalidatePath(`/dashboard/deals/${dealId}`);
     return { success: true, error: null };
   } catch (error: unknown) {
-    console.error("Error processing payment:", error);
+    logger.error("Error processing payment", { error });
     return { success: false, error: getErrorMessage(error) };
   }
 }
@@ -325,7 +326,7 @@ export async function cancelDeal(
 
     return { success: true, error: null };
   } catch (error: unknown) {
-    console.error("Error cancelling deal:", error);
+    logger.error("Error cancelling deal", { error });
     return { success: false, error: getErrorMessage(error) };
   }
 }
