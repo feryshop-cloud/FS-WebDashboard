@@ -355,7 +355,73 @@ export async function updateRolePermissions(roleId: string, permissions: Record<
 
   if (error) {
     logger.error("Database Error updating role permissions", { error });
-    return { success: false, error: error.message || "Gagal meng-update hak akses role." };
+    return { success: false, error: error.message || "Gagal meng-update hak akses." };
+  }
+
+  revalidatePath("/dashboard/settings");
+  return { success: true };
+}
+
+export async function createRole(name: string, description?: string) {
+  const supabase = await createClient();
+
+  const {
+    data: { user: currentUser },
+  } = await supabase.auth.getUser();
+  if (!currentUser) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  if (!name || !name.trim()) {
+    return { success: false, error: "Nama role wajib diisi." };
+  }
+
+  const normalizedName = name.trim().toUpperCase();
+
+  const { data, error } = await supabase
+    .from("roles")
+    .insert({
+      name: normalizedName,
+      description: description?.trim() || null,
+      permissions: {},
+    })
+    .select()
+    .single();
+
+  if (error) {
+    logger.error("Error creating role", { error });
+    return { success: false, error: error.message || "Gagal membuat role baru." };
+  }
+
+  revalidatePath("/dashboard/settings");
+  return { success: true, data };
+}
+
+export async function deleteRole(roleId: string) {
+  const supabase = await createClient();
+
+  const {
+    data: { user: currentUser },
+  } = await supabase.auth.getUser();
+  if (!currentUser) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const { data: targetRole } = await supabase
+    .from("roles")
+    .select("name")
+    .eq("id", roleId)
+    .single();
+
+  if (targetRole && ["OWNER", "ADMIN", "MEMBER"].includes(targetRole.name.toUpperCase())) {
+    return { success: false, error: "Role sistem (OWNER, ADMIN, MEMBER) tidak dapat dihapus." };
+  }
+
+  const { error } = await supabase.from("roles").delete().eq("id", roleId);
+
+  if (error) {
+    logger.error("Error deleting role", { error });
+    return { success: false, error: error.message || "Gagal menghapus role." };
   }
 
   revalidatePath("/dashboard/settings");
