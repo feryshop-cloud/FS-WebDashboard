@@ -239,6 +239,56 @@ export async function toggleUserStatus(userId: string, currentStatus: string) {
   return { success: true };
 }
 
+export async function createAdminUser(
+  email: string,
+  password: string,
+  full_name: string,
+  role_id: string | null,
+) {
+  const supabase = await createClient();
+
+  const {
+    data: { user: currentUser },
+  } = await supabase.auth.getUser();
+  if (!currentUser) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  if (!email || !password || !full_name) {
+    return { success: false, error: "Email, password, dan nama lengkap wajib diisi." };
+  }
+
+  const { data, error } = await supabase.functions.invoke<{
+    id?: string;
+    error?: string;
+  }>("admin-create-user", {
+    body: { email, password, full_name, role_id: role_id || null },
+  });
+
+  if (error) {
+    let message = "Gagal membuat pengguna.";
+    const ctx = (error as { context?: Response }).context;
+    if (ctx) {
+      try {
+        const body = await ctx.json();
+        message = body?.error ?? message;
+      } catch {
+        // ignore non-JSON error body
+      }
+    }
+    console.error("[createAdminUser] Error:", error);
+    return { success: false, error: message };
+  }
+
+  if (!data?.id) {
+    console.error("[createAdminUser] No user id returned:", data);
+    return { success: false, error: "Gagal membuat pengguna." };
+  }
+
+  revalidatePath("/dashboard/settings");
+  return { success: true, data: { id: data.id } };
+}
+
 export async function updateRolePermissions(roleId: string, permissions: Record<string, boolean>) {
   const supabase = await createClient();
 
