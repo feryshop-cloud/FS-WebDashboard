@@ -4,7 +4,12 @@ import { logger } from "@/lib/logger";
 import { createClient } from "../lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
-export async function addGameCategory(title: string, game_slug: string, logo?: string) {
+export async function addGameCategory(
+  title: string,
+  game_slug: string,
+  logo?: string,
+  instructions?: any[],
+) {
   const supabase = await createClient();
 
   const {
@@ -18,6 +23,7 @@ export async function addGameCategory(title: string, game_slug: string, logo?: s
     return { success: false, error: "Title and Game Slug are required." };
   }
 
+  // Update categories table
   const { data, error } = await supabase
     .from("categories")
     .insert({
@@ -34,6 +40,11 @@ export async function addGameCategory(title: string, game_slug: string, logo?: s
     return { success: false, error: "Gagal menambahkan kategori." };
   }
 
+  // Also update instructions in games table if exists
+  if (instructions) {
+    await supabase.from("games").update({ instructions }).eq("slug", game_slug);
+  }
+
   revalidatePath("/dashboard/settings");
   revalidatePath("/dashboard/inventory");
 
@@ -46,6 +57,7 @@ export async function updateGameCategory(
   game_slug: string,
   logo?: string,
   is_active: boolean = true,
+  instructions?: any[],
 ) {
   const supabase = await createClient();
 
@@ -73,6 +85,11 @@ export async function updateGameCategory(
   if (error) {
     logger.error("Database Error", { error });
     return { success: false, error: "Gagal mengupdate kategori." };
+  }
+
+  // Update instructions in games table
+  if (instructions) {
+    await supabase.from("games").update({ instructions }).eq("slug", game_slug);
   }
 
   revalidatePath("/dashboard/settings");
@@ -137,6 +154,23 @@ export async function deleteGameCategory(id: number) {
   revalidatePath("/dashboard/inventory");
 
   return { success: true };
+}
+
+export async function getGameInstructions(game_slug: string) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("games")
+    .select("instructions")
+    .eq("slug", game_slug)
+    .maybeSingle();
+
+  if (error) {
+    logger.error("[getGameInstructions] Error fetching instructions", { error });
+    return { data: null, error: error.message };
+  }
+
+  return { data: (data?.instructions as any[]) || null, error: null };
 }
 
 export async function getCategories() {

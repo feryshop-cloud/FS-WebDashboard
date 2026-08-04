@@ -7,6 +7,7 @@ import {
   updateGameCategory,
   deleteGameCategory,
   toggleGameCategoryStatus,
+  getGameInstructions,
 } from "@/actions/settings";
 import type { Database } from "@/types/database.types";
 import { Loader2, Plus, Check, FolderTree, Edit2, Trash2, Power } from "lucide-react";
@@ -16,6 +17,7 @@ import {
   LUCIDE_PREFIX,
   lucideIconName,
 } from "@/components/features/CategoryIconPicker";
+import { DynamicInputBuilder, DynamicField } from "@/components/features/DynamicInputBuilder";
 
 type Category = Database["public"]["Tables"]["categories"]["Row"];
 
@@ -34,6 +36,7 @@ export function GameCategoryManager({
   const [gameSlug, setGameSlug] = useState("");
   const [selectedIcon, setSelectedIcon] = useState("");
   const [isActive, setIsActive] = useState<boolean>(true);
+  const [instructions, setInstructions] = useState<DynamicField[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -57,7 +60,7 @@ export function GameCategoryManager({
     }
   };
 
-  const handleEditClick = (cat: Category) => {
+  const handleEditClick = async (cat: Category) => {
     setEditingId(cat.id);
     setTitle(cat.title);
     setGameSlug(cat.game_slug);
@@ -65,6 +68,14 @@ export function GameCategoryManager({
     setIsActive(cat.is_active ?? true);
     setError(null);
     setSuccess(false);
+
+    // Fetch existing instructions from database for this game_slug
+    const res = await getGameInstructions(cat.game_slug);
+    if (res.data && Array.isArray(res.data)) {
+      setInstructions(res.data);
+    } else {
+      setInstructions([]);
+    }
   };
 
   const handleCancelEdit = () => {
@@ -128,6 +139,7 @@ export function GameCategoryManager({
           gameSlug,
           finalLogo || undefined,
           isActive,
+          instructions,
         );
         if (result.success) {
           setCategories((prev) =>
@@ -139,7 +151,7 @@ export function GameCategoryManager({
           );
         }
       } else {
-        result = await addGameCategory(title, gameSlug, finalLogo || undefined);
+        result = await addGameCategory(title, gameSlug, finalLogo || undefined, instructions);
         if (result.success && result.data) {
           setCategories((prev) => [...prev, result.data as Category]);
         }
@@ -152,6 +164,7 @@ export function GameCategoryManager({
         setGameSlug("");
         setSelectedIcon("");
         setIsActive(true);
+        setInstructions([]);
         router.refresh();
       } else {
         setError(result.error || "Terjadi kesalahan saat menyimpan kategori.");
@@ -213,6 +226,8 @@ export function GameCategoryManager({
               </div>
 
               <CategoryIconPicker value={selectedIcon} onChange={setSelectedIcon} />
+
+              <DynamicInputBuilder fields={instructions} onChange={setInstructions} />
 
               {editingId && (
                 <div className="flex items-center gap-3 pt-1">
