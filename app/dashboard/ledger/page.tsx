@@ -1,12 +1,11 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Search,
   Filter,
   FileText,
-  MoreHorizontal,
   ArrowUpRight,
   ArrowDownRight,
   ArrowRightLeft,
@@ -42,26 +41,22 @@ export default function LedgerPage() {
   const itemsPerPage = 10;
 
   // Actions & Modals state
-  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [editingLedger, setEditingLedger] = useState<LedgerRecord | null>(null);
   const [isAddManualOpen, setIsAddManualOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
   const [error, setError] = useState("");
 
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  const loadLedgerData = async () => {
-    try {
-      setIsLoading(true);
-      const res = await getLedgers(currentPage, itemsPerPage, accountId);
-      setLedgers((res.data as LedgerRecord[]) || []);
-      setTotalCount(res.totalCount || 0);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
+  const loadLedgerData = () => {
+    setIsLoading(true);
+    Promise.all([getLedgers(currentPage, itemsPerPage, accountId), getAccounts()])
+      .then(([ledgerRes, accountsData]) => {
+        setLedgers((ledgerRes.data as LedgerRecord[]) || []);
+        setTotalCount(ledgerRes.totalCount || 0);
+        setAccounts(accountsData || []);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setIsLoading(false));
   };
 
   useEffect(() => {
@@ -83,17 +78,6 @@ export default function LedgerPage() {
       isMounted = false;
     };
   }, [currentPage, accountId]);
-
-  // Close menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setOpenMenuId(null);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   const handleAddManual = async (formData: FormData) => {
     try {
@@ -131,7 +115,6 @@ export default function LedgerPage() {
       setIsDeletingId(tx.id);
       setError("");
       await deleteLedger(tx.id);
-      setOpenMenuId(null);
       loadLedgerData();
     } catch (err: unknown) {
       alert(getErrorMessage(err));
@@ -165,6 +148,10 @@ export default function LedgerPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <button className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:text-slate-900">
+            <FileText className="h-4 w-4" />
+            Export Excel
+          </button>
           <button
             onClick={() => {
               setError("");
@@ -174,10 +161,6 @@ export default function LedgerPage() {
           >
             <Plus className="h-4 w-4" />
             Catat Kas Manual
-          </button>
-          <button className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:text-slate-900">
-            <FileText className="h-4 w-4" />
-            Export Excel
           </button>
         </div>
       </div>
@@ -254,7 +237,6 @@ export default function LedgerPage() {
               ) : (
                 filteredLedgers.map((tx) => {
                   const isPositive = Number(tx.amount) >= 0;
-                  const isMenuOpen = openMenuId === tx.id;
 
                   // Determine Badge styling based on transaction type
                   let typeBadge = "bg-slate-50 text-slate-600 border-slate-200";
@@ -321,50 +303,29 @@ export default function LedgerPage() {
                         {formatRupiah(Number(tx.amount))}
                       </td>
                       <td className="px-6 py-4 text-center whitespace-nowrap">
-                        <div className="relative inline-block text-left">
+                        <div className="flex items-center justify-center gap-2">
                           <button
-                            onClick={() => setOpenMenuId(isMenuOpen ? null : tx.id)}
-                            title="Opsi Transaksi"
-                            className={`rounded-lg p-1.5 transition-colors ${
-                              isMenuOpen
-                                ? "bg-slate-100 text-slate-900"
-                                : "text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-                            }`}
+                            onClick={() => {
+                              setError("");
+                              setEditingLedger(tx);
+                            }}
+                            className="rounded-[10px] p-1.5 text-blue-500 transition-colors hover:bg-blue-50 hover:text-blue-700"
+                            title="Edit Catatan"
                           >
-                            <MoreHorizontal className="h-4 w-4" />
+                            <Pencil className="h-3.5 w-3.5" />
                           </button>
-
-                          {/* Dropdown Menu */}
-                          {isMenuOpen && (
-                            <div
-                              ref={menuRef}
-                              className="absolute right-0 top-8 z-30 w-44 rounded-xl border border-slate-100 bg-white p-1.5 shadow-xl animate-in fade-in slide-in-from-top-2 duration-150 text-left"
-                            >
-                              <button
-                                onClick={() => {
-                                  setOpenMenuId(null);
-                                  setError("");
-                                  setEditingLedger(tx);
-                                }}
-                                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors"
-                              >
-                                <Pencil className="h-3.5 w-3.5 text-blue-600" />
-                                Edit Catatan
-                              </button>
-                              <button
-                                onClick={() => handleDelete(tx)}
-                                disabled={isDeletingId === tx.id}
-                                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 transition-colors disabled:opacity-50"
-                              >
-                                {isDeletingId === tx.id ? (
-                                  <Loader2 className="h-3.5 w-3.5 animate-spin text-rose-600" />
-                                ) : (
-                                  <Trash2 className="h-3.5 w-3.5 text-rose-600" />
-                                )}
-                                Hapus Entri Kas
-                              </button>
-                            </div>
-                          )}
+                          <button
+                            onClick={() => handleDelete(tx)}
+                            disabled={isDeletingId === tx.id}
+                            className="rounded-[10px] p-1.5 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600 disabled:opacity-50"
+                            title="Hapus Entri Kas"
+                          >
+                            {isDeletingId === tx.id ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin text-rose-600" />
+                            ) : (
+                              <Trash2 className="h-3.5 w-3.5" />
+                            )}
+                          </button>
                         </div>
                       </td>
                     </tr>
