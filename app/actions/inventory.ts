@@ -165,3 +165,83 @@ export async function markItemAsSold(id: string, soldPrice: number) {
   revalidatePath("/dashboard");
   return { success: true };
 }
+
+export async function updateInventoryItem(id: string, formData: FormData) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const game_id = formData.get("game_id") as string;
+  const title_reference = formData.get("title_reference") as string;
+  const account_specs = formData.get("account_specs") as string;
+  const capital_price = Number(formData.get("capital_price"));
+  const asking_price = Number(formData.get("asking_price"));
+
+  if (!game_id || !title_reference || isNaN(capital_price) || isNaN(asking_price)) {
+    return { success: false, error: "Data form tidak lengkap atau tidak valid." };
+  }
+
+  const { error } = await supabase
+    .from("inventory")
+    .update({
+      game_id,
+      title_reference,
+      account_specs,
+      capital_price,
+      asking_price,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id);
+
+  if (error) {
+    console.error("Database Error updating inventory:", error);
+    return { success: false, error: "Gagal memperbarui stok di database." };
+  }
+
+  revalidatePath("/dashboard/inventory");
+  return { success: true };
+}
+
+export async function deleteInventoryItem(id: string) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  // Check if item status is SOLD
+  const { data: item, error: fetchError } = await supabase
+    .from("inventory")
+    .select("status")
+    .eq("id", id)
+    .single();
+
+  if (fetchError) {
+    return { success: false, error: "Stok tidak ditemukan." };
+  }
+
+  if (item?.status === "SOLD") {
+    return { success: false, error: "Stok yang sudah TERJUAL (SOLD) tidak dapat dihapus." };
+  }
+
+  const { error } = await supabase.from("inventory").delete().eq("id", id);
+
+  if (error) {
+    console.error("Database Error deleting inventory:", error);
+    return { success: false, error: "Gagal menghapus stok dari database." };
+  }
+
+  revalidatePath("/dashboard/inventory");
+  return { success: true };
+}
+
+
+

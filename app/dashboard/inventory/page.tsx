@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
 import { getInventory, addInventoryItem, getGames } from "@/app/actions/inventory";
+import { InventoryRowActions } from "@/components/inventory/InventoryRowActions";
 import type { Database } from "@/types/database.types";
 
 type InventoryItem = Database["public"]["Tables"]["inventory"]["Row"] & {
@@ -279,9 +280,7 @@ export default function InventoryPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-center text-sm font-medium whitespace-nowrap">
-                        <button className="group/btn relative rounded-md p-1 text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-600">
-                          <MoreHorizontal className="h-5 w-5" />
-                        </button>
+                        <InventoryRowActions item={item} games={games} onRefresh={loadInventory} />
                       </td>
                     </tr>
                   );
