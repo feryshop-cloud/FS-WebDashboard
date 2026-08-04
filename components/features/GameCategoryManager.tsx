@@ -122,7 +122,13 @@ export function GameCategoryManager({
 
       let result: { success: boolean; error?: string; data?: Category | null };
       if (editingId) {
-        result = await updateGameCategory(editingId, title, gameSlug, finalLogo || undefined, isActive);
+        result = await updateGameCategory(
+          editingId,
+          title,
+          gameSlug,
+          finalLogo || undefined,
+          isActive,
+        );
         if (result.success) {
           setCategories((prev) =>
             prev.map((c) =>
@@ -217,7 +223,7 @@ export function GameCategoryManager({
                       onChange={(e) => setIsActive(e.target.checked)}
                       className="peer sr-only"
                     />
-                    <div className="peer h-5 w-9 rounded-full bg-slate-200 after:absolute after:top-[2px] after:left-[2px] after:h-4 after:w-4 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-emerald-500 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none" />
+                    <div className="peer h-5 w-9 rounded-full bg-slate-200 peer-checked:bg-emerald-500 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-4 after:w-4 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white" />
                   </label>
                   <span className="text-sm font-medium text-slate-700">
                     {isActive ? "Status Aktif" : "Status Nonaktif (Disabled)"}
@@ -314,10 +320,7 @@ export function GameCategoryManager({
                       <td className="px-3 py-2">
                         {lucideIconName(cat.logo) ? (
                           <div className="flex h-8 w-8 items-center justify-center rounded border border-blue-100 bg-blue-50 text-blue-600">
-                            <CategoryIcon
-                              name={lucideIconName(cat.logo)!}
-                              className="h-4 w-4"
-                            />
+                            <CategoryIcon name={lucideIconName(cat.logo)!} className="h-4 w-4" />
                           </div>
                         ) : cat.logo ? (
                           <>
@@ -342,7 +345,9 @@ export function GameCategoryManager({
                         <button
                           onClick={() => handleToggleStatus(cat)}
                           disabled={isPending}
-                          title={cat.is_active ? "Klik untuk menonaktifkan" : "Klik untuk mengaktifkan"}
+                          title={
+                            cat.is_active ? "Klik untuk menonaktifkan" : "Klik untuk mengaktifkan"
+                          }
                           className="inline-flex items-center gap-1 focus:outline-none"
                         >
                           {cat.is_active ? (
@@ -397,4 +402,3 @@ export function GameCategoryManager({
     </div>
   );
 }
-

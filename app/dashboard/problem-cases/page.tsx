@@ -202,10 +202,10 @@ export default function ProblemCasesPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4 text-sm whitespace-nowrap text-slate-500">
-                         {formatDate(c.created_at ?? "")}
+                        {formatDate(c.created_at ?? "")}
                       </td>
                       <td className="px-6 py-4 text-sm font-medium text-slate-700">
-                         {c.issue_type as string}
+                        {c.issue_type as string}
                       </td>
                       <td className="px-6 py-4 text-sm text-slate-600">
                         <div className="flex flex-col">

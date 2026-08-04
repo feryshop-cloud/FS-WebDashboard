@@ -91,10 +91,7 @@ export async function toggleGameCategoryStatus(id: number, is_active: boolean) {
     return { success: false, error: "Unauthorized" };
   }
 
-  const { error } = await supabase
-    .from("categories")
-    .update({ is_active })
-    .eq("id", id);
+  const { error } = await supabase.from("categories").update({ is_active }).eq("id", id);
 
   if (error) {
     logger.error("Database Error", { error });
@@ -124,11 +121,17 @@ export async function deleteGameCategory(id: number) {
   const { error, data } = await supabase.from("categories").delete().eq("id", id).select();
 
   if (error) {
-    logger.error("[deleteGameCategory] DB Error", { message: error.message, code: error.code, details: error.details });
+    logger.error("[deleteGameCategory] DB Error", {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+    });
     return { success: false, error: `Gagal menghapus: ${error.message}` };
   }
 
-  logger.info(`[deleteGameCategory] Deleted category id=${id}, rows returned`, { count: data?.length ?? 0 });
+  logger.info(`[deleteGameCategory] Deleted category id=${id}, rows returned`, {
+    count: data?.length ?? 0,
+  });
 
   revalidatePath("/dashboard/settings");
   revalidatePath("/dashboard/inventory");
@@ -316,5 +319,3 @@ export async function updateRolePermissions(roleId: string, permissions: Record<
   revalidatePath("/dashboard/settings");
   return { success: true };
 }
-
-

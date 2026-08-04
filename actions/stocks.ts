@@ -114,11 +114,7 @@ export async function createStock(
         images: stockData.images || [],
       };
 
-      const { data, error } = await supabase
-        .from("stocks")
-        .insert(dbInsertData)
-        .select()
-        .single();
+      const { data, error } = await supabase.from("stocks").insert(dbInsertData).select().single();
 
       if (error) throw error;
 
@@ -176,9 +172,11 @@ export async function updateStock(
       if (stockData.username !== undefined) dbUpdateData.login_info = stockData.username;
       if (stockData.password !== undefined) dbUpdateData.password_info = stockData.password;
       if (stockData.backup_code !== undefined) dbUpdateData.backup_code = stockData.backup_code;
-      if (stockData.capital_price !== undefined) dbUpdateData.capital_price = stockData.capital_price;
+      if (stockData.capital_price !== undefined)
+        dbUpdateData.capital_price = stockData.capital_price;
       if (stockData.post_price !== undefined) dbUpdateData.post_price = stockData.post_price;
-      if (stockData.current_price !== undefined) dbUpdateData.current_price = stockData.current_price;
+      if (stockData.current_price !== undefined)
+        dbUpdateData.current_price = stockData.current_price;
       if (stockData.status !== undefined) dbUpdateData.status = stockData.status;
       if (stockData.seller_info !== undefined) dbUpdateData.seller_info = stockData.seller_info;
       if (stockData.internal_notes !== undefined) dbUpdateData.notes = stockData.internal_notes;

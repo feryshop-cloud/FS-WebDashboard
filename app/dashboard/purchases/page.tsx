@@ -304,7 +304,7 @@ export default function PurchasesPage() {
                             {purchase.sku || "N/A"}
                           </span>
                           <span className="mt-0.5 text-[10px]">
-                            {formatDate((purchase.purchase_date ?? purchase.created_at) ?? "")}
+                            {formatDate(purchase.purchase_date ?? purchase.created_at ?? "")}
                           </span>
                         </div>
                       </td>

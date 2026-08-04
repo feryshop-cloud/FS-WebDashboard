@@ -7,16 +7,20 @@ import * as xlsx from "xlsx";
  * @param sheetName Nama Sheet (default "Sheet1")
  * @returns Buffer
  */
-export function generateExcelBuffer(data: any[], headers?: string[], sheetName: string = "Sheet1"): Buffer {
+export function generateExcelBuffer(
+  data: any[],
+  headers?: string[],
+  sheetName: string = "Sheet1",
+): Buffer {
   // Jika headers disediakan, jadikan array pertama sebagai header
   const worksheetData = headers ? [headers, ...data] : data;
-  
-  // Opsi: skipHeader true jika data sudah berbentuk matrix (array of arrays) 
+
+  // Opsi: skipHeader true jika data sudah berbentuk matrix (array of arrays)
   // atau jika kita manual sisipkan header di array pertama
   const isMatrix = headers || (data.length > 0 && Array.isArray(data[0]));
-  
-  const worksheet = isMatrix 
-    ? xlsx.utils.aoa_to_sheet(worksheetData) 
+
+  const worksheet = isMatrix
+    ? xlsx.utils.aoa_to_sheet(worksheetData)
     : xlsx.utils.json_to_sheet(data);
 
   // Buat workbook baru dan append sheet
@@ -25,13 +29,13 @@ export function generateExcelBuffer(data: any[], headers?: string[], sheetName: 
 
   // Set properti kolom sederhana (auto width sederhana)
   if (headers && worksheet["!ref"]) {
-    const colWidths = headers.map(h => ({ wch: Math.max(h.length, 10) + 2 }));
+    const colWidths = headers.map((h) => ({ wch: Math.max(h.length, 10) + 2 }));
     worksheet["!cols"] = colWidths;
   }
 
   // Tulis workbook sebagai buffer node
   const buffer = xlsx.write(workbook, { type: "buffer", bookType: "xlsx" });
-  
+
   return buffer;
 }
 

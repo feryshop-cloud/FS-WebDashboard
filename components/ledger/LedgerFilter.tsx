@@ -35,23 +35,26 @@ export function LedgerFilter({ accounts }: LedgerFilterProps) {
       const params = new URLSearchParams();
       if (currentAccountId) params.set("accountId", currentAccountId);
       if (currentType) params.set("type", currentType);
-      
+
       const response = await fetch(`/api/export/ledger?${params.toString()}`);
       if (!response.ok) {
         throw new Error("Gagal mengekspor data");
       }
-      
+
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      // Gunakan regex untuk extract filename dari content-disposition jika ada, 
+      // Gunakan regex untuk extract filename dari content-disposition jika ada,
       // tapi untuk amannya kita define hardcode nama file sebagai fallback.
-      link.setAttribute("download", `Laporan_Ledger_${new Date().toISOString().split("T")[0]}.xlsx`);
+      link.setAttribute(
+        "download",
+        `Laporan_Ledger_${new Date().toISOString().split("T")[0]}.xlsx`,
+      );
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+
       alert("Berhasil mengekspor Laporan Ledger");
     } catch (error: any) {
       console.error(error);
@@ -126,13 +129,13 @@ export function LedgerFilter({ accounts }: LedgerFilterProps) {
             Range filter
           </button>
 
-          <button 
+          <button
             onClick={handleExportExcel}
             disabled={isExporting}
             className={`${buttonClass} h-10 shrink-0 whitespace-nowrap`}
           >
             {isExporting ? (
-              <Loader2 className="h-4 w-4 text-emerald-600 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
             ) : (
               <Download className="h-4 w-4 text-emerald-600" />
             )}

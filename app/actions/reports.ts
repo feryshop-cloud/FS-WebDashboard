@@ -37,7 +37,9 @@ export async function getProfitLossReport() {
         tukarTambah += price;
       }
 
-      const dealItems = deal.deal_items as Array<{ stocks?: { capital_price?: number | null } | null }> | null;
+      const dealItems = deal.deal_items as Array<{
+        stocks?: { capital_price?: number | null } | null;
+      }> | null;
       if (dealItems) {
         dealItems.forEach((item) => {
           const stocks = item.stocks;

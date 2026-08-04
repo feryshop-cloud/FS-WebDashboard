@@ -132,7 +132,9 @@ export function AnalyticsCharts({ revenueData, gameDistributionData }: Analytics
         {isRevenueEmpty ? (
           <div className="flex h-[350px] w-full flex-col items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50/50 p-6 text-center">
             <p className="text-sm font-semibold text-slate-600">Belum ada grafik transaksi</p>
-            <p className="mt-1 text-xs text-slate-400">Data tren akan muncul secara otomatis setelah ada transaksi jual-beli terdata.</p>
+            <p className="mt-1 text-xs text-slate-400">
+              Data tren akan muncul secara otomatis setelah ada transaksi jual-beli terdata.
+            </p>
           </div>
         ) : (
           <div className="h-[350px] w-full">
@@ -202,12 +204,17 @@ export function AnalyticsCharts({ revenueData, gameDistributionData }: Analytics
         {isDistEmpty ? (
           <div className="flex h-[300px] w-full flex-col items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50/50 p-6 text-center">
             <p className="text-sm font-semibold text-slate-600">Belum ada penjualan</p>
-            <p className="mt-1 text-xs text-slate-400">Data volume penjualan per game belum tersedia.</p>
+            <p className="mt-1 text-xs text-slate-400">
+              Data volume penjualan per game belum tersedia.
+            </p>
           </div>
         ) : (
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={gameDistributionData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <BarChart
+                data={gameDistributionData}
+                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                 <XAxis
                   dataKey="name"
@@ -241,7 +248,9 @@ export function AnalyticsCharts({ revenueData, gameDistributionData }: Analytics
         {isDistEmpty ? (
           <div className="flex h-[300px] w-full flex-col items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50/50 p-6 text-center">
             <p className="text-sm font-semibold text-slate-600">Belum ada distribusi</p>
-            <p className="mt-1 text-xs text-slate-400">Persentase akan terhitung dari transaksi tercatat.</p>
+            <p className="mt-1 text-xs text-slate-400">
+              Persentase akan terhitung dari transaksi tercatat.
+            </p>
           </div>
         ) : (
           <div className="h-[300px] w-full">

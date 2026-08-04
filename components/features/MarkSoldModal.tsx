@@ -74,7 +74,9 @@ export function MarkSoldModal({
                 <p className="text-xs font-medium tracking-wider text-slate-500 uppercase">
                   Harga Modal
                 </p>
-                <p className="font-semibold text-slate-700">{formatCurrency(item.capital_price ?? 0)}</p>
+                <p className="font-semibold text-slate-700">
+                  {formatCurrency(item.capital_price ?? 0)}
+                </p>
               </div>
               <div className="text-right">
                 <p className="text-xs font-medium tracking-wider text-slate-500 uppercase">

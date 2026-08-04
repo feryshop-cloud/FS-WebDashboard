@@ -117,13 +117,7 @@ export function lucideIconName(logo?: string | null): string | null {
   return name in ICON_MAP ? name : null;
 }
 
-export function CategoryIcon({
-  name,
-  className,
-}: {
-  name: string;
-  className?: string;
-}) {
+export function CategoryIcon({ name, className }: { name: string; className?: string }) {
   const Icon = ICON_MAP[name];
   if (!Icon) return null;
   return <Icon className={className} />;
@@ -140,9 +134,7 @@ export function CategoryIconPicker({
 
   return (
     <div className="space-y-1.5">
-      <label className="block text-sm font-medium text-slate-700">
-        Logo / Icon (Opsional)
-      </label>
+      <label className="block text-sm font-medium text-slate-700">Logo / Icon (Opsional)</label>
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}

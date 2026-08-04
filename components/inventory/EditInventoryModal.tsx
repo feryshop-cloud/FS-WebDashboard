@@ -84,9 +84,7 @@ export function EditInventoryModal({
             )}
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">
-                Kategori Game
-              </label>
+              <label className="mb-1 block text-sm font-medium text-slate-700">Kategori Game</label>
               <select
                 name="game_id"
                 required
@@ -132,9 +130,7 @@ export function EditInventoryModal({
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700">
-                  Harga Modal
-                </label>
+                <label className="mb-1 block text-sm font-medium text-slate-700">Harga Modal</label>
                 <input
                   name="capital_price"
                   required
@@ -146,9 +142,7 @@ export function EditInventoryModal({
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700">
-                  Target Jual
-                </label>
+                <label className="mb-1 block text-sm font-medium text-slate-700">Target Jual</label>
                 <input
                   name="asking_price"
                   required

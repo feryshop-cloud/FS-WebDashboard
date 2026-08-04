@@ -79,7 +79,7 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
         {/* Roles List */}
-        <div className="md:col-span-4 space-y-3">
+        <div className="space-y-3 md:col-span-4">
           <h3 className="text-xs font-semibold tracking-wider text-slate-400 uppercase">
             Daftar Role Sistem
           </h3>
@@ -96,7 +96,7 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
                     setSelectedRole(r);
                     setSaveMessage("");
                   }}
-                  className={`flex w-full flex-col text-left rounded-xl border p-4 transition-all ${
+                  className={`flex w-full flex-col rounded-xl border p-4 text-left transition-all ${
                     selectedRole?.id === r.id
                       ? "border-blue-500 bg-blue-50/50 shadow-sm"
                       : "border-slate-100 bg-white hover:border-slate-200 hover:bg-slate-50/50"
@@ -108,10 +108,10 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
                         selectedRole?.id === r.id ? "text-blue-600" : "text-slate-400"
                       }`}
                     />
-                    <span className="font-bold text-slate-900 text-sm">{r.name}</span>
+                    <span className="text-sm font-bold text-slate-900">{r.name}</span>
                   </div>
                   {r.description && (
-                    <p className="mt-1 text-xs text-slate-500 line-clamp-2">{r.description}</p>
+                    <p className="mt-1 line-clamp-2 text-xs text-slate-500">{r.description}</p>
                   )}
                 </button>
               ))
@@ -122,14 +122,14 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
         {/* Permissions Editor */}
         <div className="md:col-span-8">
           {selectedRole ? (
-            <div className="rounded-xl border border-slate-100 bg-white p-6 shadow-sm space-y-6">
+            <div className="space-y-6 rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
               <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                 <div>
-                  <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <h3 className="flex items-center gap-2 text-base font-bold text-slate-900">
                     <Key className="h-5 w-5 text-blue-600" />
                     Hak Akses: {selectedRole.name}
                   </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <p className="mt-0.5 text-xs text-slate-500">
                     {selectedRole.description || "Konfigurasi izin fitur untuk role ini."}
                   </p>
                 </div>
@@ -151,8 +151,8 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
                 <div
                   className={`rounded-lg p-3 text-xs font-medium ${
                     saveMessage.includes("berhasil")
-                      ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                      : "bg-rose-50 text-rose-700 border border-rose-200"
+                      ? "border border-emerald-200 bg-emerald-50 text-emerald-700"
+                      : "border border-rose-200 bg-rose-50 text-rose-700"
                   }`}
                 >
                   {saveMessage}
@@ -166,7 +166,7 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
                     <div
                       key={perm.key}
                       onClick={() => handleTogglePermission(perm.key)}
-                      className={`flex items-center justify-between rounded-lg border p-3 cursor-pointer transition-colors ${
+                      className={`flex cursor-pointer items-center justify-between rounded-lg border p-3 transition-colors ${
                         isChecked
                           ? "border-blue-200 bg-blue-50/30 text-blue-900"
                           : "border-slate-100 bg-slate-50/50 text-slate-600 hover:bg-slate-100"

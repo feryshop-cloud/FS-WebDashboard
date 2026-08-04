@@ -6,6 +6,6 @@
  */
 export function createAdminClient(): never {
   throw new Error(
-    "SECURITY VIOLATION: createAdminClient() with SUPABASE_SERVICE_ROLE_KEY is prohibited in Next.js workspace per AI_GUARDRAILS.md Chapter 4. Use RLS + authenticated user client instead."
+    "SECURITY VIOLATION: createAdminClient() with SUPABASE_SERVICE_ROLE_KEY is prohibited in Next.js workspace per AI_GUARDRAILS.md Chapter 4. Use RLS + authenticated user client instead.",
   );
 }

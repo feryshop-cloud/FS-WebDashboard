@@ -436,8 +436,7 @@ export default function TopupOrdersPage() {
         {/* Pagination */}
         <div className="flex flex-col items-center justify-between gap-3 border-t border-slate-100 bg-white px-6 py-4 sm:flex-row">
           <div className="text-sm text-slate-500">
-            Menampilkan{" "}
-            <span className="font-semibold text-slate-900">{startFrom}</span> -{" "}
+            Menampilkan <span className="font-semibold text-slate-900">{startFrom}</span> -{" "}
             <span className="font-semibold text-slate-900">{endTo}</span> dari{" "}
             <span className="font-semibold text-slate-900">{pagination.total}</span> pesanan
           </div>
@@ -512,7 +511,9 @@ export default function TopupOrdersPage() {
                   </div>
                   <div className="flex justify-between gap-4">
                     <dt className="text-slate-500">ID Game</dt>
-                    <dd className="text-right font-mono text-slate-900">{selectedOrder.id_games}</dd>
+                    <dd className="text-right font-mono text-slate-900">
+                      {selectedOrder.id_games}
+                    </dd>
                   </div>
                   {selectedOrder.server_games && (
                     <div className="flex justify-between gap-4">
@@ -530,15 +531,19 @@ export default function TopupOrdersPage() {
                   )}
                   {selectedOrder.account_data &&
                     typeof selectedOrder.account_data === "object" &&
-                    Object.entries(selectedOrder.account_data as Record<string, unknown>).map(([key, val]) => {
-                      if (key === "id" || key === "server") return null; // already shown above
-                      return (
-                        <div key={key} className="flex justify-between gap-4">
-                          <dt className="text-slate-500 capitalize">{key.replace(/_/g, " ")}</dt>
-                          <dd className="text-right font-mono text-slate-900 select-all">{String(val ?? "-")}</dd>
-                        </div>
-                      );
-                    })}
+                    Object.entries(selectedOrder.account_data as Record<string, unknown>).map(
+                      ([key, val]) => {
+                        if (key === "id" || key === "server") return null; // already shown above
+                        return (
+                          <div key={key} className="flex justify-between gap-4">
+                            <dt className="text-slate-500 capitalize">{key.replace(/_/g, " ")}</dt>
+                            <dd className="text-right font-mono text-slate-900 select-all">
+                              {String(val ?? "-")}
+                            </dd>
+                          </div>
+                        );
+                      },
+                    )}
                   <div className="flex justify-between gap-4">
                     <dt className="text-slate-500">Qty</dt>
                     <dd className="text-right font-medium text-slate-900">

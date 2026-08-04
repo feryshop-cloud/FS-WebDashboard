@@ -50,7 +50,10 @@ export default function LedgerPage() {
       item.notes?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.ref_id?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesType = typeFilter === "ALL" || (item as any).type === typeFilter || (item as any).transaction_type === typeFilter;
+    const matchesType =
+      typeFilter === "ALL" ||
+      (item as any).type === typeFilter ||
+      (item as any).transaction_type === typeFilter;
 
     return matchesSearch && matchesType;
   });
@@ -93,7 +96,7 @@ export default function LedgerPage() {
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
-              className="bg-transparent text-sm font-medium text-slate-700 outline-none cursor-pointer"
+              className="cursor-pointer bg-transparent text-sm font-medium text-slate-700 outline-none"
             >
               <option value="ALL">Semua Tipe Kas</option>
               <option value="IN">Uang Masuk (IN)</option>

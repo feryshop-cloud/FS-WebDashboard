@@ -21,11 +21,7 @@ interface AddTopupProductModalProps {
   onSuccess: () => void;
 }
 
-export function AddTopupProductModal({
-  isOpen,
-  onClose,
-  onSuccess,
-}: AddTopupProductModalProps) {
+export function AddTopupProductModal({ isOpen, onClose, onSuccess }: AddTopupProductModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 

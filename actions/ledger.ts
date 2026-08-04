@@ -43,7 +43,7 @@ export async function getLedgerEntries(filters?: {
     if (error) throw error;
 
     return {
-      data: (data as unknown) as LedgerWithRelations[],
+      data: data as unknown as LedgerWithRelations[],
       error: null,
     };
   } catch (error: unknown) {

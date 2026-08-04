@@ -36,7 +36,9 @@ export function LedgerTable({ entries }: LedgerTableProps) {
     }
   };
 
-  const getAccountIcon = (account: { image_url?: string | null; name?: string | null } | null | undefined) => {
+  const getAccountIcon = (
+    account: { image_url?: string | null; name?: string | null } | null | undefined,
+  ) => {
     if (account?.image_url) {
       return (
         <Image

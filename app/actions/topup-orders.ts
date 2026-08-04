@@ -24,9 +24,7 @@ export type TopupOrdersResult = {
   totalPages: number;
 };
 
-export async function getTopupOrders(
-  filters: TopupOrdersFilters = {},
-): Promise<TopupOrdersResult> {
+export async function getTopupOrders(filters: TopupOrdersFilters = {}): Promise<TopupOrdersResult> {
   return runAction("getTopupOrders", async () => {
     const { search = "", paymentStatus = "", buyStatus = "", page = 1, pageSize = 20 } = filters;
 
@@ -38,9 +36,7 @@ export async function getTopupOrders(
 
     if (search.trim()) {
       const term = `%${search.trim()}%`;
-      query = query.or(
-        `order_id.ilike.${term},nickname.ilike.${term},id_games.ilike.${term}`,
-      );
+      query = query.or(`order_id.ilike.${term},nickname.ilike.${term},id_games.ilike.${term}`);
     }
 
     if (paymentStatus) {

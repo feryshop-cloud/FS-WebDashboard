@@ -26,12 +26,7 @@ interface UserManagementTabProps {
   onRefresh: () => void;
 }
 
-export function UserManagementTab({
-  users,
-  roles,
-  errorMsg,
-  onRefresh,
-}: UserManagementTabProps) {
+export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserManagementTabProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -109,7 +104,7 @@ export function UserManagementTab({
     <div className="space-y-6">
       {/* Header Controls */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative flex-1 max-w-md">
+        <div className="relative max-w-md flex-1">
           <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
@@ -128,8 +123,8 @@ export function UserManagementTab({
             Tambah Pengguna Baru
           </button>
           <div className="rounded-lg border border-blue-100 bg-blue-50 px-3 py-2 text-xs leading-relaxed text-blue-700">
-            Buat akun admin/staff baru langsung dari sini (terpisah dari proses web
-            storefront). Pengguna non-admin tetap dibuat otomatis saat login/signup pertama.
+            Buat akun admin/staff baru langsung dari sini (terpisah dari proses web storefront).
+            Pengguna non-admin tetap dibuat otomatis saat login/signup pertama.
           </div>
         </div>
       </div>

@@ -169,14 +169,16 @@ export default function ProfitLossPage() {
                 <ArrowUpRight className="h-4 w-4" /> Pendapatan (Revenue)
               </h3>
               <div className="divide-y divide-slate-100 rounded-lg border border-slate-100 bg-slate-50">
-                {(reportData.breakdown?.income ?? []).map((item: ProfitLossBreakdownItem, idx: number) => (
-                  <div key={idx} className="flex items-center justify-between px-4 py-3">
-                    <span className="text-sm font-medium text-slate-700">{item.label}</span>
-                    <span className="text-sm font-semibold text-slate-900">
-                      {formatRupiah(item.amount)}
-                    </span>
-                  </div>
-                ))}
+                {(reportData.breakdown?.income ?? []).map(
+                  (item: ProfitLossBreakdownItem, idx: number) => (
+                    <div key={idx} className="flex items-center justify-between px-4 py-3">
+                      <span className="text-sm font-medium text-slate-700">{item.label}</span>
+                      <span className="text-sm font-semibold text-slate-900">
+                        {formatRupiah(item.amount)}
+                      </span>
+                    </div>
+                  ),
+                )}
                 <div className="flex items-center justify-between rounded-b-lg border-t-2 border-slate-200 bg-white px-4 py-3">
                   <span className="text-sm font-bold text-slate-900">Total Pendapatan</span>
                   <span className="text-sm font-bold text-emerald-600">

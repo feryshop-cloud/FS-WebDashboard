@@ -4,9 +4,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl) {
-  console.error(
-    "MISSING NEXT_PUBLIC_SUPABASE_URL. Set it in .env.local before running the seed.",
-  );
+  console.error("MISSING NEXT_PUBLIC_SUPABASE_URL. Set it in .env.local before running the seed.");
   process.exit(1);
 }
 
@@ -79,10 +77,7 @@ async function main() {
     ];
     await insertRows("games", gameCategories);
 
-    const { data: allGames } = await supabase
-      .from("games")
-      .select("id, name")
-      .order("name");
+    const { data: allGames } = await supabase.from("games").select("id, name").order("name");
     const gameMap: Record<string, string> = {};
     for (const g of allGames ?? []) {
       gameMap[g.name] = g.id;

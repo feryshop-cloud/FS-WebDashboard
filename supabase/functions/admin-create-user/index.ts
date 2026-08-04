@@ -4,8 +4,7 @@ const ADMIN_ROLES = ["OWNER", "ADMIN"];
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 function json(body: Record<string, unknown>, status = 200) {
@@ -52,11 +51,7 @@ Deno.serve(async (req) => {
     .eq("id", user.id)
     .maybeSingle();
 
-  if (
-    callerErr ||
-    !caller?.roles ||
-    !ADMIN_ROLES.includes(caller.roles.name)
-  ) {
+  if (callerErr || !caller?.roles || !ADMIN_ROLES.includes(caller.roles.name)) {
     return json({ error: "Forbidden" }, 403);
   }
 
@@ -87,19 +82,15 @@ Deno.serve(async (req) => {
     return json({ error: "Nama lengkap wajib diisi" }, 400);
   }
 
-  const { data: created, error: createErr } =
-    await admin.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,
-      user_metadata: { full_name },
-    });
+  const { data: created, error: createErr } = await admin.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: { full_name },
+  });
 
   if (createErr || !created.user) {
-    return json(
-      { error: createErr?.message ?? "Gagal membuat pengguna" },
-      400,
-    );
+    return json({ error: createErr?.message ?? "Gagal membuat pengguna" }, 400);
   }
 
   if (role_id) {
@@ -109,10 +100,7 @@ Deno.serve(async (req) => {
       .eq("id", created.user.id);
 
     if (roleErr) {
-      return json(
-        { error: `User dibuat tapi gagal set role: ${roleErr.message}` },
-        500,
-      );
+      return json({ error: `User dibuat tapi gagal set role: ${roleErr.message}` }, 500);
     }
   }
 

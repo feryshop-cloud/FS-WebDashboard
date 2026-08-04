@@ -91,17 +91,20 @@ export default function InventoryPage() {
         const game = games.find((g) => g.name === activeCategory);
         if (game) params.set("gameId", game.id);
       }
-      
+
       const response = await fetch(`/api/export/inventory?${params.toString()}`);
       if (!response.ok) {
         throw new Error("Gagal mengekspor data");
       }
-      
+
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", `Laporan_Inventory_${new Date().toISOString().split("T")[0]}.xlsx`);
+      link.setAttribute(
+        "download",
+        `Laporan_Inventory_${new Date().toISOString().split("T")[0]}.xlsx`,
+      );
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -129,7 +132,7 @@ export default function InventoryPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <button 
+          <button
             onClick={handleExportExcel}
             disabled={isExporting}
             className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-900 disabled:opacity-50"

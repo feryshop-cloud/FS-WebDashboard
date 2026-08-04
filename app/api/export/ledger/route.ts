@@ -1,27 +1,34 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { generateExcelBuffer, formatRupiah, formatDate, createExcelResponse } from "@/lib/export-utils";
+import {
+  generateExcelBuffer,
+  formatRupiah,
+  formatDate,
+  createExcelResponse,
+} from "@/lib/export-utils";
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const accountId = searchParams.get("accountId");
     const type = searchParams.get("type");
-    
+
     const supabase = await createClient();
-    
+
     let query = supabase
       .from("finance_ledger")
-      .select(`
+      .select(
+        `
         *,
         accounts ( name )
-      `)
+      `,
+      )
       .order("created_at", { ascending: false });
 
     if (accountId) {
       query = query.eq("account_id", accountId);
     }
-    
+
     if (type === "IN") {
       query = query.gt("amount", 0);
     } else if (type === "OUT") {
@@ -41,7 +48,7 @@ export async function GET(request: Request) {
       "Nominal",
       "Keterangan",
       "Reference ID",
-      "Status"
+      "Status",
     ];
 
     const rows = (ledgerData || []).map((item: any) => [
@@ -51,16 +58,18 @@ export async function GET(request: Request) {
       item.amount || 0,
       item.description || "-",
       item.reference_id || "-",
-      item.status || "completed"
+      item.status || "completed",
     ]);
 
     const buffer = generateExcelBuffer(rows, headers, "Mutasi Saldo");
-    
+
     const filename = `Laporan_Ledger_${new Date().toISOString().split("T")[0]}.xlsx`;
     return createExcelResponse(buffer, filename);
-
   } catch (error: any) {
     console.error("Export Ledger Error:", error);
-    return NextResponse.json({ error: error.message || "Failed to export ledger" }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Failed to export ledger" },
+      { status: 500 },
+    );
   }
 }

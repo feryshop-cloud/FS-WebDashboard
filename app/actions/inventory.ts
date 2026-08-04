@@ -92,7 +92,9 @@ export async function addInventoryItem(formData: FormData) {
             throw new Error("Failed to upload screenshot.");
           }
 
-          const { data: publicUrlData } = supabase.storage.from("screenshots").getPublicUrl(fileName);
+          const { data: publicUrlData } = supabase.storage
+            .from("screenshots")
+            .getPublicUrl(fileName);
 
           return publicUrlData.publicUrl;
         }

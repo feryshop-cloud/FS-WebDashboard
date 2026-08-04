@@ -8,79 +8,196 @@
         "role": "primary",
         "displayName": "Calm Blue",
         "canonical": "#2563EB",
-        "tonalRamp": ["#1E3A8A", "#1E40AF", "#1D4ED8", "#2563EB", "#3B82F6", "#60A5FA", "#93C5FD", "#EFF6FF"]
+        "tonalRamp": [
+          "#1E3A8A",
+          "#1E40AF",
+          "#1D4ED8",
+          "#2563EB",
+          "#3B82F6",
+          "#60A5FA",
+          "#93C5FD",
+          "#EFF6FF"
+        ]
       },
       "primary-deep": {
         "role": "primary",
         "displayName": "Calm Blue Deep",
         "canonical": "#1D4ED8",
-        "tonalRamp": ["#1E3A8A", "#1E40AF", "#1D4ED8", "#2563EB", "#3B82F6", "#60A5FA", "#93C5FD", "#EFF6FF"]
+        "tonalRamp": [
+          "#1E3A8A",
+          "#1E40AF",
+          "#1D4ED8",
+          "#2563EB",
+          "#3B82F6",
+          "#60A5FA",
+          "#93C5FD",
+          "#EFF6FF"
+        ]
       },
       "primary-halo": {
         "role": "primary",
         "displayName": "Calm Blue Halo",
         "canonical": "#EFF6FF",
-        "tonalRamp": ["#1E3A8A", "#1E40AF", "#1D4ED8", "#2563EB", "#3B82F6", "#60A5FA", "#93C5FD", "#EFF6FF"]
+        "tonalRamp": [
+          "#1E3A8A",
+          "#1E40AF",
+          "#1D4ED8",
+          "#2563EB",
+          "#3B82F6",
+          "#60A5FA",
+          "#93C5FD",
+          "#EFF6FF"
+        ]
       },
       "canvas": {
         "role": "neutral",
         "displayName": "Slate Canvas",
         "canonical": "#F8FAFC",
-        "tonalRamp": ["#020617", "#0F172A", "#1E293B", "#334155", "#475569", "#64748B", "#94A3B8", "#F8FAFC"]
+        "tonalRamp": [
+          "#020617",
+          "#0F172A",
+          "#1E293B",
+          "#334155",
+          "#475569",
+          "#64748B",
+          "#94A3B8",
+          "#F8FAFC"
+        ]
       },
       "surface": {
         "role": "neutral",
         "displayName": "Pure White",
         "canonical": "#FFFFFF",
-        "tonalRamp": ["#020617", "#0F172A", "#1E293B", "#475569", "#64748B", "#94A3B8", "#E2E8F0", "#FFFFFF"]
+        "tonalRamp": [
+          "#020617",
+          "#0F172A",
+          "#1E293B",
+          "#475569",
+          "#64748B",
+          "#94A3B8",
+          "#E2E8F0",
+          "#FFFFFF"
+        ]
       },
       "ink": {
         "role": "neutral",
         "displayName": "Ink",
         "canonical": "#0F172A",
-        "tonalRamp": ["#020617", "#0F172A", "#1E293B", "#334155", "#475569", "#64748B", "#94A3B8", "#E2E8F0"]
+        "tonalRamp": [
+          "#020617",
+          "#0F172A",
+          "#1E293B",
+          "#334155",
+          "#475569",
+          "#64748B",
+          "#94A3B8",
+          "#E2E8F0"
+        ]
       },
       "ink-secondary": {
         "role": "neutral",
         "displayName": "Secondary Ink",
         "canonical": "#64748B",
-        "tonalRamp": ["#020617", "#0F172A", "#1E293B", "#334155", "#475569", "#64748B", "#94A3B8", "#CBD5E1"]
+        "tonalRamp": [
+          "#020617",
+          "#0F172A",
+          "#1E293B",
+          "#334155",
+          "#475569",
+          "#64748B",
+          "#94A3B8",
+          "#CBD5E1"
+        ]
       },
       "line": {
         "role": "neutral",
         "displayName": "Hairline",
         "canonical": "#E2E8F0",
-        "tonalRamp": ["#0F172A", "#334155", "#64748B", "#94A3B8", "#CBD5E1", "#E2E8F0", "#F1F5F9", "#F8FAFC"]
+        "tonalRamp": [
+          "#0F172A",
+          "#334155",
+          "#64748B",
+          "#94A3B8",
+          "#CBD5E1",
+          "#E2E8F0",
+          "#F1F5F9",
+          "#F8FAFC"
+        ]
       },
       "success": {
         "role": "semantic",
         "displayName": "Soft Emerald",
         "canonical": "#059669",
-        "tonalRamp": ["#064E3B", "#065F46", "#047857", "#059669", "#10B981", "#34D399", "#6EE7B7", "#ECFDF5"]
+        "tonalRamp": [
+          "#064E3B",
+          "#065F46",
+          "#047857",
+          "#059669",
+          "#10B981",
+          "#34D399",
+          "#6EE7B7",
+          "#ECFDF5"
+        ]
       },
       "warning": {
         "role": "semantic",
         "displayName": "Soft Amber",
         "canonical": "#D97706",
-        "tonalRamp": ["#78350F", "#92400E", "#B45309", "#D97706", "#F59E0B", "#FBBF24", "#FCD34D", "#FFFBEB"]
+        "tonalRamp": [
+          "#78350F",
+          "#92400E",
+          "#B45309",
+          "#D97706",
+          "#F59E0B",
+          "#FBBF24",
+          "#FCD34D",
+          "#FFFBEB"
+        ]
       },
       "danger": {
         "role": "semantic",
         "displayName": "Soft Red",
         "canonical": "#DC2626",
-        "tonalRamp": ["#7F1D1D", "#991B1B", "#B91C1C", "#DC2626", "#EF4444", "#F87171", "#FCA5A5", "#FEF2F2"]
+        "tonalRamp": [
+          "#7F1D1D",
+          "#991B1B",
+          "#B91C1C",
+          "#DC2626",
+          "#EF4444",
+          "#F87171",
+          "#FCA5A5",
+          "#FEF2F2"
+        ]
       },
       "violet": {
         "role": "semantic",
         "displayName": "Calm Violet",
         "canonical": "#9333EA",
-        "tonalRamp": ["#581C87", "#6B21A8", "#7E22CE", "#9333EA", "#A855F7", "#C084FC", "#D8B4FE", "#FAF5FF"]
+        "tonalRamp": [
+          "#581C87",
+          "#6B21A8",
+          "#7E22CE",
+          "#9333EA",
+          "#A855F7",
+          "#C084FC",
+          "#D8B4FE",
+          "#FAF5FF"
+        ]
       },
       "orange": {
         "role": "semantic",
         "displayName": "Warm Orange",
         "canonical": "#EA580C",
-        "tonalRamp": ["#7C2D12", "#9A3412", "#C2410C", "#EA580C", "#F97316", "#FB923C", "#FDBA74", "#FFF7ED"]
+        "tonalRamp": [
+          "#7C2D12",
+          "#9A3412",
+          "#C2410C",
+          "#EA580C",
+          "#F97316",
+          "#FB923C",
+          "#FDBA74",
+          "#FFF7ED"
+        ]
       }
     },
     "typographyMeta": {
@@ -227,9 +344,21 @@
       "Monospace for numeric and sensitive values, reinforcing the ledger/audit identity."
     ],
     "rules": [
-      { "name": "The Calm Blue Rule", "body": "Calm Blue is the one primary accent, used for primary actions and active states only. No neon, fluorescent, or cyan tones appear anywhere in the system. When a module needs emphasis, it borrows Violet or Indigo — never a new blue family.", "section": "colors" },
-      { "name": "The Ledger Line Rule", "body": "Prices, codes, and sensitive values are set in monospace so columns align and codes scan. Numbers are data; they get a fixed-width home.", "section": "typography" },
-      { "name": "The Hairline Rest Rule", "body": "Surfaces are flat at rest — white card, hairline border, whisper of shadow. Depth appears only as a response to state: hover rise, or hard overlay elevation.", "section": "elevation" }
+      {
+        "name": "The Calm Blue Rule",
+        "body": "Calm Blue is the one primary accent, used for primary actions and active states only. No neon, fluorescent, or cyan tones appear anywhere in the system. When a module needs emphasis, it borrows Violet or Indigo — never a new blue family.",
+        "section": "colors"
+      },
+      {
+        "name": "The Ledger Line Rule",
+        "body": "Prices, codes, and sensitive values are set in monospace so columns align and codes scan. Numbers are data; they get a fixed-width home.",
+        "section": "typography"
+      },
+      {
+        "name": "The Hairline Rest Rule",
+        "body": "Surfaces are flat at rest — white card, hairline border, whisper of shadow. Depth appears only as a response to state: hover rise, or hard overlay elevation.",
+        "section": "elevation"
+      }
     ],
     "dos": [
       "Do build every surface as white on the slate-50 canvas with a hairline border and a whisper of shadow — the two-layer system is the whole identity.",

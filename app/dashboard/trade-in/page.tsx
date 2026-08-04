@@ -175,7 +175,8 @@ export default function TradeInPage() {
                       </span>
                     </div>
                     <p className="mt-0.5 text-xs font-medium text-slate-500">
-                      {(tt.customers as { name?: string | null } | null)?.name || "-"} • {formatDate(tt.created_at as string)}
+                      {(tt.customers as { name?: string | null } | null)?.name || "-"} •{" "}
+                      {formatDate(tt.created_at as string)}
                     </p>
                   </div>
                 </div>
@@ -188,22 +189,24 @@ export default function TradeInPage() {
                       Aset Customer (Masuk)
                     </h3>
                     <div className="space-y-2">
-                      {(inItems as Array<{ description?: unknown; estimated_value?: unknown }>).map((item, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 p-2.5"
-                        >
-                          <span
-                            className="mr-2 truncate text-xs font-semibold text-slate-700"
-                            title={String(item.description ?? "")}
+                      {(inItems as Array<{ description?: unknown; estimated_value?: unknown }>).map(
+                        (item, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 p-2.5"
                           >
-                            {String(item.description ?? "")}
-                          </span>
-                          <span className="text-xs font-bold text-emerald-600">
-                            {formatRupiah(Number(item.estimated_value ?? 0))}
-                          </span>
-                        </div>
-                      ))}
+                            <span
+                              className="mr-2 truncate text-xs font-semibold text-slate-700"
+                              title={String(item.description ?? "")}
+                            >
+                              {String(item.description ?? "")}
+                            </span>
+                            <span className="text-xs font-bold text-emerald-600">
+                              {formatRupiah(Number(item.estimated_value ?? 0))}
+                            </span>
+                          </div>
+                        ),
+                      )}
                     </div>
                   </div>
 

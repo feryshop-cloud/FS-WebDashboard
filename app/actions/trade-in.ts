@@ -140,7 +140,9 @@ export async function createTukarTambah(formData: FormData) {
       .update({
         status: initialStockStatus,
         sold_date: initialStockStatus === "SOLD" ? new Date().toISOString() : null,
-        booking_date: (["BOOKED", "LIMITED_ACCESS", "SOLD"] as StockStatus[]).includes(initialStockStatus)
+        booking_date: (["BOOKED", "LIMITED_ACCESS", "SOLD"] as StockStatus[]).includes(
+          initialStockStatus,
+        )
           ? new Date().toISOString()
           : null,
       })
@@ -235,7 +237,9 @@ export async function createTukarTambah(formData: FormData) {
           .update({
             status: finalStockStatus,
             sold_date: finalStockStatus === "SOLD" ? new Date().toISOString() : null,
-            booking_date: (["BOOKED", "LIMITED_ACCESS", "SOLD"] as StockStatus[]).includes(finalStockStatus)
+            booking_date: (["BOOKED", "LIMITED_ACCESS", "SOLD"] as StockStatus[]).includes(
+              finalStockStatus,
+            )
               ? new Date().toISOString()
               : null,
           })
@@ -276,7 +280,9 @@ export async function createTukarTambah(formData: FormData) {
         .update({
           status: finalStockStatus,
           sold_date: finalStockStatus === "SOLD" ? new Date().toISOString() : null,
-          booking_date: (["BOOKED", "LIMITED_ACCESS", "SOLD"] as StockStatus[]).includes(finalStockStatus)
+          booking_date: (["BOOKED", "LIMITED_ACCESS", "SOLD"] as StockStatus[]).includes(
+            finalStockStatus,
+          )
             ? new Date().toISOString()
             : null,
         })

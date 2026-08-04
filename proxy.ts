@@ -17,10 +17,15 @@ export async function proxy(request: NextRequest) {
   supabaseResponse.headers.set("x-request-id", requestId);
 
   console.log(
-    formatLog("info", "request start", {
-      method: request.method,
-      path: request.nextUrl.pathname,
-    }, { service: "game-inventori", requestId }),
+    formatLog(
+      "info",
+      "request start",
+      {
+        method: request.method,
+        path: request.nextUrl.pathname,
+      },
+      { service: "game-inventori", requestId },
+    ),
   );
 
   const supabase = createServerClient(

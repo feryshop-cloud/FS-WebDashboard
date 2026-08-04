@@ -77,12 +77,12 @@ export default function DealsPage() {
       setIsExporting(true);
       const params = new URLSearchParams();
       // Bisa tambahkan status filter di sini kalau UI Deals nanti punya state activeFilter
-      
+
       const response = await fetch(`/api/export/deals?${params.toString()}`);
       if (!response.ok) {
         throw new Error("Gagal mengekspor data");
       }
-      
+
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -112,7 +112,7 @@ export default function DealsPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <button 
+          <button
             onClick={handleExportExcel}
             disabled={isExporting}
             className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-900 disabled:opacity-50"
@@ -233,9 +233,15 @@ export default function DealsPage() {
               ) : (
                 deals.map((deal) => {
                   let badgeClass = "bg-slate-100 text-slate-600 border-slate-200";
-                  if ((deal.status as string) === "Lunas" || (deal.status as string) === "Selesai") {
+                  if (
+                    (deal.status as string) === "Lunas" ||
+                    (deal.status as string) === "Selesai"
+                  ) {
                     badgeClass = "bg-emerald-50 text-emerald-600 border-emerald-100";
-                  } else if ((deal.status as string) === "Booking" || (deal.status as string) === "Akses Terbatas") {
+                  } else if (
+                    (deal.status as string) === "Booking" ||
+                    (deal.status as string) === "Akses Terbatas"
+                  ) {
                     badgeClass = "bg-orange-50 text-orange-600 border-orange-100";
                   } else if ((deal.status as string)?.includes("Cancel")) {
                     badgeClass = "bg-rose-50 text-rose-600 border-rose-100";

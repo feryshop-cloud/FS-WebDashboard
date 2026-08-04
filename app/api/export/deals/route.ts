@@ -1,20 +1,27 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { generateExcelBuffer, formatRupiah, formatDate, createExcelResponse } from "@/lib/export-utils";
+import {
+  generateExcelBuffer,
+  formatRupiah,
+  formatDate,
+  createExcelResponse,
+} from "@/lib/export-utils";
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
-    
+
     const supabase = await createClient();
-    
+
     let query = supabase
       .from("deals")
-      .select(`
+      .select(
+        `
         *,
         games ( name )
-      `)
+      `,
+      )
       .order("created_at", { ascending: false });
 
     if (status) {
@@ -36,7 +43,7 @@ export async function GET(request: Request) {
       "Harga Jual",
       "Keuntungan",
       "Tgl Deal",
-      "Tgl Selesai"
+      "Tgl Selesai",
     ];
 
     const rows = (dealsData || []).map((item: any) => [
@@ -48,14 +55,13 @@ export async function GET(request: Request) {
       item.selling_price || 0,
       (item.selling_price || 0) - (item.capital_price || 0),
       formatDate(item.created_at),
-      formatDate(item.completed_at || item.updated_at)
+      formatDate(item.completed_at || item.updated_at),
     ]);
 
     const buffer = generateExcelBuffer(rows, headers, "Laporan Deals B2B");
-    
+
     const filename = `Laporan_Deals_${new Date().toISOString().split("T")[0]}.xlsx`;
     return createExcelResponse(buffer, filename);
-
   } catch (error: any) {
     console.error("Export Deals Error:", error);
     return NextResponse.json({ error: error.message || "Failed to export deals" }, { status: 500 });

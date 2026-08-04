@@ -46,7 +46,8 @@ function mapRowToDealWithRelations(row: DealQueryRow): DealWithRelations {
         promo_price: stockRow.promo_price ? Number(stockRow.promo_price) : null,
         current_price: Number(stockRow.current_price),
         status: stockRow.status as StockStatus,
-        purchase_payment_status: (stockRow.purchase_payment_status || "LUNAS") as PurchasePaymentStatus,
+        purchase_payment_status: (stockRow.purchase_payment_status ||
+          "LUNAS") as PurchasePaymentStatus,
         payment_account_id: stockRow.payment_account_id || null,
         purchase_date: stockRow.purchase_date || null,
         post_date: stockRow.post_date || null,
