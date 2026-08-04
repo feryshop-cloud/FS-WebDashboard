@@ -26,6 +26,17 @@ export type DealStatus =
   | "COMPLETED";
 export type PaymentStatus = "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";
 export type PaymentType = "IN" | "OUT";
+export type UserStatus = "ACTIVE" | "INACTIVE";
+export type ProblemCaseStatus =
+  | "OPEN"
+  | "IN_PROGRESS"
+  | "WAITING_CUSTOMER"
+  | "WAITING_THIRD_PARTY"
+  | "RESOLVED"
+  | "CANNOT_RESOLVE"
+  | "PERMANENT"
+  | "REFUND"
+  | "CANCEL";
 export type LedgerTransactionType =
   | "PAYMENT_IN"
   | "PAYMENT_OUT"

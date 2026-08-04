@@ -258,7 +258,7 @@ export async function toggleUserStatus(userId: string, currentStatus: string) {
     return { success: false, error: "Unauthorized" };
   }
 
-  const newStatus = currentStatus === "Aktif" ? "Nonaktif" : "Aktif";
+  const newStatus = currentStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE";
 
   const { error } = await supabase
     .from("users")

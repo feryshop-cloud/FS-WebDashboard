@@ -61,7 +61,7 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
   const handleToggleStatus = async (userId: string, currentStatus: string | null) => {
     try {
       setUpdatingUserId(userId);
-      await toggleUserStatus(userId, currentStatus || "Aktif");
+      await toggleUserStatus(userId, currentStatus || "ACTIVE");
       onRefresh();
     } catch (err) {
       console.error(err);
@@ -174,12 +174,12 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
                         onClick={() => handleToggleStatus(user.id, user.status)}
                         disabled={updatingUserId === user.id}
                         className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors ${
-                          user.status === "Aktif" || !user.status
+                          user.status === "ACTIVE" || !user.status
                             ? "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
                             : "border-slate-200 bg-slate-100 text-slate-500 hover:bg-slate-200"
                         }`}
                       >
-                        {user.status === "Aktif" || !user.status ? (
+                        {user.status === "ACTIVE" || !user.status ? (
                           <>
                             <CheckCircle2 className="h-3 w-3 text-emerald-600" />
                             Aktif

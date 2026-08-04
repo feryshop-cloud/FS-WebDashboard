@@ -36,7 +36,7 @@ export async function createProblemCase(formData: FormData) {
     const supabase = await createClient();
 
     const issue_type = formData.get("issue_type")?.toString();
-    const status = formData.get("status")?.toString() || "Open";
+    const status = formData.get("status")?.toString() || "OPEN";
     const chronology = formData.get("chronology")?.toString();
     const related_type = formData.get("related_type")?.toString();
     const related_id = formData.get("related_id")?.toString();

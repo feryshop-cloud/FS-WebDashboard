@@ -340,6 +340,28 @@ async function main() {
     });
     if (payment3Err) throw new Error(`Payment 3 failed: ${payment3Err.message}`);
 
+    // 7. SEED PROBLEM CASES
+    console.log("Seeding Problem Cases...");
+    await insertRows("problem_cases", [
+      {
+        case_number: `CASE-${new Date().toISOString().slice(2, 7).replace("-", "")}-001`,
+        issue_type: "Akun Tidak Bisa Login",
+        chronology: "Buyer melaporkan akun MLBB tidak bisa login setelah transfer. Moonton kemungkinan ganti password.",
+        stock_id: mlbbStock.id,
+        deal_id: deal1.id,
+        status: "OPEN",
+      },
+      {
+        case_number: `CASE-${new Date().toISOString().slice(2, 7).replace("-", "")}-002`,
+        issue_type: "Buyer Klaim Akun Berbeda",
+        chronology: "Buyer mengklaim akun Valorant yang diterima berbeda dari listing. Sedang diverifikasi.",
+        stock_id: valoStock.id,
+        deal_id: deal2.id,
+        status: "IN_PROGRESS",
+      },
+    ]);
+
+
     console.log("Database successfully seeded with realistic data!");
   } catch (err) {
     console.error("Seeding error:", err);

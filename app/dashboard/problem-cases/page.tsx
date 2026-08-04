@@ -23,6 +23,18 @@ import {
   InventoryItemWithGame,
 } from "@/types/database";
 
+const PROBLEM_CASE_STATUS_LABEL: Record<string, string> = {
+  OPEN: "Open",
+  IN_PROGRESS: "Ditindaklanjuti",
+  WAITING_CUSTOMER: "Menunggu Customer",
+  WAITING_THIRD_PARTY: "Menunggu Pihak Ketiga",
+  RESOLVED: "Selesai",
+  CANNOT_RESOLVE: "Tidak Bisa Diselesaikan",
+  PERMANENT: "Permanen",
+  REFUND: "Refund",
+  CANCEL: "Cancel",
+};
+
 export default function ProblemCasesPage() {
   const [cases, setCases] = useState<ProblemCaseWithRelations[]>([]);
   const [deals, setDeals] = useState<DealWithRelations[]>([]);
@@ -188,14 +200,14 @@ export default function ProblemCasesPage() {
               ) : (
                 cases.map((c) => {
                   let badgeClass = "bg-slate-100 text-slate-600 border-slate-200";
-                  if (c.status === "Open") badgeClass = "bg-rose-50 text-rose-600 border-rose-100";
-                  if (c.status === "Ditindaklanjuti")
+                  if (c.status === "OPEN") badgeClass = "bg-rose-50 text-rose-600 border-rose-100";
+                  if (c.status === "IN_PROGRESS")
                     badgeClass = "bg-blue-50 text-blue-600 border-blue-100";
-                  if (c.status?.includes("Menunggu"))
+                  if (c.status === "WAITING_CUSTOMER" || c.status === "WAITING_THIRD_PARTY")
                     badgeClass = "bg-orange-50 text-orange-600 border-orange-100";
-                  if (c.status === "Selesai")
+                  if (c.status === "RESOLVED")
                     badgeClass = "bg-emerald-50 text-emerald-600 border-emerald-100";
-                  if (c.status === "Refund")
+                  if (c.status === "REFUND")
                     badgeClass = "bg-slate-800 text-white border-slate-700";
 
                   const relatedStr = c.deals
@@ -208,7 +220,7 @@ export default function ProblemCasesPage() {
                     <tr key={c.id} className="group transition-colors hover:bg-slate-50/50">
                       <td className="px-6 py-4 text-sm font-semibold whitespace-nowrap text-slate-900">
                         <div className="flex items-center gap-2">
-                          {c.status === "Open" && (
+                          {c.status === "OPEN" && (
                             <AlertTriangle className="h-4 w-4 text-rose-500" />
                           )}
                           {c.case_number}
@@ -232,7 +244,7 @@ export default function ProblemCasesPage() {
                         <span
                           className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${badgeClass}`}
                         >
-                          {c.status}
+                          {PROBLEM_CASE_STATUS_LABEL[c.status ?? ""] ?? c.status}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-center text-sm font-medium whitespace-nowrap">
@@ -362,8 +374,8 @@ export default function ProblemCasesPage() {
                     name="status"
                     className="w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   >
-                    <option value="Open">Open (Baru)</option>
-                    <option value="Ditindaklanjuti">Ditindaklanjuti</option>
+                    <option value="OPEN">Open (Baru)</option>
+                    <option value="IN_PROGRESS">Ditindaklanjuti</option>
                   </select>
                 </div>
               </div>
