@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Search, ShoppingBag, Loader2, RefreshCw } from "lucide-react";
+import { Search, ShoppingBag, Loader2, RefreshCw, Plus } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
+import { getTopupProducts } from "@/app/actions/topup-products";
+import { AddTopupProductModal } from "@/components/topup/TopupProductModals";
+import { TopupProductRowActions } from "@/components/topup/TopupProductRowActions";
 
 type TopupProduct = {
   id: string;
@@ -21,23 +23,18 @@ export default function TopupProductsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [error, setError] = useState("");
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const loadProducts = async () => {
     try {
       setIsLoading(true);
       setError("");
-      const supabase = createClient();
-      // "products" table is not in generated types, use explicit cast
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error: fetchError } = await (supabase as any)
-        .from("products")
-        .select("*")
-        .order("game_slug", { ascending: true });
+      const res = await getTopupProducts();
 
-      if (fetchError) {
-        setError(String((fetchError as { message?: unknown })?.message ?? "Error"));
+      if (res.error) {
+        setError(res.error);
       } else {
-        setProducts((data as TopupProduct[]) || []);
+        setProducts((res.data as TopupProduct[]) || []);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal mengambil data produk");
@@ -47,7 +44,6 @@ export default function TopupProductsPage() {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadProducts();
   }, []);
 
@@ -68,17 +64,26 @@ export default function TopupProductsPage() {
             Daftar Produk Top-Up
           </h1>
           <p className="mt-1 text-sm text-slate-500">
-            Monitoring produk katalog Top-Up Storefront dari database Supabase.
+            Monitoring & Kelola katalog produk Top-Up Storefront.
           </p>
         </div>
-        <button
-          onClick={loadProducts}
-          disabled={isLoading}
-          className="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-200"
-        >
-          <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
-          Refresh
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={loadProducts}
+            disabled={isLoading}
+            className="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-200"
+          >
+            <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
+            Refresh
+          </button>
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700"
+          >
+            <Plus className="h-4 w-4" />
+            Tambah Produk
+          </button>
+        </div>
       </div>
 
       {/* Filter / Search Bar */}
@@ -125,6 +130,7 @@ export default function TopupProductsPage() {
                   <th className="px-6 py-3.5">Harga Jual</th>
                   <th className="px-6 py-3.5">Harga Modal</th>
                   <th className="px-6 py-3.5 text-center">Status</th>
+                  <th className="px-6 py-3.5 text-center">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
@@ -156,6 +162,9 @@ export default function TopupProductsPage() {
                         </span>
                       )}
                     </td>
+                    <td className="px-6 py-4 text-center">
+                      <TopupProductRowActions product={p} onRefresh={loadProducts} />
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -163,6 +172,13 @@ export default function TopupProductsPage() {
           </div>
         )}
       </div>
+
+      {/* Add Product Modal */}
+      <AddTopupProductModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSuccess={loadProducts}
+      />
     </div>
   );
 }
