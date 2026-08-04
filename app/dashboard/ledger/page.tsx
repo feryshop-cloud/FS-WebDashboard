@@ -137,6 +137,47 @@ export default function LedgerPage() {
     return matchesSearch && matchesType;
   });
 
+  const handleExportExcel = () => {
+    if (filteredLedgers.length === 0) {
+      alert("Tidak ada data transaksi untuk diekspor.");
+      return;
+    }
+
+    const headers = [
+      "Tanggal",
+      "ID Transaksi",
+      "Tipe Transaksi",
+      "Rekening",
+      "Referensi",
+      "Catatan",
+      "Nominal (Rp)",
+    ];
+
+    const rows = filteredLedgers.map((tx) => [
+      formatDate(tx.created_at),
+      tx.id,
+      tx.transaction_type,
+      tx.accounts?.name || "-",
+      tx.ref_id || "-",
+      `"${(tx.notes || "-").replace(/"/g, '""')}"`,
+      tx.amount,
+    ]);
+
+    const csvContent =
+      "\uFEFF" +
+      [headers.join(","), ...rows.map((row) => row.join(","))].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const today = new Date().toISOString().split("T")[0];
+    link.setAttribute("href", url);
+    link.setAttribute("download", `buku_kas_ledger_${today}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 pb-8">
       {/* Header */}
@@ -148,7 +189,10 @@ export default function LedgerPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:text-slate-900">
+          <button
+            onClick={handleExportExcel}
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:text-slate-900"
+          >
             <FileText className="h-4 w-4" />
             Export Excel
           </button>
