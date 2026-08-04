@@ -23,6 +23,8 @@ type LedgerRecord = LedgerWithRelations;
 export default function LedgerPage() {
   const [ledgers, setLedgers] = useState<LedgerRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [typeFilter, setTypeFilter] = useState("ALL");
 
   const loadLedgers = async () => {
     try {
@@ -40,6 +42,18 @@ export default function LedgerPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     loadLedgers();
   }, []);
+
+  const filteredLedgers = ledgers.filter((item) => {
+    const matchesSearch =
+      !searchTerm ||
+      item.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.notes?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.ref_id?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesType = typeFilter === "ALL" || (item as any).type === typeFilter || (item as any).transaction_type === typeFilter;
+
+    return matchesSearch && matchesType;
+  });
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 pb-8">
@@ -67,29 +81,25 @@ export default function LedgerPage() {
           </div>
           <input
             type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             className="block w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pr-3 pl-10 text-slate-900 placeholder-slate-400 transition-all outline-none focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             placeholder="Cari referensi, catatan, atau ID..."
           />
         </div>
         <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto">
-          <button className="inline-flex flex-1 items-center justify-between gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 sm:flex-none">
-            <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-slate-400" />
-              <span>Semua Rekening</span>
-            </div>
-            <ChevronDown className="h-4 w-4 text-slate-400" />
-          </button>
-          <button className="inline-flex flex-1 items-center justify-between gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 sm:flex-none">
-            <span>Semua Status</span>
-            <ChevronDown className="h-4 w-4 text-slate-400" />
-          </button>
-          <button className="inline-flex w-full items-center justify-between gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 sm:w-auto">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-slate-400" />
-              <span>1 Jun - 30 Jun 2026</span>
-            </div>
-            <ChevronDown className="h-4 w-4 text-slate-400" />
-          </button>
+          <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700">
+            <Filter className="h-4 w-4 text-slate-400" />
+            <select
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+              className="bg-transparent text-sm font-medium text-slate-700 outline-none cursor-pointer"
+            >
+              <option value="ALL">Semua Tipe Kas</option>
+              <option value="IN">Uang Masuk (IN)</option>
+              <option value="OUT">Uang Keluar (OUT)</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -144,14 +154,14 @@ export default function LedgerPage() {
                     <Loader2 className="mx-auto h-8 w-8 animate-spin text-blue-600" />
                   </td>
                 </tr>
-              ) : ledgers.length === 0 ? (
+              ) : filteredLedgers.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-8 text-center text-sm text-slate-500">
-                    Belum ada riwayat mutasi.
+                    Tidak ada riwayat mutasi yang cocok dengan pencarian/filter.
                   </td>
                 </tr>
               ) : (
-                ledgers.map((tx) => {
+                filteredLedgers.map((tx) => {
                   const isPositive = Number(tx.amount) >= 0;
 
                   // Determine Badge styling based on transaction type
