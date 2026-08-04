@@ -6,7 +6,6 @@ import {
   Filter,
   Plus,
   ChevronDown,
-  MoreHorizontal,
   X,
   Loader2,
   Download,

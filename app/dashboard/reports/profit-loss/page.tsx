@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import {
   Calendar,
   Download,
-  ChevronDown,
   TrendingUp,
   TrendingDown,
   Activity,
@@ -67,16 +66,18 @@ export default function ProfitLossPage() {
     return { startDate: undefined, endDate: undefined };
   };
 
-  const loadData = async (filter = periodFilter) => {
-    setIsLoading(true);
-    const { startDate, endDate } = getDateRange(filter);
-    const data = await getProfitLossReport(startDate, endDate);
-    setReportData(data);
-    setIsLoading(false);
-  };
-
   useEffect(() => {
-    loadData(periodFilter);
+    let isMounted = true;
+    const { startDate, endDate } = getDateRange(periodFilter);
+    getProfitLossReport(startDate, endDate).then((data) => {
+      if (isMounted) {
+        setReportData(data);
+        setIsLoading(false);
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
   }, [periodFilter]);
 
   if (isLoading) {

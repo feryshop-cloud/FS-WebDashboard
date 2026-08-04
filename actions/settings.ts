@@ -3,12 +3,13 @@
 import { logger } from "@/lib/logger";
 import { createClient } from "../lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import type { Database, Json } from "@/types/database.types";
 
 export async function addGameCategory(
   title: string,
   game_slug: string,
   logo?: string,
-  instructions?: any[],
+  instructions?: Json,
 ) {
   const supabase = await createClient();
 
@@ -42,7 +43,7 @@ export async function addGameCategory(
 
   // Also update instructions in games table if exists
   if (instructions) {
-    await supabase.from("games").update({ instructions }).eq("slug", game_slug);
+    await supabase.from("games").update({ instructions: instructions as Json }).eq("slug", game_slug);
   }
 
   revalidatePath("/dashboard/settings");
@@ -57,7 +58,7 @@ export async function updateGameCategory(
   game_slug: string,
   logo?: string,
   is_active: boolean = true,
-  instructions?: any[],
+  instructions?: Json,
 ) {
   const supabase = await createClient();
 
@@ -89,7 +90,7 @@ export async function updateGameCategory(
 
   // Update instructions in games table
   if (instructions) {
-    await supabase.from("games").update({ instructions }).eq("slug", game_slug);
+    await supabase.from("games").update({ instructions: instructions as Json }).eq("slug", game_slug);
   }
 
   revalidatePath("/dashboard/settings");
@@ -170,7 +171,121 @@ export async function getGameInstructions(game_slug: string) {
     return { data: null, error: error.message };
   }
 
-  return { data: (data?.instructions as any[]) || null, error: null };
+  return { data: (data?.instructions as unknown[]) || null, error: null };
+}
+
+export async function getGamesList() {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("games")
+    .select("id, name, slug, logo, image_url, is_active, is_popular, sort_order, instructions, created_at")
+    .order("sort_order", { ascending: true });
+
+  if (error) {
+    logger.error("[getGamesList] Error fetching games", { error });
+    return { data: null, error: error.message };
+  }
+
+  return { data, error: null };
+}
+
+export async function addGame(
+  name: string,
+  slug: string,
+  logo?: string,
+  instructions?: unknown[],
+) {
+  const supabase = await createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "Unauthorized" };
+
+  if (!name || !slug) return { success: false, error: "Nama dan slug wajib diisi." };
+
+  const finalInstructions = instructions && instructions.length > 0
+    ? { fields: instructions }
+    : { fields: [] };
+
+  const { data, error } = await supabase
+    .from("games")
+    .insert({ name, slug, logo: logo || null, instructions: finalInstructions as Json, is_active: true })
+    .select()
+    .single();
+
+  if (error) {
+    logger.error("[addGame] DB Error", { error });
+    return { success: false, error: error.message || "Gagal menambahkan game." };
+  }
+
+  revalidatePath("/dashboard/settings");
+  revalidatePath("/dashboard/topup-products");
+  return { success: true, data };
+}
+
+export async function updateGame(
+  id: string,
+  name: string,
+  slug: string,
+  logo?: string,
+  is_active?: boolean,
+  is_popular?: boolean,
+  instructions?: unknown[],
+) {
+  const supabase = await createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "Unauthorized" };
+
+  if (!id || !name || !slug) return { success: false, error: "ID, nama, dan slug wajib diisi." };
+
+  const finalInstructions = instructions !== undefined
+    ? { fields: instructions }
+    : undefined;
+
+  const updatePayload: Database["public"]["Tables"]["games"]["Update"] = {
+    name,
+    slug,
+    logo: logo || null,
+    is_active: is_active ?? true,
+    is_popular: is_popular ?? false,
+    updated_at: new Date().toISOString(),
+  };
+  if (finalInstructions !== undefined) {
+    updatePayload.instructions = finalInstructions as Json;
+  }
+
+  const { error } = await supabase.from("games").update(updatePayload).eq("id", id);
+
+  if (error) {
+    logger.error("[updateGame] DB Error", { error });
+    return { success: false, error: error.message || "Gagal mengupdate game." };
+  }
+
+  revalidatePath("/dashboard/settings");
+  revalidatePath("/dashboard/topup-products");
+  return { success: true };
+}
+
+export async function toggleGameStatus(id: string, is_active: boolean) {
+  const supabase = await createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "Unauthorized" };
+
+  const { error } = await supabase
+    .from("games")
+    .update({ is_active, updated_at: new Date().toISOString() })
+    .eq("id", id);
+
+  if (error) {
+    logger.error("[toggleGameStatus] DB Error", { error });
+    return { success: false, error: error.message || "Gagal mengubah status game." };
+  }
+
+  revalidatePath("/dashboard/settings");
+  revalidatePath("/dashboard/topup-products");
+  return { success: true };
 }
 
 export async function getCategories() {

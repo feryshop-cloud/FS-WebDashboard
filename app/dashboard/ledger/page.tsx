@@ -32,21 +32,22 @@ export default function LedgerPage() {
   const [totalCount, setTotalCount] = useState(0);
   const itemsPerPage = 10;
 
-  const loadLedgers = async (page = currentPage) => {
-    try {
-      setIsLoading(true);
-      const res = await getLedgers(page, itemsPerPage, accountId);
-      setLedgers((res.data as unknown as LedgerRecord[]) || []);
-      setTotalCount(res.totalCount || 0);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    loadLedgers(currentPage);
+    let isMounted = true;
+    getLedgers(currentPage, itemsPerPage, accountId)
+      .then((res) => {
+        if (isMounted) {
+          setLedgers((res.data as LedgerRecord[]) || []);
+          setTotalCount(res.totalCount || 0);
+        }
+      })
+      .catch((err) => console.error(err))
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
+      });
+    return () => {
+      isMounted = false;
+    };
   }, [currentPage, accountId]);
 
   const filteredLedgers = ledgers.filter((item) => {

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Plus, Trash2, ArrowUp, ArrowDown, Settings2, Sparkles } from "lucide-react";
+import { Plus, Trash2, ArrowUp, ArrowDown, Settings2 } from "lucide-react";
 
 export type DynamicField = {
   id: string;
@@ -296,7 +296,7 @@ export function DynamicInputBuilder({ fields, onChange }: DynamicInputBuilderPro
             <label className="block text-[11px] font-medium text-slate-600">Tipe Field</label>
             <select
               value={formData.type}
-              onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
+              onChange={(e) => setFormData({ ...formData, type: e.target.value as DynamicField["type"] })}
               className="w-full rounded border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
             >
               <option value="text">Teks biasa</option>

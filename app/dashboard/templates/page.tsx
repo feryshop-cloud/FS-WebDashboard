@@ -42,7 +42,20 @@ export default function TemplatesPage() {
   };
 
   useEffect(() => {
-    loadTemplatesData();
+    let isMounted = true;
+    getTemplates()
+      .then((data) => {
+        if (isMounted) {
+          setTemplates(data as unknown as TemplateItem[]);
+        }
+      })
+      .catch((err) => console.error(err))
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
+      });
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const handleCopy = (id: string, text: string) => {

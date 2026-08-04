@@ -7,7 +7,6 @@ import {
   Plus,
   FileText,
   ChevronDown,
-  MoreHorizontal,
   X,
   Loader2,
   Trash2,

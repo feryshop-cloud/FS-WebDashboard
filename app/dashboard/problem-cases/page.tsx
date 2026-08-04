@@ -6,7 +6,6 @@ import {
   Plus,
   Filter,
   ChevronDown,
-  MoreHorizontal,
   AlertTriangle,
   X,
   Loader2,

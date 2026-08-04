@@ -50,7 +50,29 @@ export default function TopupProductsPage() {
   };
 
   useEffect(() => {
-    loadProducts(currentPage);
+    let isMounted = true;
+    getTopupProducts(currentPage, itemsPerPage)
+      .then((res) => {
+        if (isMounted) {
+          if (res.error) {
+            setError(res.error);
+          } else {
+            setProducts((res.data as TopupProduct[]) || []);
+            setTotalCount(res.totalCount || 0);
+          }
+        }
+      })
+      .catch((err) => {
+        if (isMounted) {
+          setError(err instanceof Error ? err.message : "Gagal mengambil data produk");
+        }
+      })
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
+      });
+    return () => {
+      isMounted = false;
+    };
   }, [currentPage]);
 
   const filteredProducts = products.filter(
