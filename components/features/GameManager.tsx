@@ -1,0 +1,414 @@
+"use client";
+
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import {
+  addGame,
+  updateGame,
+  toggleGameStatus,
+} from "@/actions/settings";
+import type { Database } from "@/types/database.types";
+import {
+  Loader2,
+  Plus,
+  Check,
+  Edit2,
+  Power,
+  Gamepad2,
+  Star,
+  X,
+} from "lucide-react";
+import { DynamicInputBuilder, DynamicField } from "@/components/features/DynamicInputBuilder";
+
+type Game = Database["public"]["Tables"]["games"]["Row"];
+
+function parseFields(instructions: Game["instructions"]): DynamicField[] {
+  if (!instructions) return [];
+  if (Array.isArray(instructions)) return instructions as DynamicField[];
+  if (typeof instructions !== "object") return [];
+  const payload = instructions as Record<string, unknown>;
+
+  if (Array.isArray(payload.fields) && payload.fields.length > 0) {
+    return payload.fields as DynamicField[];
+  }
+
+  if (Array.isArray(payload.input_fields) && payload.input_fields.length > 0) {
+    return (payload.input_fields as Record<string, unknown>[]).map((item, idx) => ({
+      id: (item.name as string) || `field-${idx}`,
+      name: (item.name as string) || `field_${idx}`,
+      label: (item.label as string) || (item.name as string) || `Field ${idx + 1}`,
+      placeholder: (item.placeholder as string) || "",
+      type: (item.type as "text" | "number" | "password") || "text",
+      required: true,
+    }));
+  }
+
+  return [];
+}
+
+export function GameManager({
+  initialGames,
+  errorMsg,
+}: {
+  initialGames: Game[];
+  errorMsg?: string;
+}) {
+  const router = useRouter();
+  const [games, setGames] = useState<Game[]>(initialGames);
+  const [prevGames, setPrevGames] = useState(initialGames);
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  // Form state
+  const [name, setName] = useState("");
+  const [slug, setSlug] = useState("");
+  const [isActive, setIsActive] = useState(true);
+  const [isPopular, setIsPopular] = useState(false);
+  const [fields, setFields] = useState<DynamicField[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
+  // Sync when server props revalidate
+  if (initialGames !== prevGames) {
+    setPrevGames(initialGames);
+    setGames(initialGames);
+  }
+
+  const resetForm = () => {
+    setEditingId(null);
+    setName("");
+    setSlug("");
+    setIsActive(true);
+    setIsPopular(false);
+    setFields([]);
+    setError(null);
+    setSuccess(false);
+  };
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setName(val);
+    if (!editingId) {
+      setSlug(
+        val
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/(^-|-$)/g, ""),
+      );
+    }
+  };
+
+  const handleEditClick = (game: Game) => {
+    setEditingId(game.id);
+    setName(game.name);
+    setSlug(game.slug);
+    setIsActive(game.is_active);
+    setIsPopular(game.is_popular);
+    setFields(parseFields(game.instructions));
+    setError(null);
+    setSuccess(false);
+  };
+
+  const handleToggleStatus = (game: Game) => {
+    const next = !game.is_active;
+    setGames((prev) => prev.map((g) => (g.id === game.id ? { ...g, is_active: next } : g)));
+    startTransition(async () => {
+      const res = await toggleGameStatus(game.id, next);
+      if (!res.success) {
+        setGames(initialGames);
+        alert(`Gagal mengubah status: ${res.error}`);
+      } else {
+        router.refresh();
+      }
+    });
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(false);
+
+    startTransition(async () => {
+      let result: { success: boolean; error?: string; data?: Game | null };
+      if (editingId) {
+        result = await updateGame(editingId, name, slug, undefined, isActive, isPopular, fields);
+        if (result.success) {
+          setGames((prev) =>
+            prev.map((g) =>
+              g.id === editingId
+                ? { ...g, name, slug, is_active: isActive, is_popular: isPopular }
+                : g,
+            ),
+          );
+        }
+      } else {
+        result = await addGame(name, slug, undefined, fields);
+        if (result.success && result.data) {
+          setGames((prev) => [...prev, result.data as Game]);
+        }
+      }
+
+      if (result.success) {
+        setSuccess(true);
+        resetForm();
+        router.refresh();
+      } else {
+        setError(result.error || "Terjadi kesalahan saat menyimpan game.");
+      }
+    });
+  };
+
+  return (
+    <div className="flex flex-col gap-5">
+      {/* Section header */}
+      <div className="flex items-center gap-3">
+        <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-violet-50 text-violet-600">
+          <Gamepad2 className="h-[18px] w-[18px]" strokeWidth={1.5} />
+        </div>
+        <div>
+          <h2 className="text-base font-bold text-slate-900">Master Game</h2>
+          <p className="text-xs text-slate-500">
+            Kelola daftar game dan konfigurasi field input order per game.
+          </p>
+        </div>
+      </div>
+
+      {/* Form — full width */}
+      <div className="overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm">
+        <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-5 py-3.5">
+          <h3 className="text-sm font-semibold text-slate-800">
+            {editingId ? "Edit Game" : "Tambah Game"}
+          </h3>
+          {editingId && (
+            <button
+              type="button"
+              onClick={resetForm}
+              className="rounded-[10px] p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+              title="Batal edit"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+        <div className="p-5">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            {error && (
+              <div className="rounded-[10px] bg-rose-50 p-3 text-sm text-rose-600 ring-1 ring-rose-200">
+                {error}
+              </div>
+            )}
+            {success && (
+              <div className="flex items-center gap-2 rounded-[10px] bg-emerald-50 p-3 text-sm text-emerald-700 ring-1 ring-emerald-200">
+                <Check className="h-4 w-4" /> Game berhasil disimpan!
+              </div>
+            )}
+
+            {/* Basic fields row */}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="space-y-1.5">
+                <label
+                  className="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                  htmlFor="game-name"
+                >
+                  Nama Game
+                </label>
+                <input
+                  id="game-name"
+                  type="text"
+                  required
+                  value={name}
+                  onChange={handleNameChange}
+                  placeholder="e.g. Mobile Legends"
+                  className="w-full rounded-[10px] border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label
+                  className="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                  htmlFor="game-slug"
+                >
+                  Slug
+                </label>
+                <input
+                  id="game-slug"
+                  type="text"
+                  required
+                  value={slug}
+                  onChange={(e) => setSlug(e.target.value)}
+                  placeholder="mobile-legends"
+                  className="w-full rounded-[10px] border border-slate-200 bg-white px-3.5 py-2.5 font-mono text-sm text-slate-700 placeholder:font-sans placeholder:text-slate-400 transition-colors focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-none"
+                />
+              </div>
+
+              {editingId && (
+                <div className="flex flex-col gap-2.5 justify-end">
+                  <label className="flex cursor-pointer items-center gap-2.5">
+                    <div className="relative inline-flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={isActive}
+                        onChange={(e) => setIsActive(e.target.checked)}
+                        className="peer sr-only"
+                      />
+                      <div className="peer h-5 w-9 rounded-full bg-slate-200 transition-colors peer-checked:bg-emerald-500 after:absolute after:top-[2px] after:left-[2px] after:h-4 after:w-4 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white" />
+                    </div>
+                    <span className="text-sm font-medium text-slate-700">
+                      {isActive ? "Aktif" : "Nonaktif"}
+                    </span>
+                  </label>
+                  <label className="flex cursor-pointer items-center gap-2.5">
+                    <div className="relative inline-flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={isPopular}
+                        onChange={(e) => setIsPopular(e.target.checked)}
+                        className="peer sr-only"
+                      />
+                      <div className="peer h-5 w-9 rounded-full bg-slate-200 transition-colors peer-checked:bg-amber-400 after:absolute after:top-[2px] after:left-[2px] after:h-4 after:w-4 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white" />
+                    </div>
+                    <span className="text-sm font-medium text-slate-700">
+                      {isPopular ? "Populer" : "Tidak Populer"}
+                    </span>
+                  </label>
+                </div>
+              )}
+
+              <div className="flex items-end">
+                <div className="flex w-full gap-2">
+                  <button
+                    type="submit"
+                    disabled={isPending || !name || !slug}
+                    className="inline-flex flex-1 items-center justify-center gap-2 rounded-[10px] bg-violet-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-violet-700 focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-70"
+                  >
+                    {isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : editingId ? (
+                      <Check className="h-4 w-4" strokeWidth={2.5} />
+                    ) : (
+                      <Plus className="h-4 w-4" strokeWidth={2.5} />
+                    )}
+                    <span>{isPending ? "Menyimpan..." : editingId ? "Simpan" : "Tambah"}</span>
+                  </button>
+                  {editingId && (
+                    <button
+                      type="button"
+                      onClick={resetForm}
+                      disabled={isPending}
+                      className="inline-flex items-center justify-center rounded-[10px] bg-slate-100 px-3 py-2.5 text-sm font-medium text-slate-700 transition-all hover:bg-slate-200"
+                    >
+                      Batal
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Dynamic field builder — full width, only shown when form is active */}
+            <DynamicInputBuilder fields={fields} onChange={setFields} />
+          </form>
+        </div>
+      </div>
+
+      {/* List — full width below */}
+      <div className="overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm">
+        <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50/50 px-5 py-3.5">
+          <Gamepad2 className="h-4 w-4 text-slate-400" strokeWidth={1.5} />
+          <h3 className="text-sm font-semibold text-slate-800">Daftar Game</h3>
+          <span className="ml-auto inline-flex items-center rounded-[10px] bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600">
+            {games.length} Total
+          </span>
+        </div>
+
+        <div className="overflow-x-auto">
+          {errorMsg ? (
+            <div className="bg-rose-50/50 p-6 text-sm text-rose-600">{errorMsg}</div>
+          ) : games.length > 0 ? (
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-slate-100 bg-slate-50/70 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                <tr>
+                  <th scope="col" className="px-5 py-3.5">Nama Game</th>
+                  <th scope="col" className="px-5 py-3.5">Slug</th>
+                  <th scope="col" className="px-5 py-3.5 text-center">Field Input</th>
+                  <th scope="col" className="px-5 py-3.5 text-center">Status</th>
+                  <th scope="col" className="px-5 py-3.5 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 text-slate-600">
+                {games.map((game) => {
+                  const fieldCount = parseFields(game.instructions).length;
+                  return (
+                    <tr
+                      key={game.id}
+                      className={`transition-colors hover:bg-slate-50/50 ${!game.is_active ? "opacity-60" : ""}`}
+                    >
+                      <td className="px-5 py-3.5">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-slate-900">{game.name}</span>
+                          {game.is_popular && (
+                            <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" strokeWidth={1} />
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <span className="font-mono text-xs text-slate-500">{game.slug}</span>
+                      </td>
+                      <td className="px-5 py-3.5 text-center">
+                        {fieldCount > 0 ? (
+                          <span className="inline-flex items-center rounded-[10px] border border-violet-200 bg-violet-50 px-2.5 py-1 text-xs font-semibold text-violet-700">
+                            {fieldCount} field
+                          </span>
+                        ) : (
+                          <span className="text-xs text-slate-400">—</span>
+                        )}
+                      </td>
+                      <td className="px-5 py-3.5 text-center">
+                        <button
+                          onClick={() => handleToggleStatus(game)}
+                          disabled={isPending}
+                          title={game.is_active ? "Klik untuk menonaktifkan" : "Klik untuk mengaktifkan"}
+                          className="inline-flex items-center gap-1 focus:outline-none"
+                        >
+                          {game.is_active ? (
+                            <span className="inline-flex items-center gap-1 rounded-[10px] border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-100">
+                              <Power className="h-3 w-3 text-emerald-600" /> Aktif
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 rounded-[10px] border border-slate-200 bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-500 transition-colors hover:bg-slate-200">
+                              <Power className="h-3 w-3 text-slate-400" /> Nonaktif
+                            </span>
+                          )}
+                        </button>
+                      </td>
+                      <td className="px-5 py-3.5 text-center">
+                        <button
+                          onClick={() => handleEditClick(game)}
+                          className="rounded-[10px] p-1.5 text-violet-500 transition-colors hover:bg-violet-50 hover:text-violet-700"
+                          title="Edit"
+                        >
+                          <Edit2 className="h-3.5 w-3.5" />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          ) : (
+            <div className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-400">
+                <Gamepad2 className="h-6 w-6" strokeWidth={1.5} />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-700">Belum ada game</p>
+                <p className="mt-0.5 text-xs text-slate-400">
+                  Tambahkan game pertama menggunakan form di atas.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -203,9 +203,20 @@ export async function addGame(
 
   if (!name || !slug) return { success: false, error: "Nama dan slug wajib diisi." };
 
-  const finalInstructions = instructions && instructions.length > 0
-    ? { fields: instructions }
-    : { fields: [] };
+  const mappedInputFields = instructions && Array.isArray(instructions)
+    ? (instructions as Record<string, unknown>[]).map((f) => ({
+        name: (f.name as string) || (f.id as string) || "field",
+        type: (f.type as string) || "text",
+        label: (f.label as string) || (f.name as string) || "Field",
+        placeholder: (f.placeholder as string) || "",
+      }))
+    : [];
+
+  const finalInstructions = {
+    fields: instructions || [],
+    input_fields: mappedInputFields,
+    required_inputs: mappedInputFields.map((i) => i.name),
+  };
 
   const { data, error } = await supabase
     .from("games")
@@ -239,10 +250,6 @@ export async function updateGame(
 
   if (!id || !name || !slug) return { success: false, error: "ID, nama, dan slug wajib diisi." };
 
-  const finalInstructions = instructions !== undefined
-    ? { fields: instructions }
-    : undefined;
-
   const updatePayload: Database["public"]["Tables"]["games"]["Update"] = {
     name,
     slug,
@@ -251,8 +258,34 @@ export async function updateGame(
     is_popular: is_popular ?? false,
     updated_at: new Date().toISOString(),
   };
-  if (finalInstructions !== undefined) {
-    updatePayload.instructions = finalInstructions as Json;
+
+  if (instructions !== undefined) {
+    const { data: currentGame } = await supabase
+      .from("games")
+      .select("instructions")
+      .eq("id", id)
+      .maybeSingle();
+
+    const existingObj =
+      currentGame?.instructions && typeof currentGame.instructions === "object"
+        ? (currentGame.instructions as Record<string, unknown>)
+        : {};
+
+    const mappedInputFields = Array.isArray(instructions)
+      ? (instructions as Record<string, unknown>[]).map((f) => ({
+          name: (f.name as string) || (f.id as string) || "field",
+          type: (f.type as string) || "text",
+          label: (f.label as string) || (f.name as string) || "Field",
+          placeholder: (f.placeholder as string) || "",
+        }))
+      : [];
+
+    updatePayload.instructions = {
+      ...existingObj,
+      fields: instructions,
+      input_fields: mappedInputFields,
+      required_inputs: mappedInputFields.map((i) => i.name),
+    } as Json;
   }
 
   const { error } = await supabase.from("games").update(updatePayload).eq("id", id);
