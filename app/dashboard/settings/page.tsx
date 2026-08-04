@@ -1,11 +1,12 @@
 import React from "react";
 import { Users, FolderTree, Shield } from "lucide-react";
-import { getCategories } from "@/actions/settings";
+import { getCategories, getUsersList } from "@/actions/settings";
 import { GameCategoryManager } from "@/components/features/GameCategoryManager";
 import type { Database } from "@/types/database.types";
 
 export default async function SettingsPage() {
   const { data: categories, error: categoriesError } = await getCategories();
+  const { data: usersList, error: usersError } = await getUsersList();
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 pb-8">
@@ -60,82 +61,45 @@ export default async function SettingsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
-                  <tr className="hover:bg-slate-50/50">
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col">
-                        <span className="text-sm font-semibold text-slate-900">Farhan Maulana</span>
-                        <span className="text-xs text-slate-500">farhan@feryshop.com</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm font-medium text-slate-700">Owner</td>
-                    <td className="px-6 py-4 text-center">
-                      <span className="inline-flex rounded-full border border-emerald-100 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-600">
-                        Aktif
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-center text-sm">
-                      <button className="text-xs font-semibold text-blue-600 hover:text-blue-800">
-                        Edit
-                      </button>
-                    </td>
-                  </tr>
-                  <tr className="hover:bg-slate-50/50">
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col">
-                        <span className="text-sm font-semibold text-slate-900">Budi Santoso</span>
-                        <span className="text-xs text-slate-500">budi@feryshop.com</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm font-medium text-slate-700">Admin CS</td>
-                    <td className="px-6 py-4 text-center">
-                      <span className="inline-flex rounded-full border border-emerald-100 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-600">
-                        Aktif
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-center text-sm">
-                      <button className="text-xs font-semibold text-blue-600 hover:text-blue-800">
-                        Edit
-                      </button>
-                    </td>
-                  </tr>
-                  <tr className="hover:bg-slate-50/50">
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col">
-                        <span className="text-sm font-semibold text-slate-900">Siti Rahma</span>
-                        <span className="text-xs text-slate-500">siti@feryshop.com</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm font-medium text-slate-700">Admin Keuangan</td>
-                    <td className="px-6 py-4 text-center">
-                      <span className="inline-flex rounded-full border border-emerald-100 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-600">
-                        Aktif
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-center text-sm">
-                      <button className="text-xs font-semibold text-blue-600 hover:text-blue-800">
-                        Edit
-                      </button>
-                    </td>
-                  </tr>
-                  <tr className="hover:bg-slate-50/50">
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col">
-                        <span className="text-sm font-semibold text-slate-900">Deni Setiawan</span>
-                        <span className="text-xs text-slate-500">deni@feryshop.com</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm font-medium text-slate-700">Admin Stok</td>
-                    <td className="px-6 py-4 text-center">
-                      <span className="inline-flex rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600">
-                        Nonaktif
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-center text-sm">
-                      <button className="text-xs font-semibold text-blue-600 hover:text-blue-800">
-                        Edit
-                      </button>
-                    </td>
-                  </tr>
+                  {usersList && usersList.length > 0 ? (
+                    usersList.map((userRecord: any) => (
+                      <tr key={userRecord.id} className="hover:bg-slate-50/50">
+                        <td className="px-6 py-4">
+                          <div className="flex flex-col">
+                            <span className="text-sm font-semibold text-slate-900">
+                              {userRecord.full_name || "Admin"}
+                            </span>
+                            <span className="text-xs text-slate-500">{userRecord.email}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-sm font-medium text-slate-700">
+                          {userRecord.roles?.name || "Admin"}
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <span
+                            className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-bold ${
+                              userRecord.status === "Aktif"
+                                ? "border-emerald-100 bg-emerald-50 text-emerald-600"
+                                : "border-slate-200 bg-slate-100 text-slate-600"
+                            }`}
+                          >
+                            {userRecord.status || "Aktif"}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-center text-sm">
+                          <button className="text-xs font-semibold text-blue-600 hover:text-blue-800">
+                            Edit
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={4} className="px-6 py-8 text-center text-sm text-slate-500">
+                        {usersError ? `Gagal memuat pengguna: ${usersError}` : "Belum ada data pengguna terdaftar."}
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
