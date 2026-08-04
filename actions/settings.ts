@@ -183,41 +183,6 @@ export async function getRolesList() {
   return { data, error: null };
 }
 
-export async function createAdminUser(formData: FormData) {
-  const supabase = await createClient();
-
-  const {
-    data: { user: currentUser },
-  } = await supabase.auth.getUser();
-  if (!currentUser) {
-    return { success: false, error: "Unauthorized" };
-  }
-
-  const id = formData.get("id") as string;
-  const full_name = formData.get("full_name") as string;
-  const role_id = formData.get("role_id") as string;
-
-  if (!id || !full_name) {
-    return { success: false, error: "ID (User ID/Email) dan Nama Lengkap wajib diisi." };
-  }
-
-  const { error } = await supabase.from("users").insert({
-    id,
-    full_name,
-    email: id.includes("@") ? id : `${id}@feryshop.com`,
-    role_id: role_id || null,
-    status: "Aktif",
-  });
-
-  if (error) {
-    console.error("Database Error creating user:", error);
-    return { success: false, error: error.message || "Gagal membuat pengguna." };
-  }
-
-  revalidatePath("/dashboard/settings");
-  return { success: true };
-}
-
 export async function updateUserRole(userId: string, roleId: string) {
   const supabase = await createClient();
 

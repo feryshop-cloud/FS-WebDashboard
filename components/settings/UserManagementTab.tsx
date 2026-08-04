@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Users, Plus, Search, Loader2, X, Shield, CheckCircle2, XCircle } from "lucide-react";
-import { createAdminUser, updateUserRole, toggleUserStatus } from "@/actions/settings";
+import { Search, Shield, CheckCircle2, XCircle } from "lucide-react";
+import { updateUserRole, toggleUserStatus } from "@/actions/settings";
 
 type Role = {
   id: string;
@@ -33,9 +33,6 @@ export function UserManagementTab({
   onRefresh,
 }: UserManagementTabProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [modalError, setModalError] = useState("");
   const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
 
   const filteredUsers = users.filter(
@@ -44,27 +41,6 @@ export function UserManagementTab({
       u.id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       u.roles?.name?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
-
-  const handleAddUser = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    try {
-      setIsSubmitting(true);
-      setModalError("");
-      const formData = new FormData(e.currentTarget);
-      const res = await createAdminUser(formData);
-
-      if (res.success) {
-        setIsAddModalOpen(false);
-        onRefresh();
-      } else {
-        setModalError(res.error || "Gagal menambahkan user.");
-      }
-    } catch (err) {
-      setModalError(err instanceof Error ? err.message : "Terjadi kesalahan.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   const handleRoleChange = async (userId: string, newRoleId: string) => {
     try {
@@ -104,13 +80,10 @@ export function UserManagementTab({
             className="w-full rounded-lg border border-slate-200 bg-white py-2 pr-4 pl-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
           />
         </div>
-        <button
-          onClick={() => setIsAddModalOpen(true)}
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700"
-        >
-          <Plus className="h-4 w-4" />
-          Tambah Admin Baru
-        </button>
+        <div className="rounded-lg border border-blue-100 bg-blue-50 px-3 py-2 text-xs leading-relaxed text-blue-700">
+          Pengguna baru dibuat otomatis saat pengguna pertama kali login/signup ke sistem.
+          Gunakan tabel ini untuk mengubah role atau status pengguna yang sudah ada.
+        </div>
       </div>
 
       {/* Users Table */}
@@ -198,86 +171,6 @@ export function UserManagementTab({
           </table>
         </div>
       </div>
-
-      {/* Add User Modal */}
-      {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-xl border border-slate-200 bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-6 py-4">
-              <h3 className="text-base font-bold text-slate-900">Tambah Admin / Pengguna Baru</h3>
-              <button
-                onClick={() => setIsAddModalOpen(false)}
-                className="rounded-full bg-white p-1 text-slate-400 hover:text-slate-600"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleAddUser} className="space-y-4 p-6 text-sm">
-              {modalError && (
-                <div className="rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs text-rose-600">
-                  {modalError}
-                </div>
-              )}
-
-              <div>
-                <label className="mb-1 block font-medium text-slate-700">User ID / Email</label>
-                <input
-                  name="id"
-                  type="text"
-                  required
-                  placeholder="e.g. admin@feryshop.com or UUID"
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="mb-1 block font-medium text-slate-700">Nama Lengkap</label>
-                <input
-                  name="full_name"
-                  type="text"
-                  required
-                  placeholder="e.g. John Doe"
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="mb-1 block font-medium text-slate-700">Role Sistem</label>
-                <select
-                  name="role_id"
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
-                >
-                  <option value="">-- Tanpa Role Spesifik --</option>
-                  {roles.map((r) => (
-                    <option key={r.id} value={r.id}>
-                      {r.name} ({r.description || "No desc"})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setIsAddModalOpen(false)}
-                  className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
-                >
-                  {isSubmitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                  Simpan Pengguna
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
