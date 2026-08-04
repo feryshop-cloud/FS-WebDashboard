@@ -4,6 +4,9 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { logger } from "@/lib/logger";
 import { runAction } from "@/lib/logging/server-action";
+import type { Database } from "@/types/database.types";
+
+type DealUpdate = Database["public"]["Tables"]["deals"]["Update"];
 
 export async function getDeals() {
   return runAction("getDeals", async () => {
@@ -151,3 +154,28 @@ export async function deleteDeal(id: string) {
     revalidatePath("/dashboard/ledger");
   });
 }
+
+export async function updateDeal(id: string, data: DealUpdate) {
+  return runAction("updateDeal", async () => {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      throw new Error("Sesi tidak valid. Silakan login kembali.");
+    }
+
+    const { error } = await supabase.from("deals").update(data).eq("id", id);
+
+    if (error) {
+      logger.error("Error updating deal", { error });
+      throw new Error("Gagal mengolah/mengubah data deal.");
+    }
+
+    revalidatePath("/dashboard/deals");
+    revalidatePath("/dashboard/inventory");
+    revalidatePath("/dashboard/accounts");
+    revalidatePath("/dashboard/ledger");
+  });
+}
+

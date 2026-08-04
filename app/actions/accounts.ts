@@ -92,3 +92,36 @@ export async function transferBalance(formData: FormData) {
     revalidatePath("/dashboard/accounts");
   });
 }
+
+export async function updateAccount(id: string, formData: FormData) {
+  return runAction("updateAccount", async () => {
+    const name = formData.get("name") as string;
+    const type = formData.get("type") as string;
+    const account_number = formData.get("account_number") as string;
+    const is_active = formData.get("is_active") === "true";
+
+    if (!id || !name || !type) {
+      throw new Error("ID, nama, dan tipe rekening wajib diisi.");
+    }
+
+    const supabase = await createClient();
+
+    const { error } = await supabase
+      .from("accounts")
+      .update({
+        name,
+        type,
+        account_number,
+        is_active,
+      })
+      .eq("id", id);
+
+    if (error) {
+      logger.error("Error updating account", { error });
+      throw new Error("Gagal mengolah/mengubah data rekening.");
+    }
+
+    revalidatePath("/dashboard/accounts");
+  });
+}
+

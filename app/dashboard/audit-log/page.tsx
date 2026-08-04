@@ -6,7 +6,8 @@ import { formatDate } from "@/lib/utils";
 import { getAuditLogs } from "@/app/actions/audit-log";
 import { AuditLog } from "@/types/database";
 
-type AuditLogWithUser = AuditLog & { users?: { full_name?: string | null } | null };
+type AuditLogWithUser = AuditLog & { public_users?: { full_name?: string | null } | null };
+
 
 export default function AuditLogPage() {
   const [logs, setLogs] = useState<AuditLogWithUser[]>([]);
@@ -141,7 +142,8 @@ export default function AuditLogPage() {
                         {formatDate(log.created_at)}
                       </td>
                       <td className="px-6 py-2.5 text-xs font-semibold whitespace-nowrap text-slate-800">
-                        {log.users?.full_name || "System / Deleted User"}
+                        {log.public_users?.full_name || "System / Deleted User"}
+
                       </td>
                       <td className="px-6 py-2.5 text-xs font-medium whitespace-nowrap text-slate-600">
                         {log.module}

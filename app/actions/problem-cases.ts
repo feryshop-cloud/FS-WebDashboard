@@ -131,3 +131,30 @@ export async function deleteProblemCase(id: string) {
     revalidatePath("/dashboard/problem-cases");
   });
 }
+
+export async function updateProblemCase(id: string, data: { status?: string; chronology?: string; issue_type?: string }) {
+  return runAction("updateProblemCase", async () => {
+    const supabase = await createClient();
+
+    const { error } = await supabase.from("problem_cases").update(data).eq("id", id);
+    if (error) {
+      logger.error("Error updating problem case", { error });
+      throw new Error("Gagal mengolah/mengubah problem case: " + error.message);
+    }
+
+    const { data: userData } = await supabase.auth.getUser();
+    if (userData.user) {
+      await supabase.from("audit_logs").insert([
+        {
+          user_id: userData.user.id,
+          module: "Akun Bermasalah",
+          action: "UPDATE",
+          description: `Mengubah tiket problem case ID: ${id}`,
+        },
+      ]);
+    }
+
+    revalidatePath("/dashboard/problem-cases");
+  });
+}
+

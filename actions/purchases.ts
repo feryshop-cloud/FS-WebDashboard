@@ -129,3 +129,38 @@ export async function deletePurchase(id: string): Promise<{ success: boolean; er
     return { success: false, error: getErrorMessage(error) };
   }
 }
+
+export async function updatePurchase(
+  id: string,
+  data: {
+    name?: string;
+    capital_price?: number;
+    post_price?: number;
+    seller_info?: string;
+    internal_notes?: string;
+  },
+): Promise<{ success: boolean; error: string | null }> {
+  try {
+    const supabase = await createClient();
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session?.user?.id) {
+      return { success: false, error: "Sesi admin tidak ditemukan. Silakan login kembali." };
+    }
+
+    const { error } = await supabase.from("stocks").update(data).eq("id", id);
+
+    if (error) throw error;
+
+    revalidatePath("/dashboard/purchases");
+    revalidatePath("/dashboard/inventory");
+
+    return { success: true, error: null };
+  } catch (error: unknown) {
+    logger.error("Error updating purchase stock", { error });
+    return { success: false, error: getErrorMessage(error) };
+  }
+}
+
