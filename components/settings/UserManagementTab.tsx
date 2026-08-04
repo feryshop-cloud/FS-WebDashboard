@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { Search, Shield, CheckCircle2, XCircle, Plus, X } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
+import { Search, Shield, CheckCircle2, XCircle, Plus, X, SearchX, Command } from "lucide-react";
 import { updateUserRole, toggleUserStatus, createAdminUser } from "@/actions/settings";
 
 type Role = {
@@ -13,6 +13,7 @@ type Role = {
 type UserRecord = {
   id: string;
   full_name: string;
+  email?: string | null;
   status: string | null;
   role_id: string | null;
   created_at: string;
@@ -33,6 +34,8 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
   const [isCreating, setIsCreating] = useState(false);
   const [formError, setFormError] = useState("");
   const [actionError, setActionError] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -40,12 +43,34 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
     role_id: "",
   });
 
-  const filteredUsers = users.filter(
-    (u) =>
-      u.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      u.id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      u.roles?.name?.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  // Global Keyboard Shortcut: '/' or 'Ctrl+K' to focus search input
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.key === "/" || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k")) && document.activeElement !== searchInputRef.current) {
+        // Prevent typing '/' into input when focusing
+        const isInputOrTextarea = ["INPUT", "TEXTAREA"].includes((document.activeElement?.tagName || "").toUpperCase());
+        if (!isInputOrTextarea) {
+          e.preventDefault();
+          searchInputRef.current?.focus();
+        }
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  const queryLower = searchQuery.trim().toLowerCase();
+
+  const filteredUsers = users.filter((u) => {
+    if (!queryLower) return true;
+    return (
+      u.full_name?.toLowerCase().includes(queryLower) ||
+      u.email?.toLowerCase().includes(queryLower) ||
+      u.id?.toLowerCase().includes(queryLower) ||
+      u.roles?.name?.toLowerCase().includes(queryLower) ||
+      u.status?.toLowerCase().includes(queryLower)
+    );
+  });
 
   const handleRoleChange = async (userId: string, newRoleId: string) => {
     setActionError("");
@@ -90,8 +115,8 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
       setFormError("Email, password, dan nama lengkap wajib diisi.");
       return;
     }
-    setIsCreating(true);
     try {
+      setIsCreating(true);
       const res = await createAdminUser(
         form.email,
         form.password,
@@ -118,41 +143,84 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
       {/* Header Controls */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative max-w-md flex-1">
-          <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Cari nama, user ID, atau role..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-lg border border-slate-200 bg-white py-2 pr-4 pl-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
-          />
+          <div className="group relative">
+            <Search className={`absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 transition-colors ${searchQuery ? "text-blue-600" : "text-slate-400 group-focus-within:text-blue-600"}`} />
+            <input
+              ref={searchInputRef}
+              type="text"
+              placeholder="Cari nama, email, user ID, atau role..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") {
+                  setSearchQuery("");
+                  searchInputRef.current?.blur();
+                }
+              }}
+              className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pr-24 pl-10 text-sm shadow-sm transition-all placeholder:text-slate-400 hover:border-slate-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 focus:outline-none"
+            />
+            <div className="absolute top-1/2 right-3 flex -translate-y-1/2 items-center gap-1">
+              {searchQuery ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery("");
+                    searchInputRef.current?.focus();
+                  }}
+                  title="Hapus kata kunci (Esc)"
+                  className="rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              ) : (
+                <kbd className="hidden items-center gap-0.5 rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-medium text-slate-400 sm:inline-flex">
+                  <Command className="h-2.5 w-2.5" />K
+                </kbd>
+              )}
+            </div>
+          </div>
         </div>
+
         <div className="flex flex-col gap-2 sm:items-end">
           <button
             onClick={() => setIsModalOpen(true)}
-            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+            className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow"
           >
             <Plus className="h-4 w-4" />
             Tambah Pengguna Baru
           </button>
-          <div className="rounded-lg border border-blue-100 bg-blue-50 px-3 py-2 text-xs leading-relaxed text-blue-700">
-            Buat akun admin/staff baru langsung dari sini (terpisah dari proses web storefront).
+          <div className="rounded-lg border border-blue-100 bg-blue-50 px-3 py-1.5 text-xs leading-relaxed text-blue-700">
             Pengguna non-admin tetap dibuat otomatis saat login/signup pertama.
           </div>
         </div>
       </div>
 
-      {/* Users Table */}
-      <div className="overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm">
+      {/* Users Table Container */}
+      <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
         {(errorMsg || actionError) && (
           <div className="border-b border-rose-100 bg-rose-50 p-4 text-sm font-medium text-rose-700">
             {errorMsg || actionError}
           </div>
         )}
 
+        {/* Filter Result Summary */}
+        {searchQuery.trim() !== "" && (
+          <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-2.5 text-xs text-slate-500">
+            <span>
+              Menampilkan <strong className="font-semibold text-slate-900">{filteredUsers.length}</strong> dari <strong className="font-semibold text-slate-900">{users.length}</strong> pengguna
+            </span>
+            <button
+              onClick={() => setSearchQuery("")}
+              className="font-medium text-blue-600 hover:underline"
+            >
+              Bersihkan filter
+            </button>
+          </div>
+        )}
+
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm text-slate-600">
-            <thead className="border-b border-slate-100 bg-slate-50 text-xs font-semibold tracking-wider text-slate-500 uppercase">
+            <thead className="border-b border-slate-100 bg-slate-50/70 text-xs font-semibold tracking-wider text-slate-500 uppercase">
               <tr>
                 <th className="px-6 py-3.5">Pengguna / ID</th>
                 <th className="px-6 py-3.5">Role</th>
@@ -163,8 +231,23 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
             <tbody className="divide-y divide-slate-100">
               {filteredUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-12 text-center text-sm text-slate-400">
-                    Tidak ada pengguna ditemukan.
+                  <td colSpan={4} className="px-6 py-16 text-center">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <div className="rounded-full bg-slate-100 p-3 text-slate-400">
+                        <SearchX className="h-6 w-6" />
+                      </div>
+                      <p className="text-sm font-semibold text-slate-900">
+                        {searchQuery ? `Tidak ada pengguna yang cocok dengan "${searchQuery}"` : "Belum ada pengguna ditemukan"}
+                      </p>
+                      {searchQuery && (
+                        <button
+                          onClick={() => setSearchQuery("")}
+                          className="mt-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+                        >
+                          Reset Pencarian
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ) : (
