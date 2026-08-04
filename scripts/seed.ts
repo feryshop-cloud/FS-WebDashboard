@@ -273,18 +273,28 @@ async function main() {
         stock_id: mlbbStock.id,
         customer_name: "Budi Santoso",
         customer_contact: "081234567890",
-        deal_price: 1400000,
-        remaining_balance: 1400000,
-        status: "DRAFT",
+        deal_type: "Penjualan",
+        deal_price: 1500000,
+        total_deal_price: 1500000,
+        remaining_balance: 0,
+        status: "COMPLETED",
       })
       .select()
       .single();
     if (deal1Err || !deal1) throw new Error(`Deal 1 insert failed: ${deal1Err?.message}`);
 
+    await insertRows("deal_items", [
+      {
+        deal_id: deal1.id,
+        stock_id: mlbbStock.id,
+        price: 1500000,
+      },
+    ]);
+
     const { error: payment1Err } = await supabase.rpc("process_payment", {
       p_deal_id: deal1.id,
       p_account_id: qrisAccount.id,
-      p_amount: 1400000,
+      p_amount: 1500000,
       p_notes: "Lunas via QRIS",
       p_admin_id: null,
     });
@@ -298,13 +308,23 @@ async function main() {
         stock_id: valoStock.id,
         customer_name: "Jessica Wong",
         customer_contact: "089876543210",
+        deal_type: "Penjualan",
         deal_price: 2000000,
-        remaining_balance: 2000000,
-        status: "DRAFT",
+        total_deal_price: 2000000,
+        remaining_balance: 0,
+        status: "PAID",
       })
       .select()
       .single();
     if (deal2Err || !deal2) throw new Error(`Deal 2 insert failed: ${deal2Err?.message}`);
+
+    await insertRows("deal_items", [
+      {
+        deal_id: deal2.id,
+        stock_id: valoStock.id,
+        price: 2000000,
+      },
+    ]);
 
     const { error: payment2Err } = await supabase.rpc("process_payment", {
       p_deal_id: deal2.id,
@@ -315,7 +335,7 @@ async function main() {
     });
     if (payment2Err) throw new Error(`Payment 2 failed: ${payment2Err.message}`);
 
-    // Deal 3: Booking/DP (Genshin)
+    // Deal 3: Tukar Tambah (Genshin Impact)
     const { data: deal3, error: deal3Err } = await supabase
       .from("deals")
       .insert({
@@ -323,22 +343,55 @@ async function main() {
         stock_id: genshinStock.id,
         customer_name: "Anton Wijaya",
         customer_contact: "anton@email.com",
-        deal_price: 3800000,
-        remaining_balance: 3800000,
-        status: "DRAFT",
+        deal_type: "Tukar Tambah",
+        deal_price: 4000000,
+        total_deal_price: 4000000,
+        remaining_balance: 0,
+        status: "COMPLETED",
       })
       .select()
       .single();
     if (deal3Err || !deal3) throw new Error(`Deal 3 insert failed: ${deal3Err?.message}`);
 
+    await insertRows("deal_items", [
+      {
+        deal_id: deal3.id,
+        stock_id: genshinStock.id,
+        price: 4000000,
+      },
+    ]);
+
     const { error: payment3Err } = await supabase.rpc("process_payment", {
       p_deal_id: deal3.id,
       p_account_id: qrisAccount.id,
-      p_amount: 1000000,
-      p_notes: "DP 1 Juta",
+      p_amount: 4000000,
+      p_notes: "Lunas via QRIS",
       p_admin_id: null,
     });
     if (payment3Err) throw new Error(`Payment 3 failed: ${payment3Err.message}`);
+
+    // Operational Expenses in Ledger
+    console.log("Seeding Ledger Expenses...");
+    await insertRows("finance_ledger", [
+      {
+        account_id: seabankAccount.id,
+        transaction_type: "PAYMENT_OUT",
+        amount: -150000,
+        notes: "Biaya Iklan Meta Ads & FB Marketing",
+      },
+      {
+        account_id: seabankAccount.id,
+        transaction_type: "PAYMENT_OUT",
+        amount: -350000,
+        notes: "Sewa Hosting Server & Domain Railway",
+      },
+      {
+        account_id: qrisAccount.id,
+        transaction_type: "REFUND",
+        amount: -200000,
+        notes: "Kompensasi Garansi Pelanggan MLBB",
+      },
+    ]);
 
     // 7. SEED PROBLEM CASES
     console.log("Seeding Problem Cases...");
