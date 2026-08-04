@@ -194,7 +194,7 @@ export async function getUsersList() {
 
   const { data, error } = await supabase
     .from("users")
-    .select("id, full_name, is_active, role_id, created_at, roles(id, name, description)")
+    .select("id, full_name, status, role_id, created_at, roles(id, name, description)")
     .order("created_at", { ascending: false });
 
   if (error) {
