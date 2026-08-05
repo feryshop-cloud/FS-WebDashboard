@@ -15,23 +15,60 @@ export type TopupProductInput = {
   is_gangguan?: boolean;
 };
 
-export async function getTopupProducts(page?: number, limit?: number) {
+export type TopupProductsFilters = {
+  search?: string;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+  isActive?: string;
+  isGangguan?: string;
+  page?: number;
+  limit?: number;
+};
+
+export async function getTopupProducts(filters: TopupProductsFilters = {}) {
   return runAction("getTopupProducts", async () => {
+    const {
+      search = "",
+      sortBy = "game_slug",
+      sortOrder = "asc",
+      isActive = "",
+      isGangguan = "",
+      page = 1,
+      limit = 10,
+    } = filters;
+
     const supabase = await createClient();
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let query = (supabase as any)
       .from("products")
-      .select("*", { count: "exact" })
-      .order("game_slug", { ascending: true });
+      .select("*", { count: "exact" });
 
-    if (page && limit) {
-      const from = (page - 1) * limit;
-      const to = from + limit - 1;
-      query = query.range(from, to);
+    if (search.trim()) {
+      const term = `%${search.trim()}%`;
+      query = query.or(
+        `title.ilike.${term},game_slug.ilike.${term},sku.ilike.${term}`,
+      );
     }
 
-    const { data, count, error } = await query;
+    if (isActive === "true") {
+      query = query.eq("is_active", true);
+    } else if (isActive === "false") {
+      query = query.eq("is_active", false);
+    }
+
+    if (isGangguan === "true") {
+      query = query.eq("is_gangguan", true);
+    } else if (isGangguan === "false") {
+      query = query.eq("is_gangguan", false);
+    }
+
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
+    const { data, count, error } = await query
+      .order(sortBy, { ascending: sortOrder === "asc" })
+      .range(from, to);
 
     if (error) {
       logger.error("Error fetching topup products", { error });

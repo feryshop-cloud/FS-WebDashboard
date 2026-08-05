@@ -509,6 +509,16 @@ export async function updateRolePermissions(roleId: string, permissions: Record<
     return { success: false, error: "Unauthorized" };
   }
 
+  const { data: targetRole } = await supabase
+    .from("roles")
+    .select("name")
+    .eq("id", roleId)
+    .single();
+
+  if (targetRole && ["OWNER", "MEMBER"].includes(targetRole.name.toUpperCase())) {
+    return { success: false, error: `Hak akses untuk role sistem (${targetRole.name}) telah dikunci dan tidak dapat diubah.` };
+  }
+
   const { error } = await supabase
     .from("roles")
     .update({
@@ -586,6 +596,59 @@ export async function deleteRole(roleId: string) {
   if (error) {
     logger.error("Error deleting role", { error });
     return { success: false, error: error.message || "Gagal menghapus role." };
+  }
+
+  revalidatePath("/dashboard/settings");
+  return { success: true };
+}
+
+// ─── Site Settings ───────────────────────────────────────────────────────────
+
+export async function getSiteSettings() {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("settings")
+    .select("key, value, description, updated_at")
+    .order("key");
+
+  if (error) {
+    logger.error("Error fetching site settings", { error });
+    return { data: null, error: error.message };
+  }
+
+  return { data, error: null };
+}
+
+export async function updateSiteSetting(
+  key: string,
+  value: Json,
+  description?: string,
+) {
+  const supabase = await createClient();
+
+  const {
+    data: { user: currentUser },
+  } = await supabase.auth.getUser();
+  if (!currentUser) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const { error } = await supabase
+    .from("settings")
+    .upsert(
+      {
+        key,
+        value,
+        ...(description !== undefined ? { description } : {}),
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "key" },
+    );
+
+  if (error) {
+    logger.error("Error updating site setting", { key, error });
+    return { success: false, error: error.message || "Gagal menyimpan pengaturan." };
   }
 
   revalidatePath("/dashboard/settings");

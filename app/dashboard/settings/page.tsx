@@ -1,15 +1,29 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Users, FolderTree, Shield, RefreshCw, Gamepad2 } from "lucide-react";
-import { getCategories, getUsersList, getRolesList, getGamesList } from "@/actions/settings";
+import { Users, FolderTree, Shield, RefreshCw, Gamepad2, Settings2 } from "lucide-react";
+import {
+  getCategories,
+  getUsersList,
+  getRolesList,
+  getGamesList,
+  getSiteSettings,
+} from "@/actions/settings";
 import { GameCategoryManager } from "@/components/features/GameCategoryManager";
 import { GameManager } from "@/components/features/GameManager";
 import { UserManagementTab } from "@/components/settings/UserManagementTab";
 import { RoleManagementTab } from "@/components/settings/RoleManagementTab";
+import { SiteSettingsTab } from "@/components/settings/SiteSettingsTab";
 import type { Database } from "@/types/database.types";
 
-type ActiveTab = "users" | "roles" | "categories" | "games";
+type ActiveTab = "users" | "roles" | "categories" | "games" | "site";
+
+type SiteSettingRow = {
+  key: string;
+  value: unknown;
+  description: string | null;
+  updated_at: string;
+};
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<ActiveTab>("users");
@@ -26,16 +40,20 @@ export default function SettingsPage() {
   const [games, setGames] = useState<unknown[]>([]);
   const [gamesError, setGamesError] = useState<string>("");
 
+  const [siteSettings, setSiteSettings] = useState<SiteSettingRow[]>([]);
+  const [siteSettingsError, setSiteSettingsError] = useState<string>("");
+
   const [isLoading, setIsLoading] = useState(true);
 
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const [catRes, userRes, roleRes, gameRes] = await Promise.all([
+      const [catRes, userRes, roleRes, gameRes, siteRes] = await Promise.all([
         getCategories(),
         getUsersList(),
         getRolesList(),
         getGamesList(),
+        getSiteSettings(),
       ]);
 
       if (catRes.error) setCategoriesError(catRes.error);
@@ -49,6 +67,9 @@ export default function SettingsPage() {
 
       if (gameRes.error) setGamesError(gameRes.error);
       else setGames(gameRes.data || []);
+
+      if (siteRes.error) setSiteSettingsError(siteRes.error);
+      else setSiteSettings((siteRes.data ?? []) as SiteSettingRow[]);
     } catch (err) {
       console.error("Error loading settings data:", err);
     } finally {
@@ -74,6 +95,7 @@ export default function SettingsPage() {
     { id: "roles", label: "Hak Akses / Role", icon: <Shield className="h-5 w-5" /> },
     { id: "games", label: "Master Game", icon: <Gamepad2 className="h-5 w-5" /> },
     { id: "categories", label: "Kategori", icon: <FolderTree className="h-5 w-5" /> },
+    { id: "site", label: "Pengaturan Situs", icon: <Settings2 className="h-5 w-5" /> },
   ];
 
   return (
@@ -149,6 +171,14 @@ export default function SettingsPage() {
                 (categories as unknown as Database["public"]["Tables"]["categories"]["Row"][]) || []
               }
               errorMsg={categoriesError ? `Gagal memuat kategori: ${categoriesError}` : undefined}
+            />
+          )}
+
+          {activeTab === "site" && (
+            <SiteSettingsTab
+              settings={siteSettings}
+              errorMsg={siteSettingsError ? `Gagal memuat pengaturan situs: ${siteSettingsError}` : undefined}
+              onRefresh={loadData}
             />
           )}
         </div>

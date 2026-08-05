@@ -1,13 +1,23 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Search, ShoppingBag, Loader2, RefreshCw, Plus } from "lucide-react";
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  Search,
+  ShoppingBag,
+  Loader2,
+  RefreshCw,
+  Plus,
+  Filter,
+  ChevronDown,
+  X,
+  ArrowUpDown,
+} from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
 import { getTopupProducts } from "@/app/actions/topup-products";
 import { AddTopupProductModal } from "@/components/topup/TopupProductModals";
 import { TopupProductRowActions } from "@/components/topup/TopupProductRowActions";
-
 import { Pagination } from "@/components/ui/Pagination";
+import { useRouter, useSearchParams } from "next/navigation";
 
 type TopupProduct = {
   id: string;
@@ -21,66 +31,107 @@ type TopupProduct = {
 };
 
 export default function TopupProductsPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [products, setProducts] = useState<TopupProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
   const [error, setError] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const itemsPerPage = 10;
 
-  const loadProducts = async (page = currentPage) => {
-    try {
-      setIsLoading(true);
-      setError("");
-      const res = await getTopupProducts(page, itemsPerPage);
+  const currentPage = parseInt(searchParams.get("page") || "1", 10);
+  const searchQuery = searchParams.get("search") || "";
+  const sortBy = searchParams.get("sortBy") || "game_slug";
+  const sortOrder = (searchParams.get("sortOrder") || "asc") as "asc" | "desc";
+  const isActiveFilter = searchParams.get("isActive") || "";
+  const isGangguanFilter = searchParams.get("isGangguan") || "";
 
-      if (res.error) {
-        setError(res.error);
-      } else {
-        setProducts((res.data as TopupProduct[]) || []);
-        setTotalCount(res.totalCount || 0);
+  const loadProducts = useCallback(
+    async (filters: {
+      page?: number;
+      search?: string;
+      sortBy?: string;
+      sortOrder?: string;
+      isActive?: string;
+      isGangguan?: string;
+    } = {}) => {
+      try {
+        setIsLoading(true);
+        setError("");
+        const res = await getTopupProducts({
+          page: filters.page ?? currentPage,
+          limit: itemsPerPage,
+          search: filters.search ?? searchQuery,
+          sortBy: filters.sortBy ?? sortBy,
+          sortOrder: (filters.sortOrder ?? sortOrder) as "asc" | "desc",
+          isActive: filters.isActive ?? isActiveFilter,
+          isGangguan: filters.isGangguan ?? isGangguanFilter,
+        });
+
+        if (res.error) {
+          setError(res.error);
+        } else {
+          setProducts((res.data as TopupProduct[]) || []);
+          setTotalCount(res.totalCount || 0);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Gagal mengambil data produk");
+      } finally {
+        setIsLoading(false);
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal mengambil data produk");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+    [currentPage, searchQuery, sortBy, sortOrder, isActiveFilter, isGangguanFilter],
+  );
 
   useEffect(() => {
     let isMounted = true;
-    getTopupProducts(currentPage, itemsPerPage)
-      .then((res) => {
-        if (isMounted) {
-          if (res.error) {
-            setError(res.error);
-          } else {
-            setProducts((res.data as TopupProduct[]) || []);
-            setTotalCount(res.totalCount || 0);
-          }
-        }
-      })
-      .catch((err) => {
-        if (isMounted) {
-          setError(err instanceof Error ? err.message : "Gagal mengambil data produk");
-        }
-      })
-      .finally(() => {
-        if (isMounted) setIsLoading(false);
-      });
+    loadProducts().finally(() => {
+      if (isMounted) setIsLoading(false);
+    });
     return () => {
       isMounted = false;
     };
-  }, [currentPage]);
+  }, [loadProducts]);
 
-  const filteredProducts = products.filter(
-    (p) =>
-      p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.game_slug.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (p.sku && p.sku.toLowerCase().includes(searchQuery.toLowerCase())),
-  );
+  const handleFilterChange = (key: string, value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (value) {
+      params.set(key, value);
+    } else {
+      params.delete(key);
+    }
+    params.set("page", "1");
+    router.push(`/dashboard/topup-products?${params.toString()}`);
+  };
+
+  const handleResetFilters = () => {
+    router.push("/dashboard/topup-products");
+  };
+
+  const handleSortChange = (newSortBy: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (sortBy === newSortBy) {
+      const newOrder = sortOrder === "asc" ? "desc" : "asc";
+      params.set("sortOrder", newOrder);
+    } else {
+      params.set("sortBy", newSortBy);
+      params.set("sortOrder", "asc");
+    }
+    params.set("page", "1");
+    router.push(`/dashboard/topup-products?${params.toString()}`);
+  };
+
+  const hasActiveFilters = searchQuery || isActiveFilter || isGangguanFilter || sortBy !== "game_slug" || sortOrder !== "asc";
+
+  const sortOptions = [
+    { value: "game_slug", label: "Game Slug" },
+    { value: "title", label: "Nama Produk" },
+    { value: "selling_price", label: "Harga Jual" },
+    { value: "cost_price", label: "Harga Modal" },
+    { value: "is_active", label: "Status Aktif" },
+    { value: "is_gangguan", label: "Status Gangguan" },
+  ];
 
   return (
     <div className="space-y-6 p-8">
@@ -114,17 +165,78 @@ export default function TopupProductsPage() {
         </div>
       </div>
 
-      {/* Filter / Search Bar */}
-      <div className="flex items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="relative flex-1">
-          <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Cari berdasarkan nama produk, game slug, atau SKU..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pr-4 pl-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
-          />
+      {/* Filter / Sort Bar */}
+      <div className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Search */}
+          <div className="relative flex-1 min-w-[200px]">
+            <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Cari berdasarkan nama produk, game slug, atau SKU..."
+              value={searchQuery}
+              onChange={(e) => handleFilterChange("search", e.target.value)}
+              className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pr-4 pl-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+            />
+          </div>
+
+          {/* Sort By */}
+          <div className="relative min-w-[160px]">
+            <select
+              value={sortBy}
+              onChange={(e) => handleSortChange(e.target.value)}
+              className="w-full appearance-none rounded-lg border border-slate-200 bg-slate-50 py-2 pr-8 pl-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+            >
+              {sortOptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  Urutkan: {opt.label}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="pointer-events-none absolute top-1/2 right-2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          </div>
+
+          {/* Sort Order */}
+          <button
+            onClick={() => handleSortChange(sortBy)}
+            className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
+            title="Balik urutan sortir"
+          >
+            <ArrowUpDown className="h-4 w-4" />
+            {sortOrder === "asc" ? "Naik" : "Turun"}
+          </button>
+
+          {/* Status Aktif Filter */}
+          <select
+            value={isActiveFilter}
+            onChange={(e) => handleFilterChange("isActive", e.target.value)}
+            className="appearance-none rounded-lg border border-slate-200 bg-slate-50 py-2 pr-8 pl-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+          >
+            <option value="">Semua Status</option>
+            <option value="true">Aktif</option>
+            <option value="false">Nonaktif</option>
+          </select>
+
+          {/* Gangguan Filter */}
+          <select
+            value={isGangguanFilter}
+            onChange={(e) => handleFilterChange("isGangguan", e.target.value)}
+            className="appearance-none rounded-lg border border-slate-200 bg-slate-50 py-2 pr-8 pl-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+          >
+            <option value="">Semua Kondisi</option>
+            <option value="true">Gangguan</option>
+            <option value="false">Normal</option>
+          </select>
+
+          {hasActiveFilters && (
+            <button
+              onClick={handleResetFilters}
+              className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
+            >
+              <X className="h-3 w-3" />
+              Reset
+            </button>
+          )}
         </div>
       </div>
 
@@ -139,12 +251,12 @@ export default function TopupProductsPage() {
             <Loader2 className="mr-2 h-6 w-6 animate-spin" />
             <span>Memuat katalog produk Top-Up...</span>
           </div>
-        ) : filteredProducts.length === 0 ? (
+        ) : products.length === 0 ? (
           <div className="px-4 py-16 text-center">
             <ShoppingBag className="mx-auto mb-3 h-12 w-12 text-slate-300" />
             <h3 className="text-base font-semibold text-slate-800">Tidak ada produk ditemukan</h3>
             <p className="mt-1 text-sm text-slate-500">
-              Data master belum diisi atau kata kunci pencarian tidak cocok.
+              Data master belum diisi atau filter yang dipilih tidak cocok.
             </p>
           </div>
         ) : (
@@ -162,7 +274,7 @@ export default function TopupProductsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
-                {filteredProducts.map((p) => (
+                {products.map((p) => (
                   <tr key={p.id} className="transition-colors hover:bg-slate-50/50">
                     <td className="px-6 py-4 font-medium text-slate-900">{p.title}</td>
                     <td className="px-6 py-4">
@@ -191,7 +303,7 @@ export default function TopupProductsPage() {
                       )}
                     </td>
                     <td className="px-6 py-4 text-center">
-                      <TopupProductRowActions product={p} onRefresh={loadProducts} />
+                      <TopupProductRowActions product={p} onRefresh={() => loadProducts()} />
                     </td>
                   </tr>
                 ))}
@@ -204,7 +316,7 @@ export default function TopupProductsPage() {
             currentPage={currentPage}
             totalItems={totalCount || products.length}
             itemsPerPage={itemsPerPage}
-            onPageChange={(page) => setCurrentPage(page)}
+            onPageChange={(page) => handleFilterChange("page", String(page))}
             itemLabel="produk"
           />
         )}
@@ -214,7 +326,7 @@ export default function TopupProductsPage() {
       <AddTopupProductModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        onSuccess={loadProducts}
+        onSuccess={() => loadProducts()}
       />
     </div>
   );
