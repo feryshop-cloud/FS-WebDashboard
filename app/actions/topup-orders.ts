@@ -76,6 +76,25 @@ export async function updateTopupOrder(
         return { success: false, error: "ID pesanan tidak valid." };
       }
 
+      const supabase = await createClient();
+
+      const { data: existing, error: fetchError } = await supabase
+        .from("orders")
+        .select("buy_status")
+        .eq("id", orderId)
+        .single();
+
+      if (fetchError || !existing) {
+        return { success: false, error: "Pesanan tidak ditemukan." };
+      }
+
+      if (existing.buy_status === "success" || existing.buy_status === "failed") {
+        return {
+          success: false,
+          error: `Pesanan dengan status "${existing.buy_status === "success" ? "Sukses" : "Gagal"}" tidak dapat diubah.`,
+        };
+      }
+
       const updatePayload: Database["public"]["Tables"]["orders"]["Update"] = {
         updated_at: new Date().toISOString(),
       };
@@ -87,7 +106,6 @@ export async function updateTopupOrder(
         updatePayload.serial_number = payload.serial_number;
       }
 
-      const supabase = await createClient();
       const { error } = await supabase.from("orders").update(updatePayload).eq("id", orderId);
 
       if (error) throw error;
