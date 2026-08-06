@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import ThemeProvider from "@/components/layout/ThemeProvider";
 
 const routePrefix = process.env.NEXT_PUBLIC_BASE_PATH?.trim();
 const basePath =
@@ -26,16 +27,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id" className="h-full antialiased">
-      <head>
-        <script
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem("feryshop-theme");if(t==="dark"||t==="light"){}else{t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}if(t==="dark"){document.documentElement.setAttribute("data-theme","dark")}}catch(e){}})();`,
-          }}
-        />
-      </head>
       <body className="flex min-h-full flex-col bg-[var(--background)] font-sans text-[var(--foreground)]">
-        {children}
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );
