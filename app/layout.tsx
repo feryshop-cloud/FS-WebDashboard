@@ -7,7 +7,7 @@ const basePath =
 const assetPath = (path: string) => `${basePath}${path}`;
 
 export const metadata: Metadata = {
-  title: "Ferryshop — Dashboard",
+  title: "Ferryshop Dashboard",
   description: "Enterprise Ferryshop management platform",
   icons: {
     icon: [
@@ -19,14 +19,27 @@ export const metadata: Metadata = {
   },
 };
 
+function getInitialTheme(): string {
+  if (typeof window === "undefined") return "light";
+  try {
+    const stored = localStorage.getItem("feryshop-theme");
+    if (stored === "dark" || stored === "light") return stored;
+  } catch {
+    // localStorage unavailable
+  }
+  return "light";
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const initialTheme = getInitialTheme();
+
   return (
-    <html lang="en" className="h-full antialiased">
-      <body className="flex min-h-full flex-col bg-slate-50 font-sans text-slate-900">
+    <html lang="en" className="h-full antialiased" data-theme={initialTheme === "dark" ? "dark" : undefined}>
+      <body className="flex min-h-full flex-col bg-[var(--background)] font-sans text-[var(--foreground)]">
         {children}
       </body>
     </html>

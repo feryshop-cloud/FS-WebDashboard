@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { logout } from "../../actions/logout";
 import { ADMIN_ROLES, type AdminRole } from "@/lib/roles";
+import ThemeToggle from "./ThemeToggle";
 
 const routePrefix = process.env.NEXT_PUBLIC_BASE_PATH?.trim();
 const basePath =
@@ -216,6 +217,11 @@ export default function Sidebar({ role }: { role: AdminRole }) {
             </span>
           </button>
         </form>
+      </div>
+
+      {/* Theme Toggle */}
+      <div className="shrink-0 border-t border-slate-100 bg-white p-2">
+        <ThemeToggle />
       </div>
     </aside>
   );
