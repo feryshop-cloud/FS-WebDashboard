@@ -21,10 +21,10 @@ export function InventoryHeader({ categories }: InventoryHeaderProps) {
             <Package className="h-6 w-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">
               Manajemen Inventori
             </h1>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-muted-foreground">
               Kelola stok akun game, harga, dan ketersediaan.
             </p>
           </div>

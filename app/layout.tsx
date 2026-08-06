@@ -19,26 +19,21 @@ export const metadata: Metadata = {
   },
 };
 
-function getInitialTheme(): string {
-  if (typeof window === "undefined") return "light";
-  try {
-    const stored = localStorage.getItem("feryshop-theme");
-    if (stored === "dark" || stored === "light") return stored;
-  } catch {
-    // localStorage unavailable
-  }
-  return "light";
-}
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const initialTheme = getInitialTheme();
-
   return (
-    <html lang="en" className="h-full antialiased" data-theme={initialTheme === "dark" ? "dark" : undefined}>
+    <html lang="id" className="h-full antialiased">
+      <head>
+        <script
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("feryshop-theme");if(t==="dark"||t==="light"){}else{t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}if(t==="dark"){document.documentElement.setAttribute("data-theme","dark")}}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body className="flex min-h-full flex-col bg-[var(--background)] font-sans text-[var(--foreground)]">
         {children}
       </body>

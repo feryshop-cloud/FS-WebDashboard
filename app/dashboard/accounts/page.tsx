@@ -159,8 +159,8 @@ export default function AccountsPage() {
       {/* Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Kelola Rekening</h1>
-          <p className="mt-0.5 text-sm text-slate-500">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Kelola Rekening</h1>
+          <p className="mt-0.5 text-sm text-muted-foreground">
             Pantau saldo, kelola metode pembayaran, dan mutasi antar dompet.
           </p>
         </div>
@@ -170,7 +170,7 @@ export default function AccountsPage() {
               setError("");
               setIsMutasiOpen(true);
             }}
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:text-slate-900"
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-semibold text-foreground shadow-sm transition-all hover:bg-muted hover:text-foreground"
           >
             <ArrowRightLeft className="h-4 w-4" />
             Mutasi Saldo
@@ -189,7 +189,7 @@ export default function AccountsPage() {
       </div>
 
       {/* Summary Card */}
-      <div className="group relative flex flex-col items-start justify-between gap-4 overflow-hidden rounded-2xl border border-slate-100 bg-white p-6 shadow-sm sm:flex-row sm:items-center">
+      <div className="group relative flex flex-col items-start justify-between gap-4 overflow-hidden rounded-2xl border border-border-soft bg-card p-6 shadow-sm sm:flex-row sm:items-center">
         <svg
           className="pointer-events-none absolute right-0 bottom-0 h-full w-64 opacity-[0.02] transition-opacity group-hover:opacity-5"
           viewBox="0 0 100 50"
@@ -202,17 +202,17 @@ export default function AccountsPage() {
             <Wallet className="h-6 w-6" />
           </div>
           <div>
-            <h2 className="text-xs font-semibold tracking-wider text-slate-400 uppercase">
+            <h2 className="text-xs font-semibold tracking-wider text-faint-foreground uppercase">
               Total Saldo Kas
             </h2>
-            <p className="mt-1 text-3xl font-bold tracking-tight text-slate-900">
+            <p className="mt-1 text-3xl font-bold tracking-tight text-foreground">
               {formatRupiah(totalBalance)}
             </p>
           </div>
         </div>
-        <div className="relative z-10 flex flex-col items-end rounded-xl border border-slate-100 bg-slate-50 px-4 py-2">
-          <span className="text-xs font-medium text-slate-500">Jumlah Rekening Aktif</span>
-          <span className="text-lg font-bold text-slate-800">
+        <div className="relative z-10 flex flex-col items-end rounded-xl border border-border-soft bg-muted px-4 py-2">
+          <span className="text-xs font-medium text-muted-foreground">Jumlah Rekening Aktif</span>
+          <span className="text-lg font-bold text-foreground">
             {accounts.filter((a) => a.is_active).length}
           </span>
         </div>
@@ -233,7 +233,7 @@ export default function AccountsPage() {
             return (
               <div
                 key={account.id}
-                className="group relative flex flex-col justify-between rounded-2xl border border-slate-100 bg-white p-5 shadow-sm transition-all hover:border-slate-200 hover:shadow-md"
+                className="group relative flex flex-col justify-between rounded-2xl border border-border-soft bg-card p-5 shadow-sm transition-all hover:border-border hover:shadow-md"
               >
                 <div>
                   {/* Card Header & Action Dropdown */}
@@ -246,16 +246,16 @@ export default function AccountsPage() {
                       </div>
                       <div>
                         <div className="flex items-center gap-1.5">
-                          <h3 className="text-base leading-tight font-bold text-slate-900">
+                          <h3 className="text-base leading-tight font-bold text-foreground">
                             {account.name}
                           </h3>
                           {!account.is_active && (
-                            <span className="rounded bg-slate-100 px-1.5 py-0.5 text-xs font-semibold text-slate-400">
+                            <span className="rounded bg-muted px-1.5 py-0.5 text-xs font-semibold text-faint-foreground">
                               Nonaktif
                             </span>
                           )}
                         </div>
-                        <p className="text-xs font-medium text-slate-500">{account.type}</p>
+                        <p className="text-xs font-medium text-muted-foreground">{account.type}</p>
                       </div>
                     </div>
 
@@ -266,8 +266,8 @@ export default function AccountsPage() {
                         title="Opsi Rekening"
                         className={`rounded-lg p-1.5 transition-colors ${
                           isMenuOpen
-                            ? "bg-slate-100 text-slate-900"
-                            : "text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                            ? "bg-muted text-foreground"
+                            : "text-faint-foreground hover:bg-muted hover:text-muted-foreground"
                         }`}
                       >
                         <MoreHorizontal className="h-4 w-4" />
@@ -277,7 +277,7 @@ export default function AccountsPage() {
                       {isMenuOpen && (
                         <div
                           ref={menuRef}
-                          className="animate-in fade-in slide-in-from-top-2 absolute top-8 right-0 z-30 w-44 rounded-xl border border-slate-100 bg-white p-1.5 shadow-xl duration-150"
+                          className="animate-in fade-in slide-in-from-top-2 absolute top-8 right-0 z-30 w-44 rounded-xl border border-border-soft bg-card p-1.5 shadow-xl duration-150"
                         >
                           <button
                             onClick={() => {
@@ -285,7 +285,7 @@ export default function AccountsPage() {
                               setError("");
                               setEditingAccount(account);
                             }}
-                            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50"
+                            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-foreground transition-colors hover:bg-muted"
                           >
                             <Pencil className="h-3.5 w-3.5 text-blue-600" />
                             Edit Rekening
@@ -308,23 +308,23 @@ export default function AccountsPage() {
                   </div>
 
                   {/* Account Number */}
-                  <div className="mb-4 rounded-xl border border-slate-100 bg-slate-50/70 p-3">
-                    <p className="mb-0.5 text-xs font-semibold tracking-wider text-slate-400 uppercase">
+                  <div className="mb-4 rounded-xl border border-border-soft bg-muted/70 p-3">
+                    <p className="mb-0.5 text-xs font-semibold tracking-wider text-faint-foreground uppercase">
                       Nomor Rekening / ID
                     </p>
-                    <p className="font-mono text-sm font-semibold tracking-wide text-slate-700">
+                    <p className="font-mono text-sm font-semibold tracking-wide text-foreground">
                       {account.account_number || "-"}
                     </p>
                   </div>
                 </div>
 
                 {/* Balance Footer */}
-                <div className="flex items-end justify-between border-t border-slate-100 pt-4">
+                <div className="flex items-end justify-between border-t border-border-soft pt-4">
                   <div>
-                    <p className="mb-0.5 text-xs font-semibold tracking-wider text-slate-400 uppercase">
+                    <p className="mb-0.5 text-xs font-semibold tracking-wider text-faint-foreground uppercase">
                       Saldo Terkini
                     </p>
-                    <p className="text-xl font-bold tracking-tight text-slate-900">
+                    <p className="text-xl font-bold tracking-tight text-foreground">
                       {formatRupiah(Number(account.balance))}
                     </p>
                   </div>
@@ -344,17 +344,17 @@ export default function AccountsPage() {
       {/* Add Account Modal */}
       {isAddAccountOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm">
-          <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-white shadow-2xl duration-200">
-            <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-5">
+          <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-card shadow-2xl duration-200">
+            <div className="flex items-center justify-between border-b border-border-soft bg-muted/50 px-6 py-5">
               <div>
-                <h2 className="text-base font-bold text-slate-900">Tambah Rekening Baru</h2>
-                <p className="mt-0.5 text-xs text-slate-500">
+                <h2 className="text-base font-bold text-foreground">Tambah Rekening Baru</h2>
+                <p className="mt-0.5 text-xs text-muted-foreground">
                   Isi form untuk menambah rekening atau metode pembayaran baru.
                 </p>
               </div>
               <button
                 onClick={() => setIsAddAccountOpen(false)}
-                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                className="rounded-lg p-1.5 text-faint-foreground hover:bg-muted hover:text-muted-foreground"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -367,25 +367,25 @@ export default function AccountsPage() {
                   </div>
                 )}
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-700">
+                  <label className="mb-1 block text-xs font-medium text-foreground">
                     Nama Rekening <span className="text-rose-500">*</span>
                   </label>
                   <input
                     name="name"
                     required
                     type="text"
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                    className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                     placeholder="Misal: BCA Fery, QRIS Toko"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-700">
+                  <label className="mb-1 block text-xs font-medium text-foreground">
                     Tipe Rekening <span className="text-rose-500">*</span>
                   </label>
                   <select
                     name="type"
                     required
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                    className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                   >
                     <option value="Bank Konvensional">Bank Konvensional</option>
                     <option value="Bank Digital">Bank Digital</option>
@@ -394,22 +394,22 @@ export default function AccountsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-700">
+                  <label className="mb-1 block text-xs font-medium text-foreground">
                     Nomor Rekening / ID
                   </label>
                   <input
                     name="account_number"
                     type="text"
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 font-mono text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                    className="w-full rounded-lg border border-border px-3 py-2 font-mono text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                     placeholder="Misal: 1234567890"
                   />
                 </div>
               </div>
-              <div className="flex items-center justify-end gap-3 border-t border-slate-100 bg-slate-50/50 p-6">
+              <div className="flex items-center justify-end gap-3 border-t border-border-soft bg-muted/50 p-6">
                 <button
                   type="button"
                   onClick={() => setIsAddAccountOpen(false)}
-                  className="rounded-lg px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100"
+                  className="rounded-lg px-4 py-2 text-xs font-semibold text-muted-foreground hover:bg-muted"
                 >
                   Batal
                 </button>
@@ -436,17 +436,17 @@ export default function AccountsPage() {
       {/* Edit Account Modal */}
       {editingAccount && (
         <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm">
-          <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-white shadow-2xl duration-200">
-            <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-5">
+          <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-card shadow-2xl duration-200">
+            <div className="flex items-center justify-between border-b border-border-soft bg-muted/50 px-6 py-5">
               <div>
-                <h2 className="text-base font-bold text-slate-900">Edit Rekening</h2>
-                <p className="mt-0.5 text-xs text-slate-500">
+                <h2 className="text-base font-bold text-foreground">Edit Rekening</h2>
+                <p className="mt-0.5 text-xs text-muted-foreground">
                   Ubah rincian nama, tipe, nomor rekening, atau status aktif.
                 </p>
               </div>
               <button
                 onClick={() => setEditingAccount(null)}
-                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                className="rounded-lg p-1.5 text-faint-foreground hover:bg-muted hover:text-muted-foreground"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -459,7 +459,7 @@ export default function AccountsPage() {
                   </div>
                 )}
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-700">
+                  <label className="mb-1 block text-xs font-medium text-foreground">
                     Nama Rekening <span className="text-rose-500">*</span>
                   </label>
                   <input
@@ -467,18 +467,18 @@ export default function AccountsPage() {
                     required
                     defaultValue={editingAccount.name}
                     type="text"
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                    className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-700">
+                  <label className="mb-1 block text-xs font-medium text-foreground">
                     Tipe Rekening <span className="text-rose-500">*</span>
                   </label>
                   <select
                     name="type"
                     required
                     defaultValue={editingAccount.type}
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                    className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                   >
                     <option value="Bank Konvensional">Bank Konvensional</option>
                     <option value="Bank Digital">Bank Digital</option>
@@ -487,14 +487,14 @@ export default function AccountsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-700">
+                  <label className="mb-1 block text-xs font-medium text-foreground">
                     Nomor Rekening / ID
                   </label>
                   <input
                     name="account_number"
                     type="text"
                     defaultValue={editingAccount.account_number || ""}
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 font-mono text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                    className="w-full rounded-lg border border-border px-3 py-2 font-mono text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                   />
                 </div>
                 <div className="flex items-center gap-2 pt-2">
@@ -504,18 +504,18 @@ export default function AccountsPage() {
                     name="is_active"
                     value="true"
                     defaultChecked={editingAccount.is_active}
-                    className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    className="h-4 w-4 rounded border-input text-blue-600 focus:ring-blue-500"
                   />
-                  <label htmlFor="is_active" className="text-xs font-medium text-slate-700">
+                  <label htmlFor="is_active" className="text-xs font-medium text-foreground">
                     Rekening Aktif (Dapat digunakan untuk transaksi & mutasi)
                   </label>
                 </div>
               </div>
-              <div className="flex items-center justify-end gap-3 border-t border-slate-100 bg-slate-50/50 p-6">
+              <div className="flex items-center justify-end gap-3 border-t border-border-soft bg-muted/50 p-6">
                 <button
                   type="button"
                   onClick={() => setEditingAccount(null)}
-                  className="rounded-lg px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100"
+                  className="rounded-lg px-4 py-2 text-xs font-semibold text-muted-foreground hover:bg-muted"
                 >
                   Batal
                 </button>
@@ -542,17 +542,17 @@ export default function AccountsPage() {
       {/* Mutasi Modal */}
       {isMutasiOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm">
-          <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-white shadow-2xl duration-200">
-            <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-5">
+          <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-card shadow-2xl duration-200">
+            <div className="flex items-center justify-between border-b border-border-soft bg-muted/50 px-6 py-5">
               <div>
-                <h2 className="text-base font-bold text-slate-900">Mutasi Saldo</h2>
-                <p className="mt-0.5 text-xs text-slate-500">
+                <h2 className="text-base font-bold text-foreground">Mutasi Saldo</h2>
+                <p className="mt-0.5 text-xs text-muted-foreground">
                   Pindahkan saldo antar rekening atau dompet digital.
                 </p>
               </div>
               <button
                 onClick={() => setIsMutasiOpen(false)}
-                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                className="rounded-lg p-1.5 text-faint-foreground hover:bg-muted hover:text-muted-foreground"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -565,13 +565,13 @@ export default function AccountsPage() {
                   </div>
                 )}
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-700">
+                  <label className="mb-1 block text-xs font-medium text-foreground">
                     Dari Rekening <span className="text-rose-500">*</span>
                   </label>
                   <select
                     name="from_account_id"
                     required
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                    className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                   >
                     {accounts.map((acc) => (
                       <option key={acc.id} value={acc.id}>
@@ -581,18 +581,18 @@ export default function AccountsPage() {
                   </select>
                 </div>
                 <div className="relative z-10 -my-1 flex justify-center">
-                  <div className="rounded-full border border-white bg-slate-100 p-1 text-slate-500">
+                  <div className="rounded-full border border-white bg-muted p-1 text-muted-foreground">
                     <ArrowRightLeft className="h-3.5 w-3.5 rotate-90" />
                   </div>
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-700">
+                  <label className="mb-1 block text-xs font-medium text-foreground">
                     Ke Rekening <span className="text-rose-500">*</span>
                   </label>
                   <select
                     name="to_account_id"
                     required
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                    className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                   >
                     {accounts.map((acc) => (
                       <option key={acc.id} value={acc.id}>
@@ -602,7 +602,7 @@ export default function AccountsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-700">
+                  <label className="mb-1 block text-xs font-medium text-foreground">
                     Nominal Mutasi <span className="text-rose-500">*</span>
                   </label>
                   <input
@@ -610,16 +610,16 @@ export default function AccountsPage() {
                     type="number"
                     required
                     min="1"
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                    className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                     placeholder="Rp 0"
                   />
                 </div>
               </div>
-              <div className="flex items-center justify-end gap-3 border-t border-slate-100 bg-slate-50/50 p-6">
+              <div className="flex items-center justify-end gap-3 border-t border-border-soft bg-muted/50 p-6">
                 <button
                   type="button"
                   onClick={() => setIsMutasiOpen(false)}
-                  className="rounded-lg px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100"
+                  className="rounded-lg px-4 py-2 text-xs font-semibold text-muted-foreground hover:bg-muted"
                 >
                   Batal
                 </button>

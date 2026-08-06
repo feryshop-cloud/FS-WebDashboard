@@ -108,18 +108,18 @@ export default function Sidebar({ role }: { role: AdminRole }) {
 
   return (
     <aside
-      className={` ${isCollapsed ? "w-20" : "w-64"} relative flex shrink-0 flex-col border-r border-slate-200 bg-white transition-all duration-300 ease-in-out`}
+      className={` ${isCollapsed ? "w-20" : "w-64"} relative flex shrink-0 flex-col border-r border-border bg-card transition-all duration-300 ease-in-out`}
     >
       {/* Header — Brand */}
       <div
-        className={`relative flex h-[88px] items-center ${isCollapsed ? "justify-center px-3" : "px-6"}`}
+        className={`relative flex h-22 items-center ${isCollapsed ? "justify-center px-3" : "px-6"}`}
       >
         <Link
           href="/dashboard"
           aria-label="Ferryshop dashboard"
           className={`flex min-w-0 items-center ${isCollapsed ? "justify-center" : "gap-3"}`}
         >
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-black p-1.5 shadow-sm ring-1 ring-slate-200">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-black p-1.5 shadow-sm ring-1 ring-border">
             <Image
               src={SIDEBAR_LOGO_URL}
               alt="Ferryshop logo"
@@ -130,7 +130,7 @@ export default function Sidebar({ role }: { role: AdminRole }) {
             />
           </span>
           <span
-            className={`text-2xl font-bold tracking-tight whitespace-nowrap text-slate-900 transition-all duration-300 ${isCollapsed ? "w-0 overflow-hidden opacity-0" : "w-auto opacity-100"} `}
+            className={`text-2xl font-bold tracking-tight whitespace-nowrap text-foreground transition-all duration-300 ${isCollapsed ? "w-0 overflow-hidden opacity-0" : "w-auto opacity-100"} `}
           >
             Ferryshop
           </span>
@@ -139,7 +139,7 @@ export default function Sidebar({ role }: { role: AdminRole }) {
         {/* Toggle Button */}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className={`absolute top-1/2 -right-3 z-10 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white p-0 text-slate-500 shadow-sm transition-all duration-200 ease-in-out hover:text-slate-800`}
+          className={`absolute top-1/2 -right-3 z-10 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-card p-0 text-muted-foreground shadow-sm transition-all duration-200 ease-in-out hover:text-foreground`}
           aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {isCollapsed ? (
@@ -156,7 +156,7 @@ export default function Sidebar({ role }: { role: AdminRole }) {
           <div key={idx} className="space-y-1">
             {/* Group Title */}
             {!isCollapsed && (
-              <h3 className="mb-2 px-3 text-xs font-semibold tracking-wider text-slate-400 uppercase">
+              <h3 className="mb-2 px-3 text-xs font-semibold tracking-wider text-faint-foreground uppercase">
                 {group.title}
               </h3>
             )}
@@ -176,12 +176,12 @@ export default function Sidebar({ role }: { role: AdminRole }) {
                     className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-200 ease-in-out ${
                       isActive
                         ? "bg-blue-50 text-blue-600"
-                        : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
                     } `}
                   >
                     <item.icon
                       className={`h-5 w-5 shrink-0 transition-colors duration-200 ${
-                        isActive ? "text-blue-600" : "text-slate-400 group-hover:text-slate-600"
+                        isActive ? "text-blue-600" : "text-faint-foreground group-hover:text-muted-foreground"
                       }`}
                       strokeWidth={isActive ? 2 : 1.5}
                     />
@@ -199,15 +199,15 @@ export default function Sidebar({ role }: { role: AdminRole }) {
       </nav>
 
       {/* Logout */}
-      <div className="shrink-0 border-t border-slate-100 bg-white p-4">
+      <div className="shrink-0 border-t border-border-soft bg-card p-4">
         <form action={logout}>
           <button
             type="submit"
             title={isCollapsed ? "Logout" : undefined}
-            className="group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-slate-500 transition-all duration-200 ease-in-out hover:bg-slate-50 hover:text-slate-900"
+            className="group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-muted-foreground transition-all duration-200 ease-in-out hover:bg-muted hover:text-foreground"
           >
             <LogOut
-              className="h-5 w-5 shrink-0 text-slate-400 group-hover:text-slate-600"
+              className="h-5 w-5 shrink-0 text-faint-foreground group-hover:text-muted-foreground"
               strokeWidth={1.5}
             />
             <span
@@ -220,7 +220,7 @@ export default function Sidebar({ role }: { role: AdminRole }) {
       </div>
 
       {/* Theme Toggle */}
-      <div className="shrink-0 border-t border-slate-100 bg-white p-2">
+      <div className="shrink-0 border-t border-border-soft bg-card p-2">
         <ThemeToggle />
       </div>
     </aside>

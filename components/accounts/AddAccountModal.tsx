@@ -55,8 +55,8 @@ export function AddAccountModal({ isOpen, onClose }: AddAccountModalProps) {
       />
 
       {/* Modal */}
-      <div className="animate-in fade-in zoom-in-95 relative flex w-full max-w-lg flex-col overflow-hidden rounded-[10px] bg-white shadow-2xl duration-200">
-        <div className="flex items-center justify-between border-b border-gray-100 bg-blue-600 px-6 py-4 text-white">
+      <div className="animate-in fade-in zoom-in-95 relative flex w-full max-w-lg flex-col overflow-hidden rounded-[10px] bg-card shadow-2xl duration-200">
+        <div className="flex items-center justify-between border-b border-border-soft bg-blue-600 px-6 py-4 text-white">
           <div className="flex items-center gap-2">
             <CreditCard className="h-5 w-5" />
             <h2 className="text-lg font-bold">Tambah Rekening Baru</h2>
@@ -64,7 +64,7 @@ export function AddAccountModal({ isOpen, onClose }: AddAccountModalProps) {
           <button
             onClick={onClose}
             disabled={isPending}
-            className="rounded-[10px] p-1.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-50"
+            className="rounded-[10px] p-1.5 text-white/80 transition-colors hover:bg-card/10 hover:text-white disabled:opacity-50"
           >
             <X className="h-5 w-5" />
           </button>
@@ -80,54 +80,54 @@ export function AddAccountModal({ isOpen, onClose }: AddAccountModalProps) {
 
           <form id="add-account-form" action={handleSubmit} className="space-y-5">
             <div className="space-y-1.5">
-              <label className="text-sm font-semibold text-gray-700">
+              <label className="text-sm font-semibold text-foreground">
                 Nama Rekening/Metode <span className="text-red-500">*</span>
               </label>
               <input
                 required
                 name="name"
                 type="text"
-                className="w-full rounded-[10px] border border-gray-300 px-4 py-2.5 text-sm transition-all outline-none placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-[10px] border border-input px-4 py-2.5 text-sm transition-all outline-none placeholder:text-faint-foreground focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g. Bank Mandiri Fery"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-sm font-semibold text-gray-700">
+              <label className="text-sm font-semibold text-foreground">
                 Nomor Rekening / No. HP (Optional)
               </label>
               <input
                 name="account_number"
                 type="text"
-                className="w-full rounded-[10px] border border-gray-300 px-4 py-2.5 text-sm transition-all outline-none placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-[10px] border border-input px-4 py-2.5 text-sm transition-all outline-none placeholder:text-faint-foreground focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g. 1420017110600 or 0812345678"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-sm font-semibold text-gray-700">Saldo Awal (Rp)</label>
+              <label className="text-sm font-semibold text-foreground">Saldo Awal (Rp)</label>
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                  <span className="text-sm font-medium text-gray-500">Rp</span>
+                  <span className="text-sm font-medium text-muted-foreground">Rp</span>
                 </div>
                 <input
                   name="balance"
                   type="number"
                   defaultValue="0"
                   min="0"
-                  className="w-full rounded-[10px] border border-gray-300 py-2.5 pr-4 pl-12 font-mono text-sm transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-[10px] border border-input py-2.5 pr-4 pl-12 font-mono text-sm transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
           </form>
         </div>
 
-        <div className="flex justify-end gap-3 rounded-[10px] border-t border-gray-100 bg-gray-50 p-6">
+        <div className="flex justify-end gap-3 rounded-[10px] border-t border-border-soft bg-muted p-6">
           <button
             type="button"
             onClick={onClose}
             disabled={isPending}
-            className="rounded-[10px] border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:bg-gray-50"
+            className="rounded-[10px] border border-input bg-card px-5 py-2.5 text-sm font-semibold text-foreground shadow-sm transition-all hover:bg-muted"
           >
             Batal
           </button>

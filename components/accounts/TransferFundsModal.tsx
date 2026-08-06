@@ -92,8 +92,8 @@ export function TransferFundsModal({ isOpen, onClose, accounts }: TransferFundsM
       />
 
       {/* Modal */}
-      <div className="animate-in fade-in zoom-in-95 relative flex w-full max-w-lg flex-col overflow-hidden rounded-[10px] bg-white shadow-2xl duration-200">
-        <div className="flex items-center justify-between border-b border-gray-100 bg-indigo-600 px-6 py-4 text-white">
+      <div className="animate-in fade-in zoom-in-95 relative flex w-full max-w-lg flex-col overflow-hidden rounded-[10px] bg-card shadow-2xl duration-200">
+        <div className="flex items-center justify-between border-b border-border-soft bg-indigo-600 px-6 py-4 text-white">
           <div className="flex items-center gap-2">
             <ArrowRightLeft className="h-5 w-5" />
             <h2 className="text-lg font-bold">Mutasi Saldo (Transfer Internal)</h2>
@@ -101,7 +101,7 @@ export function TransferFundsModal({ isOpen, onClose, accounts }: TransferFundsM
           <button
             onClick={onClose}
             disabled={isPending}
-            className="rounded-[10px] p-1.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-50"
+            className="rounded-[10px] p-1.5 text-white/80 transition-colors hover:bg-card/10 hover:text-white disabled:opacity-50"
           >
             <X className="h-5 w-5" />
           </button>
@@ -118,14 +118,14 @@ export function TransferFundsModal({ isOpen, onClose, accounts }: TransferFundsM
 
             {/* Source Account */}
             <div className="space-y-1.5">
-              <label className="text-sm font-semibold text-gray-700">
+              <label className="text-sm font-semibold text-foreground">
                 Rekening Asal <span className="text-red-500">*</span>
               </label>
               <select
                 required
                 value={sourceId}
                 onChange={(e) => setSourceId(e.target.value)}
-                className="w-full rounded-[10px] border border-gray-300 bg-white px-4 py-2.5 text-sm transition-all outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+                className="w-full rounded-[10px] border border-input bg-card px-4 py-2.5 text-sm transition-all outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="">-- Pilih Rekening Asal --</option>
                 {accounts
@@ -137,23 +137,23 @@ export function TransferFundsModal({ isOpen, onClose, accounts }: TransferFundsM
                   ))}
               </select>
               {selectedSource && (
-                <div className="flex justify-between px-1 text-xs text-gray-500">
+                <div className="flex justify-between px-1 text-xs text-muted-foreground">
                   <span>Saldo Tersedia:</span>
-                  <span className="font-semibold text-gray-700">{formatRupiah(sourceBalance)}</span>
+                  <span className="font-semibold text-foreground">{formatRupiah(sourceBalance)}</span>
                 </div>
               )}
             </div>
 
             {/* Destination Account */}
             <div className="space-y-1.5">
-              <label className="text-sm font-semibold text-gray-700">
+              <label className="text-sm font-semibold text-foreground">
                 Rekening Tujuan <span className="text-red-500">*</span>
               </label>
               <select
                 required
                 value={destId}
                 onChange={(e) => setDestId(e.target.value)}
-                className="w-full rounded-[10px] border border-gray-300 bg-white px-4 py-2.5 text-sm transition-all outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+                className="w-full rounded-[10px] border border-input bg-card px-4 py-2.5 text-sm transition-all outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="">-- Pilih Rekening Tujuan --</option>
                 {accounts
@@ -169,12 +169,12 @@ export function TransferFundsModal({ isOpen, onClose, accounts }: TransferFundsM
             {/* Transfer Amount */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-gray-700">
+                <label className="text-sm font-semibold text-foreground">
                   Nominal Transfer <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-                    <span className="text-xs font-semibold text-gray-500">Rp</span>
+                    <span className="text-xs font-semibold text-muted-foreground">Rp</span>
                   </div>
                   <input
                     required
@@ -182,7 +182,7 @@ export function TransferFundsModal({ isOpen, onClose, accounts }: TransferFundsM
                     min="1"
                     value={amount || ""}
                     onChange={(e) => setAmount(Number(e.target.value))}
-                    className="w-full rounded-[10px] border border-gray-300 py-2.5 pr-3.5 pl-10 font-mono text-sm font-bold text-gray-900 transition-all outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+                    className="w-full rounded-[10px] border border-input py-2.5 pr-3.5 pl-10 font-mono text-sm font-bold text-foreground transition-all outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
                     placeholder="0"
                   />
                 </div>
@@ -190,19 +190,19 @@ export function TransferFundsModal({ isOpen, onClose, accounts }: TransferFundsM
 
               {/* Admin Fee */}
               <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-gray-700">
+                <label className="text-sm font-semibold text-foreground">
                   Biaya Admin (Jika Ada)
                 </label>
                 <div className="relative">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-                    <span className="text-xs font-semibold text-gray-500">Rp</span>
+                    <span className="text-xs font-semibold text-muted-foreground">Rp</span>
                   </div>
                   <input
                     type="number"
                     min="0"
                     value={adminFee || ""}
                     onChange={(e) => setAdminFee(Number(e.target.value))}
-                    className="w-full rounded-[10px] border border-gray-300 py-2.5 pr-3.5 pl-10 font-mono text-sm text-gray-900 transition-all outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+                    className="w-full rounded-[10px] border border-input py-2.5 pr-3.5 pl-10 font-mono text-sm text-foreground transition-all outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
                     placeholder="0"
                   />
                 </div>
@@ -211,20 +211,20 @@ export function TransferFundsModal({ isOpen, onClose, accounts }: TransferFundsM
 
             {/* Calculation Breakdown Panel */}
             {(amount > 0 || adminFee > 0) && (
-              <div className="animate-in fade-in slide-in-from-top-2 space-y-2.5 rounded-[10px] border border-gray-200 bg-gray-50 p-4 duration-150">
-                <h4 className="text-xs font-bold tracking-wider text-gray-500 uppercase">
+              <div className="animate-in fade-in slide-in-from-top-2 space-y-2.5 rounded-[10px] border border-border bg-muted p-4 duration-150">
+                <h4 className="text-xs font-bold tracking-wider text-muted-foreground uppercase">
                   Rincian Pengurangan Saldo
                 </h4>
                 <div className="space-y-1.5 text-sm">
-                  <div className="flex justify-between text-gray-600">
+                  <div className="flex justify-between text-muted-foreground">
                     <span>Nominal Mutasi</span>
                     <span className="font-mono">{formatRupiah(amount)}</span>
                   </div>
-                  <div className="flex justify-between text-gray-600">
+                  <div className="flex justify-between text-muted-foreground">
                     <span>Biaya Admin</span>
                     <span className="font-mono">{formatRupiah(adminFee)}</span>
                   </div>
-                  <div className="flex justify-between border-t border-gray-200 pt-2 font-bold text-gray-950">
+                  <div className="flex justify-between border-t border-border pt-2 font-bold text-foreground">
                     <span>Total Potongan</span>
                     <span className="font-mono text-indigo-700">
                       {formatRupiah(totalDeduction)}
@@ -238,12 +238,12 @@ export function TransferFundsModal({ isOpen, onClose, accounts }: TransferFundsM
             )}
           </div>
 
-          <div className="flex justify-end gap-3 rounded-[10px] border-t border-gray-100 bg-gray-50 p-6">
+          <div className="flex justify-end gap-3 rounded-[10px] border-t border-border-soft bg-muted p-6">
             <button
               type="button"
               onClick={onClose}
               disabled={isPending}
-              className="rounded-[10px] border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:bg-gray-50"
+              className="rounded-[10px] border border-input bg-card px-5 py-2.5 text-sm font-semibold text-foreground shadow-sm transition-all hover:bg-muted"
             >
               Batal
             </button>

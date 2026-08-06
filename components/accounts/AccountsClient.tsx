@@ -45,10 +45,10 @@ export function AccountsClient({ accounts }: AccountsClientProps) {
   return (
     <div className="flex min-h-0 flex-1 flex-col space-y-6 overflow-hidden">
       {/* Hero Header Replicated from image_d4fa7b.png */}
-      <div className="flex flex-shrink-0 flex-col items-start justify-between rounded-xl border border-slate-200 bg-white p-6 shadow-sm md:flex-row md:items-center">
+      <div className="flex flex-shrink-0 flex-col items-start justify-between rounded-xl border border-border bg-card p-6 shadow-sm md:flex-row md:items-center">
         <div>
-          <p className="mb-1 text-xs font-semibold text-slate-500">TOTAL SALDO KAS</p>
-          <h2 className="mb-2 text-4xl font-bold tracking-tight text-slate-900">
+          <p className="mb-1 text-xs font-semibold text-muted-foreground">TOTAL SALDO KAS</p>
+          <h2 className="mb-2 text-4xl font-bold tracking-tight text-foreground">
             {formatRupiah(totalBalance)}
           </h2>
           <p className="text-sm font-medium text-blue-600">Akumulasi dari rekening aktif</p>
@@ -57,7 +57,7 @@ export function AccountsClient({ accounts }: AccountsClientProps) {
         <div className="mt-6 flex w-full flex-col gap-3 sm:flex-row md:mt-0 md:w-auto">
           <button
             onClick={() => setIsTransferOpen(true)}
-            className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 sm:w-auto"
+            className="flex w-full items-center justify-center gap-2 rounded-lg border border-input bg-card px-5 py-2.5 text-sm font-semibold text-foreground shadow-sm transition-colors hover:bg-muted sm:w-auto"
           >
             <ArrowRightLeft className="h-4 w-4" />
             Mutasi Saldo
@@ -65,7 +65,7 @@ export function AccountsClient({ accounts }: AccountsClientProps) {
 
           <button
             onClick={() => setIsAddOpen(true)}
-            className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 sm:w-auto"
+            className="flex w-full items-center justify-center gap-2 rounded-lg border border-input bg-card px-5 py-2.5 text-sm font-semibold text-foreground shadow-sm transition-colors hover:bg-muted sm:w-auto"
           >
             <Plus className="h-4 w-4" />
             Tambah Rekening
@@ -76,10 +76,10 @@ export function AccountsClient({ accounts }: AccountsClientProps) {
       {/* Grid of Accounts Container */}
       <div className="w-full flex-1 pb-6">
         {accounts.length === 0 ? (
-          <div className="rounded-xl border border-gray-200 bg-white p-10 text-center text-gray-500 shadow-sm">
+          <div className="rounded-xl border border-border bg-card p-10 text-center text-muted-foreground shadow-sm">
             <span className="mb-3 block text-3xl">💳</span>
-            <p className="text-base font-medium text-gray-900">Belum ada rekening terdaftar</p>
-            <p className="mt-1 text-sm text-gray-400">
+            <p className="text-base font-medium text-foreground">Belum ada rekening terdaftar</p>
+            <p className="mt-1 text-sm text-faint-foreground">
               Silakan tambahkan rekening baru untuk mulai mencatat keuangan.
             </p>
           </div>
@@ -92,10 +92,10 @@ export function AccountsClient({ accounts }: AccountsClientProps) {
               return (
                 <div
                   key={acc.id}
-                  className={`flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md ${!isActive ? "opacity-50 grayscale" : ""} `}
+                  className={`flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md ${!isActive ? "opacity-50 grayscale" : ""} `}
                 >
                   {/* Top: Full-Width Banner Image - Compressed Height */}
-                  <div className="relative flex h-24 w-full items-center justify-center overflow-hidden border-b border-slate-100 bg-slate-50">
+                  <div className="relative flex h-24 w-full items-center justify-center overflow-hidden border-b border-border-soft bg-muted">
                     {logoFile ? (
                       <Image
                         src={logoFile}
@@ -105,24 +105,24 @@ export function AccountsClient({ accounts }: AccountsClientProps) {
                         unoptimized
                       />
                     ) : (
-                      <Landmark className="h-10 w-10 text-slate-300" />
+                      <Landmark className="h-10 w-10 text-faint-foreground" />
                     )}
                   </div>
 
                   {/* Bottom: Text Content - Minimalist */}
                   <div className="flex flex-1 flex-col p-4">
                     <div className="mb-3">
-                      <h3 className="mb-0.5 text-sm font-bold text-slate-900">{acc.name}</h3>
-                      <p className="font-mono text-xs text-slate-500">
+                      <h3 className="mb-0.5 text-sm font-bold text-foreground">{acc.name}</h3>
+                      <p className="font-mono text-xs text-muted-foreground">
                         {acc.account_number || "Tidak ada no. rekening"}
                       </p>
                     </div>
 
-                    <div className="mt-auto flex items-end justify-between border-t border-slate-100 pt-3">
-                      <p className="mb-0.5 text-[10px] font-semibold tracking-wider text-slate-400 uppercase">
+                    <div className="mt-auto flex items-end justify-between border-t border-border-soft pt-3">
+                      <p className="mb-0.5 text-[10px] font-semibold tracking-wider text-faint-foreground uppercase">
                         Saldo Terkini
                       </p>
-                      <p className="text-lg leading-none font-bold tracking-tight text-slate-900">
+                      <p className="text-lg leading-none font-bold tracking-tight text-foreground">
                         {formatRupiah(acc.balance)}
                       </p>
                     </div>

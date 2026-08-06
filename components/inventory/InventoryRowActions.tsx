@@ -53,7 +53,7 @@ export function InventoryRowActions({ item, games, onRefresh }: InventoryRowActi
     <div className="relative inline-block text-left" onClick={(e) => e.stopPropagation()}>
       <button
         onClick={() => setIsOpenMenu(!isOpenMenu)}
-        className="rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 focus:outline-none"
+        className="rounded-md p-1.5 text-faint-foreground hover:bg-muted hover:text-muted-foreground focus:outline-none"
       >
         <MoreHorizontal className="h-5 w-5" />
       </button>
@@ -61,13 +61,13 @@ export function InventoryRowActions({ item, games, onRefresh }: InventoryRowActi
       {isOpenMenu && (
         <>
           <div className="fixed inset-0 z-20" onClick={() => setIsOpenMenu(false)} />
-          <div className="absolute right-0 z-30 mt-1 w-36 rounded-lg border border-slate-200 bg-white py-1 shadow-lg">
+          <div className="absolute right-0 z-30 mt-1 w-36 rounded-lg border border-border bg-card py-1 shadow-lg">
             <button
               onClick={() => {
                 setIsOpenMenu(false);
                 setIsEditOpen(true);
               }}
-              className="flex w-full items-center gap-2 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
+              className="flex w-full items-center gap-2 px-4 py-2 text-xs font-medium text-foreground hover:bg-muted"
             >
               <Edit2 className="h-3.5 w-3.5 text-blue-600" />
               Edit Data
@@ -99,16 +99,16 @@ export function InventoryRowActions({ item, games, onRefresh }: InventoryRowActi
       {/* Delete Confirmation Modal */}
       {isDeleteOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-sm rounded-xl border border-slate-200 bg-white p-6 shadow-xl">
+          <div className="w-full max-w-sm rounded-xl border border-border bg-card p-6 shadow-xl">
             <div className="mb-4 flex items-center gap-3 text-rose-600">
               <div className="rounded-full bg-rose-50 p-2">
                 <AlertTriangle className="h-6 w-6" />
               </div>
-              <h3 className="text-lg font-bold text-slate-900">Hapus Stok?</h3>
+              <h3 className="text-lg font-bold text-foreground">Hapus Stok?</h3>
             </div>
-            <p className="mb-4 text-sm text-slate-600">
+            <p className="mb-4 text-sm text-muted-foreground">
               Apakah Anda yakin ingin menghapus stok{" "}
-              <span className="font-semibold text-slate-900">{item.title_reference || "ini"}</span>?
+              <span className="font-semibold text-foreground">{item.title_reference || "ini"}</span>?
               Tindakan ini tidak dapat dibatalkan.
             </p>
             {deleteError && (
@@ -120,7 +120,7 @@ export function InventoryRowActions({ item, games, onRefresh }: InventoryRowActi
               <button
                 onClick={() => setIsDeleteOpen(false)}
                 disabled={isDeleting}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                className="rounded-lg border border-border px-4 py-2 text-xs font-medium text-foreground hover:bg-muted"
               >
                 Batal
               </button>

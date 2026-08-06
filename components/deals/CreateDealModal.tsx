@@ -86,8 +86,8 @@ export function CreateDealModal({ isOpen, onClose }: CreateDealModalProps) {
       />
 
       {/* Drawer */}
-      <div className="animate-in slide-in-from-right relative flex h-full w-full max-w-md flex-col overflow-hidden bg-white shadow-2xl duration-300">
-        <div className="flex shrink-0 items-center justify-between border-b border-gray-100 bg-slate-50 px-6 py-4 text-slate-900">
+      <div className="animate-in slide-in-from-right relative flex h-full w-full max-w-md flex-col overflow-hidden bg-card shadow-2xl duration-300">
+        <div className="flex shrink-0 items-center justify-between border-b border-border-soft bg-muted px-6 py-4 text-foreground">
           <div className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
             <h2 className="text-lg font-bold">Buat Transaksi Baru (Deal)</h2>
@@ -95,7 +95,7 @@ export function CreateDealModal({ isOpen, onClose }: CreateDealModalProps) {
           <button
             onClick={onClose}
             disabled={isPending}
-            className="rounded-[10px] p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 disabled:opacity-50"
+            className="rounded-[10px] p-1.5 text-faint-foreground transition-colors hover:bg-muted hover:text-muted-foreground disabled:opacity-50"
           >
             <X className="h-5 w-5" />
           </button>
@@ -111,18 +111,18 @@ export function CreateDealModal({ isOpen, onClose }: CreateDealModalProps) {
 
           <form id="create-deal-form" action={handleSubmit} className="space-y-5">
             <div className="space-y-1.5">
-              <label className="text-sm font-semibold text-gray-700">
+              <label className="text-sm font-semibold text-foreground">
                 Pilih Stok (Hanya Tersedia) <span className="text-red-500">*</span>
               </label>
               {isLoadingStocks ? (
-                <div className="flex w-full items-center gap-2 rounded-[10px] border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm text-gray-500">
+                <div className="flex w-full items-center gap-2 rounded-[10px] border border-input bg-muted px-4 py-2.5 text-sm text-muted-foreground">
                   <Loader2 className="h-4 w-4 animate-spin" /> Memuat stok...
                 </div>
               ) : (
                 <select
                   required
                   name="stock_id"
-                  className="w-full rounded-[10px] border border-gray-300 bg-white px-4 py-2.5 text-sm transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                  className="w-full rounded-[10px] border border-input bg-card px-4 py-2.5 text-sm transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
                   defaultValue=""
                 >
                   <option value="" disabled>
@@ -138,58 +138,58 @@ export function CreateDealModal({ isOpen, onClose }: CreateDealModalProps) {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-sm font-semibold text-gray-700">
+              <label className="text-sm font-semibold text-foreground">
                 Nama Customer <span className="text-red-500">*</span>
               </label>
               <input
                 required
                 name="customer_name"
                 type="text"
-                className="w-full rounded-[10px] border border-gray-300 px-4 py-2.5 text-sm transition-all outline-none placeholder:text-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                className="w-full rounded-[10px] border border-input px-4 py-2.5 text-sm transition-all outline-none placeholder:text-faint-foreground focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
                 placeholder="e.g. Budi Santoso"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-sm font-semibold text-gray-700">
+              <label className="text-sm font-semibold text-foreground">
                 Kontak Customer (Optional)
               </label>
               <input
                 name="customer_contact"
                 type="text"
-                className="w-full rounded-[10px] border border-gray-300 px-4 py-2.5 text-sm transition-all outline-none placeholder:text-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                className="w-full rounded-[10px] border border-input px-4 py-2.5 text-sm transition-all outline-none placeholder:text-faint-foreground focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
                 placeholder="e.g. 08123456789 / @budi_ig"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-sm font-semibold text-gray-700">
+              <label className="text-sm font-semibold text-foreground">
                 Harga Deal (Harga Jual Akhir) <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                  <span className="text-sm font-medium text-gray-500">Rp</span>
+                  <span className="text-sm font-medium text-muted-foreground">Rp</span>
                 </div>
                 <input
                   required
                   name="deal_price"
                   type="number"
                   min="1"
-                  className="w-full rounded-[10px] border border-gray-300 py-2.5 pr-4 pl-12 font-mono text-sm transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                  className="w-full rounded-[10px] border border-input py-2.5 pr-4 pl-12 font-mono text-sm transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
                   placeholder="0"
                 />
               </div>
-              <p className="text-xs text-gray-500">Harga final yang disepakati dengan customer.</p>
+              <p className="text-xs text-muted-foreground">Harga final yang disepakati dengan customer.</p>
             </div>
           </form>
         </div>
 
-        <div className="flex justify-end gap-3 rounded-[10px] border-t border-gray-100 bg-gray-50 p-6">
+        <div className="flex justify-end gap-3 rounded-[10px] border-t border-border-soft bg-muted p-6">
           <button
             type="button"
             onClick={onClose}
             disabled={isPending}
-            className="rounded-[10px] border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:bg-gray-50"
+            className="rounded-[10px] border border-input bg-card px-5 py-2.5 text-sm font-semibold text-foreground shadow-sm transition-all hover:bg-muted"
           >
             Batal
           </button>

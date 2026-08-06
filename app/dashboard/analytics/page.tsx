@@ -93,10 +93,10 @@ export default async function AnalyticsPage() {
     <div className="mx-auto max-w-7xl space-y-8">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Activity className="h-6 w-6 text-slate-800" strokeWidth={1.5} />
+        <Activity className="h-6 w-6 text-foreground" strokeWidth={1.5} />
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Analitik Bisnis</h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Analitik Bisnis</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Metrik performa dan tren pendapatan berdasarkan penjualan.
           </p>
         </div>
@@ -110,38 +110,38 @@ export default async function AnalyticsPage() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-[10px] border border-slate-200 bg-white p-4">
+        <div className="rounded-[10px] border border-border bg-card p-4">
           <div className="mb-2 flex items-center gap-2">
-            <Coins className="h-4 w-4 text-slate-400" strokeWidth={2} />
-            <span className="text-sm font-medium text-slate-500">Total Pendapatan</span>
+            <Coins className="h-4 w-4 text-faint-foreground" strokeWidth={2} />
+            <span className="text-sm font-medium text-muted-foreground">Total Pendapatan</span>
           </div>
-          <h3 className="text-xl font-bold text-slate-900">{formatRupiah(totalRevenue)}</h3>
+          <h3 className="text-xl font-bold text-foreground">{formatRupiah(totalRevenue)}</h3>
         </div>
 
-        <div className="rounded-[10px] border border-slate-200 bg-white p-4">
+        <div className="rounded-[10px] border border-border bg-card p-4">
           <div className="mb-2 flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-slate-400" strokeWidth={2} />
-            <span className="text-sm font-medium text-slate-500">Keuntungan Bersih</span>
+            <TrendingUp className="h-4 w-4 text-faint-foreground" strokeWidth={2} />
+            <span className="text-sm font-medium text-muted-foreground">Keuntungan Bersih</span>
           </div>
-          <h3 className="text-xl font-bold text-slate-900">{formatRupiah(totalProfit)}</h3>
+          <h3 className="text-xl font-bold text-foreground">{formatRupiah(totalProfit)}</h3>
         </div>
 
-        <div className="rounded-[10px] border border-slate-200 bg-white p-4">
+        <div className="rounded-[10px] border border-border bg-card p-4">
           <div className="mb-2 flex items-center gap-2">
-            <Activity className="h-4 w-4 text-slate-400" strokeWidth={2} />
-            <span className="text-sm font-medium text-slate-500">Rata-rata Harga Laku</span>
+            <Activity className="h-4 w-4 text-faint-foreground" strokeWidth={2} />
+            <span className="text-sm font-medium text-muted-foreground">Rata-rata Harga Laku</span>
           </div>
-          <h3 className="text-xl font-bold text-slate-900">{formatRupiah(averageSaleValue)}</h3>
+          <h3 className="text-xl font-bold text-foreground">{formatRupiah(averageSaleValue)}</h3>
         </div>
 
-        <div className="rounded-[10px] border border-slate-200 bg-white p-4">
+        <div className="rounded-[10px] border border-border bg-card p-4">
           <div className="mb-2 flex items-center gap-2">
-            <Award className="h-4 w-4 text-slate-400" strokeWidth={2} />
-            <span className="text-sm font-medium text-slate-500">Game Paling Laris</span>
+            <Award className="h-4 w-4 text-faint-foreground" strokeWidth={2} />
+            <span className="text-sm font-medium text-muted-foreground">Game Paling Laris</span>
           </div>
           <div className="flex items-baseline gap-2">
-            <h3 className="truncate text-xl font-bold text-slate-900">{topGame}</h3>
-            <span className="text-xs text-slate-400">{maxGameSales} terjual</span>
+            <h3 className="truncate text-xl font-bold text-foreground">{topGame}</h3>
+            <span className="text-xs text-faint-foreground">{maxGameSales} terjual</span>
           </div>
         </div>
       </div>

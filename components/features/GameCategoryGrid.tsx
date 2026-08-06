@@ -16,18 +16,18 @@ export function GameCategoryGrid({ categories }: { categories: GameCategory[] })
         <Link
           href={`/dashboard/inventory/category/${category.slug}`}
           key={category.id}
-          className="group relative rounded-[10px] border border-slate-200 bg-white p-4 transition-colors duration-200 hover:bg-slate-50"
+          className="group relative rounded-[10px] border border-border bg-card p-4 transition-colors duration-200 hover:bg-muted"
         >
           {/* Image Frame */}
-          <div className="mb-4 flex aspect-video w-full items-center justify-center rounded-[10px] border border-slate-200 bg-slate-50 transition-colors group-hover:border-slate-300">
-            <span className="text-xs text-slate-400">Bingkai Gambar</span>
+          <div className="mb-4 flex aspect-video w-full items-center justify-center rounded-[10px] border border-border bg-muted transition-colors group-hover:border-input">
+            <span className="text-xs text-faint-foreground">Bingkai Gambar</span>
           </div>
 
           {/* Content */}
           <div>
-            <h3 className="text-sm leading-tight font-semibold text-slate-800">{category.name}</h3>
+            <h3 className="text-sm leading-tight font-semibold text-foreground">{category.name}</h3>
             <div className="mt-2 flex items-center gap-2">
-              <span className="inline-flex items-center rounded-[10px] border border-slate-200 bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+              <span className="inline-flex items-center rounded-[10px] border border-border bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
                 {category.activeCount} siap jual
               </span>
             </div>
@@ -35,7 +35,7 @@ export function GameCategoryGrid({ categories }: { categories: GameCategory[] })
 
           {/* Decorative dot */}
           <div
-            className={`absolute top-4 right-4 h-2 w-2 rounded-[10px] ${category.activeCount > 0 ? "bg-emerald-400" : "bg-slate-300"} `}
+            className={`absolute top-4 right-4 h-2 w-2 rounded-[10px] ${category.activeCount > 0 ? "bg-emerald-400" : "bg-muted"} `}
           />
         </Link>
       ))}

@@ -68,23 +68,23 @@ export function AddInventoryForm({ games }: { games: Game[] }) {
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div className="relative space-y-1" ref={dropdownRef}>
-          <label className="block text-sm font-medium text-slate-700">Pilih Kategori Game</label>
+          <label className="block text-sm font-medium text-foreground">Pilih Kategori Game</label>
           <input type="hidden" name="game_id" value={selectedGameId} required />
           <button
             type="button"
             onClick={() => setIsOpen(!isOpen)}
-            className="flex w-full items-center justify-between rounded-[10px] border border-slate-200 bg-slate-50 px-3 py-2 text-slate-900 transition-colors hover:bg-slate-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+            className="flex w-full items-center justify-between rounded-[10px] border border-border bg-muted px-3 py-2 text-foreground transition-colors hover:bg-muted focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
           >
-            <span className={selectedGameId ? "text-slate-900" : "text-slate-500"}>
+            <span className={selectedGameId ? "text-foreground" : "text-muted-foreground"}>
               {selectedGameId
                 ? games.find((g) => g.id === selectedGameId)?.name
                 : "Select a game..."}
             </span>
-            <ChevronDown className="h-4 w-4 text-slate-400" />
+            <ChevronDown className="h-4 w-4 text-faint-foreground" />
           </button>
 
           {isOpen && (
-            <div className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-[10px] border border-slate-200 bg-white py-1">
+            <div className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-[10px] border border-border bg-card py-1">
               {games.map((game) => (
                 <button
                   key={game.id}
@@ -93,7 +93,7 @@ export function AddInventoryForm({ games }: { games: Game[] }) {
                     setSelectedGameId(game.id);
                     setIsOpen(false);
                   }}
-                  className="flex w-full items-center justify-between px-3 py-2 text-left text-sm text-slate-700 transition-colors hover:bg-slate-50"
+                  className="flex w-full items-center justify-between px-3 py-2 text-left text-sm text-foreground transition-colors hover:bg-muted"
                 >
                   {game.name}
                   {selectedGameId === game.id && <Check className="h-4 w-4 text-blue-600" />}
@@ -104,7 +104,7 @@ export function AddInventoryForm({ games }: { games: Game[] }) {
         </div>
 
         <div className="space-y-1">
-          <label className="block text-sm font-medium text-slate-700" htmlFor="title_reference">
+          <label className="block text-sm font-medium text-foreground" htmlFor="title_reference">
             Kode Unik Akun
           </label>
           <input
@@ -113,13 +113,13 @@ export function AddInventoryForm({ games }: { games: Game[] }) {
             type="text"
             required
             placeholder="e.g. ML-MYTHIC-001"
-            className="w-full rounded-[10px] border border-slate-200 bg-slate-50 px-3 py-2 text-slate-900 transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+            className="w-full rounded-[10px] border border-border bg-muted px-3 py-2 text-foreground transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
           />
         </div>
       </div>
 
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-slate-700">
+        <label className="block text-sm font-medium text-foreground">
           Upload Screenshot Akun (Max 20)
         </label>
 
@@ -128,7 +128,7 @@ export function AddInventoryForm({ games }: { games: Game[] }) {
             {images.map((img, idx) => (
               <div
                 key={idx}
-                className="group relative aspect-square overflow-hidden rounded-[10px] border border-slate-200 bg-slate-50"
+                className="group relative aspect-square overflow-hidden rounded-[10px] border border-border bg-muted"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -139,7 +139,7 @@ export function AddInventoryForm({ games }: { games: Game[] }) {
                 <button
                   type="button"
                   onClick={() => setImages((prev) => prev.filter((_, i) => i !== idx))}
-                  className="absolute top-1 right-1 rounded-[10px] bg-white/90 p-1 text-slate-700 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-white hover:text-rose-600"
+                  className="absolute top-1 right-1 rounded-[10px] bg-card/90 p-1 text-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:bg-card hover:text-rose-600"
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -149,9 +149,9 @@ export function AddInventoryForm({ games }: { games: Game[] }) {
         )}
 
         {images.length < 20 && (
-          <div className="group relative flex h-32 w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-[10px] border-2 border-dashed border-slate-200 bg-slate-50 transition-colors hover:bg-slate-100">
-            <div className="flex flex-col items-center justify-center pt-5 pb-6 text-slate-500">
-              <UploadCloud className="mb-3 h-8 w-8 text-slate-400 transition-colors group-hover:text-blue-500" />
+          <div className="group relative flex h-32 w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-[10px] border-2 border-dashed border-border bg-muted transition-colors hover:bg-muted">
+            <div className="flex flex-col items-center justify-center pt-5 pb-6 text-muted-foreground">
+              <UploadCloud className="mb-3 h-8 w-8 text-faint-foreground transition-colors group-hover:text-blue-500" />
               <p className="mb-2 text-sm">
                 <span className="font-semibold text-blue-600">Klik untuk upload</span> atau seret
                 file ke sini
@@ -181,7 +181,7 @@ export function AddInventoryForm({ games }: { games: Game[] }) {
       </div>
 
       <div className="space-y-1">
-        <label className="block text-sm font-medium text-slate-700" htmlFor="account_specs">
+        <label className="block text-sm font-medium text-foreground" htmlFor="account_specs">
           Spesifikasi Akun (Rank, Skin, Winrate...)
         </label>
         <textarea
@@ -190,13 +190,13 @@ export function AddInventoryForm({ games }: { games: Game[] }) {
           required
           rows={4}
           placeholder="Details like rank, skins, win rate..."
-          className="w-full rounded-[10px] border border-slate-200 bg-slate-50 px-3 py-2 text-slate-900 transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+          className="w-full rounded-[10px] border border-border bg-muted px-3 py-2 text-foreground transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
         />
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div className="space-y-1">
-          <label className="block text-sm font-medium text-slate-700" htmlFor="capital_price">
+          <label className="block text-sm font-medium text-foreground" htmlFor="capital_price">
             Harga Modal (Rp)
           </label>
           <input
@@ -206,12 +206,12 @@ export function AddInventoryForm({ games }: { games: Game[] }) {
             min="0"
             required
             placeholder="e.g. 500000"
-            className="w-full rounded-[10px] border border-slate-200 bg-slate-50 px-3 py-2 text-slate-900 transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+            className="w-full rounded-[10px] border border-border bg-muted px-3 py-2 text-foreground transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
           />
         </div>
 
         <div className="space-y-1">
-          <label className="block text-sm font-medium text-slate-700" htmlFor="asking_price">
+          <label className="block text-sm font-medium text-foreground" htmlFor="asking_price">
             Target Jual
           </label>
           <input
@@ -221,7 +221,7 @@ export function AddInventoryForm({ games }: { games: Game[] }) {
             min="0"
             required
             placeholder="e.g. 750000"
-            className="w-full rounded-[10px] border border-slate-200 bg-slate-50 px-3 py-2 text-slate-900 transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+            className="w-full rounded-[10px] border border-border bg-muted px-3 py-2 text-foreground transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
           />
         </div>
       </div>

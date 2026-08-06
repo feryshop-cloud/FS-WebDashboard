@@ -150,7 +150,7 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
         <div className="relative max-w-md flex-1">
           <div className="group relative">
             <Search
-              className={`absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 transition-colors ${searchQuery ? "text-blue-600" : "text-slate-400 group-focus-within:text-blue-600"}`}
+              className={`absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 transition-colors ${searchQuery ? "text-blue-600" : "text-faint-foreground group-focus-within:text-blue-600"}`}
             />
             <input
               ref={searchInputRef}
@@ -164,7 +164,7 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
                   searchInputRef.current?.blur();
                 }
               }}
-              className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pr-24 pl-10 text-sm shadow-sm transition-all placeholder:text-slate-400 hover:border-slate-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 focus:outline-none"
+              className="w-full rounded-xl border border-border bg-card py-2.5 pr-24 pl-10 text-sm shadow-sm transition-all placeholder:text-faint-foreground hover:border-input focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 focus:outline-none"
             />
             <div className="absolute top-1/2 right-3 flex -translate-y-1/2 items-center gap-1">
               {searchQuery ? (
@@ -175,12 +175,12 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
                     searchInputRef.current?.focus();
                   }}
                   title="Hapus kata kunci (Esc)"
-                  className="rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                  className="rounded-md p-1 text-faint-foreground transition-colors hover:bg-muted hover:text-muted-foreground"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
               ) : (
-                <kbd className="hidden items-center gap-0.5 rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-medium text-slate-400 sm:inline-flex">
+                <kbd className="hidden items-center gap-0.5 rounded border border-border bg-muted px-1.5 py-0.5 text-[10px] font-medium text-faint-foreground sm:inline-flex">
                   <Command className="h-2.5 w-2.5" />K
                 </kbd>
               )}
@@ -203,7 +203,7 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
       </div>
 
       {/* Users Table Container */}
-      <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-border-soft bg-card shadow-sm">
         {(errorMsg || actionError) && (
           <div className="border-b border-rose-100 bg-rose-50 p-4 text-sm font-medium text-rose-700">
             {errorMsg || actionError}
@@ -212,11 +212,11 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
 
         {/* Filter Result Summary */}
         {searchQuery.trim() !== "" && (
-          <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-2.5 text-xs text-slate-500">
+          <div className="flex items-center justify-between border-b border-border-soft bg-muted/50 px-6 py-2.5 text-xs text-muted-foreground">
             <span>
               Menampilkan{" "}
-              <strong className="font-semibold text-slate-900">{filteredUsers.length}</strong> dari{" "}
-              <strong className="font-semibold text-slate-900">{users.length}</strong> pengguna
+              <strong className="font-semibold text-foreground">{filteredUsers.length}</strong> dari{" "}
+              <strong className="font-semibold text-foreground">{users.length}</strong> pengguna
             </span>
             <button
               onClick={() => setSearchQuery("")}
@@ -228,8 +228,8 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
         )}
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-slate-600">
-            <thead className="border-b border-slate-100 bg-slate-50/70 text-xs font-semibold tracking-wider text-slate-500 uppercase">
+          <table className="w-full text-left text-sm text-muted-foreground">
+            <thead className="border-b border-border-soft bg-muted/70 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
               <tr>
                 <th className="px-6 py-3.5">Pengguna / ID</th>
                 <th className="px-6 py-3.5">Role</th>
@@ -237,15 +237,15 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
                 <th className="px-6 py-3.5 text-center">Aksi / Ubah Role</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-border-soft">
               {filteredUsers.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="px-6 py-16 text-center">
                     <div className="flex flex-col items-center justify-center gap-2">
-                      <div className="rounded-full bg-slate-100 p-3 text-slate-400">
+                      <div className="rounded-full bg-muted p-3 text-faint-foreground">
                         <SearchX className="h-6 w-6" />
                       </div>
-                      <p className="text-sm font-semibold text-slate-900">
+                      <p className="text-sm font-semibold text-foreground">
                         {searchQuery
                           ? `Tidak ada pengguna yang cocok dengan "${searchQuery}"`
                           : "Belum ada pengguna ditemukan"}
@@ -253,7 +253,7 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
                       {searchQuery && (
                         <button
                           onClick={() => setSearchQuery("")}
-                          className="mt-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+                          className="mt-1 rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground shadow-sm hover:bg-muted"
                         >
                           Reset Pencarian
                         </button>
@@ -263,11 +263,11 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
                 </tr>
               ) : (
                 filteredUsers.map((user) => (
-                  <tr key={user.id} className="transition-colors hover:bg-slate-50/50">
+                  <tr key={user.id} className="transition-colors hover:bg-muted/50">
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
-                        <span className="font-semibold text-slate-900">{user.full_name}</span>
-                        <span className="font-mono text-xs text-slate-400">{user.id}</span>
+                        <span className="font-semibold text-foreground">{user.full_name}</span>
+                        <span className="font-mono text-xs text-faint-foreground">{user.id}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -283,7 +283,7 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
                         className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors ${
                           user.status === "ACTIVE" || !user.status
                             ? "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-                            : "border-slate-200 bg-slate-100 text-slate-500 hover:bg-slate-200"
+                            : "border-border bg-muted text-muted-foreground hover:bg-muted"
                         }`}
                       >
                         {user.status === "ACTIVE" || !user.status ? (
@@ -293,7 +293,7 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
                           </>
                         ) : (
                           <>
-                            <XCircle className="h-3 w-3 text-slate-400" />
+                            <XCircle className="h-3 w-3 text-faint-foreground" />
                             Nonaktif
                           </>
                         )}
@@ -304,7 +304,7 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
                         value={user.role_id || ""}
                         onChange={(e) => handleRoleChange(user.id, e.target.value)}
                         disabled={updatingUserId === user.id}
-                        className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none disabled:opacity-50"
+                        className="rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none disabled:opacity-50"
                       >
                         <option value="">-- Pilih Role --</option>
                         {roles.map((r) => (
@@ -329,13 +329,13 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
             className="absolute inset-0 bg-slate-900/50"
             onClick={() => !isCreating && setIsModalOpen(false)}
           />
-          <div className="relative w-full max-w-md rounded-xl border border-slate-100 bg-white shadow-xl">
-            <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
-              <h3 className="text-base font-bold text-slate-800">Tambah Pengguna Baru</h3>
+          <div className="relative w-full max-w-md rounded-xl border border-border-soft bg-card shadow-xl">
+            <div className="flex items-center justify-between border-b border-border-soft px-6 py-4">
+              <h3 className="text-base font-bold text-foreground">Tambah Pengguna Baru</h3>
               <button
                 onClick={() => setIsModalOpen(false)}
                 disabled={isCreating}
-                className="rounded-lg p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 disabled:opacity-50"
+                className="rounded-lg p-1 text-faint-foreground transition-colors hover:bg-muted hover:text-muted-foreground disabled:opacity-50"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -349,7 +349,7 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
               )}
 
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="new-user-name" className="text-xs font-semibold text-slate-600">
+                <label htmlFor="new-user-name" className="text-xs font-semibold text-muted-foreground">
                   Nama Lengkap
                 </label>
                 <input
@@ -358,12 +358,12 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
                   value={form.full_name}
                   onChange={(e) => setForm({ ...form, full_name: e.target.value })}
                   placeholder="Nama lengkap pengguna"
-                  className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                  className="rounded-lg border border-border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                 />
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="new-user-email" className="text-xs font-semibold text-slate-600">
+                <label htmlFor="new-user-email" className="text-xs font-semibold text-muted-foreground">
                   Email
                 </label>
                 <input
@@ -372,12 +372,12 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   placeholder="nama@perusahaan.com"
-                  className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                  className="rounded-lg border border-border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                 />
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="new-user-password" className="text-xs font-semibold text-slate-600">
+                <label htmlFor="new-user-password" className="text-xs font-semibold text-muted-foreground">
                   Password
                 </label>
                 <input
@@ -387,19 +387,19 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
                   placeholder="Minimal 6 karakter"
                   minLength={6}
-                  className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                  className="rounded-lg border border-border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                 />
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="new-user-role" className="text-xs font-semibold text-slate-600">
+                <label htmlFor="new-user-role" className="text-xs font-semibold text-muted-foreground">
                   Role
                 </label>
                 <select
                   id="new-user-role"
                   value={form.role_id}
                   onChange={(e) => setForm({ ...form, role_id: e.target.value })}
-                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                  className="rounded-lg border border-border bg-card px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                 >
                   <option value="">-- Pilih Role --</option>
                   {roles.map((r) => (
@@ -415,7 +415,7 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
                   type="button"
                   onClick={() => setIsModalOpen(false)}
                   disabled={isCreating}
-                  className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 disabled:opacity-50"
+                  className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted disabled:opacity-50"
                 >
                   Batal
                 </button>

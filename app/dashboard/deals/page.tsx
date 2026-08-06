@@ -111,10 +111,10 @@ export default function DealsPage() {
       {/* Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
             Daftar Transaksi (Deals)
           </h1>
-          <p className="mt-0.5 text-sm text-slate-500">
+          <p className="mt-0.5 text-sm text-muted-foreground">
             Kelola semua transaksi penjualan reguler, booking, dan cicilan.
           </p>
         </div>
@@ -122,10 +122,10 @@ export default function DealsPage() {
           <button
             onClick={handleExportExcel}
             disabled={isExporting}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-900 disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50"
           >
             {isExporting ? (
-              <Loader2 className="h-4 w-4 animate-spin text-slate-500" />
+              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
             ) : (
               <FileText className="h-4 w-4" />
             )}
@@ -142,89 +142,89 @@ export default function DealsPage() {
       </div>
 
       {/* Action Bar */}
-      <div className="flex flex-col items-center justify-between gap-4 rounded-xl border border-slate-100 bg-white p-4 shadow-sm sm:flex-row">
+      <div className="flex flex-col items-center justify-between gap-4 rounded-xl border border-border-soft bg-card p-4 shadow-sm sm:flex-row">
         <div className="relative w-full sm:w-96">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <Search className="h-4 w-4 text-slate-400" />
+            <Search className="h-4 w-4 text-faint-foreground" />
           </div>
           <input
             type="text"
-            className="block w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pr-3 pl-10 text-slate-900 placeholder-slate-400 transition-all outline-none focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className="block w-full rounded-lg border border-border bg-muted py-2 pr-3 pl-10 text-foreground placeholder-slate-400 transition-all outline-none focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             placeholder="Cari nomor deal, customer, atau stok..."
           />
         </div>
         <div className="flex w-full items-center gap-3 sm:w-auto">
-          <button className="inline-flex w-full min-w-[140px] items-center justify-between gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 sm:w-auto">
+          <button className="inline-flex w-full min-w-[140px] items-center justify-between gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-muted sm:w-auto">
             <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-slate-400" />
+              <Filter className="h-4 w-4 text-faint-foreground" />
               <span>Semua Status</span>
             </div>
-            <ChevronDown className="h-4 w-4 text-slate-400" />
+            <ChevronDown className="h-4 w-4 text-faint-foreground" />
           </button>
-          <button className="inline-flex w-full min-w-[140px] items-center justify-between gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 sm:w-auto">
+          <button className="inline-flex w-full min-w-[140px] items-center justify-between gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-muted sm:w-auto">
             <span>Pilih Tanggal</span>
-            <ChevronDown className="h-4 w-4 text-slate-400" />
+            <ChevronDown className="h-4 w-4 text-faint-foreground" />
           </button>
         </div>
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-border-soft bg-card shadow-sm">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-slate-200">
-            <thead className="bg-slate-50/80">
+          <table className="min-w-full divide-y divide-border">
+            <thead className="bg-muted/80">
               <tr>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-slate-500 uppercase"
+                  className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase"
                 >
                   Nomor Deal
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-slate-500 uppercase"
+                  className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase"
                 >
                   Customer
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-slate-500 uppercase"
+                  className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase"
                 >
                   Stok yang Dijual
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-right text-xs font-semibold tracking-wider text-slate-500 uppercase"
+                  className="px-6 py-4 text-right text-xs font-semibold tracking-wider text-muted-foreground uppercase"
                 >
                   Harga Deal
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-right text-xs font-semibold tracking-wider text-slate-500 uppercase"
+                  className="px-6 py-4 text-right text-xs font-semibold tracking-wider text-muted-foreground uppercase"
                 >
                   Total Dibayar
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-center text-xs font-semibold tracking-wider text-slate-500 uppercase"
+                  className="px-6 py-4 text-center text-xs font-semibold tracking-wider text-muted-foreground uppercase"
                 >
                   Status Deal
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-right text-xs font-semibold tracking-wider text-slate-500 uppercase"
+                  className="px-6 py-4 text-right text-xs font-semibold tracking-wider text-muted-foreground uppercase"
                 >
                   Tanggal Deal
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-center text-xs font-semibold tracking-wider text-slate-500 uppercase"
+                  className="px-6 py-4 text-center text-xs font-semibold tracking-wider text-muted-foreground uppercase"
                 >
                   Aksi
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 bg-white">
+            <tbody className="divide-y divide-border-soft bg-card">
               {isLoading ? (
                 <tr>
                   <td colSpan={8} className="px-6 py-12 text-center">
@@ -233,13 +233,13 @@ export default function DealsPage() {
                 </tr>
               ) : deals.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-6 py-8 text-center text-sm text-slate-500">
+                  <td colSpan={8} className="px-6 py-8 text-center text-sm text-muted-foreground">
                     Belum ada transaksi.
                   </td>
                 </tr>
               ) : (
                 deals.map((deal) => {
-                  let badgeClass = "bg-slate-100 text-slate-600 border-slate-200";
+                  let badgeClass = "bg-muted text-muted-foreground border-border";
                   if (
                     (deal.status as string) === "Lunas" ||
                     (deal.status as string) === "Selesai"
@@ -257,19 +257,19 @@ export default function DealsPage() {
                   const stockName = deal.deal_items?.[0]?.stocks?.name || "N/A";
 
                   return (
-                    <tr key={deal.id} className="group transition-colors hover:bg-slate-50/50">
-                      <td className="px-6 py-4 text-sm font-semibold whitespace-nowrap text-slate-900">
+                    <tr key={deal.id} className="group transition-colors hover:bg-muted/50">
+                      <td className="px-6 py-4 text-sm font-semibold whitespace-nowrap text-foreground">
                         {deal.deal_number}
                       </td>
-                      <td className="px-6 py-4 text-sm font-medium whitespace-nowrap text-slate-600">
+                      <td className="px-6 py-4 text-sm font-medium whitespace-nowrap text-muted-foreground">
                         {deal.customers?.name || "-"}
                       </td>
-                      <td className="px-6 py-4 text-sm whitespace-nowrap text-slate-600">
+                      <td className="px-6 py-4 text-sm whitespace-nowrap text-muted-foreground">
                         <span className="block max-w-[200px] truncate" title={stockName}>
                           {stockName}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-right text-sm font-semibold whitespace-nowrap text-slate-900">
+                      <td className="px-6 py-4 text-right text-sm font-semibold whitespace-nowrap text-foreground">
                         {formatRupiah(Number(deal.total_deal_price))}
                       </td>
                       <td className="px-6 py-4 text-right text-sm whitespace-nowrap">
@@ -280,7 +280,7 @@ export default function DealsPage() {
                             {formatRupiah(Number(deal.total_paid))}
                           </span>
                           {Number(deal.total_paid) < Number(deal.total_deal_price) && (
-                            <span className="mt-0.5 text-[10px] font-medium text-slate-400">
+                            <span className="mt-0.5 text-[10px] font-medium text-faint-foreground">
                               Sisa:{" "}
                               {formatRupiah(
                                 Number(deal.total_deal_price) - Number(deal.total_paid),
@@ -296,7 +296,7 @@ export default function DealsPage() {
                           {deal.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-right text-sm whitespace-nowrap text-slate-500">
+                      <td className="px-6 py-4 text-right text-sm whitespace-nowrap text-muted-foreground">
                         {formatDate(deal.created_at)}
                       </td>
                       <td className="px-6 py-4 text-center text-sm font-medium whitespace-nowrap">
@@ -317,18 +317,18 @@ export default function DealsPage() {
         </div>
 
         {/* Pagination Mockup */}
-        <div className="flex items-center justify-between border-t border-slate-100 bg-white px-6 py-4">
-          <div className="text-sm text-slate-500">
+        <div className="flex items-center justify-between border-t border-border-soft bg-card px-6 py-4">
+          <div className="text-sm text-muted-foreground">
             Menampilkan{" "}
-            <span className="font-semibold text-slate-900">{deals.length > 0 ? 1 : 0}</span> -{" "}
-            <span className="font-semibold text-slate-900">{deals.length}</span> dari{" "}
-            <span className="font-semibold text-slate-900">{deals.length}</span> transaksi
+            <span className="font-semibold text-foreground">{deals.length > 0 ? 1 : 0}</span> -{" "}
+            <span className="font-semibold text-foreground">{deals.length}</span> dari{" "}
+            <span className="font-semibold text-foreground">{deals.length}</span> transaksi
           </div>
           <div className="flex gap-1">
-            <button className="cursor-not-allowed rounded-md border border-slate-200 px-3 py-1 text-sm text-slate-400">
+            <button className="cursor-not-allowed rounded-md border border-border px-3 py-1 text-sm text-faint-foreground">
               Sebelummnya
             </button>
-            <button className="rounded-md border border-slate-200 px-3 py-1 text-sm font-medium text-slate-700 hover:bg-slate-50">
+            <button className="rounded-md border border-border px-3 py-1 text-sm font-medium text-foreground hover:bg-muted">
               Selanjutnya
             </button>
           </div>
@@ -338,17 +338,17 @@ export default function DealsPage() {
       {/* Buat Deal Baru Modal (Slide-over / Modal) */}
       {isAddDealOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm">
-          <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-white shadow-2xl duration-300">
-            <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-6 py-5">
+          <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-card shadow-2xl duration-300">
+            <div className="flex items-center justify-between border-b border-border-soft bg-muted px-6 py-5">
               <div>
-                <h2 className="text-lg font-bold text-slate-900">Buat Deal Baru</h2>
-                <p className="mt-1 text-xs text-slate-500">
+                <h2 className="text-lg font-bold text-foreground">Buat Deal Baru</h2>
+                <p className="mt-1 text-xs text-muted-foreground">
                   Isi form transaksi penjualan atau booking.
                 </p>
               </div>
               <button
                 onClick={() => setIsAddDealOpen(false)}
-                className="rounded-full bg-white p-2 text-slate-400 shadow-sm transition-colors hover:text-slate-600"
+                className="rounded-full bg-card p-2 text-faint-foreground shadow-sm transition-colors hover:text-muted-foreground"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -361,13 +361,13 @@ export default function DealsPage() {
                   </div>
                 )}
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">
+                  <label className="mb-1 block text-sm font-medium text-foreground">
                     Pilih Stok
                   </label>
                   <select
                     name="stock_id"
                     required
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full rounded-lg border border-border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   >
                     <option value="">-- Pilih Stok Tersedia --</option>
                     {stocks.map((stock) => (
@@ -378,30 +378,30 @@ export default function DealsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">
+                  <label className="mb-1 block text-sm font-medium text-foreground">
                     Nama Customer
                   </label>
                   <input
                     name="customer_name"
                     required
                     type="text"
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full rounded-lg border border-border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     placeholder="Mis. Budi Santoso"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">
+                  <label className="mb-1 block text-sm font-medium text-foreground">
                     No. HP Customer (Opsional)
                   </label>
                   <input
                     name="customer_phone"
                     type="text"
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full rounded-lg border border-border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     placeholder="Mis. 08123456789"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">
+                  <label className="mb-1 block text-sm font-medium text-foreground">
                     Harga Deal
                   </label>
                   <input
@@ -409,34 +409,34 @@ export default function DealsPage() {
                     required
                     type="number"
                     min="1"
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full rounded-lg border border-border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     placeholder="Rp 0"
                   />
                 </div>
 
-                <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
-                  <h3 className="mb-3 text-sm font-semibold text-slate-900">Pembayaran Awal</h3>
+                <div className="rounded-xl border border-border-soft bg-muted p-4">
+                  <h3 className="mb-3 text-sm font-semibold text-foreground">Pembayaran Awal</h3>
                   <div className="space-y-3">
                     <div>
-                      <label className="mb-1 block text-xs font-medium text-slate-600">
+                      <label className="mb-1 block text-xs font-medium text-muted-foreground">
                         Nominal Pembayaran (Bisa 0 jika piutang total)
                       </label>
                       <input
                         name="payment_amount"
                         type="number"
                         min="0"
-                        className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         placeholder="Rp 0"
                         defaultValue={0}
                       />
                     </div>
                     <div>
-                      <label className="mb-1 block text-xs font-medium text-slate-600">
+                      <label className="mb-1 block text-xs font-medium text-muted-foreground">
                         Metode Pembayaran
                       </label>
                       <select
                         name="account_id"
-                        className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                       >
                         <option value="">-- Pilih Rekening (Kosongkan jika 0) --</option>
                         {accounts
@@ -451,7 +451,7 @@ export default function DealsPage() {
                   </div>
                 </div>
               </div>
-              <div className="border-t border-slate-100 bg-white p-6">
+              <div className="border-t border-border-soft bg-card p-6">
                 <button
                   type="submit"
                   disabled={isSubmitting}

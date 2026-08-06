@@ -182,15 +182,15 @@ export default function LedgerPage() {
       {/* Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Buku Kas / Ledger</h1>
-          <p className="mt-0.5 text-sm text-slate-500">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Buku Kas / Ledger</h1>
+          <p className="mt-0.5 text-sm text-muted-foreground">
             Catatan riwayat seluruh pergerakan uang masuk, keluar, dan mutasi internal.
           </p>
         </div>
         <div className="flex items-center gap-3">
           <button
             onClick={handleExportExcel}
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:text-slate-900"
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-semibold text-foreground shadow-sm transition-all hover:bg-muted hover:text-foreground"
           >
             <FileText className="h-4 w-4" />
             Export Excel
@@ -209,26 +209,26 @@ export default function LedgerPage() {
       </div>
 
       {/* Action Bar */}
-      <div className="flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:flex-row">
+      <div className="flex flex-col items-center justify-between gap-4 rounded-2xl border border-border-soft bg-card p-4 shadow-sm sm:flex-row">
         <div className="relative w-full sm:w-96">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <Search className="h-4 w-4 text-slate-400" />
+            <Search className="h-4 w-4 text-faint-foreground" />
           </div>
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="block w-full rounded-xl border border-slate-200 bg-slate-50/70 py-2 pr-3 pl-10 text-slate-900 placeholder-slate-400 transition-all outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20 sm:text-sm"
+            className="block w-full rounded-xl border border-border bg-muted/70 py-2 pr-3 pl-10 text-foreground placeholder-slate-400 transition-all outline-none focus:border-blue-500 focus:bg-card focus:ring-2 focus:ring-blue-500/20 sm:text-sm"
             placeholder="Cari referensi, catatan, atau ID..."
           />
         </div>
         <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto">
-          <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700">
-            <Filter className="h-4 w-4 text-slate-400" />
+          <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground">
+            <Filter className="h-4 w-4 text-faint-foreground" />
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
-              className="cursor-pointer bg-transparent text-sm font-medium text-slate-700 outline-none"
+              className="cursor-pointer bg-transparent text-sm font-medium text-foreground outline-none"
             >
               <option value="ALL">Semua Tipe Kas</option>
               <option value="IN">Uang Masuk (IN)</option>
@@ -239,10 +239,10 @@ export default function LedgerPage() {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-border-soft bg-card shadow-sm">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-slate-100 text-left text-sm">
-            <thead className="bg-slate-50/80 text-xs font-semibold tracking-wider text-slate-500 uppercase">
+          <table className="min-w-full divide-y divide-border-soft text-left text-sm">
+            <thead className="bg-muted/80 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
               <tr>
                 <th scope="col" className="px-6 py-4">
                   Tanggal & ID
@@ -264,7 +264,7 @@ export default function LedgerPage() {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 bg-white text-slate-600">
+            <tbody className="divide-y divide-border-soft bg-card text-muted-foreground">
               {isLoading ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-16 text-center">
@@ -273,7 +273,7 @@ export default function LedgerPage() {
                 </tr>
               ) : filteredLedgers.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-sm text-slate-400">
+                  <td colSpan={6} className="px-6 py-12 text-center text-sm text-faint-foreground">
                     Tidak ada riwayat mutasi yang cocok dengan pencarian/filter.
                   </td>
                 </tr>
@@ -282,7 +282,7 @@ export default function LedgerPage() {
                   const isPositive = Number(tx.amount) >= 0;
 
                   // Determine Badge styling based on transaction type
-                  let typeBadge = "bg-slate-50 text-slate-600 border-slate-200";
+                  let typeBadge = "bg-muted text-muted-foreground border-border";
                   let IconType = ArrowUpRight;
                   if ((tx.transaction_type as string) === "Pembayaran Masuk") {
                     typeBadge = "bg-emerald-50 text-emerald-600 border-emerald-100";
@@ -304,14 +304,14 @@ export default function LedgerPage() {
                   }
 
                   return (
-                    <tr key={tx.id} className="group transition-colors hover:bg-slate-50/50">
+                    <tr key={tx.id} className="group transition-colors hover:bg-muted/50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex flex-col">
-                          <span className="mb-0.5 text-[11px] font-medium text-slate-400">
+                          <span className="mb-0.5 text-[11px] font-medium text-faint-foreground">
                             {formatDate(tx.created_at)}
                           </span>
                           <span
-                            className="w-24 truncate font-mono text-xs font-semibold text-slate-900"
+                            className="w-24 truncate font-mono text-xs font-semibold text-foreground"
                             title={tx.id}
                           >
                             {tx.id.split("-")[0]}...
@@ -326,21 +326,21 @@ export default function LedgerPage() {
                           {tx.transaction_type}
                         </span>
                       </td>
-                      <td className="px-6 py-4 font-medium whitespace-nowrap text-slate-700">
+                      <td className="px-6 py-4 font-medium whitespace-nowrap text-foreground">
                         {tx.accounts?.name || "-"}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex max-w-[280px] flex-col">
-                          <span className="truncate font-semibold text-slate-900">
+                          <span className="truncate font-semibold text-foreground">
                             {tx.ref_id ? `Ref: ${tx.ref_id}` : "-"}
                           </span>
-                          <span className="mt-0.5 truncate text-xs text-slate-500">
+                          <span className="mt-0.5 truncate text-xs text-muted-foreground">
                             {tx.notes || "-"}
                           </span>
                         </div>
                       </td>
                       <td
-                        className={`px-6 py-4 text-right font-bold tracking-tight whitespace-nowrap ${isPositive ? "text-emerald-600" : "text-slate-900"}`}
+                        className={`px-6 py-4 text-right font-bold tracking-tight whitespace-nowrap ${isPositive ? "text-emerald-600" : "text-foreground"}`}
                       >
                         {isPositive ? "+" : ""}
                         {formatRupiah(Number(tx.amount))}
@@ -392,17 +392,17 @@ export default function LedgerPage() {
       {/* Add Manual Ledger Modal */}
       {isAddManualOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm">
-          <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-white shadow-2xl duration-200">
-            <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-5">
+          <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-card shadow-2xl duration-200">
+            <div className="flex items-center justify-between border-b border-border-soft bg-muted/50 px-6 py-5">
               <div>
-                <h2 className="text-base font-bold text-slate-900">Catat Kas Manual</h2>
-                <p className="mt-0.5 text-xs text-slate-500">
+                <h2 className="text-base font-bold text-foreground">Catat Kas Manual</h2>
+                <p className="mt-0.5 text-xs text-muted-foreground">
                   Tambah entri uang masuk, keluar, atau pengeluaran operasional.
                 </p>
               </div>
               <button
                 onClick={() => setIsAddManualOpen(false)}
-                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                className="rounded-lg p-1.5 text-faint-foreground hover:bg-muted hover:text-muted-foreground"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -415,13 +415,13 @@ export default function LedgerPage() {
                   </div>
                 )}
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-700">
+                  <label className="mb-1 block text-xs font-medium text-foreground">
                     Pilih Rekening <span className="text-rose-500">*</span>
                   </label>
                   <select
                     name="account_id"
                     required
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                    className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                   >
                     {accounts.map((acc) => (
                       <option key={acc.id} value={acc.id}>
@@ -431,13 +431,13 @@ export default function LedgerPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-700">
+                  <label className="mb-1 block text-xs font-medium text-foreground">
                     Tipe Transaksi <span className="text-rose-500">*</span>
                   </label>
                   <select
                     name="transaction_type"
                     required
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                    className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                   >
                     <option value="PAYMENT_IN">Uang Masuk (PAYMENT_IN)</option>
                     <option value="PAYMENT_OUT">Uang Keluar (PAYMENT_OUT)</option>
@@ -446,7 +446,7 @@ export default function LedgerPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-700">
+                  <label className="mb-1 block text-xs font-medium text-foreground">
                     Nominal Transaksi (Rp) <span className="text-rose-500">*</span>
                   </label>
                   <input
@@ -454,27 +454,27 @@ export default function LedgerPage() {
                     type="number"
                     required
                     min="1"
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                    className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                     placeholder="Misal: 50000"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-700">
+                  <label className="mb-1 block text-xs font-medium text-foreground">
                     Catatan / Keterangan
                   </label>
                   <textarea
                     name="notes"
                     rows={3}
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                    className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                     placeholder="Misal: Biaya admin bank, bayar listrik server, dsb."
                   />
                 </div>
               </div>
-              <div className="flex items-center justify-end gap-3 border-t border-slate-100 bg-slate-50/50 p-6">
+              <div className="flex items-center justify-end gap-3 border-t border-border-soft bg-muted/50 p-6">
                 <button
                   type="button"
                   onClick={() => setIsAddManualOpen(false)}
-                  className="rounded-lg px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100"
+                  className="rounded-lg px-4 py-2 text-xs font-semibold text-muted-foreground hover:bg-muted"
                 >
                   Batal
                 </button>
@@ -501,17 +501,17 @@ export default function LedgerPage() {
       {/* Edit Ledger Modal */}
       {editingLedger && (
         <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm">
-          <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-white shadow-2xl duration-200">
-            <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-5">
+          <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-card shadow-2xl duration-200">
+            <div className="flex items-center justify-between border-b border-border-soft bg-muted/50 px-6 py-5">
               <div>
-                <h2 className="text-base font-bold text-slate-900">Edit Catatan Transaksi</h2>
-                <p className="mt-0.5 text-xs text-slate-500">
+                <h2 className="text-base font-bold text-foreground">Edit Catatan Transaksi</h2>
+                <p className="mt-0.5 text-xs text-muted-foreground">
                   Ubah deskripsi atau catatan entri kas ini.
                 </p>
               </div>
               <button
                 onClick={() => setEditingLedger(null)}
-                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                className="rounded-lg p-1.5 text-faint-foreground hover:bg-muted hover:text-muted-foreground"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -524,23 +524,23 @@ export default function LedgerPage() {
                   </div>
                 )}
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-500">
+                  <label className="mb-1 block text-xs font-medium text-muted-foreground">
                     ID Transaksi
                   </label>
-                  <p className="truncate rounded-lg border border-slate-200 bg-slate-50 p-2 font-mono text-xs font-semibold text-slate-700">
+                  <p className="truncate rounded-lg border border-border bg-muted p-2 font-mono text-xs font-semibold text-foreground">
                     {editingLedger.id}
                   </p>
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-500">
+                  <label className="mb-1 block text-xs font-medium text-muted-foreground">
                     Tipe Transaksi & Nominal
                   </label>
-                  <p className="text-sm font-bold text-slate-900">
+                  <p className="text-sm font-bold text-foreground">
                     {editingLedger.transaction_type} ({formatRupiah(Number(editingLedger.amount))})
                   </p>
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-700">
+                  <label className="mb-1 block text-xs font-medium text-foreground">
                     Catatan / Keterangan <span className="text-rose-500">*</span>
                   </label>
                   <textarea
@@ -548,16 +548,16 @@ export default function LedgerPage() {
                     required
                     rows={4}
                     defaultValue={editingLedger.notes || ""}
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                    className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                     placeholder="Catatan transaksi..."
                   />
                 </div>
               </div>
-              <div className="flex items-center justify-end gap-3 border-t border-slate-100 bg-slate-50/50 p-6">
+              <div className="flex items-center justify-end gap-3 border-t border-border-soft bg-muted/50 p-6">
                 <button
                   type="button"
                   onClick={() => setEditingLedger(null)}
-                  className="rounded-lg px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100"
+                  className="rounded-lg px-4 py-2 text-xs font-semibold text-muted-foreground hover:bg-muted"
                 >
                   Batal
                 </button>

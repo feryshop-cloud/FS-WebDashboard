@@ -46,7 +46,7 @@ function getBuyBadgeClass(status: string) {
   if (status === BuyStatus.SUCCESS) return "bg-emerald-50 text-emerald-600 border-emerald-100";
   if (status === BuyStatus.PROCESSING) return "bg-orange-50 text-orange-600 border-orange-100";
   if (status === BuyStatus.FAILED) return "bg-rose-50 text-rose-600 border-rose-100";
-  return "bg-slate-100 text-slate-600 border-slate-200";
+  return "bg-muted text-muted-foreground border-border";
 }
 
 export default function TopupOrdersPage() {
@@ -208,11 +208,11 @@ export default function TopupOrdersPage() {
       {/* Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight text-foreground">
             <ShoppingBag className="h-7 w-7 text-blue-600" />
             Top-Up Orders
           </h1>
-          <p className="mt-0.5 text-sm text-slate-500">
+          <p className="mt-0.5 text-sm text-muted-foreground">
             Kelola pesanan top-up dari storefront, proses pengiriman (SN), dan status pesanan.
           </p>
         </div>
@@ -220,7 +220,7 @@ export default function TopupOrdersPage() {
           <button
             onClick={() => loadOrders({ page: 1, pageSize: pagination.pageSize })}
             disabled={isLoading}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-900"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-muted hover:text-foreground"
           >
             <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
             Refresh
@@ -228,7 +228,7 @@ export default function TopupOrdersPage() {
           <button
             onClick={handleExportCSV}
             disabled={orders.length === 0}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-900 disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50"
           >
             <FileText className="h-4 w-4" />
             Export CSV
@@ -237,10 +237,10 @@ export default function TopupOrdersPage() {
       </div>
 
       {/* Action Bar */}
-      <div className="flex flex-col gap-4 rounded-xl border border-slate-100 bg-white p-4 shadow-sm lg:flex-row lg:items-center">
+      <div className="flex flex-col gap-4 rounded-xl border border-border-soft bg-card p-4 shadow-sm lg:flex-row lg:items-center">
         <div className="relative w-full lg:w-96">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <Search className="h-4 w-4 text-slate-400" />
+            <Search className="h-4 w-4 text-faint-foreground" />
           </div>
           <input
             type="text"
@@ -249,17 +249,17 @@ export default function TopupOrdersPage() {
             onKeyDown={(e) => {
               if (e.key === "Enter") handleApplyFilters();
             }}
-            className="block w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pr-3 pl-10 text-slate-900 placeholder-slate-400 transition-all outline-none focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className="block w-full rounded-lg border border-border bg-muted py-2 pr-3 pl-10 text-foreground placeholder-slate-400 transition-all outline-none focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             placeholder="Cari order ID, nickname, atau ID game..."
           />
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2">
-            <Filter className="h-4 w-4 text-slate-400" />
+          <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
+            <Filter className="h-4 w-4 text-faint-foreground" />
             <select
               value={paymentStatus}
               onChange={(e) => setPaymentStatus(e.target.value)}
-              className="bg-transparent text-sm font-medium text-slate-700 outline-none"
+              className="bg-transparent text-sm font-medium text-foreground outline-none"
             >
               <option value="">Semua Status Pembayaran</option>
               {VALID_PAYMENT_STATUSES.map((s) => (
@@ -268,14 +268,14 @@ export default function TopupOrdersPage() {
                 </option>
               ))}
             </select>
-            <ChevronDown className="h-4 w-4 text-slate-400" />
+            <ChevronDown className="h-4 w-4 text-faint-foreground" />
           </div>
-          <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2">
-            <Filter className="h-4 w-4 text-slate-400" />
+          <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
+            <Filter className="h-4 w-4 text-faint-foreground" />
             <select
               value={buyStatus}
               onChange={(e) => setBuyStatus(e.target.value)}
-              className="bg-transparent text-sm font-medium text-slate-700 outline-none"
+              className="bg-transparent text-sm font-medium text-foreground outline-none"
             >
               <option value="">Semua Status Pengiriman</option>
               {VALID_BUY_STATUSES.map((s) => (
@@ -284,7 +284,7 @@ export default function TopupOrdersPage() {
                 </option>
               ))}
             </select>
-            <ChevronDown className="h-4 w-4 text-slate-400" />
+            <ChevronDown className="h-4 w-4 text-faint-foreground" />
           </div>
           <button
             onClick={handleApplyFilters}
@@ -294,7 +294,7 @@ export default function TopupOrdersPage() {
           </button>
           <button
             onClick={handleResetFilters}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-muted"
           >
             Reset
           </button>
@@ -302,62 +302,62 @@ export default function TopupOrdersPage() {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-border-soft bg-card shadow-sm">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-slate-200">
-            <thead className="bg-slate-50/80">
+          <table className="min-w-full divide-y divide-border">
+            <thead className="bg-muted/80">
               <tr>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-slate-500 uppercase"
+                  className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase"
                 >
                   Order ID
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-slate-500 uppercase"
+                  className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase"
                 >
                   Produk
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-slate-500 uppercase"
+                  className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase"
                 >
                   Game ID / Nickname
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-right text-xs font-semibold tracking-wider text-slate-500 uppercase"
+                  className="px-6 py-4 text-right text-xs font-semibold tracking-wider text-muted-foreground uppercase"
                 >
                   Total Harga
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-center text-xs font-semibold tracking-wider text-slate-500 uppercase"
+                  className="px-6 py-4 text-center text-xs font-semibold tracking-wider text-muted-foreground uppercase"
                 >
                   Pembayaran
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-center text-xs font-semibold tracking-wider text-slate-500 uppercase"
+                  className="px-6 py-4 text-center text-xs font-semibold tracking-wider text-muted-foreground uppercase"
                 >
                   Status
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-right text-xs font-semibold tracking-wider text-slate-500 uppercase"
+                  className="px-6 py-4 text-right text-xs font-semibold tracking-wider text-muted-foreground uppercase"
                 >
                   Tanggal
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-center text-xs font-semibold tracking-wider text-slate-500 uppercase"
+                  className="px-6 py-4 text-center text-xs font-semibold tracking-wider text-muted-foreground uppercase"
                 >
                   Aksi
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 bg-white">
+            <tbody className="divide-y divide-border-soft bg-card">
               {isLoading ? (
                 <tr>
                   <td colSpan={8} className="px-6 py-12 text-center">
@@ -366,31 +366,31 @@ export default function TopupOrdersPage() {
                 </tr>
               ) : orders.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-6 py-8 text-center text-sm text-slate-500">
+                  <td colSpan={8} className="px-6 py-8 text-center text-sm text-muted-foreground">
                     Belum ada pesanan top-up yang cocok dengan filter.
                   </td>
                 </tr>
               ) : (
                 orders.map((order) => (
-                  <tr key={order.id} className="group transition-colors hover:bg-slate-50/50">
-                    <td className="px-6 py-4 font-mono text-sm font-semibold whitespace-nowrap text-slate-900">
+                  <tr key={order.id} className="group transition-colors hover:bg-muted/50">
+                    <td className="px-6 py-4 font-mono text-sm font-semibold whitespace-nowrap text-foreground">
                       {order.order_id}
                     </td>
-                    <td className="px-6 py-4 text-sm whitespace-nowrap text-slate-600">
+                    <td className="px-6 py-4 text-sm whitespace-nowrap text-muted-foreground">
                       <span className="block max-w-[200px] truncate" title={order.product_title}>
                         {order.product_title}
                       </span>
-                      <span className="mt-0.5 block text-xs text-slate-400">{order.game_slug}</span>
+                      <span className="mt-0.5 block text-xs text-faint-foreground">{order.game_slug}</span>
                     </td>
-                    <td className="px-6 py-4 text-sm whitespace-nowrap text-slate-600">
+                    <td className="px-6 py-4 text-sm whitespace-nowrap text-muted-foreground">
                       <span className="block">{order.id_games}</span>
                       {order.nickname && (
-                        <span className="mt-0.5 block text-xs text-slate-400">
+                        <span className="mt-0.5 block text-xs text-faint-foreground">
                           {order.nickname}
                         </span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-right text-sm font-semibold whitespace-nowrap text-slate-900">
+                    <td className="px-6 py-4 text-right text-sm font-semibold whitespace-nowrap text-foreground">
                       {formatRupiah(Number(order.total_price))}
                     </td>
                     <td className="px-6 py-4 text-center whitespace-nowrap">
@@ -408,7 +408,7 @@ export default function TopupOrdersPage() {
                         {BuyStatusLabel[order.buy_status as BuyStatus] || order.buy_status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right text-sm whitespace-nowrap text-slate-500">
+                    <td className="px-6 py-4 text-right text-sm whitespace-nowrap text-muted-foreground">
                       {formatDate(order.created_at)}
                     </td>
                     <td className="px-6 py-4 text-center text-sm font-medium whitespace-nowrap">
@@ -429,28 +429,28 @@ export default function TopupOrdersPage() {
         </div>
 
         {/* Pagination */}
-        <div className="flex flex-col items-center justify-between gap-3 border-t border-slate-100 bg-white px-6 py-4 sm:flex-row">
-          <div className="text-sm text-slate-500">
-            Menampilkan <span className="font-semibold text-slate-900">{startFrom}</span> -{" "}
-            <span className="font-semibold text-slate-900">{endTo}</span> dari{" "}
-            <span className="font-semibold text-slate-900">{pagination.total}</span> pesanan
+        <div className="flex flex-col items-center justify-between gap-3 border-t border-border-soft bg-card px-6 py-4 sm:flex-row">
+          <div className="text-sm text-muted-foreground">
+            Menampilkan <span className="font-semibold text-foreground">{startFrom}</span> -{" "}
+            <span className="font-semibold text-foreground">{endTo}</span> dari{" "}
+            <span className="font-semibold text-foreground">{pagination.total}</span> pesanan
           </div>
           <div className="flex items-center gap-1">
             <button
               onClick={() => handlePageChange(pagination.page - 1)}
               disabled={pagination.page <= 1}
-              className="inline-flex items-center gap-1 rounded-md border border-slate-200 px-3 py-1.5 text-sm text-slate-600 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+              className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
             >
               <ChevronLeft className="h-4 w-4" />
               Sebelumnya
             </button>
-            <span className="px-3 text-sm font-medium text-slate-700">
+            <span className="px-3 text-sm font-medium text-foreground">
               Hal {pagination.page} / {pagination.totalPages}
             </span>
             <button
               onClick={() => handlePageChange(pagination.page + 1)}
               disabled={pagination.page >= pagination.totalPages}
-              className="inline-flex items-center gap-1 rounded-md border border-slate-200 px-3 py-1.5 text-sm text-slate-600 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+              className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
             >
               Selanjutnya
               <ChevronRight className="h-4 w-4" />
@@ -462,15 +462,15 @@ export default function TopupOrdersPage() {
       {/* Processing Modal (Slide-over) */}
       {selectedOrder && (
         <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm">
-          <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-white shadow-2xl duration-300">
-            <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-6 py-5">
+          <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-card shadow-2xl duration-300">
+            <div className="flex items-center justify-between border-b border-border-soft bg-muted px-6 py-5">
               <div>
-                <h2 className="text-lg font-bold text-slate-900">Proses Pesanan</h2>
-                <p className="mt-1 font-mono text-xs text-slate-500">{selectedOrder.order_id}</p>
+                <h2 className="text-lg font-bold text-foreground">Proses Pesanan</h2>
+                <p className="mt-1 font-mono text-xs text-muted-foreground">{selectedOrder.order_id}</p>
               </div>
               <button
                 onClick={() => setSelectedOrder(null)}
-                className="rounded-full bg-white p-2 text-slate-400 shadow-sm transition-colors hover:text-slate-600"
+                className="rounded-full bg-card p-2 text-faint-foreground shadow-sm transition-colors hover:text-muted-foreground"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -494,39 +494,39 @@ export default function TopupOrdersPage() {
               )}
 
               {/* Order details */}
-              <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
-                <h3 className="mb-3 text-sm font-semibold text-slate-900">Detail Pesanan</h3>
+              <div className="rounded-xl border border-border-soft bg-muted p-4">
+                <h3 className="mb-3 text-sm font-semibold text-foreground">Detail Pesanan</h3>
                 <dl className="space-y-2 text-sm">
                   <div className="flex justify-between gap-4">
-                    <dt className="text-slate-500">Produk</dt>
-                    <dd className="text-right font-medium text-slate-900">
+                    <dt className="text-muted-foreground">Produk</dt>
+                    <dd className="text-right font-medium text-foreground">
                       {selectedOrder.product_title}
                     </dd>
                   </div>
                   <div className="flex justify-between gap-4">
-                    <dt className="text-slate-500">Game</dt>
-                    <dd className="text-right font-medium text-slate-900">
+                    <dt className="text-muted-foreground">Game</dt>
+                    <dd className="text-right font-medium text-foreground">
                       {selectedOrder.game_slug}
                     </dd>
                   </div>
                   <div className="flex justify-between gap-4">
-                    <dt className="text-slate-500">ID Game</dt>
-                    <dd className="text-right font-mono text-slate-900">
+                    <dt className="text-muted-foreground">ID Game</dt>
+                    <dd className="text-right font-mono text-foreground">
                       {selectedOrder.id_games}
                     </dd>
                   </div>
                   {selectedOrder.server_games && (
                     <div className="flex justify-between gap-4">
-                      <dt className="text-slate-500">Server</dt>
-                      <dd className="text-right font-mono text-slate-900">
+                      <dt className="text-muted-foreground">Server</dt>
+                      <dd className="text-right font-mono text-foreground">
                         {selectedOrder.server_games}
                       </dd>
                     </div>
                   )}
                   {selectedOrder.nickname && (
                     <div className="flex justify-between gap-4">
-                      <dt className="text-slate-500">Nickname</dt>
-                      <dd className="text-right text-slate-900">{selectedOrder.nickname}</dd>
+                      <dt className="text-muted-foreground">Nickname</dt>
+                      <dd className="text-right text-foreground">{selectedOrder.nickname}</dd>
                     </div>
                   )}
                   {selectedOrder.account_data &&
@@ -536,8 +536,8 @@ export default function TopupOrdersPage() {
                         if (key === "id" || key === "server") return null; // already shown above
                         return (
                           <div key={key} className="flex justify-between gap-4">
-                            <dt className="text-slate-500 capitalize">{key.replace(/_/g, " ")}</dt>
-                            <dd className="text-right font-mono text-slate-900 select-all">
+                            <dt className="text-muted-foreground capitalize">{key.replace(/_/g, " ")}</dt>
+                            <dd className="text-right font-mono text-foreground select-all">
                               {String(val ?? "-")}
                             </dd>
                           </div>
@@ -545,26 +545,26 @@ export default function TopupOrdersPage() {
                       },
                     )}
                   <div className="flex justify-between gap-4">
-                    <dt className="text-slate-500">Qty</dt>
-                    <dd className="text-right font-medium text-slate-900">
+                    <dt className="text-muted-foreground">Qty</dt>
+                    <dd className="text-right font-medium text-foreground">
                       {selectedOrder.quantity}
                     </dd>
                   </div>
                   <div className="flex justify-between gap-4">
-                    <dt className="text-slate-500">Harga Satuan</dt>
-                    <dd className="text-right text-slate-900">
+                    <dt className="text-muted-foreground">Harga Satuan</dt>
+                    <dd className="text-right text-foreground">
                       {formatRupiah(Number(selectedOrder.price))}
                     </dd>
                   </div>
                   <div className="flex justify-between gap-4">
-                    <dt className="text-slate-500">Fee</dt>
-                    <dd className="text-right text-slate-900">
+                    <dt className="text-muted-foreground">Fee</dt>
+                    <dd className="text-right text-foreground">
                       {formatRupiah(Number(selectedOrder.fee))}
                     </dd>
                   </div>
-                  <div className="flex justify-between gap-4 border-t border-slate-200 pt-2">
-                    <dt className="font-semibold text-slate-700">Total</dt>
-                    <dd className="font-bold text-slate-900">
+                  <div className="flex justify-between gap-4 border-t border-border pt-2">
+                    <dt className="font-semibold text-foreground">Total</dt>
+                    <dd className="font-bold text-foreground">
                       {formatRupiah(Number(selectedOrder.total_price))}
                     </dd>
                   </div>
@@ -572,23 +572,23 @@ export default function TopupOrdersPage() {
               </div>
 
               {/* Payment info */}
-              <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
-                <h3 className="mb-3 text-sm font-semibold text-slate-900">Informasi Pembayaran</h3>
+              <div className="rounded-xl border border-border-soft bg-muted p-4">
+                <h3 className="mb-3 text-sm font-semibold text-foreground">Informasi Pembayaran</h3>
                 <dl className="space-y-2 text-sm">
                   <div className="flex justify-between gap-4">
-                    <dt className="text-slate-500">Metode</dt>
-                    <dd className="text-right font-medium text-slate-900">
+                    <dt className="text-muted-foreground">Metode</dt>
+                    <dd className="text-right font-medium text-foreground">
                       {selectedOrder.payment_name}
                     </dd>
                   </div>
                   <div className="flex justify-between gap-4">
-                    <dt className="text-slate-500">Kode Bayar</dt>
-                    <dd className="text-right font-mono text-slate-900">
+                    <dt className="text-muted-foreground">Kode Bayar</dt>
+                    <dd className="text-right font-mono text-foreground">
                       {selectedOrder.payment_code_display || selectedOrder.payment_code}
                     </dd>
                   </div>
                   <div className="flex justify-between gap-4">
-                    <dt className="text-slate-500">Status</dt>
+                    <dt className="text-muted-foreground">Status</dt>
                     <dd className="text-right">
                       <span
                         className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${getPaymentBadgeClass(selectedOrder.payment_status)}`}
@@ -600,8 +600,8 @@ export default function TopupOrdersPage() {
                   </div>
                   {(selectedOrder.whatsapp || selectedOrder.email) && (
                     <div className="flex justify-between gap-4">
-                      <dt className="text-slate-500">Kontak</dt>
-                      <dd className="text-right text-slate-900">
+                      <dt className="text-muted-foreground">Kontak</dt>
+                      <dd className="text-right text-foreground">
                         {[selectedOrder.whatsapp, selectedOrder.email].filter(Boolean).join(" · ")}
                       </dd>
                     </div>
@@ -612,7 +612,7 @@ export default function TopupOrdersPage() {
               {/* Fulfillment form */}
               <div className="space-y-4">
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">
+                  <label className="mb-1 block text-sm font-medium text-foreground">
                     Serial Number (SN / Bukti Pengiriman)
                   </label>
                   <input
@@ -623,11 +623,11 @@ export default function TopupOrdersPage() {
                     }
                     placeholder="Masukkan SN atau bukti pengiriman..."
                     disabled={LOCKED_BUY_STATUSES.includes(selectedOrder.buy_status)}
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
+                    className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-muted disabled:text-faint-foreground"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">
+                  <label className="mb-1 block text-sm font-medium text-foreground">
                     Ubah Status Pesanan
                   </label>
                   <select
@@ -636,7 +636,7 @@ export default function TopupOrdersPage() {
                       setSelectedOrder({ ...selectedOrder, buy_status: e.target.value })
                     }
                     disabled={LOCKED_BUY_STATUSES.includes(selectedOrder.buy_status)}
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
+                    className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-muted disabled:text-faint-foreground"
                   >
                     {VALID_BUY_STATUSES.map((s) => (
                       <option key={s} value={s}>
@@ -648,7 +648,7 @@ export default function TopupOrdersPage() {
               </div>
             </div>
 
-            <div className="border-t border-slate-100 bg-white p-6">
+            <div className="border-t border-border-soft bg-card p-6">
               <button
                 onClick={handleSaveOrder}
                 disabled={isSaving || (selectedOrder && LOCKED_BUY_STATUSES.includes(selectedOrder.buy_status))}

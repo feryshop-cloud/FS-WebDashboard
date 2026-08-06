@@ -6,39 +6,39 @@ import { formatRupiah } from "@/lib/utils";
 
 export function DealTable({ deals }: { deals: DealWithRelations[] }) {
   return (
-    <div className="overflow-x-auto rounded-[10px] border border-gray-200 bg-white shadow-sm">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
+    <div className="overflow-x-auto rounded-[10px] border border-border bg-card shadow-sm">
+      <table className="min-w-full divide-y divide-border">
+        <thead className="bg-muted">
           <tr>
-            <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">
+            <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase">
               Deal Number
             </th>
-            <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">
+            <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase">
               Customer
             </th>
-            <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">
+            <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase">
               Stock Code
             </th>
-            <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">
+            <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase">
               Deal Price
             </th>
-            <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">
+            <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase">
               Paid (%)
             </th>
-            <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">
+            <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase">
               Status
             </th>
-            <th className="px-6 py-4 text-right text-xs font-semibold tracking-wider text-gray-600 uppercase">
+            <th className="px-6 py-4 text-right text-xs font-semibold tracking-wider text-muted-foreground uppercase">
               Action
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200 bg-white">
+        <tbody className="divide-y divide-border bg-card">
           {deals.length === 0 ? (
             <tr>
-              <td colSpan={7} className="px-6 py-12 text-center text-sm text-gray-500">
+              <td colSpan={7} className="px-6 py-12 text-center text-sm text-muted-foreground">
                 <div className="flex flex-col items-center justify-center">
-                  <span className="mb-2 text-2xl text-gray-400">📝</span>
+                  <span className="mb-2 text-2xl text-faint-foreground">📝</span>
                   <span>No active deals found.</span>
                 </div>
               </td>
@@ -46,36 +46,36 @@ export function DealTable({ deals }: { deals: DealWithRelations[] }) {
           ) : (
             deals.map((deal) => (
               <tr key={deal.id} className="group transition-colors hover:bg-blue-50/50">
-                <td className="px-6 py-4 font-mono text-sm font-semibold whitespace-nowrap text-gray-900">
+                <td className="px-6 py-4 font-mono text-sm font-semibold whitespace-nowrap text-foreground">
                   {deal.deal_number}
                 </td>
-                <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-600">
-                  <div className="font-medium text-gray-900">{deal.customer_name}</div>
-                  <div className="text-xs text-gray-500">{deal.customer_contact || "-"}</div>
+                <td className="px-6 py-4 text-sm whitespace-nowrap text-muted-foreground">
+                  <div className="font-medium text-foreground">{deal.customer_name}</div>
+                  <div className="text-xs text-muted-foreground">{deal.customer_contact || "-"}</div>
                 </td>
-                <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-600">
+                <td className="px-6 py-4 text-sm whitespace-nowrap text-muted-foreground">
                   {deal.stock?.name || "Unknown Stock"}
                 </td>
-                <td className="px-6 py-4 font-mono text-sm font-medium whitespace-nowrap text-gray-900">
+                <td className="px-6 py-4 font-mono text-sm font-medium whitespace-nowrap text-foreground">
                   {formatRupiah(deal.deal_price)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex flex-col gap-1">
-                    <span className="font-mono text-sm text-gray-900">
+                    <span className="font-mono text-sm text-foreground">
                       {formatRupiah(deal.total_paid)}
                     </span>
-                    <div className="h-1.5 w-full rounded-[10px] bg-gray-200">
+                    <div className="h-1.5 w-full rounded-[10px] bg-muted">
                       <div
                         className={`h-1.5 rounded-[10px] ${deal.payment_percentage >= 100 ? "bg-emerald-500" : "bg-blue-600"}`}
                         style={{ width: `${Math.min(deal.payment_percentage, 100)}%` }}
                       ></div>
                     </div>
-                    <span className="text-[10px] font-semibold text-gray-500">
+                    <span className="text-[10px] font-semibold text-muted-foreground">
                       {deal.payment_percentage.toFixed(0)}%
                     </span>
                   </div>
                 </td>
-                <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500">
+                <td className="px-6 py-4 text-sm whitespace-nowrap text-muted-foreground">
                   {(() => {
                     const statusConfig: Record<string, { style: string; label: string }> = {
                       PAID: {
@@ -120,7 +120,7 @@ export function DealTable({ deals }: { deals: DealWithRelations[] }) {
                       },
                     };
                     const config = statusConfig[deal.status] || {
-                      style: "bg-slate-50 text-slate-600 ring-1 ring-slate-200/50",
+                      style: "bg-muted text-muted-foreground ring-1 ring-border/50",
                       label: deal.status,
                     };
                     return (

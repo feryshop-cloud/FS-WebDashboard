@@ -40,7 +40,7 @@ export function StockRowActions({ stock, categories = [] }: StockRowActionsProps
     <div className="relative flex justify-end">
       <button
         onClick={toggleMenu}
-        className="rounded-[10px] p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+        className="rounded-[10px] p-2 text-faint-foreground transition-colors hover:bg-muted hover:text-muted-foreground"
       >
         <MoreVertical className="h-5 w-5" />
       </button>
@@ -48,29 +48,29 @@ export function StockRowActions({ stock, categories = [] }: StockRowActionsProps
       {isMenuOpen && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setIsMenuOpen(false)} />
-          <div className="animate-in fade-in zoom-in-95 absolute right-0 z-20 mt-10 w-48 rounded-[10px] border border-gray-100 bg-white py-1 shadow-lg">
+          <div className="animate-in fade-in zoom-in-95 absolute right-0 z-20 mt-10 w-48 rounded-[10px] border border-border-soft bg-card py-1 shadow-lg">
             <button
               onClick={() => {
                 setIsMenuOpen(false);
                 setIsViewModalOpen(true);
               }}
-              className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
+              className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-foreground hover:bg-muted"
             >
               <Eye className="h-4 w-4 text-emerald-500" />
               Lihat Detail
             </button>
-            <div className="my-1 h-px bg-gray-100" />
+            <div className="my-1 h-px bg-muted" />
             <button
               onClick={() => {
                 setIsMenuOpen(false);
                 setIsEditModalOpen(true);
               }}
-              className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
+              className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-foreground hover:bg-muted"
             >
               <Edit2 className="h-4 w-4 text-blue-500" />
               Edit Data
             </button>
-            <div className="my-1 h-px bg-gray-100" />
+            <div className="my-1 h-px bg-muted" />
             <button
               onClick={() => {
                 setIsMenuOpen(false);
@@ -107,7 +107,7 @@ export function StockRowActions({ stock, categories = [] }: StockRowActionsProps
             className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm"
             onClick={!isPending ? () => setIsDeleteDialogOpen(false) : undefined}
           />
-          <div className="animate-in fade-in zoom-in-95 relative flex w-full max-w-md flex-col overflow-hidden rounded-[10px] bg-white p-6 shadow-2xl">
+          <div className="animate-in fade-in zoom-in-95 relative flex w-full max-w-md flex-col overflow-hidden rounded-[10px] bg-card p-6 shadow-2xl">
             <div className="mb-4 flex items-center gap-3 text-red-600">
               <div className="rounded-[10px] bg-red-100 p-2">
                 <AlertTriangle className="h-6 w-6" />
@@ -115,7 +115,7 @@ export function StockRowActions({ stock, categories = [] }: StockRowActionsProps
               <h2 className="text-xl font-bold">Hapus Stok?</h2>
             </div>
 
-            <p className="mb-6 text-sm text-gray-600">
+            <p className="mb-6 text-sm text-muted-foreground">
               Anda yakin ingin menghapus stok <strong>{stock.name}</strong>? Tindakan ini tidak
               dapat dibatalkan.
             </p>
@@ -133,7 +133,7 @@ export function StockRowActions({ stock, categories = [] }: StockRowActionsProps
                   setDeleteError(null);
                 }}
                 disabled={isPending}
-                className="rounded-[10px] border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition-all hover:bg-gray-50"
+                className="rounded-[10px] border border-input bg-card px-4 py-2 text-sm font-semibold text-foreground transition-all hover:bg-muted"
               >
                 Batal
               </button>

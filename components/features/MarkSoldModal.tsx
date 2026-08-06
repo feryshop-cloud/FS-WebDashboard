@@ -53,15 +53,15 @@ export function MarkSoldModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm">
-      <div className="animate-in fade-in zoom-in-95 flex w-full max-w-md flex-col overflow-hidden rounded-[10px] border border-slate-200 bg-white duration-200">
-        <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50/50 p-6">
+      <div className="animate-in fade-in zoom-in-95 flex w-full max-w-md flex-col overflow-hidden rounded-[10px] border border-border bg-card duration-200">
+        <div className="flex items-center justify-between border-b border-border bg-muted/50 p-6">
           <div className="flex items-center space-x-2 text-emerald-600">
             <CheckCircle className="h-5 w-5" />
-            <h2 className="text-lg font-semibold text-slate-900">Tandai Laku</h2>
+            <h2 className="text-lg font-semibold text-foreground">Tandai Laku</h2>
           </div>
           <button
             onClick={onClose}
-            className="rounded-[10px] p-1.5 text-slate-400 transition-colors hover:bg-slate-200 hover:text-slate-600"
+            className="rounded-[10px] p-1.5 text-faint-foreground transition-colors hover:bg-muted hover:text-muted-foreground"
           >
             <X className="h-5 w-5" />
           </button>
@@ -69,25 +69,25 @@ export function MarkSoldModal({
 
         <form onSubmit={handleSubmit} className="space-y-6 p-6">
           <div className="space-y-4">
-            <div className="flex items-center justify-between rounded-[10px] border border-slate-200 bg-slate-50 p-4">
+            <div className="flex items-center justify-between rounded-[10px] border border-border bg-muted p-4">
               <div>
-                <p className="text-xs font-medium tracking-wider text-slate-500 uppercase">
+                <p className="text-xs font-medium tracking-wider text-muted-foreground uppercase">
                   Harga Modal
                 </p>
-                <p className="font-semibold text-slate-700">
+                <p className="font-semibold text-foreground">
                   {formatCurrency(item.capital_price ?? 0)}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-xs font-medium tracking-wider text-slate-500 uppercase">
+                <p className="text-xs font-medium tracking-wider text-muted-foreground uppercase">
                   Target Jual
                 </p>
-                <p className="font-semibold text-slate-900">{formatCurrency(item.asking_price)}</p>
+                <p className="font-semibold text-foreground">{formatCurrency(item.asking_price)}</p>
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="block text-sm font-medium text-slate-700" htmlFor="soldPrice">
+              <label className="block text-sm font-medium text-foreground" htmlFor="soldPrice">
                 Harga Laku Terjual (Rp)
               </label>
               <input
@@ -97,7 +97,7 @@ export function MarkSoldModal({
                 onChange={(e) => setSoldPrice(e.target.value)}
                 min="0"
                 required
-                className="w-full rounded-[10px] border border-slate-200 bg-white px-3 py-2.5 text-slate-900 transition-colors focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none"
+                className="w-full rounded-[10px] border border-border bg-card px-3 py-2.5 text-foreground transition-colors focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none"
               />
             </div>
 
@@ -111,7 +111,7 @@ export function MarkSoldModal({
               type="button"
               onClick={onClose}
               disabled={isUpdating}
-              className="flex-1 rounded-[10px] border border-slate-200 bg-white py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-50"
+              className="flex-1 rounded-[10px] border border-border bg-card py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
             >
               Batal
             </button>

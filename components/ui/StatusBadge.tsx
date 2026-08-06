@@ -24,11 +24,11 @@ export function StatusBadge({ status }: { status: BadgeStatus }) {
       label = "Terjual";
       break;
     case "UNPOSTED":
-      badgeStyle = "bg-slate-50 text-slate-600 ring-1 ring-slate-200/50";
+      badgeStyle = "bg-muted text-muted-foreground ring-1 ring-border/50";
       label = "Belum Diposting";
       break;
     case "DRAFT":
-      badgeStyle = "bg-slate-50 text-slate-600 ring-1 ring-slate-200/50";
+      badgeStyle = "bg-muted text-muted-foreground ring-1 ring-border/50";
       label = "Draft";
       break;
     case "PAID":
@@ -41,7 +41,7 @@ export function StatusBadge({ status }: { status: BadgeStatus }) {
       break;
     case "CANCELLED_BY_BUYER":
     case "CANCELLED_BY_SELLER":
-      badgeStyle = "bg-gray-100 text-gray-500 ring-1 ring-gray-200/50";
+      badgeStyle = "bg-muted text-muted-foreground ring-1 ring-border/50";
       label = "Cancel";
       break;
     case "REFUND_PARTIAL":
@@ -54,7 +54,7 @@ export function StatusBadge({ status }: { status: BadgeStatus }) {
       label = "Bermasalah";
       break;
     case "ON_HOLD":
-      badgeStyle = "bg-slate-50 text-slate-600 ring-1 ring-slate-200/50";
+      badgeStyle = "bg-muted text-muted-foreground ring-1 ring-border/50";
       label = "On Hold";
       break;
     case "PROBLEM_ACTION":
@@ -66,11 +66,11 @@ export function StatusBadge({ status }: { status: BadgeStatus }) {
       label = "Bermasalah (Permanen)";
       break;
     case "CANCELLED":
-      badgeStyle = "bg-gray-100 text-gray-500 ring-1 ring-gray-200/50";
+      badgeStyle = "bg-muted text-muted-foreground ring-1 ring-border/50";
       label = "Cancel";
       break;
     default:
-      badgeStyle = "bg-slate-50 text-slate-600 ring-1 ring-slate-200/50";
+      badgeStyle = "bg-muted text-muted-foreground ring-1 ring-border/50";
       label = status;
   }
 

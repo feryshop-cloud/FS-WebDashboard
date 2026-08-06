@@ -23,26 +23,26 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50">
+    <div className="flex h-screen overflow-hidden bg-muted">
       <Sidebar role={role} />
 
       {/* Main Content Area */}
       <div className="flex flex-1 flex-col overflow-hidden transition-all duration-300">
         {/* Header */}
-        <header className="flex h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-white px-6 py-3 shadow-sm">
+        <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-card px-6 py-3 shadow-sm">
           <div className="flex items-center">
             {/* Reserved for far-left alignment (e.g. mobile toggle) */}
           </div>
 
           <div className="flex items-center">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold tracking-wide text-slate-600">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted px-3 py-1 text-xs font-semibold tracking-wide text-muted-foreground">
               {role}
             </span>
           </div>
         </header>
 
         {/* Scrollable Main */}
-        <main className="flex-1 overflow-y-auto bg-slate-50 p-8 transition-all duration-300">
+        <main className="flex-1 overflow-y-auto bg-muted p-8 transition-all duration-300">
           {children}
         </main>
       </div>

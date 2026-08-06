@@ -42,25 +42,25 @@ export function ViewStockModal({ stock, isOpen, onClose }: ViewStockModalProps) 
       />
 
       {/* Modal */}
-      <div className="relative flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-[10px] bg-white shadow-2xl">
-        <div className="flex items-center justify-between border-b border-gray-100 bg-white px-6 py-4">
+      <div className="relative flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-[10px] bg-card shadow-2xl">
+        <div className="flex items-center justify-between border-b border-border-soft bg-card px-6 py-4">
           <div>
-            <h2 className="text-xl font-bold text-gray-900">{stock.name}</h2>
-            <p className="mt-0.5 text-sm text-gray-500">{stock.category}</p>
+            <h2 className="text-xl font-bold text-foreground">{stock.name}</h2>
+            <p className="mt-0.5 text-sm text-muted-foreground">{stock.category}</p>
           </div>
           <button
             onClick={onClose}
-            className="rounded-[10px] p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-900"
+            className="rounded-[10px] p-2 text-faint-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        <div className="space-y-8 overflow-y-auto bg-gray-50/30 p-6">
+        <div className="space-y-8 overflow-y-auto bg-muted/30 p-6">
           {/* Gallery Section */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="flex items-center gap-2 text-sm font-bold text-gray-700">
+              <h3 className="flex items-center gap-2 text-sm font-bold text-foreground">
                 <ImageIcon className="h-4 w-4 text-blue-500" />
                 Image Gallery
               </h3>
@@ -69,14 +69,14 @@ export function ViewStockModal({ stock, isOpen, onClose }: ViewStockModalProps) 
                   <button
                     onClick={handlePrev}
                     disabled={startIndex === 0}
-                    className="rounded-[10px] border border-gray-200 bg-white p-1.5 text-gray-600 shadow-sm transition-all hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="rounded-[10px] border border-border bg-card p-1.5 text-muted-foreground shadow-sm transition-all hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </button>
                   <button
                     onClick={handleNext}
                     disabled={startIndex >= totalImages - visibleCount}
-                    className="rounded-[10px] border border-gray-200 bg-white p-1.5 text-gray-600 shadow-sm transition-all hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="rounded-[10px] border border-border bg-card p-1.5 text-muted-foreground shadow-sm transition-all hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <ChevronRight className="h-4 w-4" />
                   </button>
@@ -89,7 +89,7 @@ export function ViewStockModal({ stock, isOpen, onClose }: ViewStockModalProps) 
                 {visibleImages.map((url, idx) => (
                   <div
                     key={url + idx}
-                    className="group relative aspect-video overflow-hidden rounded-[10px] border border-gray-200/60 bg-gray-100 shadow-sm"
+                    className="group relative aspect-video overflow-hidden rounded-[10px] border border-border/60 bg-muted shadow-sm"
                   >
                     <Image
                       src={url}
@@ -102,14 +102,14 @@ export function ViewStockModal({ stock, isOpen, onClose }: ViewStockModalProps) 
                 ))}
               </div>
             ) : (
-              <div className="flex w-full flex-col items-center justify-center rounded-[10px] border border-dashed border-gray-200 bg-gray-50 py-12 text-gray-400">
+              <div className="flex w-full flex-col items-center justify-center rounded-[10px] border border-dashed border-border bg-muted py-12 text-faint-foreground">
                 <ImageIcon className="mb-2 h-8 w-8 opacity-50" />
                 <p className="text-sm">No images available for this stock.</p>
               </div>
             )}
 
             {hasImages && (
-              <p className="mt-2 text-center text-xs font-medium text-gray-400">
+              <p className="mt-2 text-center text-xs font-medium text-faint-foreground">
                 Showing {startIndex + 1}-{Math.min(startIndex + visibleCount, totalImages)} of{" "}
                 {totalImages} images
               </p>
@@ -118,61 +118,61 @@ export function ViewStockModal({ stock, isOpen, onClose }: ViewStockModalProps) 
 
           {/* Details Section */}
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div className="space-y-4 rounded-[10px] border border-gray-100 bg-white p-5 shadow-sm">
-              <h3 className="text-xs font-bold tracking-wider text-gray-400 uppercase">
+            <div className="space-y-4 rounded-[10px] border border-border-soft bg-card p-5 shadow-sm">
+              <h3 className="text-xs font-bold tracking-wider text-faint-foreground uppercase">
                 Account Credentials
               </h3>
 
               <div className="space-y-3">
                 <div>
-                  <p className="text-[10px] font-semibold text-gray-500 uppercase">
+                  <p className="text-[10px] font-semibold text-muted-foreground uppercase">
                     Username / Email
                   </p>
-                  <p className="text-sm font-medium text-gray-900">{stock.username || "-"}</p>
+                  <p className="text-sm font-medium text-foreground">{stock.username || "-"}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] font-semibold text-gray-500 uppercase">Password</p>
-                  <p className="font-mono text-sm text-gray-900">{stock.password || "-"}</p>
+                  <p className="text-[10px] font-semibold text-muted-foreground uppercase">Password</p>
+                  <p className="font-mono text-sm text-foreground">{stock.password || "-"}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] font-semibold text-gray-500 uppercase">
+                  <p className="text-[10px] font-semibold text-muted-foreground uppercase">
                     Details / Note
                   </p>
-                  <p className="text-sm leading-relaxed text-gray-600">
+                  <p className="text-sm leading-relaxed text-muted-foreground">
                     {stock.account_details || "-"}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-col justify-between space-y-4 rounded-[10px] border border-gray-100 bg-white p-5 shadow-sm">
+            <div className="flex flex-col justify-between space-y-4 rounded-[10px] border border-border-soft bg-card p-5 shadow-sm">
               <div>
-                <h3 className="mb-3 text-xs font-bold tracking-wider text-gray-400 uppercase">
+                <h3 className="mb-3 text-xs font-bold tracking-wider text-faint-foreground uppercase">
                   Pricing & Status
                 </h3>
 
-                <div className="flex items-center justify-between border-b border-gray-50 py-2">
-                  <span className="text-sm text-gray-500">Capital Price</span>
-                  <span className="font-mono text-sm font-medium text-gray-900">
+                <div className="flex items-center justify-between border-b border-border-soft py-2">
+                  <span className="text-sm text-muted-foreground">Capital Price</span>
+                  <span className="font-mono text-sm font-medium text-foreground">
                     {formatRupiah(stock.capital_price)}
                   </span>
                 </div>
-                <div className="flex items-center justify-between border-b border-gray-50 py-2">
-                  <span className="text-sm text-gray-500">Post Price</span>
-                  <span className="font-mono text-sm font-medium text-gray-900">
+                <div className="flex items-center justify-between border-b border-border-soft py-2">
+                  <span className="text-sm text-muted-foreground">Post Price</span>
+                  <span className="font-mono text-sm font-medium text-foreground">
                     {formatRupiah(stock.post_price)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between py-2">
-                  <span className="text-sm font-semibold text-gray-500">Current Price</span>
+                  <span className="text-sm font-semibold text-muted-foreground">Current Price</span>
                   <span className="font-mono text-lg font-black text-blue-600">
                     {formatRupiah(stock.current_price)}
                   </span>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between border-t border-gray-100 pt-4">
-                <span className="text-xs text-gray-400">Added {formatDate(stock.created_at)}</span>
+              <div className="flex items-center justify-between border-t border-border-soft pt-4">
+                <span className="text-xs text-faint-foreground">Added {formatDate(stock.created_at)}</span>
                 <StatusBadge status={stock.status} />
               </div>
             </div>

@@ -29,13 +29,13 @@ export default function AuditLogPage() {
       {/* Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Audit Log</h1>
-          <p className="mt-0.5 text-sm text-slate-500">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Audit Log</h1>
+          <p className="mt-0.5 text-sm text-muted-foreground">
             Catatan aktivitas admin, perubahan data, dan akses sistem (Read-only).
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-900">
+          <button className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-muted hover:text-foreground">
             <Download className="h-4 w-4" />
             Export CSV
           </button>
@@ -43,78 +43,78 @@ export default function AuditLogPage() {
       </div>
 
       {/* Action Bar */}
-      <div className="flex flex-col items-center justify-between gap-4 rounded-xl border border-slate-100 bg-white p-4 shadow-sm sm:flex-row">
+      <div className="flex flex-col items-center justify-between gap-4 rounded-xl border border-border-soft bg-card p-4 shadow-sm sm:flex-row">
         <div className="relative w-full sm:w-96">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <Search className="h-4 w-4 text-slate-400" />
+            <Search className="h-4 w-4 text-faint-foreground" />
           </div>
           <input
             type="text"
-            className="block w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pr-3 pl-10 text-slate-900 placeholder-slate-400 transition-all outline-none focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className="block w-full rounded-lg border border-border bg-muted py-2 pr-3 pl-10 text-foreground placeholder-slate-400 transition-all outline-none focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             placeholder="Cari keterangan aktivitas atau user..."
           />
         </div>
         <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto">
-          <button className="inline-flex flex-1 items-center justify-between gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 sm:flex-none">
+          <button className="inline-flex flex-1 items-center justify-between gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-muted sm:flex-none">
             <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-slate-400" />
+              <Filter className="h-4 w-4 text-faint-foreground" />
               <span>Semua User</span>
             </div>
-            <ChevronDown className="h-4 w-4 text-slate-400" />
+            <ChevronDown className="h-4 w-4 text-faint-foreground" />
           </button>
-          <button className="inline-flex flex-1 items-center justify-between gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 sm:flex-none">
+          <button className="inline-flex flex-1 items-center justify-between gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-muted sm:flex-none">
             <span>Semua Modul</span>
-            <ChevronDown className="h-4 w-4 text-slate-400" />
+            <ChevronDown className="h-4 w-4 text-faint-foreground" />
           </button>
-          <button className="inline-flex w-full items-center justify-between gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 sm:w-auto">
+          <button className="inline-flex w-full items-center justify-between gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-muted sm:w-auto">
             <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-slate-400" />
+              <Calendar className="h-4 w-4 text-faint-foreground" />
               <span>Hari Ini</span>
             </div>
-            <ChevronDown className="h-4 w-4 text-slate-400" />
+            <ChevronDown className="h-4 w-4 text-faint-foreground" />
           </button>
         </div>
       </div>
 
       {/* Table Dense Layout */}
-      <div className="overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-border-soft bg-card shadow-sm">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-slate-200">
-            <thead className="bg-slate-50/80">
+          <table className="min-w-full divide-y divide-border">
+            <thead className="bg-muted/80">
               <tr>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-semibold tracking-wider text-slate-500 uppercase"
+                  className="px-6 py-3 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase"
                 >
                   Waktu
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-semibold tracking-wider text-slate-500 uppercase"
+                  className="px-6 py-3 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase"
                 >
                   User & Role
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-semibold tracking-wider text-slate-500 uppercase"
+                  className="px-6 py-3 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase"
                 >
                   Modul
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-semibold tracking-wider text-slate-500 uppercase"
+                  className="px-6 py-3 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase"
                 >
                   Aksi
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-semibold tracking-wider text-slate-500 uppercase"
+                  className="px-6 py-3 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase"
                 >
                   Keterangan Detail
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 bg-white">
+            <tbody className="divide-y divide-border-soft bg-card">
               {isLoading ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center">
@@ -123,27 +123,27 @@ export default function AuditLogPage() {
                 </tr>
               ) : logs.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-sm text-slate-500">
+                  <td colSpan={5} className="px-6 py-12 text-center text-sm text-muted-foreground">
                     Belum ada catatan aktivitas.
                   </td>
                 </tr>
               ) : (
                 logs.map((log) => {
-                  let actionColor = "text-slate-600 bg-slate-100";
+                  let actionColor = "text-muted-foreground bg-muted";
                   if (log.action === "CREATE") actionColor = "text-emerald-700 bg-emerald-50";
                   if (log.action === "UPDATE") actionColor = "text-blue-700 bg-blue-50";
                   if (log.action === "DELETE") actionColor = "text-rose-700 bg-rose-50";
                   if (log.action === "LOGIN") actionColor = "text-purple-700 bg-purple-50";
 
                   return (
-                    <tr key={log.id} className="transition-colors hover:bg-slate-50/50">
-                      <td className="px-6 py-2.5 font-mono text-xs whitespace-nowrap text-slate-500">
+                    <tr key={log.id} className="transition-colors hover:bg-muted/50">
+                      <td className="px-6 py-2.5 font-mono text-xs whitespace-nowrap text-muted-foreground">
                         {formatDate(log.created_at)}
                       </td>
-                      <td className="px-6 py-2.5 text-xs font-semibold whitespace-nowrap text-slate-800">
+                      <td className="px-6 py-2.5 text-xs font-semibold whitespace-nowrap text-foreground">
                         {log.public_users?.full_name || "System / Deleted User"}
                       </td>
-                      <td className="px-6 py-2.5 text-xs font-medium whitespace-nowrap text-slate-600">
+                      <td className="px-6 py-2.5 text-xs font-medium whitespace-nowrap text-muted-foreground">
                         {log.module}
                       </td>
                       <td className="px-6 py-2.5 whitespace-nowrap">
@@ -154,7 +154,7 @@ export default function AuditLogPage() {
                         </span>
                       </td>
                       <td
-                        className="max-w-md truncate px-6 py-2.5 font-mono text-xs tracking-tight text-slate-600"
+                        className="max-w-md truncate px-6 py-2.5 font-mono text-xs tracking-tight text-muted-foreground"
                         title={log.description ?? undefined}
                       >
                         {log.description}

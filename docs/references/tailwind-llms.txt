@@ -1,0 +1,53 @@
+# Tailwind CSS v4 Guidelines for LLMs
+
+This reference document outlines key rules, best practices, and conventions for generating and working with Tailwind CSS v4 in this codebase.
+
+## 1. Core Architecture & Configuration (v4 CSS-First approach)
+- **Do NOT create or modify `tailwind.config.js`**: Tailwind CSS v4 uses a CSS-first configuration. All theme customizations, custom utilities, and plugins are defined directly in the main CSS entry point (usually `global.css` or `app.css`) using CSS directives.
+- **Import syntax**: Use `@import "tailwindcss";` instead of the legacy v3 directives (`@tailwind base; @tailwind components; @tailwind utilities;`).
+- **Customizing Themes**: Use the `@theme` directive in your CSS file:
+  ```css
+  @import "tailwindcss";
+
+  @theme {
+    --color-primary-500: #3b82f6;
+    --font-display: "Outfit", sans-serif;
+    --animate-fade-in: fade-in 0.5s ease-out;
+  }
+  ```
+
+## 2. Best Practices for UI Generation
+- **Utility-First**: Favor utility classes directly in the components (`className="..."`). Avoid writing custom CSS classes or using `@apply` unless it is strictly necessary for resolving high redundancy in clean CSS components.
+- **Responsive Design**: Use the standard breakpoint prefixes:
+  - `sm:` (640px)
+  - `md:` (768px)
+  - `lg:` (1024px)
+  - `xl:` (1280px)
+  - `2xl:` (1536px)
+  Always build mobile-first: design the base layout without prefixes, then layer on responsive constraints with `md:` and `lg:`.
+
+- **Interactions & States**: Use states dynamically:
+  - Hover: `hover:bg-slate-100`
+  - Focus: `focus:ring-2 focus:ring-primary-500`
+  - Disabled: `disabled:opacity-50 disabled:cursor-not-allowed`
+  - Group state styling: `group-hover:translate-x-1`
+
+- **Arbitrary Values**: Use inline arbitrary values if standard tokens do not fit, but do so sparingly:
+  - Spacing/Sizing: `w-[240px]`, `h-[calc(100vh-80px)]`
+  - Colors: `bg-[#0f172a]`
+  - Grid: `grid-cols-[auto_1fr]`
+
+## 3. Recommended Classes for Layouts & Flexbox/Grid
+- **Flexbox Layouts**:
+  - Centering: `flex items-center justify-center`
+  - Flex direction: `flex flex-col` or `flex-row`
+  - Gap spacing: `gap-4`, `gap-x-2`, `gap-y-6`
+  - Sizing constraints: `shrink-0`, `grow`, `flex-1`
+
+- **Grid Layouts**:
+  - Define container: `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3`
+  - Alignments: `items-start`, `place-content-center`
+
+- **Transitions & Animations**:
+  - Always include transitions for smooth interactions: `transition-all duration-200 ease-in-out`
+  - Common transitions: `transition-colors`, `transition-transform`, `transition-opacity`

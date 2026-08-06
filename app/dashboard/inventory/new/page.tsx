@@ -17,20 +17,20 @@ export default async function AddInventoryPage() {
       <div className="flex items-center space-x-4">
         <Link
           href="/dashboard/inventory"
-          className="rounded-[10px] border border-slate-200 bg-white p-2 text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-900"
+          className="rounded-[10px] border border-border bg-card p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Add New Account</h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Add New Account</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Input details for the newly acquired inventory.
           </p>
         </div>
       </div>
 
       {/* Form Container */}
-      <div className="rounded-[10px] border border-slate-200 bg-white p-8">
+      <div className="rounded-[10px] border border-border bg-card p-8">
         <AddInventoryForm games={games || []} />
       </div>
     </div>

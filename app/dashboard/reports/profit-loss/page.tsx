@@ -91,7 +91,7 @@ export default function ProfitLossPage() {
   if (!reportData) {
     return (
       <div className="mx-auto flex min-h-[60vh] max-w-6xl items-center justify-center">
-        <p className="text-slate-500">Gagal memuat laporan laba rugi.</p>
+        <p className="text-muted-foreground">Gagal memuat laporan laba rugi.</p>
       </div>
     );
   }
@@ -106,20 +106,20 @@ export default function ProfitLossPage() {
       {/* Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
             Laba Rugi (Profit & Loss)
           </h1>
-          <p className="mt-0.5 text-sm text-slate-500">
+          <p className="mt-0.5 text-sm text-muted-foreground">
             Analisis pendapatan, beban pokok penjualan, dan laba bersih bisnis.
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="relative inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm sm:w-auto">
-            <Calendar className="mr-2 h-4 w-4 text-slate-400" />
+          <div className="relative inline-flex items-center rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-foreground shadow-sm sm:w-auto">
+            <Calendar className="mr-2 h-4 w-4 text-faint-foreground" />
             <select
               value={periodFilter}
               onChange={(e) => setPeriodFilter(e.target.value)}
-              className="cursor-pointer bg-transparent pr-4 font-medium text-slate-700 outline-none"
+              className="cursor-pointer bg-transparent pr-4 font-medium text-foreground outline-none"
             >
               <option value="ALL">Semua Waktu</option>
               <option value="TODAY">Hari Ini</option>
@@ -128,7 +128,7 @@ export default function ProfitLossPage() {
               <option value="THIS_YEAR">Tahun Ini</option>
             </select>
           </div>
-          <button className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-900">
+          <button className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-muted hover:text-foreground">
             <Download className="h-4 w-4" />
             Export PDF
           </button>
@@ -137,9 +137,9 @@ export default function ProfitLossPage() {
 
       {/* Top Metric Cards */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <div className="flex flex-col justify-between rounded-xl border border-slate-100 bg-white px-6 py-5 shadow-sm">
+        <div className="flex flex-col justify-between rounded-xl border border-border-soft bg-card px-6 py-5 shadow-sm">
           <div className="mb-4 flex items-center justify-between">
-            <span className="text-sm font-bold tracking-wider text-slate-500 uppercase">
+            <span className="text-sm font-bold tracking-wider text-muted-foreground uppercase">
               Total Pendapatan
             </span>
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
@@ -147,15 +147,15 @@ export default function ProfitLossPage() {
             </div>
           </div>
           <div>
-            <h3 className="text-3xl font-bold tracking-tight text-slate-800">
+            <h3 className="text-3xl font-bold tracking-tight text-foreground">
               {formatRupiah(reportData.revenue ?? 0)}
             </h3>
           </div>
         </div>
 
-        <div className="flex flex-col justify-between rounded-xl border border-slate-100 bg-white px-6 py-5 shadow-sm">
+        <div className="flex flex-col justify-between rounded-xl border border-border-soft bg-card px-6 py-5 shadow-sm">
           <div className="mb-4 flex items-center justify-between">
-            <span className="text-sm font-bold tracking-wider text-slate-500 uppercase">
+            <span className="text-sm font-bold tracking-wider text-muted-foreground uppercase">
               Total HPP / Modal Stok
             </span>
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-rose-50 text-rose-600">
@@ -163,13 +163,13 @@ export default function ProfitLossPage() {
             </div>
           </div>
           <div>
-            <h3 className="text-3xl font-bold tracking-tight text-slate-800">
+            <h3 className="text-3xl font-bold tracking-tight text-foreground">
               {formatRupiah(reportData.cogs ?? 0)}
             </h3>
           </div>
         </div>
 
-        <div className="flex flex-col justify-between rounded-xl border border-b-4 border-slate-100 border-b-blue-500 bg-white px-6 py-5 shadow-sm">
+        <div className="flex flex-col justify-between rounded-xl border border-b-4 border-border-soft border-b-blue-500 bg-card px-6 py-5 shadow-sm">
           <div className="mb-4 flex items-center justify-between">
             <span className="text-sm font-bold tracking-wider text-blue-600 uppercase">
               Laba Bersih
@@ -187,9 +187,9 @@ export default function ProfitLossPage() {
       </div>
 
       {/* Structured P&L Table */}
-      <div className="mt-2 overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm">
-        <div className="border-b border-slate-100 bg-slate-50/50 px-6 py-4">
-          <h2 className="text-base font-bold text-slate-800">Rincian Laba Rugi</h2>
+      <div className="mt-2 overflow-hidden rounded-xl border border-border-soft bg-card shadow-sm">
+        <div className="border-b border-border-soft bg-muted/50 px-6 py-4">
+          <h2 className="text-base font-bold text-foreground">Rincian Laba Rugi</h2>
         </div>
 
         <div className="p-6">
@@ -199,19 +199,19 @@ export default function ProfitLossPage() {
               <h3 className="mb-3 flex items-center gap-2 text-xs font-bold tracking-wider text-emerald-600 uppercase">
                 <ArrowUpRight className="h-4 w-4" /> Pendapatan (Revenue)
               </h3>
-              <div className="divide-y divide-slate-100 rounded-lg border border-slate-100 bg-slate-50">
+              <div className="divide-y divide-border-soft rounded-lg border border-border-soft bg-muted">
                 {(reportData.breakdown?.income ?? []).map(
                   (item: ProfitLossBreakdownItem, idx: number) => (
                     <div key={idx} className="flex items-center justify-between px-4 py-3">
-                      <span className="text-sm font-medium text-slate-700">{item.label}</span>
-                      <span className="text-sm font-semibold text-slate-900">
+                      <span className="text-sm font-medium text-foreground">{item.label}</span>
+                      <span className="text-sm font-semibold text-foreground">
                         {formatRupiah(item.amount)}
                       </span>
                     </div>
                   ),
                 )}
-                <div className="flex items-center justify-between rounded-b-lg border-t-2 border-slate-200 bg-white px-4 py-3">
-                  <span className="text-sm font-bold text-slate-900">Total Pendapatan</span>
+                <div className="flex items-center justify-between rounded-b-lg border-t-2 border-border bg-card px-4 py-3">
+                  <span className="text-sm font-bold text-foreground">Total Pendapatan</span>
                   <span className="text-sm font-bold text-emerald-600">
                     {formatRupiah(reportData.revenue ?? 0)}
                   </span>
@@ -224,17 +224,17 @@ export default function ProfitLossPage() {
               <h3 className="mb-3 flex items-center gap-2 text-xs font-bold tracking-wider text-rose-600 uppercase">
                 <ArrowDownRight className="h-4 w-4" /> Harga Pokok Penjualan (HPP)
               </h3>
-              <div className="divide-y divide-slate-100 rounded-lg border border-slate-100 bg-slate-50">
+              <div className="divide-y divide-border-soft rounded-lg border border-border-soft bg-muted">
                 <div className="flex items-center justify-between px-4 py-3">
-                  <span className="text-sm font-medium text-slate-700">
+                  <span className="text-sm font-medium text-foreground">
                     {reportData.breakdown?.expenses?.[0]?.label}
                   </span>
-                  <span className="text-sm font-semibold text-slate-900">
+                  <span className="text-sm font-semibold text-foreground">
                     ({formatRupiah(reportData.breakdown?.expenses?.[0]?.amount ?? 0)})
                   </span>
                 </div>
-                <div className="flex items-center justify-between rounded-b-lg border-t-2 border-slate-200 bg-white px-4 py-3">
-                  <span className="text-sm font-bold text-slate-900">Total HPP</span>
+                <div className="flex items-center justify-between rounded-b-lg border-t-2 border-border bg-card px-4 py-3">
+                  <span className="text-sm font-bold text-foreground">Total HPP</span>
                   <span className="text-sm font-bold text-rose-600">
                     ({formatRupiah(reportData.cogs ?? 0)})
                   </span>
@@ -244,7 +244,7 @@ export default function ProfitLossPage() {
 
             {/* LABA KOTOR */}
             <div className="flex items-center justify-between rounded-lg border border-blue-100 bg-blue-50/50 px-4 py-4">
-              <span className="text-base font-bold text-slate-800">Laba Kotor (Gross Profit)</span>
+              <span className="text-base font-bold text-foreground">Laba Kotor (Gross Profit)</span>
               <span className="text-lg font-bold text-blue-700">{formatRupiah(grossProfit)}</span>
             </div>
 
@@ -253,19 +253,19 @@ export default function ProfitLossPage() {
               <h3 className="mb-3 flex items-center gap-2 text-xs font-bold tracking-wider text-orange-600 uppercase">
                 <ArrowDownRight className="h-4 w-4" /> Beban Operasional & Lainnya
               </h3>
-              <div className="divide-y divide-slate-100 rounded-lg border border-slate-100 bg-slate-50">
+              <div className="divide-y divide-border-soft rounded-lg border border-border-soft bg-muted">
                 {(reportData.breakdown?.expenses ?? [])
                   .slice(1)
                   .map((item: ProfitLossBreakdownItem, idx: number) => (
                     <div key={idx} className="flex items-center justify-between px-4 py-3">
-                      <span className="text-sm font-medium text-slate-700">{item.label}</span>
-                      <span className="text-sm font-semibold text-slate-900">
+                      <span className="text-sm font-medium text-foreground">{item.label}</span>
+                      <span className="text-sm font-semibold text-foreground">
                         ({formatRupiah(item.amount)})
                       </span>
                     </div>
                   ))}
-                <div className="flex items-center justify-between rounded-b-lg border-t-2 border-slate-200 bg-white px-4 py-3">
-                  <span className="text-sm font-bold text-slate-900">Total Beban</span>
+                <div className="flex items-center justify-between rounded-b-lg border-t-2 border-border bg-card px-4 py-3">
+                  <span className="text-sm font-bold text-foreground">Total Beban</span>
                   <span className="text-sm font-bold text-orange-600">
                     ({formatRupiah(totalExpenses)})
                   </span>

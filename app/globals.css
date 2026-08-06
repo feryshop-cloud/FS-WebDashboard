@@ -18,11 +18,49 @@
   --shadow-soft-primary: 0 2px 10px -3px rgba(37, 99, 235, 0.2);
 }
 
+/*
+ * Semantic color tokens. Each maps a utility (bg-, text-, border-, divide-,
+ * ring-) to a runtime CSS custom property declared in :root / [data-theme="dark"],
+ * so components reference roles (card, muted, foreground, border) instead of
+ * literal palette steps and the theme switches without per-class overrides.
+ */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-faint-foreground: var(--faint-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-active: var(--primary-active);
+
+  --color-input: var(--input-border);
+  --color-ring: var(--input-ring);
+  --color-border: var(--border);
+  --color-border-soft: var(--border-soft);
+
+  --color-sidebar: var(--sidebar-bg);
+  --color-sidebar-foreground: var(--sidebar-text);
+  --color-sidebar-accent: var(--sidebar-hover);
+  --color-sidebar-accent-foreground: var(--sidebar-text-hover);
+  --color-sidebar-active: var(--sidebar-active-bg);
+  --color-sidebar-active-foreground: var(--sidebar-active-text);
+  --color-sidebar-border: var(--sidebar-border);
+}
+
 @layer base {
   :root {
     --background: var(--color-slate-50);
     --foreground: var(--color-slate-900);
     --border: var(--color-slate-200);
+    --border-soft: var(--color-slate-100);
+    --faint-foreground: var(--color-slate-400);
     --card: var(--color-white);
     --card-foreground: var(--color-slate-900);
     --muted: var(--color-slate-100);
@@ -57,6 +95,8 @@
     --background: #0F172A;
     --foreground: #F1F5F9;
     --border: #334155;
+    --border-soft: #334155;
+    --faint-foreground: #94A3B8;
     --card: #1E293B;
     --card-foreground: #F1F5F9;
     --muted: #1E293B;
@@ -162,196 +202,14 @@
   [data-theme="dark"] a:hover {
     color: #93C5FD;
   }
+}
 
-  /* Gray-on-color fixes: ensure sufficient contrast on tinted backgrounds */
-  .bg-red-50 .text-slate-600,
-  .bg-rose-50 .text-slate-600 {
-    color: #991B1B;
-  }
-
-  .bg-blue-50 .text-slate-600,
-  .bg-indigo-50 .text-slate-600 {
-    color: #1E40AF;
-  }
-
-  .bg-emerald-50 .text-slate-600 {
-    color: #065F46;
-  }
-
-  .bg-amber-50 .text-slate-600 {
-    color: #92400E;
-  }
-
-  .bg-violet-50 .text-slate-600 {
-    color: #5B21B6;
-  }
-
-  .bg-orange-50 .text-slate-600 {
-    color: #9A3412;
-  }
-
-  [data-theme="dark"] .bg-red-50 .text-slate-600,
-  [data-theme="dark"] .bg-rose-50 .text-slate-600 {
-    color: #FCA5A5;
-  }
-
-  [data-theme="dark"] .bg-blue-50 .text-slate-600,
-  [data-theme="dark"] .bg-indigo-50 .text-slate-600 {
-    color: #93C5FD;
-  }
-
-  [data-theme="dark"] .bg-emerald-50 .text-slate-600 {
-    color: #6EE7B7;
-  }
-
-  [data-theme="dark"] .bg-amber-50 .text-slate-600 {
-    color: #FCD34D;
-  }
-
-  [data-theme="dark"] .bg-violet-50 .text-slate-600 {
-    color: #C4B5FD;
-  }
-
-  [data-theme="dark"] .bg-orange-50 .text-slate-600 {
-    color: #FDBA74;
-  }
-
-  /* Gray-on-color fixes for darker tinted backgrounds (rose-100, blue-100, etc.) */
-  .bg-rose-100 .text-slate-700,
-  .bg-red-100 .text-slate-700 {
-    color: #991B1B;
-  }
-
-  .bg-blue-100 .text-slate-700 {
-    color: #1E40AF;
-  }
-
-  .bg-purple-100 .text-slate-700 {
-    color: #5B21B6;
-  }
-
-  .bg-indigo-100 .text-slate-700 {
-    color: #3730A3;
-  }
-
-  [data-theme="dark"] .bg-rose-100 .text-slate-700,
-  [data-theme="dark"] .bg-red-100 .text-slate-700 {
-    color: #FCA5A5;
-  }
-
-  [data-theme="dark"] .bg-blue-100 .text-slate-700 {
-    color: #93C5FD;
-  }
-
-  [data-theme="dark"] .bg-purple-100 .text-slate-700 {
-    color: #C4B5FD;
-  }
-
-  [data-theme="dark"] .bg-indigo-100 .text-slate-700 {
-    color: #A5B4FC;
-  }
-
-  /* Hover state fixes for gray-on-color */
-  .hover\:bg-rose-50:hover .text-slate-600,
-  .hover\:bg-red-50:hover .text-slate-600 {
-    color: #991B1B;
-  }
-
-  .hover\:bg-blue-50:hover .text-slate-600,
-  .hover\:bg-indigo-50:hover .text-slate-600 {
-    color: #1E40AF;
-  }
-
-  [data-theme="dark"] .hover\:bg-rose-50:hover .text-slate-600,
-  [data-theme="dark"] .hover\:bg-red-50:hover .text-slate-600 {
-    color: #FCA5A5;
-  }
-
-  [data-theme="dark"] .hover\:bg-blue-50:hover .text-slate-600,
-  [data-theme="dark"] .hover\:bg-indigo-50:hover .text-slate-600 {
-    color: #93C5FD;
-  }
-
-  /* Button color fixes */
-  .bg-blue-600 .text-white,
-  .bg-blue-700 .text-white {
-    color: #FFFFFF;
-  }
-
-  .bg-purple-600 .text-white,
-  .bg-purple-700 .text-white {
-    color: #FFFFFF;
-  }
-
-  .bg-indigo-600 .text-white,
-  .bg-indigo-700 .text-white {
-    color: #FFFFFF;
-  }
-
-  .bg-rose-600 .text-white,
-  .bg-red-600 .text-white {
-    color: #FFFFFF;
-  }
-
-  /* Card and surface hover transitions */
-  .bg-white,
-  .bg-slate-50,
-  .bg-gray-50 {
-    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-  }
-
-  [data-theme="dark"] .bg-white {
-    background-color: #1E293B;
-  }
-
-  [data-theme="dark"] .bg-slate-50 {
-    background-color: #1E293B;
-  }
-
-  [data-theme="dark"] .bg-gray-50 {
-    background-color: #1E293B;
-  }
-
-  /* Input field dark mode overrides using CSS custom properties */
-  [data-theme="dark"] .border-slate-300,
-  [data-theme="dark"] .border-gray-300 {
-    border-color: var(--input-border);
-  }
-
-  /* Status chip contrast fixes for dark mode */
-  [data-theme="dark"] .bg-emerald-50 .text-emerald-700 {
-    color: #6EE7B7;
-  }
-
-  [data-theme="dark"] .bg-amber-50 .text-amber-700 {
-    color: #FCD34D;
-  }
-
-  [data-theme="dark"] .bg-blue-50 .text-blue-700 {
-    color: #93C5FD;
-  }
-
-  [data-theme="dark"] .bg-violet-50 .text-violet-700 {
-    color: #C4B5FD;
-  }
-
-  [data-theme="dark"] .bg-orange-50 .text-orange-700 {
-    color: #FDBA74;
-  }
-
-  /* Table row hover in dark mode */
-  [data-theme="dark"] .hover\:bg-slate-50:hover {
-    background-color: #334155;
-  }
-
-  [data-theme="dark"] .hover\:bg-gray-50:hover {
-    background-color: #334155;
-  }
-
-  /* Sidebar dark mode overrides */
-  [data-theme="dark"] .sidebar-hover\:bg-slate-50:hover {
-    background-color: #334155;
-  }
+/*
+ * Unlayered author styles. These must not sit inside @layer base: Tailwind
+ * v4 places utilities in a later cascade layer that wins over base regardless
+ * of specificity, so component/surface overrides (shadows, scrollbars, and the
+ * dark-mode status tints below) live outside every layer to guarantee they win.
+ */
 
   /* Card shadow dark mode */
   [data-theme="dark"] .shadow-sm {
@@ -380,4 +238,191 @@
     background-color: rgba(59, 130, 246, 0.3);
     color: #F1F5F9;
   }
-}
+
+  /*
+   * Dark-mode status tints. The light theme speaks status through muted
+   * 50-level chips (bg-emerald-50 text-emerald-600 ring-emerald-200/50).
+   * In dark mode those same utilities render as bright pastel squares on the
+   * deep-slate surfaces, so we remap the tinted background / text / border /
+   * ring steps to the DESIGN dark tokens (--dark-*-bg families). The
+   * light-500 steps used for active emphasis and hover stay semantic.
+   */
+  [data-theme="dark"] .bg-emerald-50,
+  [data-theme="dark"] .hover\:bg-emerald-50:hover {
+    background-color: #064e3b;
+  }
+  [data-theme="dark"] .text-emerald-600,
+  [data-theme="dark"] .text-emerald-700 {
+    color: #34d399;
+  }
+  [data-theme="dark"] .text-emerald-800 {
+    color: #6ee7b7;
+  }
+  [data-theme="dark"] .border-emerald-100,
+  [data-theme="dark"] .border-emerald-200,
+  [data-theme="dark"] .ring-emerald-200,
+  [data-theme="dark"] .ring-emerald-200\/50 {
+    border-color: #065f46;
+  }
+  [data-theme="dark"] .hover\:bg-emerald-100:hover {
+    background-color: #065f46;
+  }
+
+  [data-theme="dark"] .bg-amber-50,
+  [data-theme="dark"] .hover\:bg-amber-50:hover {
+    background-color: #78350f;
+  }
+  [data-theme="dark"] .text-amber-600,
+  [data-theme="dark"] .text-amber-700,
+  [data-theme="dark"] .text-amber-800 {
+    color: #fbbf24;
+  }
+  [data-theme="dark"] .border-amber-100,
+  [data-theme="dark"] .border-amber-200,
+  [data-theme="dark"] .ring-amber-200,
+  [data-theme="dark"] .ring-amber-200\/50 {
+    border-color: #92400e;
+  }
+  [data-theme="dark"] .hover\:bg-amber-100:hover {
+    background-color: #92400e;
+  }
+
+  [data-theme="dark"] .bg-orange-50,
+  [data-theme="dark"] .hover\:bg-orange-50:hover {
+    background-color: #7c2d12;
+  }
+  [data-theme="dark"] .text-orange-500,
+  [data-theme="dark"] .text-orange-600,
+  [data-theme="dark"] .text-orange-700,
+  [data-theme="dark"] .text-orange-800 {
+    color: #fb923c;
+  }
+  [data-theme="dark"] .border-orange-100,
+  [data-theme="dark"] .border-orange-200,
+  [data-theme="dark"] .ring-orange-200,
+  [data-theme="dark"] .ring-orange-200\/50 {
+    border-color: #9a3412;
+  }
+
+  [data-theme="dark"] .bg-red-50,
+  [data-theme="dark"] .hover\:bg-red-50:hover {
+    background-color: #7f1d1d;
+  }
+  [data-theme="dark"] .bg-red-100 {
+    background-color: #991b1b;
+  }
+  [data-theme="dark"] .text-red-500,
+  [data-theme="dark"] .text-red-600,
+  [data-theme="dark"] .text-red-700 {
+    color: #f87171;
+  }
+  [data-theme="dark"] .border-red-100,
+  [data-theme="dark"] .border-red-200,
+  [data-theme="dark"] .ring-red-200,
+  [data-theme="dark"] .ring-red-200\/50 {
+    border-color: #991b1b;
+  }
+
+  [data-theme="dark"] .bg-rose-50,
+  [data-theme="dark"] .hover\:bg-rose-50:hover {
+    background-color: #4c0519;
+  }
+  [data-theme="dark"] .bg-rose-100 {
+    background-color: #7f1d1d;
+  }
+  [data-theme="dark"] .text-rose-500,
+  [data-theme="dark"] .text-rose-600,
+  [data-theme="dark"] .text-rose-700 {
+    color: #fb7185;
+  }
+  [data-theme="dark"] .border-rose-100,
+  [data-theme="dark"] .border-rose-200,
+  [data-theme="dark"] .ring-rose-200,
+  [data-theme="dark"] .ring-rose-300 {
+    border-color: #9f1239;
+  }
+
+  [data-theme="dark"] .bg-violet-50,
+  [data-theme="dark"] .hover\:bg-violet-50:hover {
+    background-color: #581c87;
+  }
+  [data-theme="dark"] .bg-violet-100 {
+    background-color: #6b21a8;
+  }
+  [data-theme="dark"] .text-violet-500,
+  [data-theme="dark"] .text-violet-600,
+  [data-theme="dark"] .text-violet-700 {
+    color: #c084fc;
+  }
+  [data-theme="dark"] .border-violet-100,
+  [data-theme="dark"] .border-violet-200,
+  [data-theme="dark"] .ring-violet-200 {
+    border-color: #6b21a8;
+  }
+
+  [data-theme="dark"] .bg-purple-50,
+  [data-theme="dark"] .hover\:bg-purple-50:hover {
+    background-color: #581c87;
+  }
+  [data-theme="dark"] .text-purple-500,
+  [data-theme="dark"] .text-purple-600,
+  [data-theme="dark"] .text-purple-700 {
+    color: #c084fc;
+  }
+  [data-theme="dark"] .border-purple-100,
+  [data-theme="dark"] .border-purple-200,
+  [data-theme="dark"] .ring-purple-200,
+  [data-theme="dark"] .ring-purple-200\/50 {
+    border-color: #6b21a8;
+  }
+
+  [data-theme="dark"] .bg-blue-50,
+  [data-theme="dark"] .hover\:bg-blue-50:hover {
+    background-color: #1e3a8a;
+  }
+  [data-theme="dark"] .text-blue-500,
+  [data-theme="dark"] .text-blue-600,
+  [data-theme="dark"] .text-blue-600\/90 {
+    color: #60a5fa;
+  }
+  [data-theme="dark"] .text-blue-700,
+  [data-theme="dark"] .text-blue-800 {
+    color: #93c5fd;
+  }
+  [data-theme="dark"] .border-blue-100,
+  [data-theme="dark"] .border-blue-100\/50,
+  [data-theme="dark"] .border-blue-200,
+  [data-theme="dark"] .ring-blue-200,
+  [data-theme="dark"] .ring-blue-200\/50 {
+    border-color: #1d4ed8;
+  }
+  [data-theme="dark"] .hover\:bg-blue-100:hover {
+    background-color: #1e40af;
+  }
+
+  /* Opacity-step variants of the same tints (bg-*-50/40, /50, /60, hover) */
+  [data-theme="dark"] .bg-blue-50\/40,
+  [data-theme="dark"] .bg-blue-50\/50,
+  [data-theme="dark"] .bg-blue-50\/60,
+  [data-theme="dark"] .hover\:bg-blue-50\/50:hover,
+  [data-theme="dark"] .hover\:bg-blue-50\/60:hover,
+  [data-theme="dark"] .bg-blue-50\/30 {
+    background-color: #1e3a8a;
+  }
+  [data-theme="dark"] .bg-amber-50\/60 {
+    background-color: #78350f;
+  }
+  [data-theme="dark"] .bg-rose-50\/50 {
+    background-color: #4c0519;
+  }
+
+  /* File input buttons (blue tinted file selector) */
+  [data-theme="dark"] .file\:bg-blue-50 {
+    background-color: #1e3a8a;
+  }
+  [data-theme="dark"] .file\:text-blue-700 {
+    color: #93c5fd;
+  }
+  [data-theme="dark"] .hover\:file\:bg-blue-100:hover {
+    background-color: #1e40af;
+  }

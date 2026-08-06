@@ -7,7 +7,6 @@ import {
   Loader2,
   RefreshCw,
   Plus,
-  Filter,
   ChevronDown,
   X,
   ArrowUpDown,
@@ -86,6 +85,7 @@ export default function TopupProductsPage() {
 
   useEffect(() => {
     let isMounted = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadProducts().finally(() => {
       if (isMounted) setIsLoading(false);
     });
@@ -138,11 +138,11 @@ export default function TopupProductsPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
+          <h1 className="flex items-center gap-2 text-2xl font-bold text-foreground">
             <ShoppingBag className="h-7 w-7 text-blue-600" />
             Daftar Produk Top-Up
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-muted-foreground">
             Monitoring & Kelola katalog produk Top-Up Storefront.
           </p>
         </div>
@@ -150,7 +150,7 @@ export default function TopupProductsPage() {
           <button
             onClick={() => loadProducts()}
             disabled={isLoading}
-            className="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-200"
+            className="inline-flex items-center gap-2 rounded-lg bg-muted px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
           >
             <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
             Refresh
@@ -166,17 +166,17 @@ export default function TopupProductsPage() {
       </div>
 
       {/* Filter / Sort Bar */}
-      <div className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 shadow-sm">
         <div className="flex flex-wrap items-center gap-3">
           {/* Search */}
           <div className="relative flex-1 min-w-[200px]">
-            <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-faint-foreground" />
             <input
               type="text"
               placeholder="Cari berdasarkan nama produk, game slug, atau SKU..."
               value={searchQuery}
               onChange={(e) => handleFilterChange("search", e.target.value)}
-              className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pr-4 pl-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+              className="w-full rounded-lg border border-border bg-muted py-2 pr-4 pl-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
             />
           </div>
 
@@ -185,7 +185,7 @@ export default function TopupProductsPage() {
             <select
               value={sortBy}
               onChange={(e) => handleSortChange(e.target.value)}
-              className="w-full appearance-none rounded-lg border border-slate-200 bg-slate-50 py-2 pr-8 pl-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+              className="w-full appearance-none rounded-lg border border-border bg-muted py-2 pr-8 pl-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
             >
               {sortOptions.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -193,13 +193,13 @@ export default function TopupProductsPage() {
                 </option>
               ))}
             </select>
-            <ChevronDown className="pointer-events-none absolute top-1/2 right-2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <ChevronDown className="pointer-events-none absolute top-1/2 right-2 h-4 w-4 -translate-y-1/2 text-faint-foreground" />
           </div>
 
           {/* Sort Order */}
           <button
             onClick={() => handleSortChange(sortBy)}
-            className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
+            className="inline-flex items-center gap-1 rounded-lg border border-border bg-muted px-3 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
             title="Balik urutan sortir"
           >
             <ArrowUpDown className="h-4 w-4" />
@@ -210,7 +210,7 @@ export default function TopupProductsPage() {
           <select
             value={isActiveFilter}
             onChange={(e) => handleFilterChange("isActive", e.target.value)}
-            className="appearance-none rounded-lg border border-slate-200 bg-slate-50 py-2 pr-8 pl-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+            className="appearance-none rounded-lg border border-border bg-muted py-2 pr-8 pl-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
           >
             <option value="">Semua Status</option>
             <option value="true">Aktif</option>
@@ -221,7 +221,7 @@ export default function TopupProductsPage() {
           <select
             value={isGangguanFilter}
             onChange={(e) => handleFilterChange("isGangguan", e.target.value)}
-            className="appearance-none rounded-lg border border-slate-200 bg-slate-50 py-2 pr-8 pl-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+            className="appearance-none rounded-lg border border-border bg-muted py-2 pr-8 pl-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
           >
             <option value="">Semua Kondisi</option>
             <option value="true">Gangguan</option>
@@ -231,7 +231,7 @@ export default function TopupProductsPage() {
           {hasActiveFilters && (
             <button
               onClick={handleResetFilters}
-              className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
+              className="inline-flex items-center gap-1 rounded-lg border border-border bg-muted px-3 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
             >
               <X className="h-3 w-3" />
               Reset
@@ -241,28 +241,28 @@ export default function TopupProductsPage() {
       </div>
 
       {/* Content / Table */}
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
         {error && (
           <div className="border-b border-red-100 bg-red-50 p-4 text-sm text-red-700">{error}</div>
         )}
 
         {isLoading ? (
-          <div className="flex items-center justify-center py-16 text-slate-400">
+          <div className="flex items-center justify-center py-16 text-faint-foreground">
             <Loader2 className="mr-2 h-6 w-6 animate-spin" />
             <span>Memuat katalog produk Top-Up...</span>
           </div>
         ) : products.length === 0 ? (
           <div className="px-4 py-16 text-center">
-            <ShoppingBag className="mx-auto mb-3 h-12 w-12 text-slate-300" />
-            <h3 className="text-base font-semibold text-slate-800">Tidak ada produk ditemukan</h3>
-            <p className="mt-1 text-sm text-slate-500">
+            <ShoppingBag className="mx-auto mb-3 h-12 w-12 text-faint-foreground" />
+            <h3 className="text-base font-semibold text-foreground">Tidak ada produk ditemukan</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
               Data master belum diisi atau filter yang dipilih tidak cocok.
             </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-600">
-              <thead className="border-b border-slate-200 bg-slate-50 text-xs font-semibold tracking-wider text-slate-500 uppercase">
+            <table className="w-full text-left text-sm text-muted-foreground">
+              <thead className="border-b border-border bg-muted text-xs font-semibold tracking-wider text-muted-foreground uppercase">
                 <tr>
                   <th className="px-6 py-3.5">Nama Produk</th>
                   <th className="px-6 py-3.5">Game Slug</th>
@@ -273,20 +273,20 @@ export default function TopupProductsPage() {
                   <th className="px-6 py-3.5 text-center">Aksi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200">
+              <tbody className="divide-y divide-border">
                 {products.map((p) => (
-                  <tr key={p.id} className="transition-colors hover:bg-slate-50/50">
-                    <td className="px-6 py-4 font-medium text-slate-900">{p.title}</td>
+                  <tr key={p.id} className="transition-colors hover:bg-muted/50">
+                    <td className="px-6 py-4 font-medium text-foreground">{p.title}</td>
                     <td className="px-6 py-4">
                       <span className="inline-flex items-center rounded-full border border-blue-100 bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700">
                         {p.game_slug}
                       </span>
                     </td>
-                    <td className="px-6 py-4 font-mono text-xs text-slate-500">{p.sku || "-"}</td>
-                    <td className="px-6 py-4 font-semibold text-slate-900">
+                    <td className="px-6 py-4 font-mono text-xs text-muted-foreground">{p.sku || "-"}</td>
+                    <td className="px-6 py-4 font-semibold text-foreground">
                       {formatRupiah(p.selling_price)}
                     </td>
-                    <td className="px-6 py-4 text-slate-500">{formatRupiah(p.cost_price || 0)}</td>
+                    <td className="px-6 py-4 text-muted-foreground">{formatRupiah(p.cost_price || 0)}</td>
                     <td className="px-6 py-4 text-center">
                       {p.is_gangguan ? (
                         <span className="inline-flex items-center rounded-md border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
@@ -297,7 +297,7 @@ export default function TopupProductsPage() {
                           Aktif
                         </span>
                       ) : (
-                        <span className="inline-flex items-center rounded-md border border-slate-200 bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+                        <span className="inline-flex items-center rounded-md border border-border bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
                           Nonaktif
                         </span>
                       )}

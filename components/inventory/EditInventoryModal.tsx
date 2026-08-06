@@ -60,16 +60,16 @@ export function EditInventoryModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm">
-      <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-white shadow-2xl duration-300">
-        <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-6 py-5">
+      <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-card shadow-2xl duration-300">
+        <div className="flex items-center justify-between border-b border-border-soft bg-muted px-6 py-5">
           <div>
-            <h2 className="text-lg font-bold text-slate-900">Edit Data Stok</h2>
-            <p className="mt-1 text-xs text-slate-500">Ubah rincian informasi stok akun game.</p>
+            <h2 className="text-lg font-bold text-foreground">Edit Data Stok</h2>
+            <p className="mt-1 text-xs text-muted-foreground">Ubah rincian informasi stok akun game.</p>
           </div>
           <button
             onClick={onClose}
             disabled={isSubmitting}
-            className="rounded-full bg-white p-2 text-slate-400 shadow-sm transition-colors hover:text-slate-600 disabled:opacity-50"
+            className="rounded-full bg-card p-2 text-faint-foreground shadow-sm transition-colors hover:text-muted-foreground disabled:opacity-50"
           >
             <X className="h-5 w-5" />
           </button>
@@ -84,12 +84,12 @@ export function EditInventoryModal({
             )}
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">Kategori Game</label>
+              <label className="mb-1 block text-sm font-medium text-foreground">Kategori Game</label>
               <select
                 name="game_id"
                 required
                 defaultValue={item.game_id}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
               >
                 <option value="">Pilih Kategori Game...</option>
                 {games.map((game) => (
@@ -101,7 +101,7 @@ export function EditInventoryModal({
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">
+              <label className="mb-1 block text-sm font-medium text-foreground">
                 Kode Referensi
               </label>
               <input
@@ -109,13 +109,13 @@ export function EditInventoryModal({
                 type="text"
                 required
                 defaultValue={item.title_reference || ""}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 placeholder="e.g. ML-MYTHIC-001"
               />
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">
+              <label className="mb-1 block text-sm font-medium text-foreground">
                 Spesifikasi Akun
               </label>
               <textarea
@@ -123,40 +123,40 @@ export function EditInventoryModal({
                 required
                 rows={3}
                 defaultValue={item.account_specs || ""}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 placeholder="Details like rank, skins, win rate..."
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700">Harga Modal</label>
+                <label className="mb-1 block text-sm font-medium text-foreground">Harga Modal</label>
                 <input
                   name="capital_price"
                   required
                   type="number"
                   min="0"
                   defaultValue={item.capital_price}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   placeholder="Rp 0"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700">Target Jual</label>
+                <label className="mb-1 block text-sm font-medium text-foreground">Target Jual</label>
                 <input
                   name="asking_price"
                   required
                   type="number"
                   min="0"
                   defaultValue={item.asking_price}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   placeholder="Rp 0"
                 />
               </div>
             </div>
           </div>
 
-          <div className="border-t border-slate-100 bg-white p-6">
+          <div className="border-t border-border-soft bg-card p-6">
             <button
               type="submit"
               disabled={isSubmitting}

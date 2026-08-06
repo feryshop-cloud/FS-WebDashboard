@@ -100,16 +100,16 @@ function SettingRowItem({
   const isLong = displayValue.length > 60;
 
   return (
-    <div className="group border-b border-slate-100 py-3 last:border-0">
+    <div className="group border-b border-border-soft py-3 last:border-0">
       <div className="flex items-start gap-3">
         {/* Key + Description */}
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <code className="rounded bg-slate-100 px-1.5 py-0.5 text-[11px] font-mono text-slate-700">
+            <code className="rounded bg-muted px-1.5 py-0.5 text-[11px] font-mono text-foreground">
               {setting.key}
             </code>
             {setting.description && (
-              <span className="text-xs text-slate-400">{setting.description}</span>
+              <span className="text-xs text-faint-foreground">{setting.description}</span>
             )}
           </div>
 
@@ -122,7 +122,7 @@ function SettingRowItem({
                     rows={3}
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
-                    className="w-full rounded-lg border border-blue-300 bg-white px-3 py-2 font-mono text-xs text-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                    className="w-full rounded-lg border border-blue-300 bg-card px-3 py-2 font-mono text-xs text-foreground focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                     autoFocus
                   />
                 ) : (
@@ -130,7 +130,7 @@ function SettingRowItem({
                     type="text"
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
-                    className="w-full rounded-lg border border-blue-300 bg-white px-3 py-2 font-mono text-xs text-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                    className="w-full rounded-lg border border-blue-300 bg-card px-3 py-2 font-mono text-xs text-foreground focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                     autoFocus
                     onKeyDown={(e) => {
                       if (e.key === "Enter") handleSave();
@@ -138,7 +138,7 @@ function SettingRowItem({
                     }}
                   />
                 )}
-                <p className="text-[10px] text-slate-400">
+                <p className="text-[10px] text-faint-foreground">
                   Masukkan nilai JSON yang valid (string: tulis biasa, boolean:{" "}
                   <code>true</code>/<code>false</code>, angka: tanpa kutip)
                 </p>
@@ -146,7 +146,7 @@ function SettingRowItem({
             ) : (
               <p
                 className={`font-mono text-xs ${
-                  displayValue.length > 80 ? "line-clamp-2 text-slate-500" : "text-slate-700"
+                  displayValue.length > 80 ? "line-clamp-2 text-muted-foreground" : "text-foreground"
                 }`}
               >
                 {displayValue}
@@ -184,7 +184,7 @@ function SettingRowItem({
               <button
                 onClick={handleCancel}
                 title="Batal"
-                className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                className="flex h-7 w-7 items-center justify-center rounded-lg border border-border text-faint-foreground hover:bg-muted hover:text-muted-foreground"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -193,7 +193,7 @@ function SettingRowItem({
             <button
               onClick={handleEdit}
               title="Edit"
-              className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-300 opacity-0 transition-opacity hover:bg-slate-100 hover:text-slate-600 group-hover:opacity-100"
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-faint-foreground opacity-0 transition-opacity hover:bg-muted hover:text-muted-foreground group-hover:opacity-100"
             >
               <Pencil className="h-3.5 w-3.5" />
             </button>
@@ -217,27 +217,27 @@ function GroupCard({
   const label = GROUP_LABELS[groupKey] ?? groupKey.toUpperCase();
 
   return (
-    <div className="rounded-xl border border-slate-100 bg-white shadow-sm">
+    <div className="rounded-xl border border-border-soft bg-card shadow-sm">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center justify-between rounded-t-xl px-5 py-3.5 hover:bg-slate-50"
+        className="flex w-full items-center justify-between rounded-t-xl px-5 py-3.5 hover:bg-muted"
       >
         <div className="flex items-center gap-2">
           <Settings2 className="h-4 w-4 text-blue-500" />
-          <span className="text-sm font-semibold text-slate-800">{label}</span>
-          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-500">
+          <span className="text-sm font-semibold text-foreground">{label}</span>
+          <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
             {rows.length}
           </span>
         </div>
         {open ? (
-          <ChevronDown className="h-4 w-4 text-slate-400" />
+          <ChevronDown className="h-4 w-4 text-faint-foreground" />
         ) : (
-          <ChevronRight className="h-4 w-4 text-slate-400" />
+          <ChevronRight className="h-4 w-4 text-faint-foreground" />
         )}
       </button>
 
       {open && (
-        <div className="border-t border-slate-100 px-5">
+        <div className="border-t border-border-soft px-5">
           {rows.map((s) => (
             <SettingRowItem key={s.key} setting={s} onRefresh={onRefresh} />
           ))}
@@ -267,12 +267,12 @@ export function SiteSettingsTab({ settings, errorMsg, onRefresh }: SiteSettingsT
       )}
 
       {settings.length === 0 && !errorMsg ? (
-        <div className="rounded-xl border border-slate-100 bg-white p-12 text-center text-sm text-slate-400">
+        <div className="rounded-xl border border-border-soft bg-card p-12 text-center text-sm text-faint-foreground">
           Tidak ada data settings di database.
         </div>
       ) : (
         <div className="space-y-3">
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-faint-foreground">
             {settings.length} pengaturan ditemukan. Arahkan kursor ke baris untuk mengedit.
           </p>
           {allKeys.map((groupKey) => (

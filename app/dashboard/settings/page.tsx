@@ -103,15 +103,15 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Pengaturan Sistem</h1>
-          <p className="mt-0.5 text-sm text-slate-500">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Pengaturan Sistem</h1>
+          <p className="mt-0.5 text-sm text-muted-foreground">
             Konfigurasi user, role & hak akses, master game, dan kategori Feryshop.
           </p>
         </div>
         <button
           onClick={loadData}
           disabled={isLoading}
-          className="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-200"
+          className="inline-flex items-center gap-2 rounded-lg bg-muted px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
         >
           <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
           Refresh Data
@@ -128,7 +128,7 @@ export default function SettingsPage() {
               className={`flex items-center gap-3 rounded-lg px-4 py-3 text-left text-sm font-medium transition-colors ${
                 activeTab === item.id
                   ? "border border-blue-100 bg-blue-50 font-semibold text-blue-700 shadow-sm"
-                  : "text-slate-600 hover:bg-slate-50"
+                  : "text-muted-foreground hover:bg-muted"
               }`}
             >
               {item.icon}

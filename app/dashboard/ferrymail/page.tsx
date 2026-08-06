@@ -196,17 +196,17 @@ export default function FerryMailPage() {
   };
 
   return (
-    <div className="-mx-8 -my-8 flex h-[calc(100vh-4rem)] flex-col overflow-hidden border-t border-slate-200 bg-white font-sans select-none">
+    <div className="-mx-8 -my-8 flex h-[calc(100vh-4rem)] flex-col overflow-hidden border-t border-border bg-card font-sans select-none">
       {!selectedEmail ? (
         // INBOX LIST VIEW
-        <div className="flex flex-1 flex-col overflow-hidden bg-white">
+        <div className="flex flex-1 flex-col overflow-hidden bg-card">
           {/* Unified Header Bar */}
-          <div className="flex min-h-[48px] shrink-0 items-center border-b border-slate-200 px-4 pt-2">
+          <div className="flex min-h-[48px] shrink-0 items-center border-b border-border px-4 pt-2">
             {/* Actions */}
-            <div className="flex w-[252px] shrink-0 items-center gap-2 text-slate-500">
+            <div className="flex w-[252px] shrink-0 items-center gap-2 text-muted-foreground">
               <button
                 onClick={toggleAllChecks}
-                className="rounded p-1 transition-colors hover:bg-slate-100"
+                className="rounded p-1 transition-colors hover:bg-muted"
               >
                 {allFilteredChecked ? (
                   <CheckSquare className="h-4 w-4 text-blue-600" />
@@ -214,10 +214,10 @@ export default function FerryMailPage() {
                   <Square className="h-4 w-4" />
                 )}
               </button>
-              <button className="rounded p-1 transition-colors hover:bg-slate-100">
+              <button className="rounded p-1 transition-colors hover:bg-muted">
                 <RefreshCw className="h-4 w-4" />
               </button>
-              <button className="rounded p-1 transition-colors hover:bg-slate-100">
+              <button className="rounded p-1 transition-colors hover:bg-muted">
                 <MoreVertical className="h-4 w-4" />
               </button>
             </div>
@@ -229,7 +229,7 @@ export default function FerryMailPage() {
                 className={`flex items-center gap-2 border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
                   activeTab === "utama"
                     ? "border-blue-600 text-blue-600"
-                    : "border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                    : "border-transparent text-muted-foreground hover:bg-muted hover:text-foreground"
                 }`}
               >
                 <Inbox className="h-4 w-4" />
@@ -240,7 +240,7 @@ export default function FerryMailPage() {
                 className={`flex items-center gap-2 border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
                   activeTab === "notifikasi"
                     ? "border-blue-600 text-blue-600"
-                    : "border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                    : "border-transparent text-muted-foreground hover:bg-muted hover:text-foreground"
                 }`}
               >
                 <Shield className="h-4 w-4" />
@@ -251,7 +251,7 @@ export default function FerryMailPage() {
                 className={`flex items-center gap-2 border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
                   activeTab === "favorit"
                     ? "border-blue-600 text-blue-600"
-                    : "border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                    : "border-transparent text-muted-foreground hover:bg-muted hover:text-foreground"
                 }`}
               >
                 <Star className="h-4 w-4" />
@@ -262,11 +262,11 @@ export default function FerryMailPage() {
             {/* Search */}
             <div className="ml-auto w-64">
               <div className="relative">
-                <Search className="absolute top-1/2 left-2.5 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+                <Search className="absolute top-1/2 left-2.5 h-3.5 w-3.5 -translate-y-1/2 text-faint-foreground" />
                 <input
                   type="text"
                   placeholder="Telusuri dalam email"
-                  className="w-full rounded-md bg-slate-100 py-1 pr-3 pl-8 font-sans text-sm transition-all duration-200 outline-none hover:bg-slate-200/60 focus:border-blue-500 focus:bg-white focus:shadow-sm focus:ring-1 focus:ring-blue-500"
+                  className="w-full rounded-md bg-muted py-1 pr-3 pl-8 font-sans text-sm transition-all duration-200 outline-none hover:bg-muted/60 focus:border-blue-500 focus:bg-card focus:shadow-sm focus:ring-1 focus:ring-blue-500"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -281,49 +281,49 @@ export default function FerryMailPage() {
                 <div
                   key={email.id}
                   onClick={() => setSelectedEmail(email)}
-                  className={`group flex cursor-pointer items-center border-b border-slate-100 px-4 py-1.5 transition-colors ${
+                  className={`group flex cursor-pointer items-center border-b border-border-soft px-4 py-1.5 transition-colors ${
                     email.isChecked
                       ? "bg-blue-50/40 hover:bg-blue-50/60"
-                      : "bg-white hover:bg-slate-50"
+                      : "bg-card hover:bg-muted"
                   }`}
                 >
-                  <div className="flex w-[52px] shrink-0 items-center gap-2 text-slate-300">
+                  <div className="flex w-[52px] shrink-0 items-center gap-2 text-faint-foreground">
                     <button
                       onClick={(e) => toggleCheck(e, email.id)}
-                      className="p-0.5 transition-colors hover:text-slate-500"
+                      className="p-0.5 transition-colors hover:text-muted-foreground"
                     >
                       {email.isChecked ? (
                         <CheckSquare className="h-4 w-4 text-blue-600" />
                       ) : (
-                        <Square className="h-4 w-4 group-hover:text-slate-400" />
+                        <Square className="h-4 w-4 group-hover:text-faint-foreground" />
                       )}
                     </button>
                     <button
                       onClick={(e) => toggleStar(e, email.id)}
-                      className="p-0.5 transition-colors hover:text-slate-500"
+                      className="p-0.5 transition-colors hover:text-muted-foreground"
                     >
                       {email.isStarred ? (
                         <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                       ) : (
-                        <Star className="h-4 w-4 group-hover:text-slate-400" />
+                        <Star className="h-4 w-4 group-hover:text-faint-foreground" />
                       )}
                     </button>
                   </div>
                   <div className="w-[200px] max-w-[200px] min-w-[200px] shrink-0 truncate pr-4 text-left">
                     <span
-                      className={`text-sm font-bold ${email.isChecked ? "text-blue-900" : "text-slate-800"}`}
+                      className={`text-sm font-bold ${email.isChecked ? "text-blue-900" : "text-foreground"}`}
                     >
                       {email.sender}
                     </span>
                   </div>
                   <div className="flex-1 justify-start truncate text-left">
                     <span
-                      className={`text-sm font-medium ${email.isChecked ? "text-blue-900" : "text-slate-800"}`}
+                      className={`text-sm font-medium ${email.isChecked ? "text-blue-900" : "text-foreground"}`}
                     >
                       {email.subject}
                     </span>
                     <span
-                      className={`text-sm ${email.isChecked ? "text-blue-700" : "text-slate-500"}`}
+                      className={`text-sm ${email.isChecked ? "text-blue-700" : "text-muted-foreground"}`}
                     >
                       <span className="mx-1.5">-</span>
                       {email.body.replace(/\n/g, " ").substring(0, 100)}...
@@ -331,7 +331,7 @@ export default function FerryMailPage() {
                   </div>
                   <div className="w-20 shrink-0 text-right">
                     <span
-                      className={`text-xs font-medium ${email.isChecked ? "text-blue-900" : "text-slate-500"}`}
+                      className={`text-xs font-medium ${email.isChecked ? "text-blue-900" : "text-muted-foreground"}`}
                     >
                       {email.time}
                     </span>
@@ -339,8 +339,8 @@ export default function FerryMailPage() {
                 </div>
               ))
             ) : (
-              <div className="flex flex-col items-center gap-2 p-8 text-center text-sm text-slate-400">
-                <Inbox className="h-10 w-10 text-slate-300" />
+              <div className="flex flex-col items-center gap-2 p-8 text-center text-sm text-faint-foreground">
+                <Inbox className="h-10 w-10 text-faint-foreground" />
                 <span>Kotak masuk kosong. Tidak ada email yang ditemukan.</span>
               </div>
             )}
@@ -348,34 +348,34 @@ export default function FerryMailPage() {
         </div>
       ) : (
         // EMAIL DETAIL VIEW
-        <div className="flex flex-1 flex-col overflow-hidden bg-white">
+        <div className="flex flex-1 flex-col overflow-hidden bg-card">
           {/* Detail View Action Bar */}
-          <div className="flex min-h-[48px] shrink-0 items-center gap-3 border-b border-slate-200 px-4 py-1 text-slate-500">
+          <div className="flex min-h-[48px] shrink-0 items-center gap-3 border-b border-border px-4 py-1 text-muted-foreground">
             <button
               onClick={() => {
                 setSelectedEmail(null);
                 setCopied(false);
               }}
-              className="flex items-center gap-2 rounded-md px-2 py-1 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100"
+              className="flex items-center gap-2 rounded-md px-2 py-1 text-sm font-medium text-foreground transition-colors hover:bg-muted"
             >
               <ArrowLeft className="h-4 w-4" />
               Kembali
             </button>
-            <div className="mx-1 h-4 w-px bg-slate-300"></div>
-            <button className="rounded p-1 transition-colors hover:bg-slate-100">
+            <div className="mx-1 h-4 w-px bg-muted"></div>
+            <button className="rounded p-1 transition-colors hover:bg-muted">
               <RefreshCw className="h-4 w-4" />
             </button>
-            <button className="rounded p-1 transition-colors hover:bg-slate-100">
+            <button className="rounded p-1 transition-colors hover:bg-muted">
               <MoreVertical className="h-4 w-4" />
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto bg-white px-8 py-6">
+          <div className="flex-1 overflow-y-auto bg-card px-8 py-6">
             <div className="mx-auto flex max-w-3xl flex-col space-y-6">
               {/* Subject */}
-              <h1 className="flex items-center gap-3 text-lg font-medium text-slate-900">
+              <h1 className="flex items-center gap-3 text-lg font-medium text-foreground">
                 {selectedEmail.subject}
-                <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-500">
+                <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
                   Kotak Masuk
                 </span>
               </h1>
@@ -390,22 +390,22 @@ export default function FerryMailPage() {
                   </div>
                   <div>
                     <div className="flex items-center gap-1.5">
-                      <span className="text-sm font-bold text-slate-900">
+                      <span className="text-sm font-bold text-foreground">
                         {selectedEmail.sender}
                       </span>
-                      <span className="text-xs text-slate-500">
+                      <span className="text-xs text-muted-foreground">
                         &lt;{selectedEmail.senderEmail}&gt;
                       </span>
                     </div>
-                    <div className="mt-0.5 text-[11px] text-slate-500">kepada customer</div>
+                    <div className="mt-0.5 text-[11px] text-muted-foreground">kepada customer</div>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 text-slate-400">
+                <div className="flex items-center gap-3 text-faint-foreground">
                   <span className="text-xs">
                     {selectedEmail.date}, {selectedEmail.time}
                   </span>
-                  <Star className="h-4 w-4 cursor-pointer hover:text-slate-600" />
-                  <MoreVertical className="h-4 w-4 cursor-pointer hover:text-slate-600" />
+                  <Star className="h-4 w-4 cursor-pointer hover:text-muted-foreground" />
+                  <MoreVertical className="h-4 w-4 cursor-pointer hover:text-muted-foreground" />
                 </div>
               </div>
 
@@ -423,12 +423,12 @@ export default function FerryMailPage() {
               </div>
 
               {/* OTP Code Massive Highlight Box */}
-              <div className="flex flex-col items-center justify-center space-y-4 rounded-lg border border-slate-200/80 bg-slate-50 p-6 text-center">
-                <span className="text-[11px] font-bold tracking-wider text-slate-500 uppercase">
+              <div className="flex flex-col items-center justify-center space-y-4 rounded-lg border border-border/80 bg-muted p-6 text-center">
+                <span className="text-[11px] font-bold tracking-wider text-muted-foreground uppercase">
                   OTP Code
                 </span>
 
-                <div className="relative flex w-full max-w-xs items-center justify-center rounded-xl border border-blue-100 bg-white px-6 py-4 font-mono text-4xl font-bold tracking-widest text-blue-700 shadow-sm">
+                <div className="relative flex w-full max-w-xs items-center justify-center rounded-xl border border-blue-100 bg-card px-6 py-4 font-mono text-4xl font-bold tracking-widest text-blue-700 shadow-sm">
                   {selectedEmail.otp}
                 </div>
 
@@ -456,8 +456,8 @@ export default function FerryMailPage() {
               </div>
 
               {/* Email Content Container */}
-              <div className="rounded-lg border border-slate-200/80 bg-white p-6">
-                <p className="font-sans text-sm leading-relaxed font-normal whitespace-pre-line text-slate-700 select-text">
+              <div className="rounded-lg border border-border/80 bg-card p-6">
+                <p className="font-sans text-sm leading-relaxed font-normal whitespace-pre-line text-foreground select-text">
                   {selectedEmail.body}
                 </p>
               </div>

@@ -55,7 +55,7 @@ export function StockPurchaseForm({ accounts }: { accounts: Account[] }) {
   }
 
   return (
-    <div className="overflow-hidden rounded-[10px] border border-gray-200 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-[10px] border border-border bg-card shadow-sm">
       <div className="flex items-center gap-3 bg-purple-600 px-6 py-6 text-white">
         <ShoppingCart className="h-6 w-6 text-purple-100" />
         <div>
@@ -84,31 +84,31 @@ export function StockPurchaseForm({ accounts }: { accounts: Account[] }) {
         <form id="purchase-form" action={handleSubmit} className="space-y-8">
           {/* Game Details Section */}
           <div>
-            <h3 className="mb-4 border-b border-gray-100 pb-2 text-sm font-bold tracking-wider text-gray-900 uppercase">
+            <h3 className="mb-4 border-b border-border-soft pb-2 text-sm font-bold tracking-wider text-foreground uppercase">
               1. Item Details
             </h3>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-gray-700">
+                <label className="text-sm font-semibold text-foreground">
                   Category <span className="text-red-500">*</span>
                 </label>
                 <input
                   required
                   name="category"
                   type="text"
-                  className="w-full rounded-[10px] border border-gray-300 px-4 py-2.5 text-sm transition-all outline-none placeholder:text-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                  className="w-full rounded-[10px] border border-input px-4 py-2.5 text-sm transition-all outline-none placeholder:text-faint-foreground focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
                   placeholder="e.g. Mobile Legends"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-gray-700">
+                <label className="text-sm font-semibold text-foreground">
                   Stock Code / Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   required
                   name="name"
                   type="text"
-                  className="w-full rounded-[10px] border border-gray-300 px-4 py-2.5 text-sm transition-all outline-none placeholder:text-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                  className="w-full rounded-[10px] border border-input px-4 py-2.5 text-sm transition-all outline-none placeholder:text-faint-foreground focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
                   placeholder="e.g. Akun Sultan GG"
                 />
               </div>
@@ -117,108 +117,112 @@ export function StockPurchaseForm({ accounts }: { accounts: Account[] }) {
 
           {/* Credentials Section */}
           <div>
-            <h3 className="mb-4 border-b border-gray-100 pb-2 text-sm font-bold tracking-wider text-gray-900 uppercase">
+            <h3 className="mb-4 border-b border-border-soft pb-2 text-sm font-bold tracking-wider text-foreground uppercase">
               2. Credentials
             </h3>
             <div className="mb-4 grid grid-cols-1 gap-6 md:grid-cols-2">
               <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-gray-700">Username / Email</label>
+                <label className="text-sm font-semibold text-foreground">Username / Email</label>
                 <input
                   name="username"
                   type="text"
-                  className="w-full rounded-[10px] border border-gray-300 px-4 py-2.5 text-sm transition-all outline-none placeholder:text-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                  className="w-full rounded-[10px] border border-input px-4 py-2.5 text-sm transition-all outline-none placeholder:text-faint-foreground focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
                   placeholder="Login ID"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-gray-700">Password</label>
+                <label className="text-sm font-semibold text-foreground">Password</label>
                 <input
                   name="password"
                   type="text"
-                  className="w-full rounded-[10px] border border-gray-300 px-4 py-2.5 text-sm transition-all outline-none placeholder:text-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                  className="w-full rounded-[10px] border border-input px-4 py-2.5 text-sm transition-all outline-none placeholder:text-faint-foreground focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
                   placeholder="Password"
                 />
               </div>
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-semibold text-gray-700">Login Details</label>
+              <label className="text-sm font-semibold text-foreground">Login Details</label>
               <input
                 name="account_details"
                 type="text"
-                className="w-full rounded-[10px] border border-gray-300 px-4 py-2.5 text-sm transition-all outline-none placeholder:text-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                className="w-full rounded-[10px] border border-input px-4 py-2.5 text-sm transition-all outline-none placeholder:text-faint-foreground focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
                 placeholder="e.g. Login via Moonton / Google"
               />
             </div>
           </div>
 
           {/* Pricing & Financials */}
-          <div className="-mx-6 border-y border-gray-100 bg-gray-50 px-6 py-8 md:-mx-8 md:px-8">
-            <h3 className="mb-4 border-b border-gray-200 pb-2 text-sm font-bold tracking-wider text-gray-900 uppercase">
+          <div className="-mx-6 border-y border-border-soft bg-muted px-6 py-8 md:-mx-8 md:px-8">
+            <h3 className="mb-4 border-b border-border pb-2 text-sm font-bold tracking-wider text-foreground uppercase">
               3. Pricing & Payment
             </h3>
             <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-3">
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-gray-800">
+                <label className="text-sm font-bold text-foreground">
                   Capital Price (Harga Modal) <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                    <span className="font-medium text-gray-500 sm:text-sm">Rp</span>
+                    <span className="font-medium text-muted-foreground sm:text-sm">Rp</span>
                   </div>
                   <input
                     required
                     name="capital_price"
                     type="number"
-                    className="w-full rounded-[10px] border border-gray-300 py-2.5 pr-4 pl-12 font-mono text-sm font-bold text-gray-900 transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                    className="w-full rounded-[10px] border border-input py-2.5 pr-4 pl-12 font-mono text-sm font-bold text-foreground transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
                     placeholder="0"
                   />
                 </div>
-                <p className="mt-1 text-xs text-gray-500">Cost to acquire this stock.</p>
+                <p className="mt-1 text-xs text-muted-foreground">Cost to acquire this stock.</p>
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-gray-700">
+                <label className="text-sm font-semibold text-foreground">
                   Post Price (Harga Coret) <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                    <span className="text-gray-500 sm:text-sm">Rp</span>
+                    <span className="text-muted-foreground sm:text-sm">Rp</span>
                   </div>
                   <input
                     required
                     name="post_price"
                     type="number"
-                    className="w-full rounded-[10px] border border-gray-300 py-2.5 pr-4 pl-12 font-mono text-sm transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                    className="w-full rounded-[10px] border border-input py-2.5 pr-4 pl-12 font-mono text-sm transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
                     placeholder="0"
                   />
                 </div>
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-gray-800">
+                <label className="text-sm font-bold text-foreground">
                   Selling Price (Harga Jual) <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                    <span className="font-medium text-gray-500 sm:text-sm">Rp</span>
+                    <span className="font-medium text-muted-foreground sm:text-sm">Rp</span>
                   </div>
                   <input
                     required
                     name="current_price"
                     type="number"
-                    className="w-full rounded-[10px] border border-gray-300 py-2.5 pr-4 pl-12 font-mono text-sm font-bold text-blue-600 transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                    className="w-full rounded-[10px] border border-input py-2.5 pr-4 pl-12 font-mono text-sm font-bold text-blue-600 transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
                     placeholder="0"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-6 rounded-[10px] border border-gray-200 bg-white p-6 shadow-sm md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-6 rounded-[10px] border border-border bg-card p-6 shadow-sm md:grid-cols-2">
               <div className="space-y-2">
-                <label className="text-sm font-bold text-gray-900">
+                <label className="text-sm font-bold text-foreground">
                   Purchase Payment Status <span className="text-red-500">*</span>
                 </label>
                 <div className="flex gap-4">
                   <label
-                    className={`flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-[10px] border p-3 transition-all ${paymentStatus === "LUNAS" ? "border-emerald-500 bg-emerald-50 text-emerald-800 ring-1 ring-emerald-500" : "border-gray-300 bg-white text-gray-600 hover:bg-gray-50"}`}
+                    className={`flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-[10px] border p-3 transition-all ${
+                      paymentStatus === "LUNAS"
+                        ? "border-emerald-500 bg-emerald-50 text-emerald-800 ring-1 ring-emerald-500"
+                        : "border-input bg-card text-muted-foreground hover:bg-muted"
+                    }`}
                   >
                     <input
                       type="radio"
@@ -231,7 +235,11 @@ export function StockPurchaseForm({ accounts }: { accounts: Account[] }) {
                     <span className="text-sm font-semibold">LUNAS</span>
                   </label>
                   <label
-                    className={`flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-[10px] border p-3 transition-all ${paymentStatus === "PENDING" ? "border-amber-500 bg-amber-50 text-amber-800 ring-1 ring-amber-500" : "border-gray-300 bg-white text-gray-600 hover:bg-gray-50"}`}
+                    className={`flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-[10px] border p-3 transition-all ${
+                      paymentStatus === "PENDING"
+                        ? "border-amber-500 bg-amber-50 text-amber-800 ring-1 ring-amber-500"
+                        : "border-input bg-card text-muted-foreground hover:bg-muted"
+                    }`}
                   >
                     <input
                       type="radio"
@@ -244,7 +252,7 @@ export function StockPurchaseForm({ accounts }: { accounts: Account[] }) {
                     <span className="text-sm font-semibold">PENDING</span>
                   </label>
                 </div>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   {paymentStatus === "LUNAS"
                     ? "Will instantly deduct from the selected account and record in ledger."
                     : "Records stock as liability. Account balance will not be deducted yet."}
@@ -253,13 +261,13 @@ export function StockPurchaseForm({ accounts }: { accounts: Account[] }) {
 
               {paymentStatus === "LUNAS" && (
                 <div className="animate-in fade-in slide-in-from-top-2 space-y-1.5">
-                  <label className="text-sm font-bold text-gray-900">
+                  <label className="text-sm font-bold text-foreground">
                     Source Account (Rekening) <span className="text-red-500">*</span>
                   </label>
                   <select
                     required
                     name="payment_account_id"
-                    className="w-full rounded-[10px] border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-800 transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                    className="w-full rounded-[10px] border border-input bg-card px-4 py-3 text-sm font-medium text-foreground transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
                   >
                     <option value="">-- Choose Account to Deduct --</option>
                     {accounts.map((acc) => (
@@ -275,25 +283,25 @@ export function StockPurchaseForm({ accounts }: { accounts: Account[] }) {
 
           {/* Additional Info */}
           <div>
-            <h3 className="mb-4 border-b border-gray-100 pb-2 text-sm font-bold tracking-wider text-gray-900 uppercase">
+            <h3 className="mb-4 border-b border-border-soft pb-2 text-sm font-bold tracking-wider text-foreground uppercase">
               4. Additional Info
             </h3>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-gray-700">Seller Info</label>
+                <label className="text-sm font-semibold text-foreground">Seller Info</label>
                 <input
                   name="seller_info"
                   type="text"
-                  className="w-full rounded-[10px] border border-gray-300 px-4 py-2.5 text-sm transition-all outline-none placeholder:text-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                  className="w-full rounded-[10px] border border-input px-4 py-2.5 text-sm transition-all outline-none placeholder:text-faint-foreground focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
                   placeholder="e.g. Nama Seller / WA / Grup FB"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-gray-700">Internal Notes</label>
+                <label className="text-sm font-semibold text-foreground">Internal Notes</label>
                 <input
                   name="internal_notes"
                   type="text"
-                  className="w-full rounded-[10px] border border-gray-300 px-4 py-2.5 text-sm transition-all outline-none placeholder:text-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                  className="w-full rounded-[10px] border border-input px-4 py-2.5 text-sm transition-all outline-none placeholder:text-faint-foreground focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
                   placeholder="e.g. Butuh change email 7 hari"
                 />
               </div>

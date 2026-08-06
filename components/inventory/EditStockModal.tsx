@@ -72,8 +72,8 @@ export function EditStockModal({ stock, isOpen, onClose, categories = [] }: Edit
   }
 
   const inputClass =
-    "w-full border border-slate-200 rounded-[10px] bg-white px-4 py-2.5 text-[15px] text-slate-900 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400";
-  const labelClass = "text-sm font-medium text-slate-700";
+    "w-full border border-border rounded-[10px] bg-card px-4 py-2.5 text-[15px] text-foreground focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-faint-foreground";
+  const labelClass = "text-sm font-medium text-foreground";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm">
@@ -82,13 +82,13 @@ export function EditStockModal({ stock, isOpen, onClose, categories = [] }: Edit
         onClick={!isPending ? onClose : undefined}
       />
 
-      <div className="animate-in slide-in-from-right relative flex h-full w-full max-w-md flex-col overflow-hidden bg-white shadow-2xl duration-300">
-        <div className="flex shrink-0 items-center justify-between border-b border-slate-100 bg-slate-50 px-6 py-4">
-          <h2 className="text-lg font-bold text-slate-900">Edit Stok Akun</h2>
+      <div className="animate-in slide-in-from-right relative flex h-full w-full max-w-md flex-col overflow-hidden bg-card shadow-2xl duration-300">
+        <div className="flex shrink-0 items-center justify-between border-b border-border-soft bg-muted px-6 py-4">
+          <h2 className="text-lg font-bold text-foreground">Edit Stok Akun</h2>
           <button
             onClick={onClose}
             disabled={isPending}
-            className="rounded-[10px] p-2 text-slate-400 transition-colors hover:bg-white hover:text-slate-600 disabled:opacity-50"
+            className="rounded-[10px] p-2 text-faint-foreground transition-colors hover:bg-card hover:text-muted-foreground disabled:opacity-50"
           >
             <X className="h-5 w-5" />
           </button>
@@ -267,9 +267,9 @@ export function EditStockModal({ stock, isOpen, onClose, categories = [] }: Edit
               </div>
             </div>
 
-            <div className="space-y-1.5 rounded-[10px] border border-slate-200 p-4">
+            <div className="space-y-1.5 rounded-[10px] border border-border p-4">
               <label className={labelClass}>
-                Gambar <span className="ml-1 text-xs font-normal text-slate-400">(Opsional)</span>
+                Gambar <span className="ml-1 text-xs font-normal text-faint-foreground">(Opsional)</span>
               </label>
 
               {stock.images && stock.images.length > 0 && (
@@ -281,7 +281,7 @@ export function EditStockModal({ stock, isOpen, onClose, categories = [] }: Edit
                         key={idx}
                         src={img}
                         alt="Current"
-                        className="h-12 w-12 rounded-lg border border-slate-200 object-cover"
+                        className="h-12 w-12 rounded-lg border border-border object-cover"
                       />
                     ))}
                   </div>
@@ -290,7 +290,7 @@ export function EditStockModal({ stock, isOpen, onClose, categories = [] }: Edit
                       type="checkbox"
                       checked={clearExisting}
                       onChange={(e) => setClearExisting(e.target.checked)}
-                      className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                      className="h-4 w-4 rounded border-input text-blue-600 focus:ring-blue-500"
                     />
                     <span className="text-sm font-medium text-red-600">
                       Hapus gambar lama & timpa dengan yang baru
@@ -304,9 +304,9 @@ export function EditStockModal({ stock, isOpen, onClose, categories = [] }: Edit
                 name="imageFiles"
                 multiple
                 accept="image/*"
-                className="mt-2 w-full rounded-[10px] border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 transition-colors file:mr-4 file:rounded-md file:border-0 file:bg-blue-50 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-blue-700 hover:file:bg-blue-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                className="mt-2 w-full rounded-[10px] border border-border bg-muted px-3.5 py-2.5 text-sm text-foreground transition-colors file:mr-4 file:rounded-md file:border-0 file:bg-blue-50 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-blue-700 hover:file:bg-blue-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
               />
-              <p className="mt-1 text-xs text-slate-500">Pilih gambar baru untuk ditambahkan.</p>
+              <p className="mt-1 text-xs text-muted-foreground">Pilih gambar baru untuk ditambahkan.</p>
             </div>
 
             <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
@@ -353,12 +353,12 @@ export function EditStockModal({ stock, isOpen, onClose, categories = [] }: Edit
           </form>
         </div>
 
-        <div className="flex shrink-0 justify-end gap-3 border-t border-slate-100 bg-slate-50/50 p-5">
+        <div className="flex shrink-0 justify-end gap-3 border-t border-border-soft bg-muted/50 p-5">
           <button
             type="button"
             onClick={onClose}
             disabled={isPending}
-            className="rounded-[10px] border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition-all hover:bg-slate-50"
+            className="rounded-[10px] border border-border bg-card px-5 py-2.5 text-sm font-semibold text-foreground transition-all hover:bg-muted"
           >
             Batal
           </button>

@@ -69,12 +69,12 @@ export function LedgerFilter({ accounts }: LedgerFilterProps) {
   }
 
   const selectClass =
-    "w-full xl:w-[180px] shrink-0 border border-slate-200 rounded-md bg-white px-3 py-2 text-sm text-slate-700 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none appearance-none cursor-pointer";
+    "w-full xl:w-[180px] shrink-0 border border-border rounded-md bg-card px-3 py-2 text-sm text-foreground focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none appearance-none cursor-pointer";
   const buttonClass =
-    "flex items-center gap-2 border border-slate-200 rounded-md px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed";
+    "flex items-center gap-2 border border-border rounded-md px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed";
 
   return (
-    <div className="mb-6 w-full rounded-md border border-slate-100 bg-white p-5 shadow-sm">
+    <div className="mb-6 w-full rounded-md border border-border-soft bg-card p-5 shadow-sm">
       <div className="flex w-full flex-col items-center justify-between gap-4 xl:flex-row">
         {/* Left Side (Dropdowns) */}
         <div className="flex w-full items-center gap-3 xl:w-auto">
@@ -91,7 +91,7 @@ export function LedgerFilter({ accounts }: LedgerFilterProps) {
                 </option>
               ))}
             </select>
-            <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-faint-foreground" />
           </div>
 
           <div className="relative w-full xl:w-auto">
@@ -104,7 +104,7 @@ export function LedgerFilter({ accounts }: LedgerFilterProps) {
               <option value="IN">Uang Masuk (IN)</option>
               <option value="OUT">Uang Keluar (OUT)</option>
             </select>
-            <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-faint-foreground" />
           </div>
 
           {(currentAccountId || currentType) && (
@@ -123,13 +123,13 @@ export function LedgerFilter({ accounts }: LedgerFilterProps) {
             <input
               type="text"
               placeholder="Cari transaksi..."
-              className="h-10 w-full rounded-md border border-slate-200 bg-white pr-3 pl-9 text-sm text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+              className="h-10 w-full rounded-md border border-border bg-card pr-3 pl-9 text-sm text-foreground outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
             />
-            <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-faint-foreground" />
           </div>
 
           <button className={`${buttonClass} h-10 shrink-0 whitespace-nowrap`}>
-            <Calendar className="h-4 w-4 text-slate-500" />
+            <Calendar className="h-4 w-4 text-muted-foreground" />
             Range filter
           </button>
 
