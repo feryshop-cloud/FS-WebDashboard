@@ -383,6 +383,7 @@ export type Database = {
         Row: {
           banner: string | null;
           category_id: number;
+          code: string | null;
           created_at: string;
           description: string | null;
           developers: string;
@@ -401,6 +402,7 @@ export type Database = {
         Insert: {
           banner?: string | null;
           category_id?: number;
+          code?: string | null;
           created_at?: string;
           description?: string | null;
           developers?: string;
@@ -419,6 +421,7 @@ export type Database = {
         Update: {
           banner?: string | null;
           category_id?: number;
+          code?: string | null;
           created_at?: string;
           description?: string | null;
           developers?: string;
@@ -488,6 +491,7 @@ export type Database = {
           game_id: string;
           id: string;
           image_urls: string[];
+          public_id: string;
           screenshot_url: string | null;
           search_vector: unknown;
           sold_at: string | null;
@@ -506,6 +510,7 @@ export type Database = {
           game_id: string;
           id?: string;
           image_urls?: string[];
+          public_id?: string | null;
           screenshot_url?: string | null;
           search_vector?: unknown;
           sold_at?: string | null;
@@ -524,6 +529,7 @@ export type Database = {
           game_id?: string;
           id?: string;
           image_urls?: string[];
+          public_id?: string | null;
           screenshot_url?: string | null;
           search_vector?: unknown;
           sold_at?: string | null;

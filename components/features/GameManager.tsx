@@ -220,10 +220,9 @@ export function GameManager({
                 <input
                   id="game-slug"
                   type="text"
-                  required
                   value={slug}
                   onChange={(e) => setSlug(e.target.value)}
-                  placeholder="mobile-legends"
+                  placeholder="auto dari nama game"
                   className="border-border bg-card text-foreground placeholder:text-faint-foreground w-full rounded-[10px] border px-3.5 py-2.5 font-mono text-sm transition-colors placeholder:font-sans focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-none"
                 />
               </div>
@@ -265,7 +264,7 @@ export function GameManager({
                 <div className="flex w-full gap-2">
                   <button
                     type="submit"
-                    disabled={isPending || !name || !slug}
+                    disabled={isPending || !name}
                     className="inline-flex flex-1 items-center justify-center gap-2 rounded-[10px] bg-violet-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-violet-700 focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-70"
                   >
                     {isPending ? (

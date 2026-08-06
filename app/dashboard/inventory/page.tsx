@@ -288,7 +288,7 @@ export default function InventoryPage() {
                   return (
                     <tr key={item.id} className="group hover:bg-muted/50 transition-colors">
                       <td className="text-foreground px-6 py-4 text-sm font-semibold whitespace-nowrap">
-                        {item.title_reference || "-"}
+                        {item.public_id || item.title_reference || "-"}
                       </td>
                       <td className="text-muted-foreground px-6 py-4 text-sm font-medium whitespace-nowrap">
                         <span className="bg-muted text-muted-foreground rounded-md px-2.5 py-1 text-[11px] font-semibold">

@@ -180,6 +180,42 @@ export async function getGameInstructions(game_slug: string) {
   return { data: (data?.instructions as unknown[]) || null, error: null };
 }
 
+function slugify(input: string): string {
+  return (
+    input
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 100) || "game"
+  );
+}
+
+async function resolveGameSlug(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  name: string,
+  preferred?: string,
+  excludeId?: string,
+): Promise<string> {
+  const trimmed = preferred?.trim();
+  const base = trimmed ? trimmed : slugify(name);
+
+  let query = supabase.from("games").select("slug").ilike("slug", `${base}%`);
+  if (excludeId) query = query.neq("id", excludeId);
+  const { data } = await query;
+
+  const taken = new Set((data ?? []).map((row) => row.slug));
+
+  let candidate = base;
+  let n = 2;
+  while (taken.has(candidate)) {
+    candidate = `${base}-${n}`;
+    n += 1;
+  }
+  return candidate;
+}
+
 export async function getGamesList() {
   const supabase = await createClient();
 
@@ -206,7 +242,9 @@ export async function addGame(name: string, slug: string, logo?: string, instruc
   } = await supabase.auth.getUser();
   if (!user) return { success: false, error: "Unauthorized" };
 
-  if (!name || !slug) return { success: false, error: "Nama dan slug wajib diisi." };
+  if (!name) return { success: false, error: "Nama game wajib diisi." };
+
+  const finalSlug = await resolveGameSlug(supabase, name, slug);
 
   const mappedInputFields =
     instructions && Array.isArray(instructions)
@@ -228,7 +266,7 @@ export async function addGame(name: string, slug: string, logo?: string, instruc
     .from("games")
     .insert({
       name,
-      slug,
+      slug: finalSlug,
       logo: logo || null,
       instructions: finalInstructions as Json,
       is_active: true,
@@ -262,11 +300,13 @@ export async function updateGame(
   } = await supabase.auth.getUser();
   if (!user) return { success: false, error: "Unauthorized" };
 
-  if (!id || !name || !slug) return { success: false, error: "ID, nama, dan slug wajib diisi." };
+  if (!id || !name) return { success: false, error: "ID dan nama wajib diisi." };
+
+  const finalSlug = await resolveGameSlug(supabase, name, slug, id);
 
   const updatePayload: Database["public"]["Tables"]["games"]["Update"] = {
     name,
-    slug,
+    slug: finalSlug,
     logo: logo || null,
     is_active: is_active ?? true,
     is_popular: is_popular ?? false,
