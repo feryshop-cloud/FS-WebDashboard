@@ -162,10 +162,10 @@ export default function ProblemCasesPage() {
       {/* Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          <h1 className="text-foreground text-2xl font-bold tracking-tight">
             Akun Bermasalah (Problem Cases)
           </h1>
-          <p className="mt-0.5 text-sm text-muted-foreground">
+          <p className="text-muted-foreground mt-0.5 text-sm">
             Kelola tiket masalah untuk stok akun maupun komplain transaksi.
           </p>
         </div>
@@ -184,26 +184,26 @@ export default function ProblemCasesPage() {
       </div>
 
       {/* Action Bar */}
-      <div className="flex flex-col items-center justify-between gap-4 rounded-2xl border border-border-soft bg-card p-4 shadow-sm sm:flex-row">
+      <div className="border-border-soft bg-card flex flex-col items-center justify-between gap-4 rounded-2xl border p-4 shadow-sm sm:flex-row">
         <div className="relative w-full sm:w-96">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <Search className="h-4 w-4 text-faint-foreground" />
+            <Search className="text-faint-foreground h-4 w-4" />
           </div>
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="block w-full rounded-xl border border-border bg-muted/70 py-2 pr-3 pl-10 text-foreground placeholder-slate-400 transition-all outline-none focus:border-blue-500 focus:bg-card focus:ring-2 focus:ring-blue-500/20 sm:text-sm"
+            className="border-border bg-muted/70 text-foreground focus:bg-card block w-full rounded-xl border py-2 pr-3 pl-10 placeholder-slate-400 transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 sm:text-sm"
             placeholder="Cari ID case, tipe masalah, atau customer..."
           />
         </div>
         <div className="flex w-full items-center gap-3 sm:w-auto">
-          <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground">
-            <Filter className="h-4 w-4 text-faint-foreground" />
+          <div className="border-border bg-card text-foreground flex items-center gap-2 rounded-xl border px-3 py-1.5 text-sm font-medium">
+            <Filter className="text-faint-foreground h-4 w-4" />
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="cursor-pointer bg-transparent text-sm font-medium text-foreground outline-none"
+              className="text-foreground cursor-pointer bg-transparent text-sm font-medium outline-none"
             >
               <option value="ALL">Semua Status</option>
               <option value="OPEN">Open (Baru)</option>
@@ -217,10 +217,10 @@ export default function ProblemCasesPage() {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-2xl border border-border-soft bg-card shadow-sm">
+      <div className="border-border-soft bg-card overflow-hidden rounded-2xl border shadow-sm">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-border-soft text-left text-sm">
-            <thead className="bg-muted/80 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+          <table className="divide-border-soft min-w-full divide-y text-left text-sm">
+            <thead className="bg-muted/80 text-muted-foreground text-xs font-semibold tracking-wider uppercase">
               <tr>
                 <th scope="col" className="px-6 py-4">
                   Nomor Case
@@ -242,7 +242,7 @@ export default function ProblemCasesPage() {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border-soft bg-card text-muted-foreground">
+            <tbody className="divide-border-soft bg-card text-muted-foreground divide-y">
               {isLoading ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-16 text-center">
@@ -251,7 +251,7 @@ export default function ProblemCasesPage() {
                 </tr>
               ) : filteredCases.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-sm text-faint-foreground">
+                  <td colSpan={6} className="text-faint-foreground px-6 py-12 text-center text-sm">
                     Belum ada tiket masalah yang cocok dengan filter.
                   </td>
                 </tr>
@@ -275,8 +275,8 @@ export default function ProblemCasesPage() {
                       : "-";
 
                   return (
-                    <tr key={c.id} className="group transition-colors hover:bg-muted/50">
-                      <td className="px-6 py-4 font-semibold whitespace-nowrap text-foreground">
+                    <tr key={c.id} className="group hover:bg-muted/50 transition-colors">
+                      <td className="text-foreground px-6 py-4 font-semibold whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           {c.status === "OPEN" && (
                             <AlertTriangle className="h-4 w-4 text-rose-500" />
@@ -284,17 +284,17 @@ export default function ProblemCasesPage() {
                           {c.case_number}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-muted-foreground">
+                      <td className="text-muted-foreground px-6 py-4 whitespace-nowrap">
                         {formatDate(c.created_at ?? "")}
                       </td>
-                      <td className="px-6 py-4 font-medium text-foreground">
+                      <td className="text-foreground px-6 py-4 font-medium">
                         {c.issue_type as string}
                       </td>
-                      <td className="px-6 py-4 text-muted-foreground">
+                      <td className="text-muted-foreground px-6 py-4">
                         <div className="flex flex-col">
-                          <span className="font-semibold text-foreground">{relatedStr}</span>
+                          <span className="text-foreground font-semibold">{relatedStr}</span>
                           {c.customers && (
-                            <span className="mt-0.5 text-xs text-faint-foreground">
+                            <span className="text-faint-foreground mt-0.5 text-xs">
                               Cust: {c.customers.name}
                             </span>
                           )}
@@ -342,17 +342,17 @@ export default function ProblemCasesPage() {
       {/* Buat Case Baru Modal */}
       {isAddOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm">
-          <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-card shadow-2xl duration-200">
-            <div className="flex items-center justify-between border-b border-border-soft bg-muted/50 px-6 py-5">
+          <div className="animate-in slide-in-from-right bg-card flex h-full w-full max-w-md flex-col shadow-2xl duration-200">
+            <div className="border-border-soft bg-muted/50 flex items-center justify-between border-b px-6 py-5">
               <div>
-                <h2 className="text-base font-bold text-foreground">Buat Case Baru</h2>
-                <p className="mt-0.5 text-xs text-muted-foreground">
+                <h2 className="text-foreground text-base font-bold">Buat Case Baru</h2>
+                <p className="text-muted-foreground mt-0.5 text-xs">
                   Catat masalah untuk ditindaklanjuti.
                 </p>
               </div>
               <button
                 onClick={() => setIsAddOpen(false)}
-                className="rounded-lg p-1.5 text-faint-foreground hover:bg-muted hover:text-muted-foreground"
+                className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-lg p-1.5"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -366,27 +366,27 @@ export default function ProblemCasesPage() {
                 )}
 
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-foreground">
+                  <label className="text-foreground mb-1 block text-xs font-medium">
                     Tipe Masalah <span className="text-rose-500">*</span>
                   </label>
                   <input
                     name="issue_type"
                     required
                     type="text"
-                    className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                     placeholder="Mis. Kena Hackback, Password Salah"
                   />
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-foreground">
+                  <label className="text-foreground mb-1 block text-xs font-medium">
                     Terkait Dengan
                   </label>
                   <select
                     name="related_type"
                     value={relatedType}
                     onChange={(e) => setRelatedType(e.target.value)}
-                    className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                   >
                     <option value="NONE">-- Tidak Ada --</option>
                     <option value="DEAL">Transaksi (Deal)</option>
@@ -396,12 +396,12 @@ export default function ProblemCasesPage() {
 
                 {relatedType === "DEAL" && (
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-foreground">
+                    <label className="text-foreground mb-1 block text-xs font-medium">
                       Pilih Deal
                     </label>
                     <select
                       name="related_id"
-                      className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                      className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                     >
                       {deals.map((d) => (
                         <option key={d.id} value={d.id}>
@@ -414,12 +414,12 @@ export default function ProblemCasesPage() {
 
                 {relatedType === "STOCK" && (
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-foreground">
+                    <label className="text-foreground mb-1 block text-xs font-medium">
                       Pilih Stok
                     </label>
                     <select
                       name="related_id"
-                      className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                      className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                     >
                       {stocks.map((s) => (
                         <option key={s.id} value={s.id}>
@@ -431,35 +431,35 @@ export default function ProblemCasesPage() {
                 )}
 
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-foreground">
+                  <label className="text-foreground mb-1 block text-xs font-medium">
                     Kronologi / Catatan
                   </label>
                   <textarea
                     name="chronology"
                     rows={4}
-                    className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                     placeholder="Tuliskan kronologi kejadian secara detail..."
                   ></textarea>
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-foreground">
+                  <label className="text-foreground mb-1 block text-xs font-medium">
                     Status Awal
                   </label>
                   <select
                     name="status"
-                    className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                   >
                     <option value="OPEN">Open (Baru)</option>
                     <option value="IN_PROGRESS">Ditindaklanjuti</option>
                   </select>
                 </div>
               </div>
-              <div className="flex items-center justify-end gap-3 border-t border-border-soft bg-muted/50 p-6">
+              <div className="border-border-soft bg-muted/50 flex items-center justify-end gap-3 border-t p-6">
                 <button
                   type="button"
                   onClick={() => setIsAddOpen(false)}
-                  className="rounded-lg px-4 py-2 text-xs font-semibold text-muted-foreground hover:bg-muted"
+                  className="text-muted-foreground hover:bg-muted rounded-lg px-4 py-2 text-xs font-semibold"
                 >
                   Batal
                 </button>
@@ -486,19 +486,19 @@ export default function ProblemCasesPage() {
       {/* Detail & Update Status Modal */}
       {selectedCase && (
         <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm">
-          <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-card shadow-2xl duration-200">
-            <div className="flex items-center justify-between border-b border-border-soft bg-muted/50 px-6 py-5">
+          <div className="animate-in slide-in-from-right bg-card flex h-full w-full max-w-md flex-col shadow-2xl duration-200">
+            <div className="border-border-soft bg-muted/50 flex items-center justify-between border-b px-6 py-5">
               <div>
-                <h2 className="text-base font-bold text-foreground">
+                <h2 className="text-foreground text-base font-bold">
                   Detail & Status Case ({selectedCase.case_number})
                 </h2>
-                <p className="mt-0.5 text-xs text-muted-foreground">
+                <p className="text-muted-foreground mt-0.5 text-xs">
                   Tanggal: {formatDate(selectedCase.created_at ?? "")}
                 </p>
               </div>
               <button
                 onClick={() => setSelectedCase(null)}
-                className="rounded-lg p-1.5 text-faint-foreground hover:bg-muted hover:text-muted-foreground"
+                className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-lg p-1.5"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -512,7 +512,7 @@ export default function ProblemCasesPage() {
                 )}
 
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-foreground">
+                  <label className="text-foreground mb-1 block text-xs font-medium">
                     Tipe Masalah <span className="text-rose-500">*</span>
                   </label>
                   <input
@@ -520,18 +520,18 @@ export default function ProblemCasesPage() {
                     required
                     value={editIssueType}
                     onChange={(e) => setEditIssueType(e.target.value)}
-                    className="w-full rounded-lg border border-border px-3 py-2 text-sm font-semibold text-foreground focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                    className="border-border text-foreground w-full rounded-lg border px-3 py-2 text-sm font-semibold focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-foreground">
+                  <label className="text-foreground mb-1 block text-xs font-medium">
                     Status Case Terkini <span className="text-rose-500">*</span>
                   </label>
                   <select
                     value={editStatus}
                     onChange={(e) => setEditStatus(e.target.value)}
-                    className="w-full rounded-lg border border-border px-3 py-2 text-sm font-semibold text-foreground focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                    className="border-border text-foreground w-full rounded-lg border px-3 py-2 text-sm font-semibold focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                   >
                     <option value="OPEN">Open (Baru)</option>
                     <option value="IN_PROGRESS">Ditindaklanjuti (In Progress)</option>
@@ -544,11 +544,11 @@ export default function ProblemCasesPage() {
                   </select>
                 </div>
 
-                <div className="space-y-1 rounded-xl border border-border-soft bg-muted/70 p-3">
-                  <p className="text-[10px] font-semibold tracking-wider text-faint-foreground uppercase">
+                <div className="border-border-soft bg-muted/70 space-y-1 rounded-xl border p-3">
+                  <p className="text-faint-foreground text-[10px] font-semibold tracking-wider uppercase">
                     Objek Terkait
                   </p>
-                  <p className="text-xs font-bold text-foreground">
+                  <p className="text-foreground text-xs font-bold">
                     {selectedCase.deals
                       ? `Deal: ${selectedCase.deals.deal_number}`
                       : selectedCase.stocks
@@ -556,30 +556,30 @@ export default function ProblemCasesPage() {
                         : "Tidak Ada"}
                   </p>
                   {selectedCase.customers && (
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-muted-foreground text-xs">
                       Customer: {selectedCase.customers.name}
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-foreground">
+                  <label className="text-foreground mb-1 block text-xs font-medium">
                     Kronologi & Catatan Penanganan
                   </label>
                   <textarea
                     rows={5}
                     value={editChronology}
                     onChange={(e) => setEditChronology(e.target.value)}
-                    className="w-full rounded-lg border border-border px-3 py-2 text-sm text-foreground focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                    className="border-border text-foreground w-full rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                     placeholder="Catatan penanganan case..."
                   />
                 </div>
               </div>
-              <div className="flex items-center justify-end gap-3 border-t border-border-soft bg-muted/50 p-6">
+              <div className="border-border-soft bg-muted/50 flex items-center justify-end gap-3 border-t p-6">
                 <button
                   type="button"
                   onClick={() => setSelectedCase(null)}
-                  className="rounded-lg px-4 py-2 text-xs font-semibold text-muted-foreground hover:bg-muted"
+                  className="text-muted-foreground hover:bg-muted rounded-lg px-4 py-2 text-xs font-semibold"
                 >
                   Batal
                 </button>

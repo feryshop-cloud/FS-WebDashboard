@@ -43,15 +43,13 @@ export default function ThemeToggle() {
   if (!mounted) {
     return (
       <button
-        className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-muted-foreground transition-all duration-200 ease-in-out hover:bg-muted hover:text-foreground"
+        className="text-muted-foreground hover:bg-muted hover:text-foreground flex w-full items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-200 ease-in-out"
         aria-label="Switch to dark mode"
         title="Switch to dark mode"
         disabled
       >
         <Moon className="h-5 w-5 shrink-0" strokeWidth={1.5} />
-        <span className="text-sm font-medium whitespace-nowrap">
-          Dark Mode
-        </span>
+        <span className="text-sm font-medium whitespace-nowrap">Dark Mode</span>
       </button>
     );
   }
@@ -59,7 +57,7 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={handleToggle}
-      className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-muted-foreground transition-all duration-200 ease-in-out hover:bg-muted hover:text-foreground"
+      className="text-muted-foreground hover:bg-muted hover:text-foreground flex w-full items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-200 ease-in-out"
       aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
       title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
     >

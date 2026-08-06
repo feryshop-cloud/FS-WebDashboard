@@ -40,15 +40,11 @@ export async function getTopupProducts(filters: TopupProductsFilters = {}) {
     const supabase = await createClient();
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let query = (supabase as any)
-      .from("products")
-      .select("*", { count: "exact" });
+    let query = (supabase as any).from("products").select("*", { count: "exact" });
 
     if (search.trim()) {
       const term = `%${search.trim()}%`;
-      query = query.or(
-        `title.ilike.${term},game_slug.ilike.${term},sku.ilike.${term}`,
-      );
+      query = query.or(`title.ilike.${term},game_slug.ilike.${term},sku.ilike.${term}`);
     }
 
     if (isActive === "true") {

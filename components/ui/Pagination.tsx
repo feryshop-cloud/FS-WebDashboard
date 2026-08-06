@@ -21,24 +21,24 @@ export const Pagination: React.FC<PaginationProps> = ({
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
   return (
-    <div className="flex flex-col gap-4 border-t border-border-soft bg-card px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
-      <div className="text-sm text-muted-foreground">
-        Menampilkan <span className="font-semibold text-foreground">{startItem}</span> -{" "}
-        <span className="font-semibold text-foreground">{endItem}</span> dari{" "}
-        <span className="font-semibold text-foreground">{totalItems}</span> {itemLabel}
+    <div className="border-border-soft bg-card flex flex-col gap-4 border-t px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="text-muted-foreground text-sm">
+        Menampilkan <span className="text-foreground font-semibold">{startItem}</span> -{" "}
+        <span className="text-foreground font-semibold">{endItem}</span> dari{" "}
+        <span className="text-foreground font-semibold">{totalItems}</span> {itemLabel}
       </div>
       <div className="flex items-center gap-2">
         <button
           type="button"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage <= 1}
-          className="inline-flex items-center gap-1 rounded-lg border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+          className="border-border bg-card text-foreground hover:bg-muted hover:text-foreground inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 text-sm font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
         >
           <ChevronLeft className="h-4 w-4" />
           <span>Sebelumnya</span>
         </button>
 
-        <span className="px-2 text-xs font-semibold text-muted-foreground">
+        <span className="text-muted-foreground px-2 text-xs font-semibold">
           Halaman {currentPage} dari {totalPages}
         </span>
 
@@ -46,7 +46,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           type="button"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage >= totalPages}
-          className="inline-flex items-center gap-1 rounded-lg border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+          className="border-border bg-card text-foreground hover:bg-muted hover:text-foreground inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 text-sm font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
         >
           <span>Selanjutnya</span>
           <ChevronRight className="h-4 w-4" />

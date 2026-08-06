@@ -173,24 +173,24 @@ export function GameCategoryManager({
           <LayoutGrid className="h-[18px] w-[18px]" strokeWidth={1.5} />
         </div>
         <div>
-          <h2 className="text-base font-bold text-foreground">Master Kategori Game</h2>
-          <p className="text-xs text-muted-foreground">
+          <h2 className="text-foreground text-base font-bold">Master Kategori Game</h2>
+          <p className="text-muted-foreground text-xs">
             Kelola kategori game untuk inventori dan topup produk.
           </p>
         </div>
       </div>
 
       {/* Form — full width, fields in a row */}
-      <div className="overflow-hidden rounded-xl border border-border-soft bg-card shadow-sm">
-        <div className="flex items-center justify-between border-b border-border-soft bg-muted/50 px-5 py-3.5">
-          <h3 className="text-sm font-semibold text-foreground">
+      <div className="border-border-soft bg-card overflow-hidden rounded-xl border shadow-sm">
+        <div className="border-border-soft bg-muted/50 flex items-center justify-between border-b px-5 py-3.5">
+          <h3 className="text-foreground text-sm font-semibold">
             {editingId ? "Edit Kategori" : "Tambah Kategori"}
           </h3>
           {editingId && (
             <button
               type="button"
               onClick={handleCancelEdit}
-              className="rounded-[10px] p-1 text-faint-foreground hover:bg-muted hover:text-muted-foreground"
+              className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-[10px] p-1"
               title="Batal edit"
             >
               <X className="h-4 w-4" />
@@ -213,7 +213,7 @@ export function GameCategoryManager({
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <div className="space-y-1.5">
                 <label
-                  className="block text-xs font-semibold tracking-wide text-muted-foreground uppercase"
+                  className="text-muted-foreground block text-xs font-semibold tracking-wide uppercase"
                   htmlFor="cat-title"
                 >
                   Judul Kategori
@@ -225,13 +225,13 @@ export function GameCategoryManager({
                   value={title}
                   onChange={handleTitleChange}
                   placeholder="e.g. Diamond Top Up"
-                  className="w-full rounded-[10px] border border-border bg-card px-3.5 py-2.5 text-sm text-foreground transition-colors placeholder:text-faint-foreground focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                  className="border-border bg-card text-foreground placeholder:text-faint-foreground w-full rounded-[10px] border px-3.5 py-2.5 text-sm transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                 />
               </div>
 
               <div className="space-y-1.5">
                 <label
-                  className="block text-xs font-semibold tracking-wide text-muted-foreground uppercase"
+                  className="text-muted-foreground block text-xs font-semibold tracking-wide uppercase"
                   htmlFor="cat-slug"
                 >
                   Game Slug
@@ -243,12 +243,12 @@ export function GameCategoryManager({
                   value={gameSlug}
                   onChange={(e) => setGameSlug(e.target.value)}
                   placeholder="mobile-legends"
-                  className="w-full rounded-[10px] border border-border bg-card px-3.5 py-2.5 font-mono text-sm text-foreground transition-colors placeholder:font-sans placeholder:text-faint-foreground focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                  className="border-border bg-card text-foreground placeholder:text-faint-foreground w-full rounded-[10px] border px-3.5 py-2.5 font-mono text-sm transition-colors placeholder:font-sans focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                <label className="text-muted-foreground block text-xs font-semibold tracking-wide uppercase">
                   Ikon
                 </label>
                 <CategoryIconPicker value={selectedIcon} onChange={setSelectedIcon} />
@@ -264,9 +264,9 @@ export function GameCategoryManager({
                         onChange={(e) => setIsActive(e.target.checked)}
                         className="peer sr-only"
                       />
-                      <div className="peer h-5 w-9 rounded-full bg-muted transition-colors peer-checked:bg-emerald-500 after:absolute after:top-[2px] after:left-[2px] after:h-4 after:w-4 after:rounded-full after:border after:border-input after:bg-card after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white" />
+                      <div className="peer bg-muted after:border-input after:bg-card h-5 w-9 rounded-full transition-colors peer-checked:bg-emerald-500 after:absolute after:top-[2px] after:left-[2px] after:h-4 after:w-4 after:rounded-full after:border after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white" />
                     </div>
-                    <span className="text-sm font-medium text-foreground">
+                    <span className="text-foreground text-sm font-medium">
                       {isActive ? "Aktif" : "Nonaktif"}
                     </span>
                   </label>
@@ -291,7 +291,7 @@ export function GameCategoryManager({
                       type="button"
                       onClick={handleCancelEdit}
                       disabled={isPending}
-                      className="inline-flex items-center justify-center rounded-[10px] bg-muted px-3 py-2.5 text-sm font-medium text-foreground transition-all hover:bg-muted"
+                      className="bg-muted text-foreground hover:bg-muted inline-flex items-center justify-center rounded-[10px] px-3 py-2.5 text-sm font-medium transition-all"
                     >
                       Batal
                     </button>
@@ -305,11 +305,11 @@ export function GameCategoryManager({
 
       {/* List — full width below */}
       <div>
-        <div className="overflow-hidden rounded-xl border border-border-soft bg-card shadow-sm">
-          <div className="flex items-center gap-2 border-b border-border-soft bg-muted/50 px-5 py-3.5">
-            <FolderTree className="h-4 w-4 text-faint-foreground" strokeWidth={1.5} />
-            <h3 className="text-sm font-semibold text-foreground">Daftar Kategori</h3>
-            <span className="ml-auto inline-flex items-center rounded-[10px] bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+        <div className="border-border-soft bg-card overflow-hidden rounded-xl border shadow-sm">
+          <div className="border-border-soft bg-muted/50 flex items-center gap-2 border-b px-5 py-3.5">
+            <FolderTree className="text-faint-foreground h-4 w-4" strokeWidth={1.5} />
+            <h3 className="text-foreground text-sm font-semibold">Daftar Kategori</h3>
+            <span className="bg-muted text-muted-foreground ml-auto inline-flex items-center rounded-[10px] px-2.5 py-0.5 text-xs font-medium">
               {categories.length} Total
             </span>
           </div>
@@ -319,7 +319,7 @@ export function GameCategoryManager({
               <div className="bg-rose-50/50 p-6 text-sm text-rose-600">{errorMsg}</div>
             ) : categories.length > 0 ? (
               <table className="w-full text-left text-sm">
-                <thead className="border-b border-border-soft bg-muted/70 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                <thead className="border-border-soft bg-muted/70 text-muted-foreground border-b text-xs font-semibold tracking-wider uppercase">
                   <tr>
                     <th scope="col" className="px-5 py-3.5">
                       Logo
@@ -341,11 +341,11 @@ export function GameCategoryManager({
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border-soft text-muted-foreground">
+                <tbody className="divide-border-soft text-muted-foreground divide-y">
                   {categories.map((cat: Category) => (
                     <tr
                       key={cat.id}
-                      className={`transition-colors hover:bg-muted/50 ${!cat.is_active ? "opacity-60" : ""}`}
+                      className={`hover:bg-muted/50 transition-colors ${!cat.is_active ? "opacity-60" : ""}`}
                     >
                       <td className="px-5 py-3.5">
                         {lucideIconName(cat.logo) ? (
@@ -360,14 +360,16 @@ export function GameCategoryManager({
                             className="h-8 w-8 rounded-[10px] object-cover"
                           />
                         ) : (
-                          <div className="flex h-8 w-8 items-center justify-center rounded-[10px] border border-border bg-muted text-xs text-faint-foreground">
+                          <div className="border-border bg-muted text-faint-foreground flex h-8 w-8 items-center justify-center rounded-[10px] border text-xs">
                             ?
                           </div>
                         )}
                       </td>
-                      <td className="px-5 py-3.5 font-medium text-foreground">{cat.title}</td>
+                      <td className="text-foreground px-5 py-3.5 font-medium">{cat.title}</td>
                       <td className="px-5 py-3.5">
-                        <span className="font-mono text-xs text-muted-foreground">{cat.game_slug}</span>
+                        <span className="text-muted-foreground font-mono text-xs">
+                          {cat.game_slug}
+                        </span>
                       </td>
                       <td className="px-5 py-3.5 text-center">
                         <button
@@ -383,14 +385,14 @@ export function GameCategoryManager({
                               <Power className="h-3 w-3 text-emerald-600" /> Aktif
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 rounded-[10px] border border-border bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground transition-colors hover:bg-muted">
-                              <Power className="h-3 w-3 text-faint-foreground" /> Nonaktif
+                            <span className="border-border bg-muted text-muted-foreground hover:bg-muted inline-flex items-center gap-1 rounded-[10px] border px-2.5 py-1 text-xs font-semibold transition-colors">
+                              <Power className="text-faint-foreground h-3 w-3" /> Nonaktif
                             </span>
                           )}
                         </button>
                       </td>
                       <td className="px-5 py-3.5 text-right">
-                        <span className="text-xs text-faint-foreground">
+                        <span className="text-faint-foreground text-xs">
                           {new Date(cat.created_at).toLocaleDateString("id-ID", {
                             day: "numeric",
                             month: "short",
@@ -409,7 +411,7 @@ export function GameCategoryManager({
                           </button>
                           <button
                             onClick={() => handleDelete(cat.id)}
-                            className="rounded-[10px] p-1.5 text-faint-foreground transition-colors hover:bg-rose-50 hover:text-rose-600"
+                            className="text-faint-foreground rounded-[10px] p-1.5 transition-colors hover:bg-rose-50 hover:text-rose-600"
                             title="Hapus"
                             disabled={isPending}
                           >
@@ -423,12 +425,12 @@ export function GameCategoryManager({
               </table>
             ) : (
               <div className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted text-faint-foreground">
+                <div className="bg-muted text-faint-foreground flex h-12 w-12 items-center justify-center rounded-xl">
                   <FolderTree className="h-6 w-6" strokeWidth={1.5} />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-foreground">Belum ada kategori</p>
-                  <p className="mt-0.5 text-xs text-faint-foreground">
+                  <p className="text-foreground text-sm font-semibold">Belum ada kategori</p>
+                  <p className="text-faint-foreground mt-0.5 text-xs">
                     Tambahkan kategori menggunakan form di atas.
                   </p>
                 </div>

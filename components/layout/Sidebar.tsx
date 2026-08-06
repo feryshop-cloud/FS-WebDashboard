@@ -108,7 +108,7 @@ export default function Sidebar({ role }: { role: AdminRole }) {
 
   return (
     <aside
-      className={` ${isCollapsed ? "w-20" : "w-64"} relative flex shrink-0 flex-col border-r border-border bg-card transition-all duration-300 ease-in-out`}
+      className={` ${isCollapsed ? "w-20" : "w-64"} border-border bg-card relative flex shrink-0 flex-col border-r transition-all duration-300 ease-in-out`}
     >
       {/* Header — Brand */}
       <div
@@ -119,7 +119,7 @@ export default function Sidebar({ role }: { role: AdminRole }) {
           aria-label="Ferryshop dashboard"
           className={`flex min-w-0 items-center ${isCollapsed ? "justify-center" : "gap-3"}`}
         >
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-black p-1.5 shadow-sm ring-1 ring-border">
+          <span className="ring-border flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-black p-1.5 shadow-sm ring-1">
             <Image
               src={SIDEBAR_LOGO_URL}
               alt="Ferryshop logo"
@@ -130,7 +130,7 @@ export default function Sidebar({ role }: { role: AdminRole }) {
             />
           </span>
           <span
-            className={`text-2xl font-bold tracking-tight whitespace-nowrap text-foreground transition-all duration-300 ${isCollapsed ? "w-0 overflow-hidden opacity-0" : "w-auto opacity-100"} `}
+            className={`text-foreground text-2xl font-bold tracking-tight whitespace-nowrap transition-all duration-300 ${isCollapsed ? "w-0 overflow-hidden opacity-0" : "w-auto opacity-100"} `}
           >
             Ferryshop
           </span>
@@ -139,7 +139,7 @@ export default function Sidebar({ role }: { role: AdminRole }) {
         {/* Toggle Button */}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className={`absolute top-1/2 -right-3 z-10 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-card p-0 text-muted-foreground shadow-sm transition-all duration-200 ease-in-out hover:text-foreground`}
+          className={`border-border bg-card text-muted-foreground hover:text-foreground absolute top-1/2 -right-3 z-10 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border p-0 shadow-sm transition-all duration-200 ease-in-out`}
           aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {isCollapsed ? (
@@ -156,7 +156,7 @@ export default function Sidebar({ role }: { role: AdminRole }) {
           <div key={idx} className="space-y-1">
             {/* Group Title */}
             {!isCollapsed && (
-              <h3 className="mb-2 px-3 text-xs font-semibold tracking-wider text-faint-foreground uppercase">
+              <h3 className="text-faint-foreground mb-2 px-3 text-xs font-semibold tracking-wider uppercase">
                 {group.title}
               </h3>
             )}
@@ -181,7 +181,9 @@ export default function Sidebar({ role }: { role: AdminRole }) {
                   >
                     <item.icon
                       className={`h-5 w-5 shrink-0 transition-colors duration-200 ${
-                        isActive ? "text-blue-600" : "text-faint-foreground group-hover:text-muted-foreground"
+                        isActive
+                          ? "text-blue-600"
+                          : "text-faint-foreground group-hover:text-muted-foreground"
                       }`}
                       strokeWidth={isActive ? 2 : 1.5}
                     />
@@ -199,15 +201,15 @@ export default function Sidebar({ role }: { role: AdminRole }) {
       </nav>
 
       {/* Logout */}
-      <div className="shrink-0 border-t border-border-soft bg-card p-4">
+      <div className="border-border-soft bg-card shrink-0 border-t p-4">
         <form action={logout}>
           <button
             type="submit"
             title={isCollapsed ? "Logout" : undefined}
-            className="group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-muted-foreground transition-all duration-200 ease-in-out hover:bg-muted hover:text-foreground"
+            className="group text-muted-foreground hover:bg-muted hover:text-foreground flex w-full items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-200 ease-in-out"
           >
             <LogOut
-              className="h-5 w-5 shrink-0 text-faint-foreground group-hover:text-muted-foreground"
+              className="text-faint-foreground group-hover:text-muted-foreground h-5 w-5 shrink-0"
               strokeWidth={1.5}
             />
             <span
@@ -220,7 +222,7 @@ export default function Sidebar({ role }: { role: AdminRole }) {
       </div>
 
       {/* Theme Toggle */}
-      <div className="shrink-0 border-t border-border-soft bg-card p-2">
+      <div className="border-border-soft bg-card shrink-0 border-t p-2">
         <ThemeToggle />
       </div>
     </aside>

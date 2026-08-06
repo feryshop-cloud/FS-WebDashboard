@@ -27,7 +27,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-card">
+    <div className="bg-card flex h-screen w-full overflow-hidden">
       {/* ====== LEFT PANEL: VISUAL BRANDING ====== */}
       <div
         className="relative hidden w-1/2 flex-col justify-end overflow-hidden lg:flex"
@@ -116,10 +116,10 @@ export default function LoginPage() {
           </div>
 
           {/* Header */}
-          <h1 className="text-[28px] leading-tight font-bold tracking-tight text-foreground">
+          <h1 className="text-foreground text-[28px] leading-tight font-bold tracking-tight">
             Masuk Admin
           </h1>
-          <p className="mt-3 max-w-[360px] text-sm leading-relaxed text-muted-foreground">
+          <p className="text-muted-foreground mt-3 max-w-[360px] text-sm leading-relaxed">
             Silakan masukkan kredensial untuk melanjutkan ke dashboard.
           </p>
 
@@ -133,12 +133,12 @@ export default function LoginPage() {
 
             {/* Email */}
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-foreground" htmlFor="email">
+              <label className="text-foreground mb-1.5 block text-sm font-medium" htmlFor="email">
                 Alamat Email
               </label>
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-                  <Mail className="h-[18px] w-[18px] text-faint-foreground" strokeWidth={1.5} />
+                  <Mail className="text-faint-foreground h-[18px] w-[18px]" strokeWidth={1.5} />
                 </div>
                 <input
                   id="email"
@@ -146,7 +146,7 @@ export default function LoginPage() {
                   type="email"
                   autoComplete="email"
                   required
-                  className="block w-full rounded-xl border border-border bg-card py-3 pr-4 pl-11 text-sm text-foreground placeholder-slate-400 transition-colors focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                  className="border-border bg-card text-foreground block w-full rounded-xl border py-3 pr-4 pl-11 text-sm placeholder-slate-400 transition-colors focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                   placeholder="admin@ferryshop.com"
                 />
               </div>
@@ -154,12 +154,15 @@ export default function LoginPage() {
 
             {/* Password */}
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-foreground" htmlFor="password">
+              <label
+                className="text-foreground mb-1.5 block text-sm font-medium"
+                htmlFor="password"
+              >
                 Kata Sandi
               </label>
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-                  <Lock className="h-[18px] w-[18px] text-faint-foreground" strokeWidth={1.5} />
+                  <Lock className="text-faint-foreground h-[18px] w-[18px]" strokeWidth={1.5} />
                 </div>
                 <input
                   id="password"
@@ -167,13 +170,13 @@ export default function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   required
-                  className="block w-full rounded-xl border border-border bg-card py-3 pr-11 pl-11 text-sm text-foreground placeholder-slate-400 transition-colors focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                  className="border-border bg-card text-foreground block w-full rounded-xl border py-3 pr-11 pl-11 text-sm placeholder-slate-400 transition-colors focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                   placeholder="••••••••"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-faint-foreground transition-colors hover:text-muted-foreground"
+                  className="text-faint-foreground hover:text-muted-foreground absolute inset-y-0 right-0 flex items-center pr-3.5 transition-colors"
                 >
                   {showPassword ? (
                     <EyeOff className="h-[18px] w-[18px]" strokeWidth={1.5} />
@@ -189,9 +192,9 @@ export default function LoginPage() {
               <label className="flex cursor-pointer items-center gap-2">
                 <input
                   type="checkbox"
-                  className="h-4 w-4 rounded border-input text-blue-600 focus:ring-blue-500/20"
+                  className="border-input h-4 w-4 rounded text-blue-600 focus:ring-blue-500/20"
                 />
-                <span className="text-sm text-muted-foreground">Ingat saya</span>
+                <span className="text-muted-foreground text-sm">Ingat saya</span>
               </label>
               <button
                 type="button"
@@ -213,7 +216,7 @@ export default function LoginPage() {
           </form>
 
           {/* Footer */}
-          <p className="mt-10 text-center text-sm text-muted-foreground">
+          <p className="text-muted-foreground mt-10 text-center text-sm">
             Belum punya akun? <span className="font-semibold text-blue-600">Hubungi Admin.</span>
           </p>
         </div>

@@ -151,27 +151,27 @@ export function DynamicInputBuilder({ fields, onChange }: DynamicInputBuilderPro
   };
 
   return (
-    <div className="space-y-4 rounded-xl border border-border bg-card p-4 shadow-sm">
-      <div className="flex items-center justify-between border-b border-border-soft pb-3">
+    <div className="border-border bg-card space-y-4 rounded-xl border p-4 shadow-sm">
+      <div className="border-border-soft flex items-center justify-between border-b pb-3">
         <div className="flex items-center gap-2">
           <Settings2 className="h-4 w-4 text-blue-600" />
-          <h4 className="text-sm font-semibold text-foreground">
+          <h4 className="text-foreground text-sm font-semibold">
             Field Input Dinamis (User Account)
           </h4>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="text-xs text-faint-foreground">Preset:</span>
+          <span className="text-faint-foreground text-xs">Preset:</span>
           <button
             type="button"
             onClick={() => applyPreset("mlbb")}
-            className="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground hover:bg-muted"
+            className="bg-muted text-muted-foreground hover:bg-muted rounded px-2 py-0.5 text-xs"
           >
             MLBB
           </button>
           <button
             type="button"
             onClick={() => applyPreset("valorant")}
-            className="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground hover:bg-muted"
+            className="bg-muted text-muted-foreground hover:bg-muted rounded px-2 py-0.5 text-xs"
           >
             Valorant
           </button>
@@ -181,7 +181,7 @@ export function DynamicInputBuilder({ fields, onChange }: DynamicInputBuilderPro
       {/* Field List */}
       <div className="space-y-2">
         {fields.length === 0 ? (
-          <p className="py-2 text-center text-xs text-faint-foreground italic">
+          <p className="text-faint-foreground py-2 text-center text-xs italic">
             Belum ada input dinamis yang dikonfigurasi. Menggunakan default (User ID + Server).
           </p>
         ) : (
@@ -196,8 +196,8 @@ export function DynamicInputBuilder({ fields, onChange }: DynamicInputBuilderPro
             >
               <div className="flex flex-col gap-0.5">
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold text-foreground">{field.label}</span>
-                  <span className="py-0.2 rounded bg-muted px-1.5 text-[10px] text-muted-foreground">
+                  <span className="text-foreground font-semibold">{field.label}</span>
+                  <span className="py-0.2 bg-muted text-muted-foreground rounded px-1.5 text-[10px]">
                     key: {field.name || field.id}
                   </span>
                   {field.required && (
@@ -206,7 +206,9 @@ export function DynamicInputBuilder({ fields, onChange }: DynamicInputBuilderPro
                     </span>
                   )}
                 </div>
-                <span className="text-faint-foreground">Placeholder: &quot;{field.placeholder}&quot;</span>
+                <span className="text-faint-foreground">
+                  Placeholder: &quot;{field.placeholder}&quot;
+                </span>
               </div>
 
               <div className="flex items-center gap-1">
@@ -214,7 +216,7 @@ export function DynamicInputBuilder({ fields, onChange }: DynamicInputBuilderPro
                   type="button"
                   onClick={() => handleMove(idx, "up")}
                   disabled={idx === 0}
-                  className="rounded p-1 text-faint-foreground hover:bg-muted hover:text-muted-foreground disabled:opacity-30"
+                  className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded p-1 disabled:opacity-30"
                 >
                   <ArrowUp className="h-3.5 w-3.5" />
                 </button>
@@ -222,7 +224,7 @@ export function DynamicInputBuilder({ fields, onChange }: DynamicInputBuilderPro
                   type="button"
                   onClick={() => handleMove(idx, "down")}
                   disabled={idx === fields.length - 1}
-                  className="rounded p-1 text-faint-foreground hover:bg-muted hover:text-muted-foreground disabled:opacity-30"
+                  className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded p-1 disabled:opacity-30"
                 >
                   <ArrowDown className="h-3.5 w-3.5" />
                 </button>
@@ -247,8 +249,8 @@ export function DynamicInputBuilder({ fields, onChange }: DynamicInputBuilderPro
       </div>
 
       {/* Editor Form */}
-      <div className="space-y-3 rounded-lg border border-dashed border-input bg-muted/50 p-3">
-        <h5 className="text-xs font-semibold text-foreground">
+      <div className="border-input bg-muted/50 space-y-3 rounded-lg border border-dashed p-3">
+        <h5 className="text-foreground text-xs font-semibold">
           {editingIndex !== null
             ? `Edit Field: ${fields[editingIndex].label}`
             : "Tambah Field Baru"}
@@ -256,7 +258,7 @@ export function DynamicInputBuilder({ fields, onChange }: DynamicInputBuilderPro
 
         <div className="grid grid-cols-2 gap-2">
           <div>
-            <label className="block text-[11px] font-medium text-muted-foreground">
+            <label className="text-muted-foreground block text-[11px] font-medium">
               ID / Key (e.g. id, server)
             </label>
             <input
@@ -270,42 +272,48 @@ export function DynamicInputBuilder({ fields, onChange }: DynamicInputBuilderPro
                 })
               }
               placeholder="e.g. zone_id"
-              className="w-full rounded border border-border bg-card px-2.5 py-1.5 text-xs text-foreground focus:ring-1 focus:ring-blue-500 focus:outline-none"
+              className="border-border bg-card text-foreground w-full rounded border px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
             />
           </div>
 
           <div>
-            <label className="block text-[11px] font-medium text-muted-foreground">Label Tampilan</label>
+            <label className="text-muted-foreground block text-[11px] font-medium">
+              Label Tampilan
+            </label>
             <input
               type="text"
               value={formData.label}
               onChange={(e) => setFormData({ ...formData, label: e.target.value })}
               placeholder="e.g. Zone ID / Server"
-              className="w-full rounded border border-border bg-card px-2.5 py-1.5 text-xs text-foreground focus:ring-1 focus:ring-blue-500 focus:outline-none"
+              className="border-border bg-card text-foreground w-full rounded border px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-2">
           <div>
-            <label className="block text-[11px] font-medium text-muted-foreground">Placeholder</label>
+            <label className="text-muted-foreground block text-[11px] font-medium">
+              Placeholder
+            </label>
             <input
               type="text"
               value={formData.placeholder}
               onChange={(e) => setFormData({ ...formData, placeholder: e.target.value })}
               placeholder="e.g. Masukkan Zone ID"
-              className="w-full rounded border border-border bg-card px-2.5 py-1.5 text-xs text-foreground focus:ring-1 focus:ring-blue-500 focus:outline-none"
+              className="border-border bg-card text-foreground w-full rounded border px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
             />
           </div>
 
           <div>
-            <label className="block text-[11px] font-medium text-muted-foreground">Tipe Field</label>
+            <label className="text-muted-foreground block text-[11px] font-medium">
+              Tipe Field
+            </label>
             <select
               value={formData.type}
               onChange={(e) =>
                 setFormData({ ...formData, type: e.target.value as DynamicField["type"] })
               }
-              className="w-full rounded border border-border bg-card px-2.5 py-1.5 text-xs text-foreground focus:ring-1 focus:ring-blue-500 focus:outline-none"
+              className="border-border bg-card text-foreground w-full rounded border px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
             >
               <option value="text">Teks biasa</option>
               <option value="number">Angka saja</option>
@@ -316,7 +324,7 @@ export function DynamicInputBuilder({ fields, onChange }: DynamicInputBuilderPro
 
         <div className="grid grid-cols-2 gap-2">
           <div>
-            <label className="block text-[11px] font-medium text-muted-foreground">
+            <label className="text-muted-foreground block text-[11px] font-medium">
               Regex Validasi (Opsional)
             </label>
             <input
@@ -324,12 +332,12 @@ export function DynamicInputBuilder({ fields, onChange }: DynamicInputBuilderPro
               value={formData.regex || ""}
               onChange={(e) => setFormData({ ...formData, regex: e.target.value })}
               placeholder="e.g. ^[0-9]+$"
-              className="w-full rounded border border-border bg-card px-2.5 py-1.5 text-xs text-foreground focus:ring-1 focus:ring-blue-500 focus:outline-none"
+              className="border-border bg-card text-foreground w-full rounded border px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
             />
           </div>
 
           <div>
-            <label className="block text-[11px] font-medium text-muted-foreground">
+            <label className="text-muted-foreground block text-[11px] font-medium">
               Pesan Error Validasi
             </label>
             <input
@@ -337,18 +345,18 @@ export function DynamicInputBuilder({ fields, onChange }: DynamicInputBuilderPro
               value={formData.errorMessage || ""}
               onChange={(e) => setFormData({ ...formData, errorMessage: e.target.value })}
               placeholder="e.g. Format tidak valid"
-              className="w-full rounded border border-border bg-card px-2.5 py-1.5 text-xs text-foreground focus:ring-1 focus:ring-blue-500 focus:outline-none"
+              className="border-border bg-card text-foreground w-full rounded border px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
             />
           </div>
         </div>
 
         <div className="flex items-center justify-between pt-1">
-          <label className="flex cursor-pointer items-center gap-1.5 text-xs text-foreground">
+          <label className="text-foreground flex cursor-pointer items-center gap-1.5 text-xs">
             <input
               type="checkbox"
               checked={formData.required}
               onChange={(e) => setFormData({ ...formData, required: e.target.checked })}
-              className="rounded border-input text-blue-600 focus:ring-blue-500"
+              className="border-input rounded text-blue-600 focus:ring-blue-500"
             />
             Field Wajib Diisi
           </label>
@@ -358,7 +366,7 @@ export function DynamicInputBuilder({ fields, onChange }: DynamicInputBuilderPro
               <button
                 type="button"
                 onClick={handleAddField}
-                className="rounded bg-muted px-2.5 py-1 text-xs font-medium text-foreground hover:bg-muted"
+                className="bg-muted text-foreground hover:bg-muted rounded px-2.5 py-1 text-xs font-medium"
               >
                 Batal
               </button>

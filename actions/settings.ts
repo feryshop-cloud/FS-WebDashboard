@@ -516,7 +516,10 @@ export async function updateRolePermissions(roleId: string, permissions: Record<
     .single();
 
   if (targetRole && ["OWNER", "MEMBER"].includes(targetRole.name.toUpperCase())) {
-    return { success: false, error: `Hak akses untuk role sistem (${targetRole.name}) telah dikunci dan tidak dapat diubah.` };
+    return {
+      success: false,
+      error: `Hak akses untuk role sistem (${targetRole.name}) telah dikunci dan tidak dapat diubah.`,
+    };
   }
 
   const { error } = await supabase
@@ -620,11 +623,7 @@ export async function getSiteSettings() {
   return { data, error: null };
 }
 
-export async function updateSiteSetting(
-  key: string,
-  value: Json,
-  description?: string,
-) {
+export async function updateSiteSetting(key: string, value: Json, description?: string) {
   const supabase = await createClient();
 
   const {
@@ -634,17 +633,15 @@ export async function updateSiteSetting(
     return { success: false, error: "Unauthorized" };
   }
 
-  const { error } = await supabase
-    .from("settings")
-    .upsert(
-      {
-        key,
-        value,
-        ...(description !== undefined ? { description } : {}),
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "key" },
-    );
+  const { error } = await supabase.from("settings").upsert(
+    {
+      key,
+      value,
+      ...(description !== undefined ? { description } : {}),
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "key" },
+  );
 
   if (error) {
     logger.error("Error updating site setting", { key, error });

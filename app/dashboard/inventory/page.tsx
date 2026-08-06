@@ -121,8 +121,8 @@ export default function InventoryPage() {
       {/* Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Manajemen Stok</h1>
-          <p className="mt-0.5 text-sm text-muted-foreground">
+          <h1 className="text-foreground text-2xl font-bold tracking-tight">Manajemen Stok</h1>
+          <p className="text-muted-foreground mt-0.5 text-sm">
             Kelola seluruh stok akun game, harga modal, dan status ketersediaan.
           </p>
         </div>
@@ -130,10 +130,10 @@ export default function InventoryPage() {
           <button
             onClick={handleExportExcel}
             disabled={isExporting}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50"
+            className="border-border bg-card text-foreground hover:bg-muted hover:text-foreground inline-flex items-center justify-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium shadow-sm transition-colors disabled:opacity-50"
           >
             {isExporting ? (
-              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
             ) : (
               <Download className="h-4 w-4" />
             )}
@@ -150,28 +150,28 @@ export default function InventoryPage() {
       </div>
 
       {/* Action Bar */}
-      <div className="flex flex-col items-center justify-between gap-4 rounded-xl border border-border-soft bg-card p-4 shadow-sm sm:flex-row">
+      <div className="border-border-soft bg-card flex flex-col items-center justify-between gap-4 rounded-xl border p-4 shadow-sm sm:flex-row">
         <div className="relative w-full sm:w-96">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <Search className="h-4 w-4 text-faint-foreground" />
+            <Search className="text-faint-foreground h-4 w-4" />
           </div>
           <input
             type="text"
-            className="block w-full rounded-lg border border-border bg-muted py-2 pr-3 pl-10 text-foreground placeholder-slate-400 transition-all outline-none focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className="border-border bg-muted text-foreground block w-full rounded-lg border py-2 pr-3 pl-10 placeholder-slate-400 transition-all outline-none focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             placeholder="Cari ID stok, kategori, atau nama akun..."
           />
         </div>
         <div className="flex w-full items-center gap-3 sm:w-auto">
-          <button className="inline-flex w-full min-w-[140px] items-center justify-between gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-muted sm:w-auto">
+          <button className="border-border bg-card text-foreground hover:bg-muted inline-flex w-full min-w-[140px] items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm font-medium sm:w-auto">
             <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-faint-foreground" />
+              <Filter className="text-faint-foreground h-4 w-4" />
               <span>{activeCategory}</span>
             </div>
-            <ChevronDown className="h-4 w-4 text-faint-foreground" />
+            <ChevronDown className="text-faint-foreground h-4 w-4" />
           </button>
-          <button className="inline-flex w-full min-w-[140px] items-center justify-between gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-muted sm:w-auto">
+          <button className="border-border bg-card text-foreground hover:bg-muted inline-flex w-full min-w-[140px] items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm font-medium sm:w-auto">
             <span>Semua Status</span>
-            <ChevronDown className="h-4 w-4 text-faint-foreground" />
+            <ChevronDown className="text-faint-foreground h-4 w-4" />
           </button>
         </div>
       </div>
@@ -204,56 +204,56 @@ export default function InventoryPage() {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-xl border border-border-soft bg-card shadow-sm">
+      <div className="border-border-soft bg-card overflow-hidden rounded-xl border shadow-sm">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-border">
+          <table className="divide-border min-w-full divide-y">
             <thead className="bg-muted/80">
               <tr>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                  className="text-muted-foreground px-6 py-4 text-left text-xs font-semibold tracking-wider uppercase"
                 >
                   ID Stok
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                  className="text-muted-foreground px-6 py-4 text-left text-xs font-semibold tracking-wider uppercase"
                 >
                   Kategori Game
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                  className="text-muted-foreground px-6 py-4 text-left text-xs font-semibold tracking-wider uppercase"
                 >
                   Nama / Kode Stok
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-right text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                  className="text-muted-foreground px-6 py-4 text-right text-xs font-semibold tracking-wider uppercase"
                 >
                   Harga Modal
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-right text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                  className="text-muted-foreground px-6 py-4 text-right text-xs font-semibold tracking-wider uppercase"
                 >
                   Harga Jual
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-center text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                  className="text-muted-foreground px-6 py-4 text-center text-xs font-semibold tracking-wider uppercase"
                 >
                   Status Stok
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-center text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                  className="text-muted-foreground px-6 py-4 text-center text-xs font-semibold tracking-wider uppercase"
                 >
                   Aksi
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border-soft bg-card">
+            <tbody className="divide-border-soft bg-card divide-y">
               {isLoading ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-12 text-center">
@@ -262,13 +262,13 @@ export default function InventoryPage() {
                 </tr>
               ) : inventory.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center text-sm text-muted-foreground">
+                  <td colSpan={7} className="text-muted-foreground px-6 py-8 text-center text-sm">
                     Belum ada data stok.
                   </td>
                 </tr>
               ) : filteredInventory.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center text-sm text-muted-foreground">
+                  <td colSpan={7} className="text-muted-foreground px-6 py-8 text-center text-sm">
                     Tidak ada stok untuk kategori ini.
                   </td>
                 </tr>
@@ -286,26 +286,26 @@ export default function InventoryPage() {
                   }
 
                   return (
-                    <tr key={item.id} className="group transition-colors hover:bg-muted/50">
-                      <td className="px-6 py-4 text-sm font-semibold whitespace-nowrap text-foreground">
+                    <tr key={item.id} className="group hover:bg-muted/50 transition-colors">
+                      <td className="text-foreground px-6 py-4 text-sm font-semibold whitespace-nowrap">
                         {item.title_reference || "-"}
                       </td>
-                      <td className="px-6 py-4 text-sm font-medium whitespace-nowrap text-muted-foreground">
-                        <span className="rounded-md bg-muted px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
+                      <td className="text-muted-foreground px-6 py-4 text-sm font-medium whitespace-nowrap">
+                        <span className="bg-muted text-muted-foreground rounded-md px-2.5 py-1 text-[11px] font-semibold">
                           {item.games?.name || "-"}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-foreground">
+                      <td className="text-foreground px-6 py-4 text-sm">
                         <span className="block max-w-[250px] truncate font-medium">
                           {item.title_reference || "-"}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-right text-sm font-medium whitespace-nowrap text-muted-foreground">
+                      <td className="text-muted-foreground px-6 py-4 text-right text-sm font-medium whitespace-nowrap">
                         {formatRupiah(Number(item.capital_price))}
                       </td>
                       <td className="px-6 py-4 text-right text-sm whitespace-nowrap">
                         <div className="flex flex-col items-end">
-                          <span className="font-bold text-foreground">
+                          <span className="text-foreground font-bold">
                             {formatRupiah(Number(item.asking_price))}
                           </span>
                         </div>
@@ -329,20 +329,20 @@ export default function InventoryPage() {
         </div>
 
         {/* Pagination Mockup */}
-        <div className="flex items-center justify-between border-t border-border-soft bg-card px-6 py-4">
-          <div className="text-sm text-muted-foreground">
+        <div className="border-border-soft bg-card flex items-center justify-between border-t px-6 py-4">
+          <div className="text-muted-foreground text-sm">
             Menampilkan{" "}
-            <span className="font-semibold text-foreground">
+            <span className="text-foreground font-semibold">
               {filteredInventory.length > 0 ? 1 : 0}
             </span>{" "}
-            - <span className="font-semibold text-foreground">{filteredInventory.length}</span> dari{" "}
-            <span className="font-semibold text-foreground">{filteredInventory.length}</span> stok
+            - <span className="text-foreground font-semibold">{filteredInventory.length}</span> dari{" "}
+            <span className="text-foreground font-semibold">{filteredInventory.length}</span> stok
           </div>
           <div className="flex gap-1">
-            <button className="cursor-not-allowed rounded-md border border-border px-3 py-1 text-sm text-faint-foreground">
+            <button className="border-border text-faint-foreground cursor-not-allowed rounded-md border px-3 py-1 text-sm">
               Sebelumnya
             </button>
-            <button className="rounded-md border border-border px-3 py-1 text-sm font-medium text-foreground hover:bg-muted">
+            <button className="border-border text-foreground hover:bg-muted rounded-md border px-3 py-1 text-sm font-medium">
               Selanjutnya
             </button>
           </div>
@@ -352,15 +352,17 @@ export default function InventoryPage() {
       {/* Tambah Stok Modal (Slide-over Drawer) */}
       {isAddStockOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm">
-          <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-card shadow-2xl duration-300">
-            <div className="flex items-center justify-between border-b border-border-soft bg-muted px-6 py-5">
+          <div className="animate-in slide-in-from-right bg-card flex h-full w-full max-w-md flex-col shadow-2xl duration-300">
+            <div className="border-border-soft bg-muted flex items-center justify-between border-b px-6 py-5">
               <div>
-                <h2 className="text-lg font-bold text-foreground">Tambah Stok Baru</h2>
-                <p className="mt-1 text-xs text-muted-foreground">Isi form data stok akun game baru.</p>
+                <h2 className="text-foreground text-lg font-bold">Tambah Stok Baru</h2>
+                <p className="text-muted-foreground mt-1 text-xs">
+                  Isi form data stok akun game baru.
+                </p>
               </div>
               <button
                 onClick={() => setIsAddStockOpen(false)}
-                className="rounded-full bg-card p-2 text-faint-foreground shadow-sm transition-colors hover:text-muted-foreground"
+                className="bg-card text-faint-foreground hover:text-muted-foreground rounded-full p-2 shadow-sm transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -375,13 +377,13 @@ export default function InventoryPage() {
                 )}
 
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-foreground">
+                  <label className="text-foreground mb-1 block text-sm font-medium">
                     Kategori Game
                   </label>
                   <select
                     name="game_id"
                     required
-                    className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   >
                     <option value="">Pilih Kategori Game...</option>
                     {games.map((game) => (
@@ -393,34 +395,34 @@ export default function InventoryPage() {
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-foreground">
+                  <label className="text-foreground mb-1 block text-sm font-medium">
                     Kode Referensi
                   </label>
                   <input
                     name="title_reference"
                     type="text"
                     required
-                    className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     placeholder="e.g. ML-MYTHIC-001"
                   />
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-foreground">
+                  <label className="text-foreground mb-1 block text-sm font-medium">
                     Spesifikasi Akun
                   </label>
                   <textarea
                     name="account_specs"
                     required
                     rows={3}
-                    className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     placeholder="Details like rank, skins, win rate..."
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-foreground">
+                    <label className="text-foreground mb-1 block text-sm font-medium">
                       Harga Modal
                     </label>
                     <input
@@ -428,12 +430,12 @@ export default function InventoryPage() {
                       required
                       type="number"
                       min="0"
-                      className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                       placeholder="Rp 0"
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-foreground">
+                    <label className="text-foreground mb-1 block text-sm font-medium">
                       Target Jual
                     </label>
                     <input
@@ -441,14 +443,14 @@ export default function InventoryPage() {
                       required
                       type="number"
                       min="0"
-                      className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                       placeholder="Rp 0"
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="border-t border-border-soft bg-card p-6">
+              <div className="border-border-soft bg-card border-t p-6">
                 <button
                   type="submit"
                   disabled={isSubmitting}

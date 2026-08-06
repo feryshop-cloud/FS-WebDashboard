@@ -55,13 +55,13 @@ export function DealDetailHeader({
         <div className="flex items-center gap-4">
           <Link
             href="/dashboard/deals"
-            className="rounded-[10px] border border-border bg-card p-2 text-muted-foreground shadow-sm transition-colors hover:text-foreground"
+            className="border-border bg-card text-muted-foreground hover:text-foreground rounded-[10px] border p-2 shadow-sm transition-colors"
           >
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">Deal Details</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <h1 className="text-foreground text-2xl font-bold tracking-tight">Deal Details</h1>
+            <p className="text-muted-foreground mt-1 text-sm">
               View history and manage payments for this deal.
             </p>
           </div>
@@ -70,7 +70,7 @@ export function DealDetailHeader({
           {isCancellable && (
             <button
               onClick={() => setIsCancelModalOpen(true)}
-              className="flex w-full items-center justify-center gap-2 rounded-[10px] border border-red-200 bg-card px-4 py-2.5 font-semibold text-red-600 transition-all hover:bg-red-50 sm:w-auto"
+              className="bg-card flex w-full items-center justify-center gap-2 rounded-[10px] border border-red-200 px-4 py-2.5 font-semibold text-red-600 transition-all hover:bg-red-50 sm:w-auto"
             >
               <XCircle className="h-5 w-5" />
               Batalkan Transaksi
@@ -106,7 +106,7 @@ export function DealDetailHeader({
             className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm"
             onClick={!isPending ? () => setIsCancelModalOpen(false) : undefined}
           />
-          <div className="animate-in fade-in zoom-in-95 relative flex w-full max-w-md flex-col overflow-hidden rounded-[10px] bg-card p-6 shadow-2xl">
+          <div className="animate-in fade-in zoom-in-95 bg-card relative flex w-full max-w-md flex-col overflow-hidden rounded-[10px] p-6 shadow-2xl">
             <div className="mb-4 flex items-center gap-3 text-red-600">
               <div className="rounded-[10px] bg-red-100 p-2">
                 <AlertTriangle className="h-6 w-6" />
@@ -114,7 +114,7 @@ export function DealDetailHeader({
               <h2 className="text-xl font-bold">Batalkan Transaksi?</h2>
             </div>
 
-            <p className="mb-6 text-sm text-muted-foreground">
+            <p className="text-muted-foreground mb-6 text-sm">
               Anda yakin ingin membatalkan deal ini? Status deal akan menjadi <strong>Batal</strong>{" "}
               dan stok akun akan dikembalikan ke status <strong>Tersedia</strong> di inventori.
             </p>
@@ -132,7 +132,7 @@ export function DealDetailHeader({
                   setCancelError(null);
                 }}
                 disabled={isPending}
-                className="rounded-[10px] border border-input bg-card px-4 py-2 text-sm font-semibold text-foreground transition-all hover:bg-muted"
+                className="border-input bg-card text-foreground hover:bg-muted rounded-[10px] border px-4 py-2 text-sm font-semibold transition-all"
               >
                 Kembali
               </button>

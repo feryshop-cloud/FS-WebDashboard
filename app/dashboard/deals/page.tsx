@@ -111,10 +111,10 @@ export default function DealsPage() {
       {/* Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          <h1 className="text-foreground text-2xl font-bold tracking-tight">
             Daftar Transaksi (Deals)
           </h1>
-          <p className="mt-0.5 text-sm text-muted-foreground">
+          <p className="text-muted-foreground mt-0.5 text-sm">
             Kelola semua transaksi penjualan reguler, booking, dan cicilan.
           </p>
         </div>
@@ -122,10 +122,10 @@ export default function DealsPage() {
           <button
             onClick={handleExportExcel}
             disabled={isExporting}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50"
+            className="border-border bg-card text-foreground hover:bg-muted hover:text-foreground inline-flex items-center justify-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium shadow-sm transition-colors disabled:opacity-50"
           >
             {isExporting ? (
-              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
             ) : (
               <FileText className="h-4 w-4" />
             )}
@@ -142,89 +142,89 @@ export default function DealsPage() {
       </div>
 
       {/* Action Bar */}
-      <div className="flex flex-col items-center justify-between gap-4 rounded-xl border border-border-soft bg-card p-4 shadow-sm sm:flex-row">
+      <div className="border-border-soft bg-card flex flex-col items-center justify-between gap-4 rounded-xl border p-4 shadow-sm sm:flex-row">
         <div className="relative w-full sm:w-96">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <Search className="h-4 w-4 text-faint-foreground" />
+            <Search className="text-faint-foreground h-4 w-4" />
           </div>
           <input
             type="text"
-            className="block w-full rounded-lg border border-border bg-muted py-2 pr-3 pl-10 text-foreground placeholder-slate-400 transition-all outline-none focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className="border-border bg-muted text-foreground block w-full rounded-lg border py-2 pr-3 pl-10 placeholder-slate-400 transition-all outline-none focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             placeholder="Cari nomor deal, customer, atau stok..."
           />
         </div>
         <div className="flex w-full items-center gap-3 sm:w-auto">
-          <button className="inline-flex w-full min-w-[140px] items-center justify-between gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-muted sm:w-auto">
+          <button className="border-border bg-card text-foreground hover:bg-muted inline-flex w-full min-w-[140px] items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm font-medium sm:w-auto">
             <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-faint-foreground" />
+              <Filter className="text-faint-foreground h-4 w-4" />
               <span>Semua Status</span>
             </div>
-            <ChevronDown className="h-4 w-4 text-faint-foreground" />
+            <ChevronDown className="text-faint-foreground h-4 w-4" />
           </button>
-          <button className="inline-flex w-full min-w-[140px] items-center justify-between gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-muted sm:w-auto">
+          <button className="border-border bg-card text-foreground hover:bg-muted inline-flex w-full min-w-[140px] items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm font-medium sm:w-auto">
             <span>Pilih Tanggal</span>
-            <ChevronDown className="h-4 w-4 text-faint-foreground" />
+            <ChevronDown className="text-faint-foreground h-4 w-4" />
           </button>
         </div>
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-xl border border-border-soft bg-card shadow-sm">
+      <div className="border-border-soft bg-card overflow-hidden rounded-xl border shadow-sm">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-border">
+          <table className="divide-border min-w-full divide-y">
             <thead className="bg-muted/80">
               <tr>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                  className="text-muted-foreground px-6 py-4 text-left text-xs font-semibold tracking-wider uppercase"
                 >
                   Nomor Deal
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                  className="text-muted-foreground px-6 py-4 text-left text-xs font-semibold tracking-wider uppercase"
                 >
                   Customer
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                  className="text-muted-foreground px-6 py-4 text-left text-xs font-semibold tracking-wider uppercase"
                 >
                   Stok yang Dijual
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-right text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                  className="text-muted-foreground px-6 py-4 text-right text-xs font-semibold tracking-wider uppercase"
                 >
                   Harga Deal
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-right text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                  className="text-muted-foreground px-6 py-4 text-right text-xs font-semibold tracking-wider uppercase"
                 >
                   Total Dibayar
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-center text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                  className="text-muted-foreground px-6 py-4 text-center text-xs font-semibold tracking-wider uppercase"
                 >
                   Status Deal
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-right text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                  className="text-muted-foreground px-6 py-4 text-right text-xs font-semibold tracking-wider uppercase"
                 >
                   Tanggal Deal
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-center text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                  className="text-muted-foreground px-6 py-4 text-center text-xs font-semibold tracking-wider uppercase"
                 >
                   Aksi
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border-soft bg-card">
+            <tbody className="divide-border-soft bg-card divide-y">
               {isLoading ? (
                 <tr>
                   <td colSpan={8} className="px-6 py-12 text-center">
@@ -233,7 +233,7 @@ export default function DealsPage() {
                 </tr>
               ) : deals.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-6 py-8 text-center text-sm text-muted-foreground">
+                  <td colSpan={8} className="text-muted-foreground px-6 py-8 text-center text-sm">
                     Belum ada transaksi.
                   </td>
                 </tr>
@@ -257,19 +257,19 @@ export default function DealsPage() {
                   const stockName = deal.deal_items?.[0]?.stocks?.name || "N/A";
 
                   return (
-                    <tr key={deal.id} className="group transition-colors hover:bg-muted/50">
-                      <td className="px-6 py-4 text-sm font-semibold whitespace-nowrap text-foreground">
+                    <tr key={deal.id} className="group hover:bg-muted/50 transition-colors">
+                      <td className="text-foreground px-6 py-4 text-sm font-semibold whitespace-nowrap">
                         {deal.deal_number}
                       </td>
-                      <td className="px-6 py-4 text-sm font-medium whitespace-nowrap text-muted-foreground">
+                      <td className="text-muted-foreground px-6 py-4 text-sm font-medium whitespace-nowrap">
                         {deal.customers?.name || "-"}
                       </td>
-                      <td className="px-6 py-4 text-sm whitespace-nowrap text-muted-foreground">
+                      <td className="text-muted-foreground px-6 py-4 text-sm whitespace-nowrap">
                         <span className="block max-w-[200px] truncate" title={stockName}>
                           {stockName}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-right text-sm font-semibold whitespace-nowrap text-foreground">
+                      <td className="text-foreground px-6 py-4 text-right text-sm font-semibold whitespace-nowrap">
                         {formatRupiah(Number(deal.total_deal_price))}
                       </td>
                       <td className="px-6 py-4 text-right text-sm whitespace-nowrap">
@@ -280,7 +280,7 @@ export default function DealsPage() {
                             {formatRupiah(Number(deal.total_paid))}
                           </span>
                           {Number(deal.total_paid) < Number(deal.total_deal_price) && (
-                            <span className="mt-0.5 text-[10px] font-medium text-faint-foreground">
+                            <span className="text-faint-foreground mt-0.5 text-[10px] font-medium">
                               Sisa:{" "}
                               {formatRupiah(
                                 Number(deal.total_deal_price) - Number(deal.total_paid),
@@ -296,7 +296,7 @@ export default function DealsPage() {
                           {deal.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-right text-sm whitespace-nowrap text-muted-foreground">
+                      <td className="text-muted-foreground px-6 py-4 text-right text-sm whitespace-nowrap">
                         {formatDate(deal.created_at)}
                       </td>
                       <td className="px-6 py-4 text-center text-sm font-medium whitespace-nowrap">
@@ -317,18 +317,18 @@ export default function DealsPage() {
         </div>
 
         {/* Pagination Mockup */}
-        <div className="flex items-center justify-between border-t border-border-soft bg-card px-6 py-4">
-          <div className="text-sm text-muted-foreground">
+        <div className="border-border-soft bg-card flex items-center justify-between border-t px-6 py-4">
+          <div className="text-muted-foreground text-sm">
             Menampilkan{" "}
-            <span className="font-semibold text-foreground">{deals.length > 0 ? 1 : 0}</span> -{" "}
-            <span className="font-semibold text-foreground">{deals.length}</span> dari{" "}
-            <span className="font-semibold text-foreground">{deals.length}</span> transaksi
+            <span className="text-foreground font-semibold">{deals.length > 0 ? 1 : 0}</span> -{" "}
+            <span className="text-foreground font-semibold">{deals.length}</span> dari{" "}
+            <span className="text-foreground font-semibold">{deals.length}</span> transaksi
           </div>
           <div className="flex gap-1">
-            <button className="cursor-not-allowed rounded-md border border-border px-3 py-1 text-sm text-faint-foreground">
+            <button className="border-border text-faint-foreground cursor-not-allowed rounded-md border px-3 py-1 text-sm">
               Sebelummnya
             </button>
-            <button className="rounded-md border border-border px-3 py-1 text-sm font-medium text-foreground hover:bg-muted">
+            <button className="border-border text-foreground hover:bg-muted rounded-md border px-3 py-1 text-sm font-medium">
               Selanjutnya
             </button>
           </div>
@@ -338,17 +338,17 @@ export default function DealsPage() {
       {/* Buat Deal Baru Modal (Slide-over / Modal) */}
       {isAddDealOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm">
-          <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-card shadow-2xl duration-300">
-            <div className="flex items-center justify-between border-b border-border-soft bg-muted px-6 py-5">
+          <div className="animate-in slide-in-from-right bg-card flex h-full w-full max-w-md flex-col shadow-2xl duration-300">
+            <div className="border-border-soft bg-muted flex items-center justify-between border-b px-6 py-5">
               <div>
-                <h2 className="text-lg font-bold text-foreground">Buat Deal Baru</h2>
-                <p className="mt-1 text-xs text-muted-foreground">
+                <h2 className="text-foreground text-lg font-bold">Buat Deal Baru</h2>
+                <p className="text-muted-foreground mt-1 text-xs">
                   Isi form transaksi penjualan atau booking.
                 </p>
               </div>
               <button
                 onClick={() => setIsAddDealOpen(false)}
-                className="rounded-full bg-card p-2 text-faint-foreground shadow-sm transition-colors hover:text-muted-foreground"
+                className="bg-card text-faint-foreground hover:text-muted-foreground rounded-full p-2 shadow-sm transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -361,13 +361,13 @@ export default function DealsPage() {
                   </div>
                 )}
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-foreground">
+                  <label className="text-foreground mb-1 block text-sm font-medium">
                     Pilih Stok
                   </label>
                   <select
                     name="stock_id"
                     required
-                    className="w-full rounded-lg border border-border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   >
                     <option value="">-- Pilih Stok Tersedia --</option>
                     {stocks.map((stock) => (
@@ -378,30 +378,30 @@ export default function DealsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-foreground">
+                  <label className="text-foreground mb-1 block text-sm font-medium">
                     Nama Customer
                   </label>
                   <input
                     name="customer_name"
                     required
                     type="text"
-                    className="w-full rounded-lg border border-border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     placeholder="Mis. Budi Santoso"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-foreground">
+                  <label className="text-foreground mb-1 block text-sm font-medium">
                     No. HP Customer (Opsional)
                   </label>
                   <input
                     name="customer_phone"
                     type="text"
-                    className="w-full rounded-lg border border-border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     placeholder="Mis. 08123456789"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-foreground">
+                  <label className="text-foreground mb-1 block text-sm font-medium">
                     Harga Deal
                   </label>
                   <input
@@ -409,34 +409,34 @@ export default function DealsPage() {
                     required
                     type="number"
                     min="1"
-                    className="w-full rounded-lg border border-border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     placeholder="Rp 0"
                   />
                 </div>
 
-                <div className="rounded-xl border border-border-soft bg-muted p-4">
-                  <h3 className="mb-3 text-sm font-semibold text-foreground">Pembayaran Awal</h3>
+                <div className="border-border-soft bg-muted rounded-xl border p-4">
+                  <h3 className="text-foreground mb-3 text-sm font-semibold">Pembayaran Awal</h3>
                   <div className="space-y-3">
                     <div>
-                      <label className="mb-1 block text-xs font-medium text-muted-foreground">
+                      <label className="text-muted-foreground mb-1 block text-xs font-medium">
                         Nominal Pembayaran (Bisa 0 jika piutang total)
                       </label>
                       <input
                         name="payment_amount"
                         type="number"
                         min="0"
-                        className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         placeholder="Rp 0"
                         defaultValue={0}
                       />
                     </div>
                     <div>
-                      <label className="mb-1 block text-xs font-medium text-muted-foreground">
+                      <label className="text-muted-foreground mb-1 block text-xs font-medium">
                         Metode Pembayaran
                       </label>
                       <select
                         name="account_id"
-                        className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                       >
                         <option value="">-- Pilih Rekening (Kosongkan jika 0) --</option>
                         {accounts
@@ -451,7 +451,7 @@ export default function DealsPage() {
                   </div>
                 </div>
               </div>
-              <div className="border-t border-border-soft bg-card p-6">
+              <div className="border-border-soft bg-card border-t p-6">
                 <button
                   type="submit"
                   disabled={isSubmitting}

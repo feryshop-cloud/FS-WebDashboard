@@ -138,7 +138,7 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
         {/* Roles List */}
         <div className="space-y-3 md:col-span-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-semibold tracking-wider text-faint-foreground uppercase">
+            <h3 className="text-faint-foreground text-xs font-semibold tracking-wider uppercase">
               Daftar Role Sistem
             </h3>
             <button
@@ -152,7 +152,7 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
 
           <div className="space-y-2">
             {roles.length === 0 ? (
-              <div className="rounded-xl border border-border-soft bg-card p-6 text-center text-xs text-faint-foreground">
+              <div className="border-border-soft bg-card text-faint-foreground rounded-xl border p-6 text-center text-xs">
                 Belum ada data role di database.
               </div>
             ) : (
@@ -178,15 +178,17 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
                         <Shield
                           className={`h-4 w-4 ${isSelected ? "text-blue-600" : "text-faint-foreground"}`}
                         />
-                        <span className="text-sm font-bold text-foreground">{r.name}</span>
+                        <span className="text-foreground text-sm font-bold">{r.name}</span>
                         {isSystem && (
-                          <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+                          <span className="bg-muted text-muted-foreground rounded px-1.5 py-0.5 text-[10px] font-medium">
                             Sistem
                           </span>
                         )}
                       </div>
                       {r.description && (
-                        <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{r.description}</p>
+                        <p className="text-muted-foreground mt-1 line-clamp-2 text-xs">
+                          {r.description}
+                        </p>
                       )}
                     </div>
 
@@ -197,7 +199,7 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
                           handleDeleteRole(r.id, r.name);
                         }}
                         title="Hapus Role Custom"
-                        className="p-1 text-faint-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:text-rose-600"
+                        className="text-faint-foreground p-1 opacity-0 transition-opacity group-hover:opacity-100 hover:text-rose-600"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -216,14 +218,14 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
               const isLockedRole = ["OWNER", "MEMBER"].includes(selectedRole.name.toUpperCase());
 
               return (
-                <div className="space-y-6 rounded-xl border border-border-soft bg-card p-6 shadow-sm">
-                  <div className="flex items-center justify-between border-b border-border-soft pb-4">
+                <div className="border-border-soft bg-card space-y-6 rounded-xl border p-6 shadow-sm">
+                  <div className="border-border-soft flex items-center justify-between border-b pb-4">
                     <div>
-                      <h3 className="flex items-center gap-2 text-base font-bold text-foreground">
+                      <h3 className="text-foreground flex items-center gap-2 text-base font-bold">
                         <Key className="h-5 w-5 text-blue-600" />
                         Hak Akses: {selectedRole.name}
                       </h3>
-                      <p className="mt-0.5 text-xs text-muted-foreground">
+                      <p className="text-muted-foreground mt-0.5 text-xs">
                         {selectedRole.description || "Konfigurasi izin fitur untuk role ini."}
                       </p>
                     </div>
@@ -244,7 +246,8 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
 
                   {isLockedRole && (
                     <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs font-medium text-amber-800">
-                      Hak akses untuk role bawaan ({selectedRole.name}) telah dikunci untuk menjaga kestabilan dan keamanan sistem.
+                      Hak akses untuk role bawaan ({selectedRole.name}) telah dikunci untuk menjaga
+                      kestabilan dan keamanan sistem.
                     </div>
                   )}
 
@@ -273,7 +276,7 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
                             isLockedRole
                               ? "cursor-not-allowed opacity-75 " +
                                 (isChecked
-                                  ? "border-blue-200 bg-muted/80 text-foreground"
+                                  ? "bg-muted/80 text-foreground border-blue-200"
                                   : "border-border-soft bg-muted/50 text-faint-foreground")
                               : "cursor-pointer " +
                                 (isChecked
@@ -287,7 +290,7 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
                             checked={isChecked}
                             disabled={isLockedRole}
                             onChange={() => {}}
-                            className="h-4 w-4 rounded border-input text-blue-600 focus:ring-blue-500 disabled:opacity-60"
+                            className="border-input h-4 w-4 rounded text-blue-600 focus:ring-blue-500 disabled:opacity-60"
                           />
                         </div>
                       );
@@ -297,7 +300,7 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
               );
             })()
           ) : (
-            <div className="rounded-xl border border-border-soft bg-card p-12 text-center text-sm text-faint-foreground">
+            <div className="border-border-soft bg-card text-faint-foreground rounded-xl border p-12 text-center text-sm">
               Pilih role di sebelah kiri untuk mengatur hak akses.
             </div>
           )}
@@ -307,12 +310,12 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
       {/* Modal Add Role */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md space-y-4 rounded-2xl bg-card p-6 shadow-xl">
-            <div className="flex items-center justify-between border-b border-border-soft pb-3">
-              <h3 className="text-base font-bold text-foreground">Tambah Role Baru</h3>
+          <div className="bg-card w-full max-w-md space-y-4 rounded-2xl p-6 shadow-xl">
+            <div className="border-border-soft flex items-center justify-between border-b pb-3">
+              <h3 className="text-foreground text-base font-bold">Tambah Role Baru</h3>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="rounded-lg p-1 text-faint-foreground hover:bg-muted hover:text-muted-foreground"
+                className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-lg p-1"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -326,7 +329,7 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
 
             <form onSubmit={handleCreateRole} className="space-y-4">
               <div>
-                <label className="mb-1 block text-xs font-medium text-foreground">
+                <label className="text-foreground mb-1 block text-xs font-medium">
                   Nama Role <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -334,26 +337,26 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
                   placeholder="misal: STAFF_FINANCE, CS_OFFICER"
                   value={newRoleName}
                   onChange={(e) => setNewRoleName(e.target.value)}
-                  className="w-full rounded-lg border border-border px-3 py-2 text-sm uppercase focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                  className="border-border w-full rounded-lg border px-3 py-2 text-sm uppercase focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="mb-1 block text-xs font-medium text-foreground">Deskripsi</label>
+                <label className="text-foreground mb-1 block text-xs font-medium">Deskripsi</label>
                 <textarea
                   rows={3}
                   placeholder="Keterangan tugas atau tanggung jawab role ini..."
                   value={newRoleDesc}
                   onChange={(e) => setNewRoleDesc(e.target.value)}
-                  className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                  className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-3 border-t border-border-soft pt-3">
+              <div className="border-border-soft flex items-center justify-end gap-3 border-t pt-3">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="rounded-lg px-4 py-2 text-xs font-semibold text-muted-foreground hover:bg-muted"
+                  className="text-muted-foreground hover:bg-muted rounded-lg px-4 py-2 text-xs font-semibold"
                 >
                   Batal
                 </button>

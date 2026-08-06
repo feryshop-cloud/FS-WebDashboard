@@ -29,13 +29,13 @@ export default function AuditLogPage() {
       {/* Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Audit Log</h1>
-          <p className="mt-0.5 text-sm text-muted-foreground">
+          <h1 className="text-foreground text-2xl font-bold tracking-tight">Audit Log</h1>
+          <p className="text-muted-foreground mt-0.5 text-sm">
             Catatan aktivitas admin, perubahan data, dan akses sistem (Read-only).
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-muted hover:text-foreground">
+          <button className="border-border bg-card text-foreground hover:bg-muted hover:text-foreground inline-flex items-center justify-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium shadow-sm transition-colors">
             <Download className="h-4 w-4" />
             Export CSV
           </button>
@@ -43,78 +43,78 @@ export default function AuditLogPage() {
       </div>
 
       {/* Action Bar */}
-      <div className="flex flex-col items-center justify-between gap-4 rounded-xl border border-border-soft bg-card p-4 shadow-sm sm:flex-row">
+      <div className="border-border-soft bg-card flex flex-col items-center justify-between gap-4 rounded-xl border p-4 shadow-sm sm:flex-row">
         <div className="relative w-full sm:w-96">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <Search className="h-4 w-4 text-faint-foreground" />
+            <Search className="text-faint-foreground h-4 w-4" />
           </div>
           <input
             type="text"
-            className="block w-full rounded-lg border border-border bg-muted py-2 pr-3 pl-10 text-foreground placeholder-slate-400 transition-all outline-none focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className="border-border bg-muted text-foreground block w-full rounded-lg border py-2 pr-3 pl-10 placeholder-slate-400 transition-all outline-none focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             placeholder="Cari keterangan aktivitas atau user..."
           />
         </div>
         <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto">
-          <button className="inline-flex flex-1 items-center justify-between gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-muted sm:flex-none">
+          <button className="border-border bg-card text-foreground hover:bg-muted inline-flex flex-1 items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm font-medium sm:flex-none">
             <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-faint-foreground" />
+              <Filter className="text-faint-foreground h-4 w-4" />
               <span>Semua User</span>
             </div>
-            <ChevronDown className="h-4 w-4 text-faint-foreground" />
+            <ChevronDown className="text-faint-foreground h-4 w-4" />
           </button>
-          <button className="inline-flex flex-1 items-center justify-between gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-muted sm:flex-none">
+          <button className="border-border bg-card text-foreground hover:bg-muted inline-flex flex-1 items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm font-medium sm:flex-none">
             <span>Semua Modul</span>
-            <ChevronDown className="h-4 w-4 text-faint-foreground" />
+            <ChevronDown className="text-faint-foreground h-4 w-4" />
           </button>
-          <button className="inline-flex w-full items-center justify-between gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-muted sm:w-auto">
+          <button className="border-border bg-card text-foreground hover:bg-muted inline-flex w-full items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm font-medium sm:w-auto">
             <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-faint-foreground" />
+              <Calendar className="text-faint-foreground h-4 w-4" />
               <span>Hari Ini</span>
             </div>
-            <ChevronDown className="h-4 w-4 text-faint-foreground" />
+            <ChevronDown className="text-faint-foreground h-4 w-4" />
           </button>
         </div>
       </div>
 
       {/* Table Dense Layout */}
-      <div className="overflow-hidden rounded-xl border border-border-soft bg-card shadow-sm">
+      <div className="border-border-soft bg-card overflow-hidden rounded-xl border shadow-sm">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-border">
+          <table className="divide-border min-w-full divide-y">
             <thead className="bg-muted/80">
               <tr>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                  className="text-muted-foreground px-6 py-3 text-left text-xs font-semibold tracking-wider uppercase"
                 >
                   Waktu
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                  className="text-muted-foreground px-6 py-3 text-left text-xs font-semibold tracking-wider uppercase"
                 >
                   User & Role
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                  className="text-muted-foreground px-6 py-3 text-left text-xs font-semibold tracking-wider uppercase"
                 >
                   Modul
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                  className="text-muted-foreground px-6 py-3 text-left text-xs font-semibold tracking-wider uppercase"
                 >
                   Aksi
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                  className="text-muted-foreground px-6 py-3 text-left text-xs font-semibold tracking-wider uppercase"
                 >
                   Keterangan Detail
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border-soft bg-card">
+            <tbody className="divide-border-soft bg-card divide-y">
               {isLoading ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center">
@@ -123,7 +123,7 @@ export default function AuditLogPage() {
                 </tr>
               ) : logs.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-sm text-muted-foreground">
+                  <td colSpan={5} className="text-muted-foreground px-6 py-12 text-center text-sm">
                     Belum ada catatan aktivitas.
                   </td>
                 </tr>
@@ -136,14 +136,14 @@ export default function AuditLogPage() {
                   if (log.action === "LOGIN") actionColor = "text-purple-700 bg-purple-50";
 
                   return (
-                    <tr key={log.id} className="transition-colors hover:bg-muted/50">
-                      <td className="px-6 py-2.5 font-mono text-xs whitespace-nowrap text-muted-foreground">
+                    <tr key={log.id} className="hover:bg-muted/50 transition-colors">
+                      <td className="text-muted-foreground px-6 py-2.5 font-mono text-xs whitespace-nowrap">
                         {formatDate(log.created_at)}
                       </td>
-                      <td className="px-6 py-2.5 text-xs font-semibold whitespace-nowrap text-foreground">
+                      <td className="text-foreground px-6 py-2.5 text-xs font-semibold whitespace-nowrap">
                         {log.public_users?.full_name || "System / Deleted User"}
                       </td>
-                      <td className="px-6 py-2.5 text-xs font-medium whitespace-nowrap text-muted-foreground">
+                      <td className="text-muted-foreground px-6 py-2.5 text-xs font-medium whitespace-nowrap">
                         {log.module}
                       </td>
                       <td className="px-6 py-2.5 whitespace-nowrap">
@@ -154,7 +154,7 @@ export default function AuditLogPage() {
                         </span>
                       </td>
                       <td
-                        className="max-w-md truncate px-6 py-2.5 font-mono text-xs tracking-tight text-muted-foreground"
+                        className="text-muted-foreground max-w-md truncate px-6 py-2.5 font-mono text-xs tracking-tight"
                         title={log.description ?? undefined}
                       >
                         {log.description}

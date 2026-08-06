@@ -25,7 +25,7 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
   }
 
   return (
-    <div className="mx-auto min-h-screen max-w-[1400px] space-y-6 bg-muted/50 p-6 md:p-8">
+    <div className="bg-muted/50 mx-auto min-h-screen max-w-[1400px] space-y-6 p-6 md:p-8">
       <DealDetailHeader
         dealId={deal.id}
         stockId={deal.stock_id}
@@ -37,40 +37,40 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Deal Summary Card */}
         <div className="space-y-6 lg:col-span-2">
-          <div className="rounded-[10px] border border-border bg-card p-6 shadow-sm">
-            <h2 className="mb-6 border-b border-border-soft pb-4 text-lg font-bold text-foreground">
+          <div className="border-border bg-card rounded-[10px] border p-6 shadow-sm">
+            <h2 className="border-border-soft text-foreground mb-6 border-b pb-4 text-lg font-bold">
               Deal Overview
             </h2>
 
             <div className="mb-6 grid grid-cols-2 gap-6 md:grid-cols-4">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Deal Number</p>
-                <p className="mt-1 font-mono text-base font-semibold text-foreground">
+                <p className="text-muted-foreground text-sm font-medium">Deal Number</p>
+                <p className="text-foreground mt-1 font-mono text-base font-semibold">
                   {deal.deal_number}
                 </p>
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Status</p>
+                <p className="text-muted-foreground text-sm font-medium">Status</p>
                 <div className="mt-1">
                   <StatusBadge status={deal.status} />
                 </div>
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Customer</p>
-                <p className="mt-1 text-base font-semibold text-foreground">{deal.customer_name}</p>
+                <p className="text-muted-foreground text-sm font-medium">Customer</p>
+                <p className="text-foreground mt-1 text-base font-semibold">{deal.customer_name}</p>
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Contact</p>
-                <p className="mt-1 text-base font-semibold text-foreground">
+                <p className="text-muted-foreground text-sm font-medium">Contact</p>
+                <p className="text-foreground mt-1 text-base font-semibold">
                   {deal.customer_contact || "-"}
                 </p>
               </div>
             </div>
 
-            <div className="rounded-[10px] border border-border-soft bg-muted p-4">
+            <div className="border-border-soft bg-muted rounded-[10px] border p-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-muted-foreground">Stock Linked</span>
-                <span className="text-sm font-semibold text-foreground">
+                <span className="text-muted-foreground text-sm font-medium">Stock Linked</span>
+                <span className="text-foreground text-sm font-semibold">
                   {deal.stock?.name} ({deal.stock?.category})
                 </span>
               </div>
@@ -78,49 +78,49 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
           </div>
 
           {/* Historical Payments Table */}
-          <div className="overflow-hidden rounded-[10px] border border-border bg-card shadow-sm">
-            <div className="border-b border-border-soft px-6 py-5">
-              <h2 className="text-lg font-bold text-foreground">Payment History</h2>
+          <div className="border-border bg-card overflow-hidden rounded-[10px] border shadow-sm">
+            <div className="border-border-soft border-b px-6 py-5">
+              <h2 className="text-foreground text-lg font-bold">Payment History</h2>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-border">
+              <table className="divide-border min-w-full divide-y">
                 <thead className="bg-muted">
                   <tr>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase">
+                    <th className="text-muted-foreground px-6 py-4 text-left text-xs font-semibold uppercase">
                       Date
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase">
+                    <th className="text-muted-foreground px-6 py-4 text-left text-xs font-semibold uppercase">
                       Method/Account
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase">
+                    <th className="text-muted-foreground px-6 py-4 text-left text-xs font-semibold uppercase">
                       Amount
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase">
+                    <th className="text-muted-foreground px-6 py-4 text-left text-xs font-semibold uppercase">
                       Notes
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase">
+                    <th className="text-muted-foreground px-6 py-4 text-left text-xs font-semibold uppercase">
                       Status
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border bg-card">
+                <tbody className="divide-border bg-card divide-y">
                   {deal.payments && deal.payments.length > 0 ? (
                     deal.payments.map((payment: PaymentWithRelations) => (
-                      <tr key={payment.id} className="transition-colors hover:bg-muted">
-                        <td className="px-6 py-4 text-sm whitespace-nowrap text-muted-foreground">
+                      <tr key={payment.id} className="hover:bg-muted transition-colors">
+                        <td className="text-muted-foreground px-6 py-4 text-sm whitespace-nowrap">
                           {formatDate(payment.created_at)}
                         </td>
-                        <td className="px-6 py-4 text-sm font-medium whitespace-nowrap text-foreground">
+                        <td className="text-foreground px-6 py-4 text-sm font-medium whitespace-nowrap">
                           {payment.account?.name || "Unknown Account"}
                         </td>
                         <td className="px-6 py-4 font-mono text-sm font-bold whitespace-nowrap text-emerald-600">
                           + {formatRupiah(payment.amount)}
                         </td>
-                        <td className="px-6 py-4 text-sm whitespace-nowrap text-muted-foreground">
+                        <td className="text-muted-foreground px-6 py-4 text-sm whitespace-nowrap">
                           {payment.notes || "-"}
                         </td>
-                        <td className="px-6 py-4 text-sm whitespace-nowrap text-muted-foreground">
+                        <td className="text-muted-foreground px-6 py-4 text-sm whitespace-nowrap">
                           <span className="inline-flex items-center rounded-[10px] bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-600 ring-1 ring-emerald-200/50">
                             {payment.status}
                           </span>
@@ -129,7 +129,10 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={5} className="px-6 py-12 text-center text-sm text-muted-foreground">
+                      <td
+                        colSpan={5}
+                        className="text-muted-foreground px-6 py-12 text-center text-sm"
+                      >
                         No payments recorded yet.
                       </td>
                     </tr>
@@ -142,28 +145,28 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
 
         {/* Financial Summary Sidebar */}
         <div className="space-y-6">
-          <div className="sticky top-6 rounded-[10px] border border-border bg-card p-6 shadow-sm">
-            <h2 className="mb-6 border-b border-border-soft pb-4 text-lg font-bold text-foreground">
+          <div className="border-border bg-card sticky top-6 rounded-[10px] border p-6 shadow-sm">
+            <h2 className="border-border-soft text-foreground mb-6 border-b pb-4 text-lg font-bold">
               Financial Summary
             </h2>
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Deal Price</span>
-                <span className="font-mono font-medium text-foreground">
+                <span className="text-muted-foreground text-sm">Deal Price</span>
+                <span className="text-foreground font-mono font-medium">
                   {formatRupiah(deal.deal_price)}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Total Paid</span>
+                <span className="text-muted-foreground text-sm">Total Paid</span>
                 <span className="font-mono font-bold text-emerald-600">
                   {formatRupiah(deal.total_paid)}
                 </span>
               </div>
 
-              <div className="border-t border-border-soft pt-4">
+              <div className="border-border-soft border-t pt-4">
                 <div className="flex items-center justify-between">
-                  <span className="font-medium text-foreground">Remaining Balance</span>
+                  <span className="text-foreground font-medium">Remaining Balance</span>
                   <span
                     className={`font-mono text-lg font-bold ${deal.remaining_balance > 0 ? "text-red-600" : "text-emerald-600"}`}
                   >
@@ -172,16 +175,16 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
                 </div>
               </div>
 
-              <div className="mt-6 border-t border-border-soft pt-6">
+              <div className="border-border-soft mt-6 border-t pt-6">
                 <div className="mb-2 flex items-center justify-between">
-                  <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                  <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
                     Payment Progress
                   </span>
                   <span className="text-sm font-bold text-blue-600">
                     {deal.payment_percentage.toFixed(0)}%
                   </span>
                 </div>
-                <div className="h-2.5 w-full overflow-hidden rounded-[10px] bg-muted">
+                <div className="bg-muted h-2.5 w-full overflow-hidden rounded-[10px]">
                   <div
                     className={`h-full rounded-[10px] transition-all duration-1000 ease-out ${deal.payment_percentage >= 100 ? "bg-emerald-500" : "bg-blue-600"}`}
                     style={{ width: `${Math.min(deal.payment_percentage, 100)}%` }}

@@ -53,13 +53,7 @@ function parseValueInput(raw: string): unknown {
   }
 }
 
-function SettingRowItem({
-  setting,
-  onRefresh,
-}: {
-  setting: SettingRow;
-  onRefresh: () => void;
-}) {
+function SettingRowItem({ setting, onRefresh }: { setting: SettingRow; onRefresh: () => void }) {
   const [isEditing, setIsEditing] = useState(false);
   const [inputValue, setInputValue] = useState(valueToDisplay(setting.value));
   const [isSaving, setIsSaving] = useState(false);
@@ -100,16 +94,16 @@ function SettingRowItem({
   const isLong = displayValue.length > 60;
 
   return (
-    <div className="group border-b border-border-soft py-3 last:border-0">
+    <div className="group border-border-soft border-b py-3 last:border-0">
       <div className="flex items-start gap-3">
         {/* Key + Description */}
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <code className="rounded bg-muted px-1.5 py-0.5 text-[11px] font-mono text-foreground">
+            <code className="bg-muted text-foreground rounded px-1.5 py-0.5 font-mono text-[11px]">
               {setting.key}
             </code>
             {setting.description && (
-              <span className="text-xs text-faint-foreground">{setting.description}</span>
+              <span className="text-faint-foreground text-xs">{setting.description}</span>
             )}
           </div>
 
@@ -122,7 +116,7 @@ function SettingRowItem({
                     rows={3}
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
-                    className="w-full rounded-lg border border-blue-300 bg-card px-3 py-2 font-mono text-xs text-foreground focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                    className="bg-card text-foreground w-full rounded-lg border border-blue-300 px-3 py-2 font-mono text-xs focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                     autoFocus
                   />
                 ) : (
@@ -130,7 +124,7 @@ function SettingRowItem({
                     type="text"
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
-                    className="w-full rounded-lg border border-blue-300 bg-card px-3 py-2 font-mono text-xs text-foreground focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                    className="bg-card text-foreground w-full rounded-lg border border-blue-300 px-3 py-2 font-mono text-xs focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                     autoFocus
                     onKeyDown={(e) => {
                       if (e.key === "Enter") handleSave();
@@ -138,15 +132,17 @@ function SettingRowItem({
                     }}
                   />
                 )}
-                <p className="text-[10px] text-faint-foreground">
-                  Masukkan nilai JSON yang valid (string: tulis biasa, boolean:{" "}
-                  <code>true</code>/<code>false</code>, angka: tanpa kutip)
+                <p className="text-faint-foreground text-[10px]">
+                  Masukkan nilai JSON yang valid (string: tulis biasa, boolean: <code>true</code>/
+                  <code>false</code>, angka: tanpa kutip)
                 </p>
               </div>
             ) : (
               <p
                 className={`font-mono text-xs ${
-                  displayValue.length > 80 ? "line-clamp-2 text-muted-foreground" : "text-foreground"
+                  displayValue.length > 80
+                    ? "text-muted-foreground line-clamp-2"
+                    : "text-foreground"
                 }`}
               >
                 {displayValue}
@@ -184,7 +180,7 @@ function SettingRowItem({
               <button
                 onClick={handleCancel}
                 title="Batal"
-                className="flex h-7 w-7 items-center justify-center rounded-lg border border-border text-faint-foreground hover:bg-muted hover:text-muted-foreground"
+                className="border-border text-faint-foreground hover:bg-muted hover:text-muted-foreground flex h-7 w-7 items-center justify-center rounded-lg border"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -193,7 +189,7 @@ function SettingRowItem({
             <button
               onClick={handleEdit}
               title="Edit"
-              className="flex h-7 w-7 items-center justify-center rounded-lg text-faint-foreground opacity-0 transition-opacity hover:bg-muted hover:text-muted-foreground group-hover:opacity-100"
+              className="text-faint-foreground hover:bg-muted hover:text-muted-foreground flex h-7 w-7 items-center justify-center rounded-lg opacity-0 transition-opacity group-hover:opacity-100"
             >
               <Pencil className="h-3.5 w-3.5" />
             </button>
@@ -217,27 +213,27 @@ function GroupCard({
   const label = GROUP_LABELS[groupKey] ?? groupKey.toUpperCase();
 
   return (
-    <div className="rounded-xl border border-border-soft bg-card shadow-sm">
+    <div className="border-border-soft bg-card rounded-xl border shadow-sm">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center justify-between rounded-t-xl px-5 py-3.5 hover:bg-muted"
+        className="hover:bg-muted flex w-full items-center justify-between rounded-t-xl px-5 py-3.5"
       >
         <div className="flex items-center gap-2">
           <Settings2 className="h-4 w-4 text-blue-500" />
-          <span className="text-sm font-semibold text-foreground">{label}</span>
-          <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+          <span className="text-foreground text-sm font-semibold">{label}</span>
+          <span className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-[10px] font-medium">
             {rows.length}
           </span>
         </div>
         {open ? (
-          <ChevronDown className="h-4 w-4 text-faint-foreground" />
+          <ChevronDown className="text-faint-foreground h-4 w-4" />
         ) : (
-          <ChevronRight className="h-4 w-4 text-faint-foreground" />
+          <ChevronRight className="text-faint-foreground h-4 w-4" />
         )}
       </button>
 
       {open && (
-        <div className="border-t border-border-soft px-5">
+        <div className="border-border-soft border-t px-5">
           {rows.map((s) => (
             <SettingRowItem key={s.key} setting={s} onRefresh={onRefresh} />
           ))}
@@ -267,12 +263,12 @@ export function SiteSettingsTab({ settings, errorMsg, onRefresh }: SiteSettingsT
       )}
 
       {settings.length === 0 && !errorMsg ? (
-        <div className="rounded-xl border border-border-soft bg-card p-12 text-center text-sm text-faint-foreground">
+        <div className="border-border-soft bg-card text-faint-foreground rounded-xl border p-12 text-center text-sm">
           Tidak ada data settings di database.
         </div>
       ) : (
         <div className="space-y-3">
-          <p className="text-xs text-faint-foreground">
+          <p className="text-faint-foreground text-xs">
             {settings.length} pengaturan ditemukan. Arahkan kursor ke baris untuk mengedit.
           </p>
           {allKeys.map((groupKey) => (

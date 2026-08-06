@@ -39,7 +39,7 @@ export function InventoryTable({ inventory, hideActions = false }: InventoryTabl
 
   return (
     <>
-      <div className="w-full overflow-x-auto rounded-xl border border-border bg-card">
+      <div className="border-border bg-card w-full overflow-x-auto rounded-xl border">
         <table className="w-full table-fixed text-left text-[13px] whitespace-nowrap">
           <thead className="border-b border-blue-700 bg-blue-600">
             <tr>
@@ -91,16 +91,16 @@ export function InventoryTable({ inventory, hideActions = false }: InventoryTabl
               )}
             </tr>
           </thead>
-          <tbody className="divide-y divide-border-soft">
+          <tbody className="divide-border-soft divide-y">
             {inventory && inventory.length > 0 ? (
               inventory.map((item: InventoryItemWithGame) => (
                 <Fragment key={item.id}>
                   <tr
                     onClick={() => setExpandedRowId(expandedRowId === item.id ? null : item.id)}
-                    className={`group cursor-pointer transition-colors hover:bg-muted/50 ${expandedRowId === item.id ? "bg-muted/50" : ""}`}
+                    className={`group hover:bg-muted/50 cursor-pointer transition-colors ${expandedRowId === item.id ? "bg-muted/50" : ""}`}
                   >
                     <td
-                      className="truncate px-3 py-2 font-medium text-foreground"
+                      className="text-foreground truncate px-3 py-2 font-medium"
                       title={item.title_reference ?? undefined}
                     >
                       {item.title_reference}
@@ -114,7 +114,7 @@ export function InventoryTable({ inventory, hideActions = false }: InventoryTabl
                       </span>
                     </td>
                     <td
-                      className="truncate px-3 py-2 text-muted-foreground"
+                      className="text-muted-foreground truncate px-3 py-2"
                       title={formatCurrency(item.asking_price)}
                     >
                       {formatCurrency(item.asking_price)}
@@ -130,7 +130,7 @@ export function InventoryTable({ inventory, hideActions = false }: InventoryTabl
                     <td className="truncate px-3 py-2">
                       <StatusBadge status={item.status} />
                     </td>
-                    <td className="truncate px-3 py-2 text-muted-foreground">
+                    <td className="text-muted-foreground truncate px-3 py-2">
                       {hideActions && item.sold_at
                         ? formatDate(item.sold_at)
                         : formatDate(item.created_at)}
@@ -163,45 +163,47 @@ export function InventoryTable({ inventory, hideActions = false }: InventoryTabl
                             <span className="text-[11px] font-medium">Tandai Laku</span>
                           </button>
                         )}
-                        <button className="rounded-[10px] p-2 text-faint-foreground transition-colors hover:bg-muted hover:text-muted-foreground">
+                        <button className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-[10px] p-2 transition-colors">
                           <MoreHorizontal className="h-4 w-4" />
                         </button>
                       </td>
                     )}
                   </tr>
                   {expandedRowId === item.id && (
-                    <tr className="border-b border-border-soft/50 bg-muted/50">
+                    <tr className="border-border-soft/50 bg-muted/50 border-b">
                       <td colSpan={columnCount} className="px-4 py-4 whitespace-normal">
-                        <div className="grid grid-cols-1 gap-4 rounded-lg border border-border bg-card p-4 text-[13px] shadow-sm md:grid-cols-2">
+                        <div className="border-border bg-card grid grid-cols-1 gap-4 rounded-lg border p-4 text-[13px] shadow-sm md:grid-cols-2">
                           <div>
-                            <span className="mb-1 block text-[11px] font-semibold tracking-wide text-faint-foreground uppercase">
+                            <span className="text-faint-foreground mb-1 block text-[11px] font-semibold tracking-wide uppercase">
                               Detail Referensi & Game
                             </span>
-                            <p className="mb-0.5 font-medium text-foreground">
+                            <p className="text-foreground mb-0.5 font-medium">
                               {item.title_reference}
                             </p>
-                            <p className="text-muted-foreground">{item.games?.name || "Unknown Game"}</p>
+                            <p className="text-muted-foreground">
+                              {item.games?.name || "Unknown Game"}
+                            </p>
                           </div>
                           <div>
-                            <span className="mb-1 block text-[11px] font-semibold tracking-wide text-faint-foreground uppercase">
+                            <span className="text-faint-foreground mb-1 block text-[11px] font-semibold tracking-wide uppercase">
                               Status Transaksi
                             </span>
                             <p className="text-foreground">
-                              <span className="font-medium text-foreground">Dibuat:</span>{" "}
+                              <span className="text-foreground font-medium">Dibuat:</span>{" "}
                               {formatDate(item.created_at)}
                             </p>
                             {item.sold_at && (
-                              <p className="mt-0.5 text-foreground">
-                                <span className="font-medium text-foreground">Terjual:</span>{" "}
+                              <p className="text-foreground mt-0.5">
+                                <span className="text-foreground font-medium">Terjual:</span>{" "}
                                 {formatDate(item.sold_at)}
                               </p>
                             )}
-                            <p className="mt-0.5 text-foreground">
-                              <span className="font-medium text-foreground">Target Jual:</span>{" "}
+                            <p className="text-foreground mt-0.5">
+                              <span className="text-foreground font-medium">Target Jual:</span>{" "}
                               {formatCurrency(item.asking_price)}
                             </p>
                             {item.sold_price && (
-                              <p className="mt-0.5 text-foreground">
+                              <p className="text-foreground mt-0.5">
                                 <span className="font-medium text-emerald-600">
                                   Harga Laku: {formatCurrency(item.sold_price)}
                                 </span>
@@ -216,7 +218,10 @@ export function InventoryTable({ inventory, hideActions = false }: InventoryTabl
               ))
             ) : (
               <tr>
-                <td colSpan={columnCount} className="px-4 py-12 text-center text-sm text-muted-foreground">
+                <td
+                  colSpan={columnCount}
+                  className="text-muted-foreground px-4 py-12 text-center text-sm"
+                >
                   Belum ada data akun di sini.
                 </td>
               </tr>

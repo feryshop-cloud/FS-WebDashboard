@@ -54,19 +54,19 @@ export function CaptionGeneratorModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm">
-      <div className="animate-in fade-in zoom-in-95 flex w-full max-w-lg flex-col overflow-hidden rounded-[10px] border border-border bg-card duration-200">
-        <div className="flex items-center justify-between border-b border-border bg-muted/50 p-6">
-          <h2 className="text-lg font-semibold text-foreground">Buat Caption</h2>
+      <div className="animate-in fade-in zoom-in-95 border-border bg-card flex w-full max-w-lg flex-col overflow-hidden rounded-[10px] border duration-200">
+        <div className="border-border bg-muted/50 flex items-center justify-between border-b p-6">
+          <h2 className="text-foreground text-lg font-semibold">Buat Caption</h2>
           <button
             onClick={handleClose}
-            className="rounded-[10px] p-1.5 text-faint-foreground transition-colors hover:bg-muted hover:text-muted-foreground"
+            className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-[10px] p-1.5 transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
         <div className="flex-1 space-y-6 overflow-auto p-6">
-          <div className="rounded-[10px] border border-border bg-muted p-5 text-sm leading-relaxed font-normal whitespace-pre-wrap text-foreground">
+          <div className="border-border bg-muted text-foreground rounded-[10px] border p-5 text-sm leading-relaxed font-normal whitespace-pre-wrap">
             {captionText}
           </div>
 
@@ -84,8 +84,8 @@ export function CaptionGeneratorModal({
                 <Check className="h-10 w-10 rounded-[10px] bg-blue-100 p-2" />
               </div>
               <div>
-                <p className="font-semibold text-foreground">Caption disalin!</p>
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p className="text-foreground font-semibold">Caption disalin!</p>
+                <p className="text-muted-foreground mt-1 text-sm">
                   Apakah kamu ingin menandai akun ini sebagai SIAP JUAL (AVAILABLE)?
                 </p>
               </div>
@@ -93,7 +93,7 @@ export function CaptionGeneratorModal({
                 <button
                   onClick={handleClose}
                   disabled={isUpdating}
-                  className="flex-1 rounded-[10px] border border-border bg-card py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+                  className="border-border bg-card text-foreground hover:bg-muted flex-1 rounded-[10px] border py-2.5 text-sm font-medium transition-colors disabled:opacity-50"
                 >
                   Tidak, Tetap Belum Posting
                 </button>

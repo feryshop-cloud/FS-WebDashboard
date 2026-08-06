@@ -146,13 +146,13 @@ export default function PurchasesPage() {
       {/* Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Pembelian Stok</h1>
-          <p className="mt-0.5 text-sm text-muted-foreground">
+          <h1 className="text-foreground text-2xl font-bold tracking-tight">Pembelian Stok</h1>
+          <p className="text-muted-foreground mt-0.5 text-sm">
             Catat setiap pembelian akun dari penjual, harga modal, dan kewajiban pembayaran.
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-muted hover:text-foreground">
+          <button className="border-border bg-card text-foreground hover:bg-muted hover:text-foreground inline-flex items-center justify-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium shadow-sm transition-colors">
             <Download className="h-4 w-4" />
             Export Data
           </button>
@@ -170,43 +170,43 @@ export default function PurchasesPage() {
       </div>
 
       {/* Action Bar */}
-      <div className="flex flex-col items-center justify-between gap-4 rounded-xl border border-border-soft bg-card p-4 shadow-sm sm:flex-row">
+      <div className="border-border-soft bg-card flex flex-col items-center justify-between gap-4 rounded-xl border p-4 shadow-sm sm:flex-row">
         <div className="relative w-full sm:w-96">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <Search className="h-4 w-4 text-faint-foreground" />
+            <Search className="text-faint-foreground h-4 w-4" />
           </div>
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="block w-full rounded-lg border border-border bg-muted py-2 pr-3 pl-10 text-foreground placeholder-slate-400 transition-all outline-none focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className="border-border bg-muted text-foreground block w-full rounded-lg border py-2 pr-3 pl-10 placeholder-slate-400 transition-all outline-none focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             placeholder="Cari ID pembelian, item, atau supplier..."
           />
         </div>
         <div className="relative flex w-full items-center gap-3 sm:w-auto">
           <button
             onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
-            className="inline-flex w-full min-w-[160px] items-center justify-between gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-muted sm:w-auto"
+            className="border-border bg-card text-foreground hover:bg-muted inline-flex w-full min-w-[160px] items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm font-medium sm:w-auto"
           >
             <span className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-faint-foreground" />
+              <Filter className="text-faint-foreground h-4 w-4" />
               <span>
                 {statusFilter === "ALL" && "Semua Status"}
                 {statusFilter === "LUNAS" && "Lunas"}
                 {statusFilter === "PENDING" && "Pending"}
               </span>
             </span>
-            <ChevronDown className="h-4 w-4 text-faint-foreground" />
+            <ChevronDown className="text-faint-foreground h-4 w-4" />
           </button>
 
           {isFilterDropdownOpen && (
-            <div className="absolute top-full right-0 z-10 mt-2 w-48 rounded-xl border border-border-soft bg-card py-1 shadow-lg">
+            <div className="border-border-soft bg-card absolute top-full right-0 z-10 mt-2 w-48 rounded-xl border py-1 shadow-lg">
               <button
                 onClick={() => {
                   setStatusFilter("ALL");
                   setIsFilterDropdownOpen(false);
                 }}
-                className="w-full px-4 py-2 text-left text-sm font-medium text-foreground hover:bg-muted"
+                className="text-foreground hover:bg-muted w-full px-4 py-2 text-left text-sm font-medium"
               >
                 Semua Status
               </button>
@@ -215,7 +215,7 @@ export default function PurchasesPage() {
                   setStatusFilter("LUNAS");
                   setIsFilterDropdownOpen(false);
                 }}
-                className="w-full px-4 py-2 text-left text-sm font-medium text-foreground hover:bg-muted"
+                className="text-foreground hover:bg-muted w-full px-4 py-2 text-left text-sm font-medium"
               >
                 Lunas
               </button>
@@ -224,7 +224,7 @@ export default function PurchasesPage() {
                   setStatusFilter("PENDING");
                   setIsFilterDropdownOpen(false);
                 }}
-                className="w-full px-4 py-2 text-left text-sm font-medium text-foreground hover:bg-muted"
+                className="text-foreground hover:bg-muted w-full px-4 py-2 text-left text-sm font-medium"
               >
                 Pending
               </button>
@@ -234,56 +234,56 @@ export default function PurchasesPage() {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-xl border border-border-soft bg-card shadow-sm">
+      <div className="border-border-soft bg-card overflow-hidden rounded-xl border shadow-sm">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-border">
+          <table className="divide-border min-w-full divide-y">
             <thead className="bg-muted/80">
               <tr>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                  className="text-muted-foreground px-6 py-4 text-left text-xs font-semibold tracking-wider uppercase"
                 >
                   Tgl & ID Pembelian
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                  className="text-muted-foreground px-6 py-4 text-left text-xs font-semibold tracking-wider uppercase"
                 >
                   Item / Akun
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                  className="text-muted-foreground px-6 py-4 text-left text-xs font-semibold tracking-wider uppercase"
                 >
                   Supplier
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-right text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                  className="text-muted-foreground px-6 py-4 text-right text-xs font-semibold tracking-wider uppercase"
                 >
                   Harga Modal
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-center text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                  className="text-muted-foreground px-6 py-4 text-center text-xs font-semibold tracking-wider uppercase"
                 >
                   Metode Pembayaran
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-center text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                  className="text-muted-foreground px-6 py-4 text-center text-xs font-semibold tracking-wider uppercase"
                 >
                   Status Pembayaran
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 text-center text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                  className="text-muted-foreground px-6 py-4 text-center text-xs font-semibold tracking-wider uppercase"
                 >
                   Aksi
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border-soft bg-card">
+            <tbody className="divide-border-soft bg-card divide-y">
               {isLoading ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-12 text-center">
@@ -292,7 +292,7 @@ export default function PurchasesPage() {
                 </tr>
               ) : filteredPurchases.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center text-sm text-muted-foreground">
+                  <td colSpan={7} className="text-muted-foreground px-6 py-8 text-center text-sm">
                     Belum ada data pembelian stok.
                   </td>
                 </tr>
@@ -304,10 +304,10 @@ export default function PurchasesPage() {
                     : "bg-orange-50 text-orange-600 border-orange-100";
 
                   return (
-                    <tr key={purchase.id} className="group transition-colors hover:bg-muted/50">
-                      <td className="px-6 py-4 text-sm whitespace-nowrap text-muted-foreground">
+                    <tr key={purchase.id} className="group hover:bg-muted/50 transition-colors">
+                      <td className="text-muted-foreground px-6 py-4 text-sm whitespace-nowrap">
                         <div className="flex flex-col">
-                          <span className="font-semibold text-foreground">
+                          <span className="text-foreground font-semibold">
                             {purchase.sku || "N/A"}
                           </span>
                           <span className="mt-0.5 text-[10px]">
@@ -315,23 +315,23 @@ export default function PurchasesPage() {
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-foreground">
+                      <td className="text-foreground px-6 py-4 text-sm">
                         <div className="flex flex-col">
-                          <span className="block max-w-[240px] truncate font-semibold text-foreground">
+                          <span className="text-foreground block max-w-[240px] truncate font-semibold">
                             {purchase.name}
                           </span>
-                          <span className="mt-0.5 text-[10px] text-faint-foreground">
+                          <span className="text-faint-foreground mt-0.5 text-[10px]">
                             {purchase.category}
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm font-medium whitespace-nowrap text-muted-foreground">
+                      <td className="text-muted-foreground px-6 py-4 text-sm font-medium whitespace-nowrap">
                         {purchase.seller_info || "-"}
                       </td>
-                      <td className="px-6 py-4 text-right text-sm font-bold whitespace-nowrap text-foreground">
+                      <td className="text-foreground px-6 py-4 text-right text-sm font-bold whitespace-nowrap">
                         {formatRupiah(purchase.capital_price ?? 0)}
                       </td>
-                      <td className="px-6 py-4 text-center text-sm font-medium whitespace-nowrap text-muted-foreground">
+                      <td className="text-muted-foreground px-6 py-4 text-center text-sm font-medium whitespace-nowrap">
                         {purchase.accounts?.name || "-"}
                       </td>
                       <td className="px-6 py-4 text-center whitespace-nowrap">
@@ -359,21 +359,21 @@ export default function PurchasesPage() {
         </div>
 
         {/* Pagination Info */}
-        <div className="flex items-center justify-between border-t border-border-soft bg-card px-6 py-4">
-          <div className="text-sm text-muted-foreground">
+        <div className="border-border-soft bg-card flex items-center justify-between border-t px-6 py-4">
+          <div className="text-muted-foreground text-sm">
             Menampilkan{" "}
-            <span className="font-semibold text-foreground">
+            <span className="text-foreground font-semibold">
               {filteredPurchases.length > 0 ? 1 : 0}
             </span>{" "}
-            - <span className="font-semibold text-foreground">{filteredPurchases.length}</span> dari{" "}
-            <span className="font-semibold text-foreground">{filteredPurchases.length}</span>{" "}
+            - <span className="text-foreground font-semibold">{filteredPurchases.length}</span> dari{" "}
+            <span className="text-foreground font-semibold">{filteredPurchases.length}</span>{" "}
             pembelian
           </div>
           <div className="flex gap-1">
-            <button className="cursor-not-allowed rounded-md border border-border px-3 py-1 text-sm text-faint-foreground">
+            <button className="border-border text-faint-foreground cursor-not-allowed rounded-md border px-3 py-1 text-sm">
               Sebelummnya
             </button>
-            <button className="rounded-md border border-border px-3 py-1 text-sm font-medium text-foreground hover:bg-muted">
+            <button className="border-border text-foreground hover:bg-muted rounded-md border px-3 py-1 text-sm font-medium">
               Selanjutnya
             </button>
           </div>
@@ -383,17 +383,17 @@ export default function PurchasesPage() {
       {/* Buat Pembelian Baru Modal (Slide-over Drawer) */}
       {isAddOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm">
-          <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-card shadow-2xl duration-300">
-            <div className="flex items-center justify-between border-b border-border-soft bg-muted px-6 py-5">
+          <div className="animate-in slide-in-from-right bg-card flex h-full w-full max-w-md flex-col shadow-2xl duration-300">
+            <div className="border-border-soft bg-muted flex items-center justify-between border-b px-6 py-5">
               <div>
-                <h2 className="text-lg font-bold text-foreground">Catat Pembelian Baru</h2>
-                <p className="mt-1 text-xs text-muted-foreground">
+                <h2 className="text-foreground text-lg font-bold">Catat Pembelian Baru</h2>
+                <p className="text-muted-foreground mt-1 text-xs">
                   Isi form transaksi pembelian akun dari penjual.
                 </p>
               </div>
               <button
                 onClick={() => setIsAddOpen(false)}
-                className="rounded-full bg-card p-2 text-faint-foreground shadow-sm transition-colors hover:text-muted-foreground"
+                className="bg-card text-faint-foreground hover:text-muted-foreground rounded-full p-2 shadow-sm transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -408,13 +408,13 @@ export default function PurchasesPage() {
                 )}
 
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-foreground">
+                  <label className="text-foreground mb-1 block text-sm font-medium">
                     Kategori Game
                   </label>
                   <select
                     name="category"
                     required
-                    className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   >
                     <option value="">-- Pilih Game --</option>
                     {games.map((game) => (
@@ -426,58 +426,58 @@ export default function PurchasesPage() {
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-foreground">
+                  <label className="text-foreground mb-1 block text-sm font-medium">
                     Nama Item / Akun
                   </label>
                   <input
                     name="name"
                     required
                     type="text"
-                    className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     placeholder="Mis. MLBB Mythic Glory 120 Skins"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-foreground">
+                    <label className="text-foreground mb-1 block text-sm font-medium">
                       Login Username/Email
                     </label>
                     <input
                       name="username"
                       type="text"
-                      className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                       placeholder="Username/email"
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-foreground">
+                    <label className="text-foreground mb-1 block text-sm font-medium">
                       Login Password
                     </label>
                     <input
                       name="password"
                       type="text"
-                      className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                       placeholder="Password"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-foreground">
+                  <label className="text-foreground mb-1 block text-sm font-medium">
                     Spek / Detail Akun
                   </label>
                   <textarea
                     name="account_details"
                     rows={2}
-                    className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     placeholder="Masukkan spesifikasi akun (heros, skins, winrate, dll)..."
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-foreground">
+                    <label className="text-foreground mb-1 block text-sm font-medium">
                       Harga Modal
                     </label>
                     <input
@@ -485,12 +485,12 @@ export default function PurchasesPage() {
                       required
                       type="number"
                       min="1"
-                      className="w-full rounded-lg border border-border px-3 py-2 text-sm font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      className="border-border w-full rounded-lg border px-3 py-2 text-sm font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
                       placeholder="Rp 0"
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-foreground">
+                    <label className="text-foreground mb-1 block text-sm font-medium">
                       Harga Post Jual
                     </label>
                     <input
@@ -498,7 +498,7 @@ export default function PurchasesPage() {
                       required
                       type="number"
                       min="1"
-                      className="w-full rounded-lg border border-border px-3 py-2 text-sm font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      className="border-border w-full rounded-lg border px-3 py-2 text-sm font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
                       placeholder="Rp 0"
                     />
                   </div>
@@ -506,18 +506,18 @@ export default function PurchasesPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-foreground">
+                    <label className="text-foreground mb-1 block text-sm font-medium">
                       Supplier / Penjual
                     </label>
                     <input
                       name="seller_info"
                       type="text"
-                      className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                       placeholder="Nama seller/supplier"
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-foreground">
+                    <label className="text-foreground mb-1 block text-sm font-medium">
                       Status Pembayaran
                     </label>
                     <select
@@ -525,7 +525,7 @@ export default function PurchasesPage() {
                       required
                       value={selectedStatus}
                       onChange={(e) => setSelectedStatus(e.target.value as "LUNAS" | "PENDING")}
-                      className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     >
                       <option value="LUNAS">Lunas</option>
                       <option value="PENDING">Pending</option>
@@ -535,13 +535,13 @@ export default function PurchasesPage() {
 
                 {selectedStatus === "LUNAS" && (
                   <div className="animate-in fade-in rounded-xl border border-blue-100 bg-blue-50/50 p-4 duration-200">
-                    <label className="mb-1 block text-xs font-semibold text-foreground">
+                    <label className="text-foreground mb-1 block text-xs font-semibold">
                       Sumber Rekening / Metode Pembayaran
                     </label>
                     <select
                       name="payment_account_id"
                       required
-                      className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      className="border-border bg-card w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     >
                       <option value="">-- Pilih Rekening Pembayaran --</option>
                       {accounts
@@ -556,19 +556,19 @@ export default function PurchasesPage() {
                 )}
 
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-foreground">
+                  <label className="text-foreground mb-1 block text-sm font-medium">
                     Catatan Internal (Opsional)
                   </label>
                   <textarea
                     name="internal_notes"
                     rows={2}
-                    className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     placeholder="Catatan tambahan untuk internal..."
                   />
                 </div>
               </div>
 
-              <div className="border-t border-border-soft bg-card p-6">
+              <div className="border-border-soft bg-card border-t p-6">
                 <button
                   type="submit"
                   disabled={isSubmitting}

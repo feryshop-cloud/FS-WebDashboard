@@ -103,15 +103,15 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Pengaturan Sistem</h1>
-          <p className="mt-0.5 text-sm text-muted-foreground">
+          <h1 className="text-foreground text-2xl font-bold tracking-tight">Pengaturan Sistem</h1>
+          <p className="text-muted-foreground mt-0.5 text-sm">
             Konfigurasi user, role & hak akses, master game, dan kategori Feryshop.
           </p>
         </div>
         <button
           onClick={loadData}
           disabled={isLoading}
-          className="inline-flex items-center gap-2 rounded-lg bg-muted px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+          className="bg-muted text-foreground hover:bg-muted inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
         >
           <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
           Refresh Data
@@ -177,7 +177,11 @@ export default function SettingsPage() {
           {activeTab === "site" && (
             <SiteSettingsTab
               settings={siteSettings}
-              errorMsg={siteSettingsError ? `Gagal memuat pengaturan situs: ${siteSettingsError}` : undefined}
+              errorMsg={
+                siteSettingsError
+                  ? `Gagal memuat pengaturan situs: ${siteSettingsError}`
+                  : undefined
+              }
               onRefresh={loadData}
             />
           )}

@@ -45,7 +45,7 @@ export function StockTable({ stocks, categories }: StockTableProps) {
         <div className="pointer-events-none absolute top-0 bottom-6 left-0 z-10 flex w-20 items-center justify-start bg-gradient-to-r from-gray-50 to-transparent">
           <button
             onClick={scrollLeft}
-            className="pointer-events-auto ml-1 flex h-8 w-8 items-center justify-center rounded-full border border-border-soft bg-card text-muted-foreground opacity-0 shadow-md transition-opacity group-hover:opacity-100 hover:bg-muted"
+            className="border-border-soft bg-card text-muted-foreground hover:bg-muted pointer-events-auto ml-1 flex h-8 w-8 items-center justify-center rounded-full border opacity-0 shadow-md transition-opacity group-hover:opacity-100"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
@@ -55,7 +55,7 @@ export function StockTable({ stocks, categories }: StockTableProps) {
         <div className="pointer-events-none absolute top-0 right-0 bottom-6 z-10 flex w-20 items-center justify-end bg-gradient-to-l from-gray-50 to-transparent">
           <button
             onClick={scrollRight}
-            className="pointer-events-auto mr-1 flex h-8 w-8 items-center justify-center rounded-full border border-border-soft bg-card text-muted-foreground opacity-0 shadow-md transition-opacity group-hover:opacity-100 hover:bg-muted"
+            className="border-border-soft bg-card text-muted-foreground hover:bg-muted pointer-events-auto mr-1 flex h-8 w-8 items-center justify-center rounded-full border opacity-0 shadow-md transition-opacity group-hover:opacity-100"
           >
             <ChevronRight className="h-5 w-5" />
           </button>
@@ -74,7 +74,7 @@ export function StockTable({ stocks, categories }: StockTableProps) {
                 className="group/item flex w-[88px] shrink-0 cursor-pointer flex-col items-center"
               >
                 <div
-                  className={`relative h-20 w-20 overflow-hidden rounded-2xl border bg-muted shadow-sm transition-all duration-300 ${
+                  className={`bg-muted relative h-20 w-20 overflow-hidden rounded-2xl border shadow-sm transition-all duration-300 ${
                     isSelected
                       ? "border-transparent opacity-100 ring-2 ring-blue-600 ring-offset-2"
                       : "border-border opacity-50 group-hover/item:border-blue-300 group-hover/item:opacity-100"
@@ -88,7 +88,7 @@ export function StockTable({ stocks, categories }: StockTableProps) {
                       className="object-cover"
                     />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-muted text-faint-foreground">
+                    <div className="bg-muted text-faint-foreground flex h-full w-full items-center justify-center">
                       <span className="text-xs font-medium">
                         {category.name === "Semua" ? "All" : "No Img"}
                       </span>
@@ -97,7 +97,9 @@ export function StockTable({ stocks, categories }: StockTableProps) {
                 </div>
                 <p
                   className={`mt-2.5 w-full truncate px-1 text-center text-xs font-medium tracking-tight transition-colors ${
-                    isSelected ? "text-blue-700" : "text-muted-foreground group-hover/item:text-blue-600"
+                    isSelected
+                      ? "text-blue-700"
+                      : "text-muted-foreground group-hover/item:text-blue-600"
                   }`}
                 >
                   {category.name}
@@ -108,38 +110,38 @@ export function StockTable({ stocks, categories }: StockTableProps) {
         </div>
       </div>
 
-      <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-xl border border-border bg-card">
+      <div className="border-border bg-card flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-xl border">
         <div className="flex-1 [scrollbar-width:none] overflow-y-auto [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           <table className="w-full table-fixed whitespace-nowrap">
-            <thead className="sticky top-0 z-10 border-b border-border bg-muted">
+            <thead className="border-border bg-muted sticky top-0 z-10 border-b">
               <tr>
-                <th className="w-40 px-4 py-3 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                <th className="text-muted-foreground w-40 px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase">
                   Kode Stok
                 </th>
-                <th className="w-32 px-4 py-3 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                <th className="text-muted-foreground w-32 px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase">
                   Kategori
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                <th className="text-muted-foreground px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase">
                   Detail (Login)
                 </th>
-                <th className="w-48 px-4 py-3 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                <th className="text-muted-foreground w-48 px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase">
                   Harga
                 </th>
-                <th className="w-32 px-4 py-3 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                <th className="text-muted-foreground w-32 px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase">
                   Status
                 </th>
-                <th className="w-28 px-4 py-3 text-right text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                <th className="text-muted-foreground w-28 px-4 py-3 text-right text-xs font-semibold tracking-wider uppercase">
                   Aksi
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border-soft">
+            <tbody className="divide-border-soft divide-y">
               {filteredStocks.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-4 py-16 text-center">
                     <div className="flex flex-col items-center justify-center">
-                      <Inbox className="mb-3 h-10 w-10 stroke-[1.5] text-faint-foreground" />
-                      <span className="text-sm text-muted-foreground">
+                      <Inbox className="text-faint-foreground mb-3 h-10 w-10 stroke-[1.5]" />
+                      <span className="text-muted-foreground text-sm">
                         Tidak ada stok akun ditemukan untuk &quot;{activeGame}&quot;.
                       </span>
                     </div>
@@ -150,10 +152,10 @@ export function StockTable({ stocks, categories }: StockTableProps) {
                   <Fragment key={stock.id}>
                     <tr
                       onClick={() => setExpandedRowId(expandedRowId === stock.id ? null : stock.id)}
-                      className={`group cursor-pointer transition-colors hover:bg-muted/50 ${expandedRowId === stock.id ? "bg-muted" : ""}`}
+                      className={`group hover:bg-muted/50 cursor-pointer transition-colors ${expandedRowId === stock.id ? "bg-muted" : ""}`}
                     >
                       <td
-                        className="truncate px-4 py-3 text-[13px] font-semibold text-foreground"
+                        className="text-foreground truncate px-4 py-3 text-[13px] font-semibold"
                         title={stock.name}
                       >
                         {stock.name}
@@ -171,26 +173,26 @@ export function StockTable({ stocks, categories }: StockTableProps) {
                         title={`${stock.username || "-"} (${stock.account_details || "-"})`}
                       >
                         <div className="flex items-center gap-1.5 truncate">
-                          <span className="truncate font-medium text-foreground">
+                          <span className="text-foreground truncate font-medium">
                             {stock.username || "-"}
                           </span>
-                          <span className="truncate text-[11px] text-faint-foreground">
+                          <span className="text-faint-foreground truncate text-[11px]">
                             ({stock.account_details || "-"})
                           </span>
                         </div>
                       </td>
                       <td
-                        className="truncate px-4 py-3 text-[13px] text-foreground"
+                        className="text-foreground truncate px-4 py-3 text-[13px]"
                         title={`${formatRupiah(stock.current_price)} (Modal: ${formatRupiah(stock.capital_price)})`}
                       >
                         <span className="truncate font-semibold">
                           {formatRupiah(stock.current_price)}
                         </span>
-                        <span className="ml-1.5 truncate text-[11px] text-faint-foreground">
+                        <span className="text-faint-foreground ml-1.5 truncate text-[11px]">
                           Modal: {formatRupiah(stock.capital_price)}
                         </span>
                       </td>
-                      <td className="truncate px-4 py-3 text-[13px] text-muted-foreground">
+                      <td className="text-muted-foreground truncate px-4 py-3 text-[13px]">
                         <StatusBadge status={stock.status} />
                       </td>
                       <td
@@ -201,39 +203,39 @@ export function StockTable({ stocks, categories }: StockTableProps) {
                       </td>
                     </tr>
                     {expandedRowId === stock.id && (
-                      <tr className="border-b border-border-soft/50 bg-muted/50">
+                      <tr className="border-border-soft/50 bg-muted/50 border-b">
                         <td colSpan={6} className="px-4 py-4 whitespace-normal">
-                          <div className="grid grid-cols-1 gap-4 rounded-lg border border-border bg-card p-4 text-[13px] shadow-sm md:grid-cols-3">
+                          <div className="border-border bg-card grid grid-cols-1 gap-4 rounded-lg border p-4 text-[13px] shadow-sm md:grid-cols-3">
                             <div>
-                              <span className="mb-1 block text-[11px] font-semibold tracking-wide text-faint-foreground uppercase">
+                              <span className="text-faint-foreground mb-1 block text-[11px] font-semibold tracking-wide uppercase">
                                 Detail Akun
                               </span>
-                              <p className="mb-0.5 font-medium text-foreground">{stock.name}</p>
+                              <p className="text-foreground mb-0.5 font-medium">{stock.name}</p>
                               <p className="text-muted-foreground">{stock.category}</p>
                             </div>
                             <div>
-                              <span className="mb-1 block text-[11px] font-semibold tracking-wide text-faint-foreground uppercase">
+                              <span className="text-faint-foreground mb-1 block text-[11px] font-semibold tracking-wide uppercase">
                                 Kredensial Login
                               </span>
                               <p className="text-foreground">
-                                <span className="font-medium text-foreground">User:</span>{" "}
+                                <span className="text-foreground font-medium">User:</span>{" "}
                                 {stock.username || "-"}
                               </p>
-                              <p className="mt-0.5 text-foreground">
-                                <span className="font-medium text-foreground">Info:</span>{" "}
+                              <p className="text-foreground mt-0.5">
+                                <span className="text-foreground font-medium">Info:</span>{" "}
                                 {stock.account_details || "-"}
                               </p>
                             </div>
                             <div>
-                              <span className="mb-1 block text-[11px] font-semibold tracking-wide text-faint-foreground uppercase">
+                              <span className="text-faint-foreground mb-1 block text-[11px] font-semibold tracking-wide uppercase">
                                 Informasi Harga
                               </span>
                               <p className="text-foreground">
-                                <span className="font-medium text-foreground">Harga Modal:</span>{" "}
+                                <span className="text-foreground font-medium">Harga Modal:</span>{" "}
                                 {formatRupiah(stock.capital_price)}
                               </p>
-                              <p className="mt-0.5 text-foreground">
-                                <span className="font-medium text-foreground">Harga Jual:</span>{" "}
+                              <p className="text-foreground mt-0.5">
+                                <span className="text-foreground font-medium">Harga Jual:</span>{" "}
                                 {formatRupiah(stock.current_price)}
                               </p>
                             </div>

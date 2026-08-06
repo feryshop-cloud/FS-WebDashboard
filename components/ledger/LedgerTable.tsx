@@ -77,14 +77,14 @@ export function LedgerTable({ entries }: LedgerTableProps) {
         </div>
       );
     return (
-      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-muted text-muted-foreground shadow-sm">
+      <div className="bg-muted text-muted-foreground flex h-7 w-7 items-center justify-center rounded-full shadow-sm">
         <Wallet className="h-3.5 w-3.5" />
       </div>
     );
   };
 
   return (
-    <div className="w-full overflow-x-auto rounded-xl border border-border bg-card">
+    <div className="border-border bg-card w-full overflow-x-auto rounded-xl border">
       <table className="w-full table-fixed whitespace-nowrap">
         <thead className="border-b border-blue-700 bg-blue-600">
           <tr>
@@ -111,13 +111,13 @@ export function LedgerTable({ entries }: LedgerTableProps) {
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-border-soft">
+        <tbody className="divide-border-soft divide-y">
           {entries.length === 0 ? (
             <tr>
-              <td colSpan={7} className="px-4 py-12 text-center text-sm text-muted-foreground">
+              <td colSpan={7} className="text-muted-foreground px-4 py-12 text-center text-sm">
                 <div className="flex flex-col items-center justify-center">
-                  <span className="mb-2 text-2xl text-faint-foreground">📊</span>
-                  <span className="font-semibold text-foreground">Belum ada catatan transaksi</span>
+                  <span className="text-faint-foreground mb-2 text-2xl">📊</span>
+                  <span className="text-foreground font-semibold">Belum ada catatan transaksi</span>
                 </div>
               </td>
             </tr>
@@ -130,13 +130,13 @@ export function LedgerTable({ entries }: LedgerTableProps) {
                 <Fragment key={entry.id}>
                   <tr
                     onClick={() => setExpandedRowId(expandedRowId === entry.id ? null : entry.id)}
-                    className={`group cursor-pointer transition-colors hover:bg-muted/50 ${expandedRowId === entry.id ? "bg-muted/50" : ""}`}
+                    className={`group hover:bg-muted/50 cursor-pointer transition-colors ${expandedRowId === entry.id ? "bg-muted/50" : ""}`}
                   >
-                    <td className="truncate px-3 py-2 text-center text-[13px] text-muted-foreground">
+                    <td className="text-muted-foreground truncate px-3 py-2 text-center text-[13px]">
                       {index + 1}
                     </td>
                     <td
-                      className="truncate px-3 py-2 text-[13px] text-muted-foreground"
+                      className="text-muted-foreground truncate px-3 py-2 text-[13px]"
                       title={formattedDate}
                     >
                       {formattedDate}
@@ -156,11 +156,11 @@ export function LedgerTable({ entries }: LedgerTableProps) {
                         {getAccountIcon(entry.account)}
                       </div>
                     </td>
-                    <td className="truncate px-3 py-2 text-[13px] font-semibold tracking-tight text-foreground">
+                    <td className="text-foreground truncate px-3 py-2 text-[13px] font-semibold tracking-tight">
                       {isPositive ? "+" : ""} {formatRupiah(Number(entry.amount))}
                     </td>
                     <td
-                      className="truncate px-3 py-2 text-[13px] text-muted-foreground"
+                      className="text-muted-foreground truncate px-3 py-2 text-[13px]"
                       title={entry.description || ""}
                     >
                       {entry.description || "-"}
@@ -170,20 +170,20 @@ export function LedgerTable({ entries }: LedgerTableProps) {
                         className="flex flex-row items-center justify-end gap-1.5"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <button className="flex h-8 w-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+                        <button className="border-border text-muted-foreground hover:bg-muted hover:text-foreground flex h-8 w-8 items-center justify-center rounded-md border transition-colors">
                           <Edit2 className="h-4 w-4" />
                         </button>
-                        <button className="flex h-8 w-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600">
+                        <button className="border-border text-muted-foreground flex h-8 w-8 items-center justify-center rounded-md border transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600">
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
                     </td>
                   </tr>
                   {expandedRowId === entry.id && (
-                    <tr className="border-b border-border-soft/50 bg-muted/50">
+                    <tr className="border-border-soft/50 bg-muted/50 border-b">
                       <td colSpan={7} className="px-4 py-4 whitespace-normal">
-                        <div className="rounded-lg border border-border bg-card p-4 text-[13px] text-foreground shadow-sm">
-                          <span className="mb-1 block text-[11px] font-semibold tracking-wide text-faint-foreground uppercase">
+                        <div className="border-border bg-card text-foreground rounded-lg border p-4 text-[13px] shadow-sm">
+                          <span className="text-faint-foreground mb-1 block text-[11px] font-semibold tracking-wide uppercase">
                             Catatan Lengkap
                           </span>
                           <p className="leading-relaxed whitespace-pre-wrap">

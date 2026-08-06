@@ -69,8 +69,8 @@ interface CustomTooltipProps {
 const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     return (
-      <div className="rounded-[10px] border border-border bg-card p-4">
-        <p className="mb-2 text-sm font-medium text-muted-foreground">{label}</p>
+      <div className="border-border bg-card rounded-[10px] border p-4">
+        <p className="text-muted-foreground mb-2 text-sm font-medium">{label}</p>
         <div className="space-y-1">
           {payload.map((entry: TooltipPayloadItem, index: number) => (
             <div key={index} className="flex items-center gap-2">
@@ -78,8 +78,8 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
                 className="h-2.5 w-2.5 rounded-[10px]"
                 style={{ backgroundColor: entry.color || entry.payload?.fill }}
               />
-              <span className="text-sm font-semibold text-foreground">{entry.name}:</span>
-              <span className="text-sm font-bold text-foreground">
+              <span className="text-foreground text-sm font-semibold">{entry.name}:</span>
+              <span className="text-foreground text-sm font-bold">
                 {entry.name === "Revenue" || entry.name === "Profit"
                   ? new Intl.NumberFormat("id-ID", {
                       style: "currency",
@@ -107,11 +107,11 @@ export function AnalyticsCharts({ revenueData, gameDistributionData }: Analytics
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
       {/* Column 1: Revenue Trends (Spans 2 columns on large screens) */}
-      <div className="rounded-[10px] border border-border bg-card p-6 md:p-8 lg:col-span-2">
+      <div className="border-border bg-card rounded-[10px] border p-6 md:p-8 lg:col-span-2">
         <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div>
-            <h3 className="text-lg font-semibold text-foreground">Tren Pendapatan & Profit</h3>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <h3 className="text-foreground text-lg font-semibold">Tren Pendapatan & Profit</h3>
+            <p className="text-muted-foreground mt-1 text-sm">
               {isRevenueEmpty
                 ? "Belum ada transaksi pada periode ini"
                 : "Pendapatan harian dan tren profit"}
@@ -130,9 +130,11 @@ export function AnalyticsCharts({ revenueData, gameDistributionData }: Analytics
         </div>
 
         {isRevenueEmpty ? (
-          <div className="flex h-[350px] w-full flex-col items-center justify-center rounded-lg border border-dashed border-border bg-muted/50 p-6 text-center">
-            <p className="text-sm font-semibold text-muted-foreground">Belum ada grafik transaksi</p>
-            <p className="mt-1 text-xs text-faint-foreground">
+          <div className="border-border bg-muted/50 flex h-[350px] w-full flex-col items-center justify-center rounded-lg border border-dashed p-6 text-center">
+            <p className="text-muted-foreground text-sm font-semibold">
+              Belum ada grafik transaksi
+            </p>
+            <p className="text-faint-foreground mt-1 text-xs">
               Data tren akan muncul secara otomatis setelah ada transaksi jual-beli terdata.
             </p>
           </div>
@@ -195,16 +197,16 @@ export function AnalyticsCharts({ revenueData, gameDistributionData }: Analytics
       </div>
 
       {/* Column 2: Game Sales Bar Chart */}
-      <div className="rounded-[10px] border border-border bg-card p-6 md:p-8">
+      <div className="border-border bg-card rounded-[10px] border p-6 md:p-8">
         <div className="mb-8">
-          <h3 className="text-lg font-semibold text-foreground">Total Penjualan per Game</h3>
-          <p className="mt-1 text-sm text-muted-foreground">Volume akun terjual</p>
+          <h3 className="text-foreground text-lg font-semibold">Total Penjualan per Game</h3>
+          <p className="text-muted-foreground mt-1 text-sm">Volume akun terjual</p>
         </div>
 
         {isDistEmpty ? (
-          <div className="flex h-[300px] w-full flex-col items-center justify-center rounded-lg border border-dashed border-border bg-muted/50 p-6 text-center">
-            <p className="text-sm font-semibold text-muted-foreground">Belum ada penjualan</p>
-            <p className="mt-1 text-xs text-faint-foreground">
+          <div className="border-border bg-muted/50 flex h-[300px] w-full flex-col items-center justify-center rounded-lg border border-dashed p-6 text-center">
+            <p className="text-muted-foreground text-sm font-semibold">Belum ada penjualan</p>
+            <p className="text-faint-foreground mt-1 text-xs">
               Data volume penjualan per game belum tersedia.
             </p>
           </div>
@@ -239,16 +241,16 @@ export function AnalyticsCharts({ revenueData, gameDistributionData }: Analytics
       </div>
 
       {/* Column 3: Game Sales Distribution (Donut) */}
-      <div className="rounded-[10px] border border-border bg-card p-6 md:p-8">
+      <div className="border-border bg-card rounded-[10px] border p-6 md:p-8">
         <div className="mb-8">
-          <h3 className="text-lg font-semibold text-foreground">Distribusi Penjualan</h3>
-          <p className="mt-1 text-sm text-muted-foreground">Persentase berdasarkan game</p>
+          <h3 className="text-foreground text-lg font-semibold">Distribusi Penjualan</h3>
+          <p className="text-muted-foreground mt-1 text-sm">Persentase berdasarkan game</p>
         </div>
 
         {isDistEmpty ? (
-          <div className="flex h-[300px] w-full flex-col items-center justify-center rounded-lg border border-dashed border-border bg-muted/50 p-6 text-center">
-            <p className="text-sm font-semibold text-muted-foreground">Belum ada distribusi</p>
-            <p className="mt-1 text-xs text-faint-foreground">
+          <div className="border-border bg-muted/50 flex h-[300px] w-full flex-col items-center justify-center rounded-lg border border-dashed p-6 text-center">
+            <p className="text-muted-foreground text-sm font-semibold">Belum ada distribusi</p>
+            <p className="text-faint-foreground mt-1 text-xs">
               Persentase akan terhitung dari transaksi tercatat.
             </p>
           </div>

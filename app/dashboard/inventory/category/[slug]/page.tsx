@@ -45,7 +45,7 @@ export default async function GameCategoryPage({ params }: { params: Promise<{ s
       <div>
         <Link
           href="/dashboard/inventory"
-          className="inline-flex items-center space-x-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          className="text-muted-foreground hover:text-foreground inline-flex items-center space-x-2 text-sm font-medium transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           <span>Kembali</span>
@@ -55,10 +55,10 @@ export default async function GameCategoryPage({ params }: { params: Promise<{ s
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          <h1 className="text-foreground text-2xl font-bold tracking-tight">
             Stok Akun: {game.name}
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="text-muted-foreground mt-1 text-sm">
             Menampilkan {items.length} akun jualan untuk game ini.
           </p>
         </div>

@@ -153,24 +153,24 @@ export function GameManager({
           <Gamepad2 className="h-[18px] w-[18px]" strokeWidth={1.5} />
         </div>
         <div>
-          <h2 className="text-base font-bold text-foreground">Master Game</h2>
-          <p className="text-xs text-muted-foreground">
+          <h2 className="text-foreground text-base font-bold">Master Game</h2>
+          <p className="text-muted-foreground text-xs">
             Kelola daftar game dan konfigurasi field input order per game.
           </p>
         </div>
       </div>
 
       {/* Form — full width */}
-      <div className="overflow-hidden rounded-xl border border-border-soft bg-card shadow-sm">
-        <div className="flex items-center justify-between border-b border-border-soft bg-muted/50 px-5 py-3.5">
-          <h3 className="text-sm font-semibold text-foreground">
+      <div className="border-border-soft bg-card overflow-hidden rounded-xl border shadow-sm">
+        <div className="border-border-soft bg-muted/50 flex items-center justify-between border-b px-5 py-3.5">
+          <h3 className="text-foreground text-sm font-semibold">
             {editingId ? "Edit Game" : "Tambah Game"}
           </h3>
           {editingId && (
             <button
               type="button"
               onClick={resetForm}
-              className="rounded-[10px] p-1 text-faint-foreground hover:bg-muted hover:text-muted-foreground"
+              className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-[10px] p-1"
               title="Batal edit"
             >
               <X className="h-4 w-4" />
@@ -194,7 +194,7 @@ export function GameManager({
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <div className="space-y-1.5">
                 <label
-                  className="block text-xs font-semibold tracking-wide text-muted-foreground uppercase"
+                  className="text-muted-foreground block text-xs font-semibold tracking-wide uppercase"
                   htmlFor="game-name"
                 >
                   Nama Game
@@ -206,13 +206,13 @@ export function GameManager({
                   value={name}
                   onChange={handleNameChange}
                   placeholder="e.g. Mobile Legends"
-                  className="w-full rounded-[10px] border border-border bg-card px-3.5 py-2.5 text-sm text-foreground transition-colors placeholder:text-faint-foreground focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-none"
+                  className="border-border bg-card text-foreground placeholder:text-faint-foreground w-full rounded-[10px] border px-3.5 py-2.5 text-sm transition-colors focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-none"
                 />
               </div>
 
               <div className="space-y-1.5">
                 <label
-                  className="block text-xs font-semibold tracking-wide text-muted-foreground uppercase"
+                  className="text-muted-foreground block text-xs font-semibold tracking-wide uppercase"
                   htmlFor="game-slug"
                 >
                   Slug
@@ -224,7 +224,7 @@ export function GameManager({
                   value={slug}
                   onChange={(e) => setSlug(e.target.value)}
                   placeholder="mobile-legends"
-                  className="w-full rounded-[10px] border border-border bg-card px-3.5 py-2.5 font-mono text-sm text-foreground transition-colors placeholder:font-sans placeholder:text-faint-foreground focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-none"
+                  className="border-border bg-card text-foreground placeholder:text-faint-foreground w-full rounded-[10px] border px-3.5 py-2.5 font-mono text-sm transition-colors placeholder:font-sans focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-none"
                 />
               </div>
 
@@ -238,9 +238,9 @@ export function GameManager({
                         onChange={(e) => setIsActive(e.target.checked)}
                         className="peer sr-only"
                       />
-                      <div className="peer h-5 w-9 rounded-full bg-muted transition-colors peer-checked:bg-emerald-500 after:absolute after:top-[2px] after:left-[2px] after:h-4 after:w-4 after:rounded-full after:border after:border-input after:bg-card after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white" />
+                      <div className="peer bg-muted after:border-input after:bg-card h-5 w-9 rounded-full transition-colors peer-checked:bg-emerald-500 after:absolute after:top-[2px] after:left-[2px] after:h-4 after:w-4 after:rounded-full after:border after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white" />
                     </div>
-                    <span className="text-sm font-medium text-foreground">
+                    <span className="text-foreground text-sm font-medium">
                       {isActive ? "Aktif" : "Nonaktif"}
                     </span>
                   </label>
@@ -252,9 +252,9 @@ export function GameManager({
                         onChange={(e) => setIsPopular(e.target.checked)}
                         className="peer sr-only"
                       />
-                      <div className="peer h-5 w-9 rounded-full bg-muted transition-colors peer-checked:bg-amber-400 after:absolute after:top-[2px] after:left-[2px] after:h-4 after:w-4 after:rounded-full after:border after:border-input after:bg-card after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white" />
+                      <div className="peer bg-muted after:border-input after:bg-card h-5 w-9 rounded-full transition-colors peer-checked:bg-amber-400 after:absolute after:top-[2px] after:left-[2px] after:h-4 after:w-4 after:rounded-full after:border after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white" />
                     </div>
-                    <span className="text-sm font-medium text-foreground">
+                    <span className="text-foreground text-sm font-medium">
                       {isPopular ? "Populer" : "Tidak Populer"}
                     </span>
                   </label>
@@ -282,7 +282,7 @@ export function GameManager({
                       type="button"
                       onClick={resetForm}
                       disabled={isPending}
-                      className="inline-flex items-center justify-center rounded-[10px] bg-muted px-3 py-2.5 text-sm font-medium text-foreground transition-all hover:bg-muted"
+                      className="bg-muted text-foreground hover:bg-muted inline-flex items-center justify-center rounded-[10px] px-3 py-2.5 text-sm font-medium transition-all"
                     >
                       Batal
                     </button>
@@ -298,11 +298,11 @@ export function GameManager({
       </div>
 
       {/* List — full width below */}
-      <div className="overflow-hidden rounded-xl border border-border-soft bg-card shadow-sm">
-        <div className="flex items-center gap-2 border-b border-border-soft bg-muted/50 px-5 py-3.5">
-          <Gamepad2 className="h-4 w-4 text-faint-foreground" strokeWidth={1.5} />
-          <h3 className="text-sm font-semibold text-foreground">Daftar Game</h3>
-          <span className="ml-auto inline-flex items-center rounded-[10px] bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+      <div className="border-border-soft bg-card overflow-hidden rounded-xl border shadow-sm">
+        <div className="border-border-soft bg-muted/50 flex items-center gap-2 border-b px-5 py-3.5">
+          <Gamepad2 className="text-faint-foreground h-4 w-4" strokeWidth={1.5} />
+          <h3 className="text-foreground text-sm font-semibold">Daftar Game</h3>
+          <span className="bg-muted text-muted-foreground ml-auto inline-flex items-center rounded-[10px] px-2.5 py-0.5 text-xs font-medium">
             {games.length} Total
           </span>
         </div>
@@ -312,7 +312,7 @@ export function GameManager({
             <div className="bg-rose-50/50 p-6 text-sm text-rose-600">{errorMsg}</div>
           ) : games.length > 0 ? (
             <table className="w-full text-left text-sm">
-              <thead className="border-b border-border-soft bg-muted/70 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+              <thead className="border-border-soft bg-muted/70 text-muted-foreground border-b text-xs font-semibold tracking-wider uppercase">
                 <tr>
                   <th scope="col" className="px-5 py-3.5">
                     Nama Game
@@ -331,17 +331,17 @@ export function GameManager({
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border-soft text-muted-foreground">
+              <tbody className="divide-border-soft text-muted-foreground divide-y">
                 {games.map((game) => {
                   const fieldCount = parseFields(game.instructions).length;
                   return (
                     <tr
                       key={game.id}
-                      className={`transition-colors hover:bg-muted/50 ${!game.is_active ? "opacity-60" : ""}`}
+                      className={`hover:bg-muted/50 transition-colors ${!game.is_active ? "opacity-60" : ""}`}
                     >
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-2">
-                          <span className="font-medium text-foreground">{game.name}</span>
+                          <span className="text-foreground font-medium">{game.name}</span>
                           {game.is_popular && (
                             <Star
                               className="h-3.5 w-3.5 fill-amber-400 text-amber-400"
@@ -351,7 +351,7 @@ export function GameManager({
                         </div>
                       </td>
                       <td className="px-5 py-3.5">
-                        <span className="font-mono text-xs text-muted-foreground">{game.slug}</span>
+                        <span className="text-muted-foreground font-mono text-xs">{game.slug}</span>
                       </td>
                       <td className="px-5 py-3.5 text-center">
                         {fieldCount > 0 ? (
@@ -359,7 +359,7 @@ export function GameManager({
                             {fieldCount} field
                           </span>
                         ) : (
-                          <span className="text-xs text-faint-foreground">—</span>
+                          <span className="text-faint-foreground text-xs">—</span>
                         )}
                       </td>
                       <td className="px-5 py-3.5 text-center">
@@ -376,8 +376,8 @@ export function GameManager({
                               <Power className="h-3 w-3 text-emerald-600" /> Aktif
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 rounded-[10px] border border-border bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground transition-colors hover:bg-muted">
-                              <Power className="h-3 w-3 text-faint-foreground" /> Nonaktif
+                            <span className="border-border bg-muted text-muted-foreground hover:bg-muted inline-flex items-center gap-1 rounded-[10px] border px-2.5 py-1 text-xs font-semibold transition-colors">
+                              <Power className="text-faint-foreground h-3 w-3" /> Nonaktif
                             </span>
                           )}
                         </button>
@@ -398,12 +398,12 @@ export function GameManager({
             </table>
           ) : (
             <div className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted text-faint-foreground">
+              <div className="bg-muted text-faint-foreground flex h-12 w-12 items-center justify-center rounded-xl">
                 <Gamepad2 className="h-6 w-6" strokeWidth={1.5} />
               </div>
               <div>
-                <p className="text-sm font-semibold text-foreground">Belum ada game</p>
-                <p className="mt-0.5 text-xs text-faint-foreground">
+                <p className="text-foreground text-sm font-semibold">Belum ada game</p>
+                <p className="text-faint-foreground mt-0.5 text-xs">
                   Tambahkan game pertama menggunakan form di atas.
                 </p>
               </div>

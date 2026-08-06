@@ -6,39 +6,39 @@ import { formatRupiah } from "@/lib/utils";
 
 export function DealTable({ deals }: { deals: DealWithRelations[] }) {
   return (
-    <div className="overflow-x-auto rounded-[10px] border border-border bg-card shadow-sm">
-      <table className="min-w-full divide-y divide-border">
+    <div className="border-border bg-card overflow-x-auto rounded-[10px] border shadow-sm">
+      <table className="divide-border min-w-full divide-y">
         <thead className="bg-muted">
           <tr>
-            <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+            <th className="text-muted-foreground px-6 py-4 text-left text-xs font-semibold tracking-wider uppercase">
               Deal Number
             </th>
-            <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+            <th className="text-muted-foreground px-6 py-4 text-left text-xs font-semibold tracking-wider uppercase">
               Customer
             </th>
-            <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+            <th className="text-muted-foreground px-6 py-4 text-left text-xs font-semibold tracking-wider uppercase">
               Stock Code
             </th>
-            <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+            <th className="text-muted-foreground px-6 py-4 text-left text-xs font-semibold tracking-wider uppercase">
               Deal Price
             </th>
-            <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+            <th className="text-muted-foreground px-6 py-4 text-left text-xs font-semibold tracking-wider uppercase">
               Paid (%)
             </th>
-            <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+            <th className="text-muted-foreground px-6 py-4 text-left text-xs font-semibold tracking-wider uppercase">
               Status
             </th>
-            <th className="px-6 py-4 text-right text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+            <th className="text-muted-foreground px-6 py-4 text-right text-xs font-semibold tracking-wider uppercase">
               Action
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-border bg-card">
+        <tbody className="divide-border bg-card divide-y">
           {deals.length === 0 ? (
             <tr>
-              <td colSpan={7} className="px-6 py-12 text-center text-sm text-muted-foreground">
+              <td colSpan={7} className="text-muted-foreground px-6 py-12 text-center text-sm">
                 <div className="flex flex-col items-center justify-center">
-                  <span className="mb-2 text-2xl text-faint-foreground">📝</span>
+                  <span className="text-faint-foreground mb-2 text-2xl">📝</span>
                   <span>No active deals found.</span>
                 </div>
               </td>
@@ -46,36 +46,38 @@ export function DealTable({ deals }: { deals: DealWithRelations[] }) {
           ) : (
             deals.map((deal) => (
               <tr key={deal.id} className="group transition-colors hover:bg-blue-50/50">
-                <td className="px-6 py-4 font-mono text-sm font-semibold whitespace-nowrap text-foreground">
+                <td className="text-foreground px-6 py-4 font-mono text-sm font-semibold whitespace-nowrap">
                   {deal.deal_number}
                 </td>
-                <td className="px-6 py-4 text-sm whitespace-nowrap text-muted-foreground">
-                  <div className="font-medium text-foreground">{deal.customer_name}</div>
-                  <div className="text-xs text-muted-foreground">{deal.customer_contact || "-"}</div>
+                <td className="text-muted-foreground px-6 py-4 text-sm whitespace-nowrap">
+                  <div className="text-foreground font-medium">{deal.customer_name}</div>
+                  <div className="text-muted-foreground text-xs">
+                    {deal.customer_contact || "-"}
+                  </div>
                 </td>
-                <td className="px-6 py-4 text-sm whitespace-nowrap text-muted-foreground">
+                <td className="text-muted-foreground px-6 py-4 text-sm whitespace-nowrap">
                   {deal.stock?.name || "Unknown Stock"}
                 </td>
-                <td className="px-6 py-4 font-mono text-sm font-medium whitespace-nowrap text-foreground">
+                <td className="text-foreground px-6 py-4 font-mono text-sm font-medium whitespace-nowrap">
                   {formatRupiah(deal.deal_price)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex flex-col gap-1">
-                    <span className="font-mono text-sm text-foreground">
+                    <span className="text-foreground font-mono text-sm">
                       {formatRupiah(deal.total_paid)}
                     </span>
-                    <div className="h-1.5 w-full rounded-[10px] bg-muted">
+                    <div className="bg-muted h-1.5 w-full rounded-[10px]">
                       <div
                         className={`h-1.5 rounded-[10px] ${deal.payment_percentage >= 100 ? "bg-emerald-500" : "bg-blue-600"}`}
                         style={{ width: `${Math.min(deal.payment_percentage, 100)}%` }}
                       ></div>
                     </div>
-                    <span className="text-[10px] font-semibold text-muted-foreground">
+                    <span className="text-muted-foreground text-[10px] font-semibold">
                       {deal.payment_percentage.toFixed(0)}%
                     </span>
                   </div>
                 </td>
-                <td className="px-6 py-4 text-sm whitespace-nowrap text-muted-foreground">
+                <td className="text-muted-foreground px-6 py-4 text-sm whitespace-nowrap">
                   {(() => {
                     const statusConfig: Record<string, { style: string; label: string }> = {
                       PAID: {

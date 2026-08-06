@@ -134,11 +134,11 @@ export function CategoryIconPicker({
 
   return (
     <div className="space-y-1.5">
-      <label className="block text-sm font-medium text-foreground">Logo / Icon (Opsional)</label>
+      <label className="text-foreground block text-sm font-medium">Logo / Icon (Opsional)</label>
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        className="flex w-full items-center justify-between rounded-[10px] border border-border bg-muted px-3.5 py-2.5 text-sm text-foreground transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+        className="border-border bg-muted text-foreground flex w-full items-center justify-between rounded-[10px] border px-3.5 py-2.5 text-sm transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
       >
         <span className="flex items-center gap-2">
           {value ? (
@@ -151,12 +151,12 @@ export function CategoryIconPicker({
           )}
         </span>
         <ChevronDown
-          className={`h-4 w-4 text-faint-foreground transition-transform ${open ? "rotate-180" : ""}`}
+          className={`text-faint-foreground h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`}
         />
       </button>
 
       {open && (
-        <div className="max-h-56 overflow-y-auto rounded-[10px] border border-border bg-card p-2 shadow-sm">
+        <div className="border-border bg-card max-h-56 overflow-y-auto rounded-[10px] border p-2 shadow-sm">
           <div className="grid grid-cols-6 gap-1 sm:grid-cols-8">
             {CATEGORY_ICONS.map((icon) => {
               const Icon = icon.component;
@@ -173,7 +173,7 @@ export function CategoryIconPicker({
                   className={`flex h-10 w-10 items-center justify-center rounded-lg border transition-colors ${
                     selected
                       ? "border-blue-500 bg-blue-50 text-blue-600"
-                      : "border-transparent text-muted-foreground hover:bg-muted hover:text-foreground"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground border-transparent"
                   }`}
                 >
                   {selected ? <Check className="h-4 w-4" /> : <Icon className="h-5 w-5" />}

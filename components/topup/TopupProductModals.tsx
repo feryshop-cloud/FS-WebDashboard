@@ -67,16 +67,16 @@ export function AddTopupProductModal({ isOpen, onClose, onSuccess }: AddTopupPro
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm">
-      <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-card shadow-2xl duration-300">
-        <div className="flex items-center justify-between border-b border-border-soft bg-muted px-6 py-5">
+      <div className="animate-in slide-in-from-right bg-card flex h-full w-full max-w-md flex-col shadow-2xl duration-300">
+        <div className="border-border-soft bg-muted flex items-center justify-between border-b px-6 py-5">
           <div>
-            <h2 className="text-lg font-bold text-foreground">Tambah Produk Top-Up</h2>
-            <p className="mt-1 text-xs text-muted-foreground">Tambah katalog item top-up baru.</p>
+            <h2 className="text-foreground text-lg font-bold">Tambah Produk Top-Up</h2>
+            <p className="text-muted-foreground mt-1 text-xs">Tambah katalog item top-up baru.</p>
           </div>
           <button
             onClick={onClose}
             disabled={isSubmitting}
-            className="rounded-full bg-card p-2 text-faint-foreground shadow-sm transition-colors hover:text-muted-foreground disabled:opacity-50"
+            className="bg-card text-faint-foreground hover:text-muted-foreground rounded-full p-2 shadow-sm transition-colors disabled:opacity-50"
           >
             <X className="h-5 w-5" />
           </button>
@@ -91,80 +91,80 @@ export function AddTopupProductModal({ isOpen, onClose, onSuccess }: AddTopupPro
             )}
 
             <div>
-              <label className="mb-1 block font-medium text-foreground">Nama Produk</label>
+              <label className="text-foreground mb-1 block font-medium">Nama Produk</label>
               <input
                 name="title"
                 type="text"
                 required
                 placeholder="e.g. 86 Diamonds Mobile Legends"
-                className="w-full rounded-lg border border-border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="border-border w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="mb-1 block font-medium text-foreground">Game Slug</label>
+              <label className="text-foreground mb-1 block font-medium">Game Slug</label>
               <input
                 name="game_slug"
                 type="text"
                 required
                 placeholder="e.g. mobile-legends"
-                className="w-full rounded-lg border border-border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="border-border w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="mb-1 block font-medium text-foreground">SKU / Kode Produk</label>
+              <label className="text-foreground mb-1 block font-medium">SKU / Kode Produk</label>
               <input
                 name="sku"
                 type="text"
                 placeholder="e.g. ML-86"
-                className="w-full rounded-lg border border-border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="border-border w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="mb-1 block font-medium text-foreground">Harga Modal (Rp)</label>
+                <label className="text-foreground mb-1 block font-medium">Harga Modal (Rp)</label>
                 <input
                   name="cost_price"
                   type="number"
                   required
                   min="0"
                   placeholder="0"
-                  className="w-full rounded-lg border border-border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="border-border w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
               <div>
-                <label className="mb-1 block font-medium text-foreground">Harga Jual (Rp)</label>
+                <label className="text-foreground mb-1 block font-medium">Harga Jual (Rp)</label>
                 <input
                   name="selling_price"
                   type="number"
                   required
                   min="0"
                   placeholder="0"
-                  className="w-full rounded-lg border border-border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="border-border w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="mb-1 block font-medium text-foreground">Status Produk</label>
+                <label className="text-foreground mb-1 block font-medium">Status Produk</label>
                 <select
                   name="is_active"
                   defaultValue="true"
-                  className="w-full rounded-lg border border-border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="border-border w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 >
                   <option value="true">Aktif</option>
                   <option value="false">Nonaktif</option>
                 </select>
               </div>
               <div>
-                <label className="mb-1 block font-medium text-foreground">Status Gangguan</label>
+                <label className="text-foreground mb-1 block font-medium">Status Gangguan</label>
                 <select
                   name="is_gangguan"
                   defaultValue="false"
-                  className="w-full rounded-lg border border-border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="border-border w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 >
                   <option value="false">Normal</option>
                   <option value="true">Gangguan</option>
@@ -173,7 +173,7 @@ export function AddTopupProductModal({ isOpen, onClose, onSuccess }: AddTopupPro
             </div>
           </div>
 
-          <div className="border-t border-border-soft bg-card p-6">
+          <div className="border-border-soft bg-card border-t p-6">
             <button
               type="submit"
               disabled={isSubmitting}
@@ -253,16 +253,18 @@ export function EditTopupProductModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm">
-      <div className="animate-in slide-in-from-right flex h-full w-full max-w-md flex-col bg-card shadow-2xl duration-300">
-        <div className="flex items-center justify-between border-b border-border-soft bg-muted px-6 py-5">
+      <div className="animate-in slide-in-from-right bg-card flex h-full w-full max-w-md flex-col shadow-2xl duration-300">
+        <div className="border-border-soft bg-muted flex items-center justify-between border-b px-6 py-5">
           <div>
-            <h2 className="text-lg font-bold text-foreground">Edit Produk Top-Up</h2>
-            <p className="mt-1 text-xs text-muted-foreground">Ubah rincian informasi produk top-up.</p>
+            <h2 className="text-foreground text-lg font-bold">Edit Produk Top-Up</h2>
+            <p className="text-muted-foreground mt-1 text-xs">
+              Ubah rincian informasi produk top-up.
+            </p>
           </div>
           <button
             onClick={onClose}
             disabled={isSubmitting}
-            className="rounded-full bg-card p-2 text-faint-foreground shadow-sm transition-colors hover:text-muted-foreground disabled:opacity-50"
+            className="bg-card text-faint-foreground hover:text-muted-foreground rounded-full p-2 shadow-sm transition-colors disabled:opacity-50"
           >
             <X className="h-5 w-5" />
           </button>
@@ -277,80 +279,80 @@ export function EditTopupProductModal({
             )}
 
             <div>
-              <label className="mb-1 block font-medium text-foreground">Nama Produk</label>
+              <label className="text-foreground mb-1 block font-medium">Nama Produk</label>
               <input
                 name="title"
                 type="text"
                 required
                 defaultValue={product.title}
-                className="w-full rounded-lg border border-border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="border-border w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="mb-1 block font-medium text-foreground">Game Slug</label>
+              <label className="text-foreground mb-1 block font-medium">Game Slug</label>
               <input
                 name="game_slug"
                 type="text"
                 required
                 defaultValue={product.game_slug}
-                className="w-full rounded-lg border border-border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="border-border w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="mb-1 block font-medium text-foreground">SKU / Kode Produk</label>
+              <label className="text-foreground mb-1 block font-medium">SKU / Kode Produk</label>
               <input
                 name="sku"
                 type="text"
                 defaultValue={product.sku || ""}
-                className="w-full rounded-lg border border-border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="border-border w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="mb-1 block font-medium text-foreground">Harga Modal (Rp)</label>
+                <label className="text-foreground mb-1 block font-medium">Harga Modal (Rp)</label>
                 <input
                   name="cost_price"
                   type="number"
                   required
                   min="0"
                   defaultValue={product.cost_price}
-                  className="w-full rounded-lg border border-border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="border-border w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
               <div>
-                <label className="mb-1 block font-medium text-foreground">Harga Jual (Rp)</label>
+                <label className="text-foreground mb-1 block font-medium">Harga Jual (Rp)</label>
                 <input
                   name="selling_price"
                   type="number"
                   required
                   min="0"
                   defaultValue={product.selling_price}
-                  className="w-full rounded-lg border border-border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="border-border w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="mb-1 block font-medium text-foreground">Status Produk</label>
+                <label className="text-foreground mb-1 block font-medium">Status Produk</label>
                 <select
                   name="is_active"
                   defaultValue={product.is_active ? "true" : "false"}
-                  className="w-full rounded-lg border border-border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="border-border w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 >
                   <option value="true">Aktif</option>
                   <option value="false">Nonaktif</option>
                 </select>
               </div>
               <div>
-                <label className="mb-1 block font-medium text-foreground">Status Gangguan</label>
+                <label className="text-foreground mb-1 block font-medium">Status Gangguan</label>
                 <select
                   name="is_gangguan"
                   defaultValue={product.is_gangguan ? "true" : "false"}
-                  className="w-full rounded-lg border border-border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="border-border w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 >
                   <option value="false">Normal</option>
                   <option value="true">Gangguan</option>
@@ -359,7 +361,7 @@ export function EditTopupProductModal({
             </div>
           </div>
 
-          <div className="border-t border-border-soft bg-card p-6">
+          <div className="border-border-soft bg-card border-t p-6">
             <button
               type="submit"
               disabled={isSubmitting}

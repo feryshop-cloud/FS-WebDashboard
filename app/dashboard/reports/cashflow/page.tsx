@@ -215,8 +215,10 @@ export default function CashflowPage() {
       {/* Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Arus Kas (Cash Flow)</h1>
-          <p className="mt-0.5 text-sm text-muted-foreground">
+          <h1 className="text-foreground text-2xl font-bold tracking-tight">
+            Arus Kas (Cash Flow)
+          </h1>
+          <p className="text-muted-foreground mt-0.5 text-sm">
             Laporan pergerakan kas masuk dan keluar aktual (Cash Basis).
           </p>
         </div>
@@ -227,13 +229,13 @@ export default function CashflowPage() {
                 setIsMonthDropdownOpen(!isMonthDropdownOpen);
                 setIsYearDropdownOpen(false);
               }}
-              className="inline-flex min-w-[140px] cursor-pointer items-center justify-between gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-semibold text-foreground shadow-sm hover:bg-muted"
+              className="border-border bg-card text-foreground hover:bg-muted inline-flex min-w-[140px] cursor-pointer items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm font-semibold shadow-sm"
             >
               <span>{MONTHS[selectedMonth]}</span>
-              <ChevronDown className="h-4 w-4 text-faint-foreground" />
+              <ChevronDown className="text-faint-foreground h-4 w-4" />
             </button>
             {isMonthDropdownOpen && (
-              <div className="absolute top-full right-0 z-20 mt-1.5 max-h-60 w-44 overflow-y-auto rounded-xl border border-border-soft bg-card py-1 shadow-lg">
+              <div className="border-border-soft bg-card absolute top-full right-0 z-20 mt-1.5 max-h-60 w-44 overflow-y-auto rounded-xl border py-1 shadow-lg">
                 {MONTHS.map((m, idx) => (
                   <button
                     key={m}
@@ -241,7 +243,7 @@ export default function CashflowPage() {
                       setSelectedMonth(idx);
                       setIsMonthDropdownOpen(false);
                     }}
-                    className={`w-full px-4 py-2 text-left text-sm font-medium hover:bg-muted ${selectedMonth === idx ? "bg-blue-50/50 text-blue-600" : "text-blue-700"}`}
+                    className={`hover:bg-muted w-full px-4 py-2 text-left text-sm font-medium ${selectedMonth === idx ? "bg-blue-50/50 text-blue-600" : "text-blue-700"}`}
                   >
                     {m}
                   </button>
@@ -256,13 +258,13 @@ export default function CashflowPage() {
                 setIsYearDropdownOpen(!isYearDropdownOpen);
                 setIsMonthDropdownOpen(false);
               }}
-              className="inline-flex min-w-[90px] cursor-pointer items-center justify-between gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-semibold text-foreground shadow-sm hover:bg-muted"
+              className="border-border bg-card text-foreground hover:bg-muted inline-flex min-w-[90px] cursor-pointer items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm font-semibold shadow-sm"
             >
               <span>{selectedYear}</span>
-              <ChevronDown className="h-4 w-4 text-faint-foreground" />
+              <ChevronDown className="text-faint-foreground h-4 w-4" />
             </button>
             {isYearDropdownOpen && (
-              <div className="absolute top-full right-0 z-20 mt-1.5 w-28 rounded-xl border border-border-soft bg-card py-1 shadow-lg">
+              <div className="border-border-soft bg-card absolute top-full right-0 z-20 mt-1.5 w-28 rounded-xl border py-1 shadow-lg">
                 {YEARS.map((y) => (
                   <button
                     key={y}
@@ -270,7 +272,7 @@ export default function CashflowPage() {
                       setSelectedYear(y);
                       setIsYearDropdownOpen(false);
                     }}
-                    className={`w-full px-4 py-2 text-left text-sm font-medium hover:bg-muted ${selectedYear === y ? "bg-blue-50/50 text-blue-600" : "text-blue-700"}`}
+                    className={`hover:bg-muted w-full px-4 py-2 text-left text-sm font-medium ${selectedYear === y ? "bg-blue-50/50 text-blue-600" : "text-blue-700"}`}
                   >
                     {y}
                   </button>
@@ -282,7 +284,7 @@ export default function CashflowPage() {
           <button
             onClick={handleExportCSV}
             disabled={filteredEntries.length === 0}
-            className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-semibold text-foreground shadow-sm transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            className="border-border bg-card text-foreground hover:bg-muted hover:text-foreground inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 py-2 text-sm font-semibold shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Download className="h-4 w-4" />
             Export CSV
@@ -298,9 +300,9 @@ export default function CashflowPage() {
 
       {/* Top Metric Cards */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <div className="flex flex-col justify-between rounded-xl border border-border-soft bg-card px-6 py-5 shadow-sm transition-shadow hover:shadow-md">
+        <div className="border-border-soft bg-card flex flex-col justify-between rounded-xl border px-6 py-5 shadow-sm transition-shadow hover:shadow-md">
           <div className="mb-4 flex items-center justify-between">
-            <span className="text-sm font-bold tracking-wider text-muted-foreground uppercase">
+            <span className="text-muted-foreground text-sm font-bold tracking-wider uppercase">
               Total Kas Masuk
             </span>
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
@@ -310,7 +312,7 @@ export default function CashflowPage() {
           <div>
             <h3 className="text-3xl font-black tracking-tight text-emerald-600">
               {isLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin text-faint-foreground" />
+                <Loader2 className="text-faint-foreground h-6 w-6 animate-spin" />
               ) : (
                 formatRupiah(cashIn)
               )}
@@ -318,9 +320,9 @@ export default function CashflowPage() {
           </div>
         </div>
 
-        <div className="flex flex-col justify-between rounded-xl border border-border-soft bg-card px-6 py-5 shadow-sm transition-shadow hover:shadow-md">
+        <div className="border-border-soft bg-card flex flex-col justify-between rounded-xl border px-6 py-5 shadow-sm transition-shadow hover:shadow-md">
           <div className="mb-4 flex items-center justify-between">
-            <span className="text-sm font-bold tracking-wider text-muted-foreground uppercase">
+            <span className="text-muted-foreground text-sm font-bold tracking-wider uppercase">
               Total Kas Keluar
             </span>
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-rose-50 text-rose-600">
@@ -330,7 +332,7 @@ export default function CashflowPage() {
           <div>
             <h3 className="text-3xl font-black tracking-tight text-rose-600">
               {isLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin text-faint-foreground" />
+                <Loader2 className="text-faint-foreground h-6 w-6 animate-spin" />
               ) : (
                 formatRupiah(cashOut)
               )}
@@ -338,7 +340,7 @@ export default function CashflowPage() {
           </div>
         </div>
 
-        <div className="flex flex-col justify-between rounded-xl border border-b-4 border-border-soft border-b-blue-600 bg-card px-6 py-5 shadow-sm transition-shadow hover:shadow-md">
+        <div className="border-border-soft bg-card flex flex-col justify-between rounded-xl border border-b-4 border-b-blue-600 px-6 py-5 shadow-sm transition-shadow hover:shadow-md">
           <div className="mb-4 flex items-center justify-between">
             <span className="text-sm font-bold tracking-wider text-blue-600 uppercase">
               Kenaikan Kas Bersih
@@ -352,7 +354,7 @@ export default function CashflowPage() {
               className={`text-3xl font-black tracking-tight ${netCashflow >= 0 ? "text-foreground" : "text-rose-600"}`}
             >
               {isLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin text-faint-foreground" />
+                <Loader2 className="text-faint-foreground h-6 w-6 animate-spin" />
               ) : (
                 formatRupiah(netCashflow)
               )}
@@ -364,9 +366,9 @@ export default function CashflowPage() {
       {/* Structured Cashflow Statement & Details */}
       <div className="mt-2 grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Breakdown Card */}
-        <div className="h-fit overflow-hidden rounded-xl border border-border-soft bg-card shadow-sm lg:col-span-1">
-          <div className="border-b border-border-soft bg-muted/50 px-6 py-4">
-            <h2 className="text-base font-bold text-foreground">Rincian Arus Kas</h2>
+        <div className="border-border-soft bg-card h-fit overflow-hidden rounded-xl border shadow-sm lg:col-span-1">
+          <div className="border-border-soft bg-muted/50 border-b px-6 py-4">
+            <h2 className="text-foreground text-base font-bold">Rincian Arus Kas</h2>
           </div>
           <div className="space-y-6 p-6">
             {isLoading ? (
@@ -377,23 +379,23 @@ export default function CashflowPage() {
               <>
                 {/* INFLOWS */}
                 <div>
-                  <h3 className="mb-3 flex items-center gap-1.5 text-xs font-bold tracking-wider text-faint-foreground uppercase">
+                  <h3 className="text-faint-foreground mb-3 flex items-center gap-1.5 text-xs font-bold tracking-wider uppercase">
                     <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                     Penerimaan Kas
                   </h3>
                   {inflows.length === 0 ? (
-                    <p className="pl-3 text-sm text-faint-foreground">Tidak ada kas masuk.</p>
+                    <p className="text-faint-foreground pl-3 text-sm">Tidak ada kas masuk.</p>
                   ) : (
                     <div className="space-y-3 pl-3">
                       {inflows.map((item, idx) => (
                         <div key={idx} className="flex items-center justify-between text-sm">
-                          <span className="font-medium text-muted-foreground">{item.label}</span>
-                          <span className="font-semibold text-foreground">
+                          <span className="text-muted-foreground font-medium">{item.label}</span>
+                          <span className="text-foreground font-semibold">
                             {formatRupiah(item.amount)}
                           </span>
                         </div>
                       ))}
-                      <div className="flex items-center justify-between border-t border-border-soft pt-2 text-sm font-bold">
+                      <div className="border-border-soft flex items-center justify-between border-t pt-2 text-sm font-bold">
                         <span className="text-foreground">Total Masuk</span>
                         <span className="text-emerald-600">{formatRupiah(cashIn)}</span>
                       </div>
@@ -403,23 +405,23 @@ export default function CashflowPage() {
 
                 {/* OUTFLOWS */}
                 <div>
-                  <h3 className="mb-3 flex items-center gap-1.5 text-xs font-bold tracking-wider text-faint-foreground uppercase">
+                  <h3 className="text-faint-foreground mb-3 flex items-center gap-1.5 text-xs font-bold tracking-wider uppercase">
                     <div className="h-1.5 w-1.5 rounded-full bg-rose-500" />
                     Pengeluaran Kas
                   </h3>
                   {outflows.length === 0 ? (
-                    <p className="pl-3 text-sm text-faint-foreground">Tidak ada kas keluar.</p>
+                    <p className="text-faint-foreground pl-3 text-sm">Tidak ada kas keluar.</p>
                   ) : (
                     <div className="space-y-3 pl-3">
                       {outflows.map((item, idx) => (
                         <div key={idx} className="flex items-center justify-between text-sm">
-                          <span className="font-medium text-muted-foreground">{item.label}</span>
-                          <span className="font-semibold text-foreground">
+                          <span className="text-muted-foreground font-medium">{item.label}</span>
+                          <span className="text-foreground font-semibold">
                             ({formatRupiah(item.amount)})
                           </span>
                         </div>
                       ))}
-                      <div className="flex items-center justify-between border-t border-border-soft pt-2 text-sm font-bold">
+                      <div className="border-border-soft flex items-center justify-between border-t pt-2 text-sm font-bold">
                         <span className="text-foreground">Total Keluar</span>
                         <span className="text-rose-600">({formatRupiah(cashOut)})</span>
                       </div>
@@ -428,7 +430,7 @@ export default function CashflowPage() {
                 </div>
 
                 {/* SUMMARY ROW */}
-                <div className="flex items-center justify-between border-t border-border-soft pt-4 font-bold text-foreground">
+                <div className="border-border-soft text-foreground flex items-center justify-between border-t pt-4 font-bold">
                   <span className="text-sm">Net Perubahan Kas</span>
                   <span
                     className={`text-base ${netCashflow >= 0 ? "text-emerald-600" : "text-rose-600"}`}
@@ -443,19 +445,19 @@ export default function CashflowPage() {
         </div>
 
         {/* Transactions List */}
-        <div className="flex flex-col overflow-hidden rounded-xl border border-border-soft bg-card shadow-sm lg:col-span-2">
-          <div className="flex flex-col justify-between gap-4 border-b border-border-soft bg-muted/50 px-6 py-4 sm:flex-row sm:items-center">
-            <h2 className="text-base font-bold text-foreground">Riwayat Transaksi Kas</h2>
+        <div className="border-border-soft bg-card flex flex-col overflow-hidden rounded-xl border shadow-sm lg:col-span-2">
+          <div className="border-border-soft bg-muted/50 flex flex-col justify-between gap-4 border-b px-6 py-4 sm:flex-row sm:items-center">
+            <h2 className="text-foreground text-base font-bold">Riwayat Transaksi Kas</h2>
             <div className="relative w-full sm:w-64">
               <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <Search className="h-4 w-4 text-faint-foreground" />
+                <Search className="text-faint-foreground h-4 w-4" />
               </span>
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Cari transaksi..."
-                className="w-full rounded-lg border border-border bg-card py-1.5 pr-3 pl-9 text-xs font-semibold text-foreground placeholder-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                className="border-border bg-card text-foreground w-full rounded-lg border py-1.5 pr-3 pl-9 text-xs font-semibold placeholder-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
               />
             </div>
           </div>
@@ -466,46 +468,46 @@ export default function CashflowPage() {
                 <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
               </div>
             ) : filteredEntries.length === 0 ? (
-              <div className="py-24 text-center text-sm text-faint-foreground">
+              <div className="text-faint-foreground py-24 text-center text-sm">
                 Tidak ada transaksi kas untuk periode ini.
               </div>
             ) : (
-              <table className="min-w-full divide-y divide-border-soft text-sm">
-                <thead className="sticky top-0 bg-muted/60">
+              <table className="divide-border-soft min-w-full divide-y text-sm">
+                <thead className="bg-muted/60 sticky top-0">
                   <tr>
                     <th
                       scope="col"
-                      className="px-6 py-3.5 text-left text-xs font-bold tracking-wider text-muted-foreground uppercase"
+                      className="text-muted-foreground px-6 py-3.5 text-left text-xs font-bold tracking-wider uppercase"
                     >
                       Tanggal
                     </th>
                     <th
                       scope="col"
-                      className="px-6 py-3.5 text-left text-xs font-bold tracking-wider text-muted-foreground uppercase"
+                      className="text-muted-foreground px-6 py-3.5 text-left text-xs font-bold tracking-wider uppercase"
                     >
                       Rekening
                     </th>
                     <th
                       scope="col"
-                      className="px-6 py-3.5 text-left text-xs font-bold tracking-wider text-muted-foreground uppercase"
+                      className="text-muted-foreground px-6 py-3.5 text-left text-xs font-bold tracking-wider uppercase"
                     >
                       Tipe
                     </th>
                     <th
                       scope="col"
-                      className="px-6 py-3.5 text-left text-xs font-bold tracking-wider text-muted-foreground uppercase"
+                      className="text-muted-foreground px-6 py-3.5 text-left text-xs font-bold tracking-wider uppercase"
                     >
                       Keterangan
                     </th>
                     <th
                       scope="col"
-                      className="px-6 py-3.5 text-right text-xs font-bold tracking-wider text-muted-foreground uppercase"
+                      className="text-muted-foreground px-6 py-3.5 text-right text-xs font-bold tracking-wider uppercase"
                     >
                       Jumlah
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border-soft bg-card">
+                <tbody className="divide-border-soft bg-card divide-y">
                   {filteredEntries.map((entry) => {
                     const isPositive = Number(entry.amount) > 0;
 
@@ -545,8 +547,8 @@ export default function CashflowPage() {
                     }
 
                     return (
-                      <tr key={entry.id} className="transition-colors hover:bg-muted/50">
-                        <td className="px-6 py-4 text-xs font-semibold whitespace-nowrap text-muted-foreground">
+                      <tr key={entry.id} className="hover:bg-muted/50 transition-colors">
+                        <td className="text-muted-foreground px-6 py-4 text-xs font-semibold whitespace-nowrap">
                           {new Date(entry.created_at).toLocaleString("id-ID", {
                             day: "2-digit",
                             month: "short",
@@ -555,7 +557,7 @@ export default function CashflowPage() {
                             minute: "2-digit",
                           })}
                         </td>
-                        <td className="px-6 py-4 text-xs font-semibold whitespace-nowrap text-foreground">
+                        <td className="text-foreground px-6 py-4 text-xs font-semibold whitespace-nowrap">
                           {entry.account?.name || "-"}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -566,7 +568,7 @@ export default function CashflowPage() {
                           </span>
                         </td>
                         <td
-                          className="max-w-xs truncate px-6 py-4 text-xs font-medium text-muted-foreground"
+                          className="text-muted-foreground max-w-xs truncate px-6 py-4 text-xs font-medium"
                           title={entry.description ?? undefined}
                         >
                           {entry.description || "-"}

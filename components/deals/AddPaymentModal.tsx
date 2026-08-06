@@ -60,16 +60,18 @@ export function AddPaymentModal({
       />
 
       {/* Drawer */}
-      <div className="animate-in slide-in-from-right relative flex h-full w-full max-w-md flex-col overflow-hidden bg-card shadow-2xl duration-300">
-        <div className="flex items-center justify-between border-b border-border-soft bg-muted px-6 py-5">
+      <div className="animate-in slide-in-from-right bg-card relative flex h-full w-full max-w-md flex-col overflow-hidden shadow-2xl duration-300">
+        <div className="border-border-soft bg-muted flex items-center justify-between border-b px-6 py-5">
           <div>
-            <h2 className="text-lg font-bold text-foreground">Input Next Payment</h2>
-            <p className="mt-1 text-xs text-muted-foreground">Catat pembayaran baru untuk transaksi ini.</p>
+            <h2 className="text-foreground text-lg font-bold">Input Next Payment</h2>
+            <p className="text-muted-foreground mt-1 text-xs">
+              Catat pembayaran baru untuk transaksi ini.
+            </p>
           </div>
           <button
             onClick={onClose}
             disabled={isPending}
-            className="rounded-full bg-card p-2 text-faint-foreground shadow-sm transition-colors hover:text-muted-foreground disabled:opacity-50"
+            className="bg-card text-faint-foreground hover:text-muted-foreground rounded-full p-2 shadow-sm transition-colors disabled:opacity-50"
           >
             <X className="h-5 w-5" />
           </button>
@@ -84,7 +86,7 @@ export function AddPaymentModal({
           )}
 
           <div className="flex items-center justify-between rounded-lg border border-blue-100 bg-blue-50/50 p-4">
-            <span className="text-sm font-medium text-muted-foreground">Remaining Balance:</span>
+            <span className="text-muted-foreground text-sm font-medium">Remaining Balance:</span>
             <span className="font-mono text-lg font-bold text-blue-700">
               {formatRupiah(remainingBalance)}
             </span>
@@ -92,7 +94,7 @@ export function AddPaymentModal({
 
           <form id="add-payment-form" action={handleSubmit} className="space-y-6">
             <div className="space-y-1.5">
-              <label className="text-sm font-semibold text-foreground">
+              <label className="text-foreground text-sm font-semibold">
                 Payment Amount (Rp) <span className="text-red-500">*</span>
               </label>
               <input
@@ -101,19 +103,19 @@ export function AddPaymentModal({
                 type="number"
                 min="1"
                 max={remainingBalance}
-                className="w-full rounded-lg border border-input px-4 py-2.5 font-mono text-sm transition-all outline-none placeholder:text-faint-foreground focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                className="border-input placeholder:text-faint-foreground w-full rounded-lg border px-4 py-2.5 font-mono text-sm transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                 placeholder="0"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-sm font-semibold text-foreground">
+              <label className="text-foreground text-sm font-semibold">
                 Select Account / Method <span className="text-red-500">*</span>
               </label>
               <select
                 required
                 name="account_id"
-                className="w-full rounded-lg border border-input bg-card px-4 py-2.5 text-sm transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                className="border-input bg-card w-full rounded-lg border px-4 py-2.5 text-sm transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">-- Choose Account --</option>
                 {accounts.map((acc) => (
@@ -125,23 +127,23 @@ export function AddPaymentModal({
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-sm font-semibold text-foreground">Notes / Ref Number</label>
+              <label className="text-foreground text-sm font-semibold">Notes / Ref Number</label>
               <input
                 name="notes"
                 type="text"
-                className="w-full rounded-lg border border-input px-4 py-2.5 text-sm transition-all outline-none placeholder:text-faint-foreground focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                className="border-input placeholder:text-faint-foreground w-full rounded-lg border px-4 py-2.5 text-sm transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g. TF BCA a.n. Budi"
               />
             </div>
           </form>
         </div>
 
-        <div className="flex justify-end gap-3 border-t border-border-soft bg-card p-6">
+        <div className="border-border-soft bg-card flex justify-end gap-3 border-t p-6">
           <button
             type="button"
             onClick={onClose}
             disabled={isPending}
-            className="w-full rounded-lg border border-input bg-card px-5 py-2.5 text-sm font-semibold text-foreground shadow-sm transition-all hover:bg-muted"
+            className="border-input bg-card text-foreground hover:bg-muted w-full rounded-lg border px-5 py-2.5 text-sm font-semibold shadow-sm transition-all"
           >
             Cancel
           </button>
