@@ -26,6 +26,7 @@ const supabase = createClient(supabaseUrl, serviceRoleKey, {
 // problem_cases/stock_histories are gone. users/public_users are intentionally
 // left untouched (audit_logs and auth.users reference them).
 const CLEANUP_TABLES = [
+  "audit_logs",
   "finance_ledger",
   "payments",
   "deal_items",
@@ -37,6 +38,7 @@ const CLEANUP_TABLES = [
   "inventory",
   "accounts",
   "games",
+  "worker_heartbeat",
 ] as const;
 
 async function deleteAll(table: string) {
