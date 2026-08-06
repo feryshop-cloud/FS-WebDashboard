@@ -250,7 +250,7 @@ export default function AccountsPage() {
                             {account.name}
                           </h3>
                           {!account.is_active && (
-                            <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-400">
+                            <span className="rounded bg-slate-100 px-1.5 py-0.5 text-xs font-semibold text-slate-400">
                               Nonaktif
                             </span>
                           )}
@@ -309,7 +309,7 @@ export default function AccountsPage() {
 
                   {/* Account Number */}
                   <div className="mb-4 rounded-xl border border-slate-100 bg-slate-50/70 p-3">
-                    <p className="mb-0.5 text-[10px] font-semibold tracking-wider text-slate-400 uppercase">
+                    <p className="mb-0.5 text-xs font-semibold tracking-wider text-slate-400 uppercase">
                       Nomor Rekening / ID
                     </p>
                     <p className="font-mono text-sm font-semibold tracking-wide text-slate-700">
@@ -321,7 +321,7 @@ export default function AccountsPage() {
                 {/* Balance Footer */}
                 <div className="flex items-end justify-between border-t border-slate-100 pt-4">
                   <div>
-                    <p className="mb-0.5 text-[10px] font-semibold tracking-wider text-slate-400 uppercase">
+                    <p className="mb-0.5 text-xs font-semibold tracking-wider text-slate-400 uppercase">
                       Saldo Terkini
                     </p>
                     <p className="text-xl font-bold tracking-tight text-slate-900">

@@ -345,7 +345,7 @@ export default function PurchasesPage() {
                         <button
                           onClick={() => handleDeletePurchase(purchase.id, purchase.name)}
                           title="Hapus Pembelian"
-                          className="rounded-md p-1.5 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
+                          className="rounded-md p-1.5 text-rose-600 transition-colors hover:bg-rose-50 hover:text-rose-700"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>

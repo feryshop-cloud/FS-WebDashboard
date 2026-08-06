@@ -241,7 +241,7 @@ export default function CashflowPage() {
                       setSelectedMonth(idx);
                       setIsMonthDropdownOpen(false);
                     }}
-                    className={`w-full px-4 py-2 text-left text-sm font-medium hover:bg-slate-50 ${selectedMonth === idx ? "bg-blue-50/50 text-blue-600" : "text-slate-700"}`}
+                    className={`w-full px-4 py-2 text-left text-sm font-medium hover:bg-slate-50 ${selectedMonth === idx ? "bg-blue-50/50 text-blue-600" : "text-blue-700"}`}
                   >
                     {m}
                   </button>
@@ -270,7 +270,7 @@ export default function CashflowPage() {
                       setSelectedYear(y);
                       setIsYearDropdownOpen(false);
                     }}
-                    className={`w-full px-4 py-2 text-left text-sm font-medium hover:bg-slate-50 ${selectedYear === y ? "bg-blue-50/50 text-blue-600" : "text-slate-700"}`}
+                    className={`w-full px-4 py-2 text-left text-sm font-medium hover:bg-slate-50 ${selectedYear === y ? "bg-blue-50/50 text-blue-600" : "text-blue-700"}`}
                   >
                     {y}
                   </button>
@@ -560,7 +560,7 @@ export default function CashflowPage() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span
-                            className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-bold ${badgeColor}`}
+                            className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-bold ${badgeColor}`}
                           >
                             {label}
                           </span>

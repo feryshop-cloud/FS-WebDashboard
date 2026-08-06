@@ -303,7 +303,7 @@ export default function DealsPage() {
                         <button
                           onClick={() => handleDeleteDeal(deal.id, deal.deal_number)}
                           title="Hapus Deal"
-                          className="rounded-md p-1.5 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
+                          className="rounded-md p-1.5 text-rose-600 transition-colors hover:bg-rose-50 hover:text-rose-700"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>

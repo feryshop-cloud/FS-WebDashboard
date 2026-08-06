@@ -319,7 +319,7 @@ export default function ProblemCasesPage() {
                           <button
                             onClick={() => handleDeleteCase(c.id, c.case_number)}
                             disabled={isDeletingId === c.id}
-                            className="rounded-[10px] p-1.5 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600 disabled:opacity-50"
+                            className="rounded-[10px] p-1.5 text-rose-600 transition-colors hover:bg-rose-50 hover:text-rose-700 disabled:opacity-50"
                             title="Hapus Case"
                           >
                             {isDeletingId === c.id ? (

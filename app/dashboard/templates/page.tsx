@@ -241,7 +241,7 @@ export default function TemplatesPage() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleCopy(tpl.id, tpl.content)}
-                    className="rounded p-1.5 text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-600"
+                    className="rounded p-1.5 text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-700"
                     title="Copy to clipboard"
                   >
                     {copiedId === tpl.id ? (
@@ -252,14 +252,14 @@ export default function TemplatesPage() {
                   </button>
                   <button
                     onClick={() => handleStartEdit(tpl)}
-                    className="rounded p-1.5 text-slate-400 transition-colors hover:bg-emerald-50 hover:text-emerald-600"
+                    className="rounded p-1.5 text-emerald-600 transition-colors hover:bg-emerald-50 hover:text-emerald-700"
                     title="Edit template"
                   >
                     <Edit className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => handleDelete(tpl.id)}
-                    className="rounded p-1.5 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
+                    className="rounded p-1.5 text-rose-600 transition-colors hover:bg-rose-50 hover:text-rose-700"
                     title="Hapus template"
                   >
                     <Trash2 className="h-4 w-4" />

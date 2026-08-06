@@ -58,7 +58,7 @@ const publishers = [
   {
     sender: "Hoyoverse",
     senderEmail: "noreply@hoyoverse.com",
-    avatarBg: "bg-gradient-to-br from-indigo-400 to-purple-600",
+    avatarBg: "bg-gradient-to-br from-violet-500 to-purple-600",
     avatarText: "H",
   },
 ];

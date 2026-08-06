@@ -360,7 +360,7 @@ export default function LedgerPage() {
                           <button
                             onClick={() => handleDelete(tx)}
                             disabled={isDeletingId === tx.id}
-                            className="rounded-[10px] p-1.5 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600 disabled:opacity-50"
+                            className="rounded-[10px] p-1.5 text-rose-600 transition-colors hover:bg-rose-50 hover:text-rose-700 disabled:opacity-50"
                             title="Hapus Entri Kas"
                           >
                             {isDeletingId === tx.id ? (

@@ -156,7 +156,7 @@ export default function TradeInPage() {
                 className="group relative overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm transition-shadow hover:shadow-md"
               >
                 <div className="absolute top-4 right-4">
-                  <button className="rounded-md p-1.5 text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-600">
+                  <button className="rounded-md p-1.5 text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-700">
                     <MoreHorizontal className="h-5 w-5" />
                   </button>
                 </div>
