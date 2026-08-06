@@ -11,6 +11,18 @@ export default function ThemeToggle() {
     applyTheme(theme);
   }, [theme]);
 
+  useEffect(() => {
+    const mql = window.matchMedia("(prefers-color-scheme: dark)");
+    const handler = (e: MediaQueryListEvent) => {
+      const stored = localStorage.getItem("feryshop-theme");
+      if (!stored) {
+        setTheme(e.matches ? "dark" : "light");
+      }
+    };
+    mql.addEventListener("change", handler);
+    return () => mql.removeEventListener("change", handler);
+  }, []);
+
   const handleToggle = useCallback(() => {
     const next = theme === "dark" ? "light" : "dark";
     setTheme(next);
