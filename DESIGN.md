@@ -22,6 +22,19 @@ colors:
   violet-bg: "#FAF5FF"
   orange: "#EA580C"
   orange-bg: "#FFF7ED"
+  dark-canvas: "#0F172A"
+  dark-surface: "#1E293B"
+  dark-ink: "#F1F5F9"
+  dark-ink-secondary: "#94A3B8"
+  dark-ink-faint: "#64748B"
+  dark-line: "#334155"
+  dark-line-soft: "#1E293B"
+  dark-primary-halo: "#1E3A8A"
+  dark-success-bg: "#064E3B"
+  dark-warning-bg: "#78350F"
+  dark-danger-bg: "#7F1D1D"
+  dark-violet-bg: "#581C87"
+  dark-orange-bg: "#7C2D12"
 typography:
   display:
     fontFamily: "ui-sans-serif, system-ui, sans-serif"
@@ -102,16 +115,16 @@ components:
 
 **Creative North Star: "The Ledger Room"**
 
-Feryshop's dashboard is designed to feel like a calm, well-run back office where every number sits in its place — quiet, orderly, and always traceable. Admins live in this interface for hours across a shift, so the system trades spectacle for stillness: an airy slate canvas (`#F8FAFC`) carries pure-white surfaces, a single restrained blue accent carries interaction, and status is spoken in muted, soft-tinted chips rather than loud fills. The aesthetic philosophy in the project's own design brief is a "Human-Made Modern B2B SaaS" look: breathable, premium, and calm, explicitly built to reduce eye strain for staff who stare at tables and dashboards all day.
+Feryshop's dashboard is designed to feel like a calm, well-run back office where every number sits in its place — quiet, orderly, and always traceable. Admins live in this interface for hours across a shift, so the system trades spectacle for stillness: an airy slate canvas (`#F8FAFC` on light, `#0F172A` on dark) carries pure-white surfaces (light) or deep slate surfaces (`#1E293B` on dark), a single restrained blue accent carries interaction, and status is spoken in muted, soft-tinted chips rather than loud fills. The aesthetic philosophy in the project's own design brief is a "Human-Made Modern B2B SaaS" look: breathable, premium, and calm, explicitly built to reduce eye strain for staff who stare at tables and dashboards all day. Dark mode uses tonal layering — dark surfaces with subtle borders — instead of the light two-layer white-on-slate system.
 
 Density is comfortable, never cramped. Cards breathe with `p-6`/`p-8` padding, tables leave generous cell spacing, and grids gap at 16–24px. Depth is a whisper at rest — white cards sit on hairline slate borders with a barely-there shadow — and elevation only appears when it earns attention: a card rises on hover, and modals or slide-over drawers lift hard above the page. Typography leans on the system UI sans stack with tight-tracked bold display headings and 14px body copy; sensitive values (prices, account codes, OTPs) are set in monospace so columns line up and codes scan — a visual nod to the product's audit-first discipline.
 
 **Key Characteristics:**
 
-- Single calm blue accent (`blue-600`) on a slate-50 / white two-layer canvas; no neon, fluorescent, or cyan tones, ever.
+- Single calm blue accent (`blue-600`) on a slate-50 / white two-layer canvas (light) or deep slate-900 / slate-800 tonal layering (dark); no neon, fluorescent, or cyan tones, ever.
 - Soft but never pill-shaped corners: 10px controls, 12px cards, 16px imagery; `rounded-full` reserved for avatars, dots, and circular icon buttons.
-- Muted status system: 50-level tinted backgrounds with 600-level text and hairline rings.
-- Layered elevation: flat at rest, gentle rise on hover, hard `shadow-2xl` lift for overlays.
+- Muted status system: 50-level tinted backgrounds with 600-level text and hairline rings; dark mode uses deeper tinted backgrounds.
+- Layered elevation: flat at rest, gentle rise on hover, hard `shadow-2xl` lift for overlays. Dark mode uses subtle ambient glow instead of shadow on dark surfaces.
 - Comfortable, breathable density with generous whitespace throughout.
 - Thin-line lucide icons (`strokeWidth` 1.5) at 20px in navigation; duotone Phosphor icons for dashboard stats.
 - Monospace for numeric and sensitive values, reinforcing the ledger/audit identity.
@@ -139,6 +152,24 @@ The palette is a restrained cool-neutral system: one blue accent, a slate neutra
 - **Faint Ink** (#94A3B8): Placeholders, inactive icons, micro-labels.
 - **Hairline** (#E2E8F0): Borders and dividers (`slate-200`).
 - **Soft Hairline** (#F1F5F9): The lightest separators and card borders (`slate-100`).
+
+### Dark Mode
+
+The dark mode palette inverts the light neutral ramp while preserving the same accent and semantic colors. Dark mode surfaces use tonal layering (dark slate backgrounds with subtle borders) instead of the light two-layer white-on-slate system.
+
+- **Dark Canvas** (#0F172A): The application background — deep slate replaces the light slate-50 canvas.
+- **Dark Surface** (#1E293B): Card, table, input, sidebar, header, and modal backgrounds — one step above the canvas.
+- **Dark Ink** (#F1F5F9): Primary text on dark backgrounds — light slate replaces the dark ink.
+- **Dark Secondary Ink** (#94A3B8): Descriptions, table metadata, secondary text on dark surfaces.
+- **Dark Faint Ink** (#64748B): Placeholders, inactive icons, micro-labels.
+- **Dark Hairline** (#334155): Borders and dividers on dark surfaces — slate-700 replaces slate-200.
+- **Dark Soft Hairline** (#1E293B): The darkest separators and card borders — slate-800.
+- **Dark Calm Blue Halo** (#1E3A8A): The deep blue tint for active sidebar items, selected rows, and subtle emphasis fills on dark backgrounds.
+- **Dark Success Bg** (#064E3B): Dark emerald tint for success status chips.
+- **Dark Warning Bg** (#78350F): Dark amber tint for warning status chips.
+- **Dark Danger Bg** (#7F1D1D): Dark red tint for danger status chips.
+- **Dark Violet Bg** (#581C87): Dark purple tint for limited-access status chips.
+- **Dark Orange Bg** (#7C2D12): Dark orange tint for refund status chips.
 
 ### Named Rules
 
@@ -177,15 +208,15 @@ The project's design docs specify a custom soft-shadow scale (`--shadow-soft-mai
 
 ### Shadow Vocabulary
 
-- **Card Rest** (`0 1px 2px rgba(0,0,0,0.05)`, `shadow-sm`): Every resting card, table, and panel.
-- **Card Hover** (`0 4px 6px -1px rgba(0,0,0,0.10)`, `shadow-md`): Interactive cards when hovered.
-- **Overlay** (`0 25px 50px -12px rgba(0,0,0,0.25)`, `shadow-2xl`): Modals, drawers, and dropdown menus.
-- **Soft Ambient** (docs): `0 4px 20px -4px rgba(15,23,42,0.04)` for main cards and `0 8px 30px -6px rgba(15,23,42,0.08)` for hover — the intended premium alternative to default shadows.
-- **Button Glow** (docs): `0 2px 10px -3px rgba(37,99,235,0.20)` — a faint blue halo on primary buttons; implementations tint it per accent (`shadow-blue-200`, `shadow-purple-200`, etc.).
+- **Card Rest** (`0 1px 2px rgba(0,0,0,0.05)`, `shadow-sm`): Every resting card, table, and panel on light mode. On dark mode, a subtle inner glow (`inset 0 1px 0 rgba(255,255,255,0.05)`) replaces the drop shadow.
+- **Card Hover** (`0 4px 6px -1px rgba(0,0,0,0.10)`, `shadow-md`): Interactive cards when hovered on light mode. On dark mode, a brighter inner glow (`inset 0 1px 0 rgba(255,255,255,0.08)`) plus a subtle outer glow.
+- **Overlay** (`0 25px 50px -12px rgba(0,0,0,0.25)`, `shadow-2xl`): Modals, drawers, and dropdown menus. Same on both modes.
+- **Soft Ambient** (docs): `0 4px 20px -4px rgba(15,23,42,0.04)` for main cards and `0 8px 30px -6px rgba(15,23,42,0.08)` for hover — the intended premium alternative to default shadows. On dark mode, these become `0 4px 20px -4px rgba(0,0,0,0.12)` and `0 8px 30px -6px rgba(0,0,0,0.18)`.
+- **Button Glow** (docs): `0 2px 10px -3px rgba(37,99,235,0.20)` — a faint blue halo on primary buttons; implementations tint it per accent (`shadow-blue-200`, `shadow-purple-200`, etc.). On dark mode, the glow uses `rgba(37,99,235,0.30)` for better visibility.
 
 ### Named Rules
 
-**The Hairline Rest Rule.** Surfaces are flat at rest — white card, hairline border, whisper of shadow. Depth appears only as a response to state: hover rise, or hard overlay elevation.
+**The Hairline Rest Rule.** Surfaces are flat at rest — white card, hairline border, whisper of shadow on light mode; dark surface, subtle inner glow, whisper of ambient on dark mode. Depth appears only as a response to state: hover rise, or hard overlay elevation.
 
 ## Shapes
 
@@ -235,14 +266,15 @@ A soft-corner system. The radius scale is normalized around 10px: controls, badg
 
 ### Do:
 
-- **Do** build every surface as white on the slate-50 canvas with a hairline border and a whisper of shadow — the two-layer system is the whole identity.
+- **Do** build every surface as white on the slate-50 canvas with a hairline border and a whisper of shadow on light mode — dark mode uses `#1E293B` surface on `#0F172A` canvas with subtle inner glow and hairline `#334155` borders.
 - **Do** use Calm Blue as the one primary accent, and deepen it on hover (`#1D4ED8`) and press (`#1E40AF`).
-- **Do** speak status through muted 50-tint chips with 600-level text and hairline rings.
+- **Do** speak status through muted 50-tint chips with 600-level text and hairline rings; dark mode uses deeper tinted backgrounds with the same 600-level text.
 - **Do** keep corners soft: 10px controls, 12px cards, 16px imagery.
 - **Do** reserve `rounded-full` for avatars, dots, and circular icon buttons only.
 - **Do** set prices, codes, and sensitive values in monospace so columns align.
 - **Do** use thin 20px icons at `strokeWidth` 1.5 in navigation.
 - **Do** keep density comfortable: `p-6` cards, `p-8` gutters, 16–24px grid gaps.
+- **Do** use the dark mode tokens (`dark-canvas`, `dark-surface`, `dark-ink`, etc.) when building dark mode surfaces — never reuse light mode tokens for dark backgrounds.
 
 ### Don't:
 
@@ -251,3 +283,4 @@ A soft-corner system. The radius scale is normalized around 10px: controls, badg
 - **Don't** leave main cards resting on heavy `shadow-md`/`shadow-lg`; flat hairline + whisper is the resting state.
 - **Don't** cramp tables or compress cell padding to fit more data.
 - **Don't** introduce new blue families for emphasis — borrow Violet or Indigo for module-level accent instead.
+- **Don't** reuse light mode surface colors (`#FFFFFF`, `#F8FAFC`) for dark mode backgrounds — the dark palette is a separate token set.
