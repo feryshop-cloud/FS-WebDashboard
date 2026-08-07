@@ -11,6 +11,7 @@ export type TopupProductInput = {
   selling_price: number;
   cost_price: number;
   sku?: string | null;
+  brand?: string | null;
   is_active?: boolean;
   is_gangguan?: boolean;
 };
@@ -71,23 +72,7 @@ export async function getTopupProducts(filters: TopupProductsFilters = {}) {
       return { data: null, totalCount: 0, error: error.message };
     }
 
-    const {
-      data: games,
-      error: gamesError,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } = await (supabase as any).from("games").select("slug, name");
-    if (gamesError) {
-      logger.error("Error fetching games for topup products", { error: gamesError });
-    }
-    const gameNames = new Map<string, string>();
-    for (const g of games ?? []) gameNames.set(g.slug, g.name);
-
-    const rows = (data ?? []).map((p: Record<string, unknown>) => ({
-      ...p,
-      game_name: gameNames.get(p.game_slug as string) ?? (p.game_slug as string),
-    }));
-
-    return { data: rows, totalCount: count || 0, error: null };
+    return { data: data ?? [], totalCount: count || 0, error: null };
   });
 }
 
@@ -109,6 +94,7 @@ export async function addTopupProduct(input: TopupProductInput) {
       selling_price: input.selling_price,
       cost_price: input.cost_price || 0,
       sku: input.sku || null,
+      brand: input.brand || null,
       is_active: input.is_active ?? true,
       is_gangguan: input.is_gangguan ?? false,
     });
@@ -143,6 +129,7 @@ export async function updateTopupProduct(id: string, input: TopupProductInput) {
         selling_price: input.selling_price,
         cost_price: input.cost_price || 0,
         sku: input.sku || null,
+        brand: input.brand || null,
         is_active: input.is_active ?? true,
         is_gangguan: input.is_gangguan ?? false,
         updated_at: new Date().toISOString(),

@@ -12,6 +12,7 @@ type TopupProduct = {
   selling_price: number;
   cost_price: number;
   sku: string | null;
+  brand?: string | null;
   is_active: boolean;
   is_gangguan: boolean;
 };

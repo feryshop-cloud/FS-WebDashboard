@@ -11,6 +11,7 @@ type TopupProduct = {
   selling_price: number;
   cost_price: number;
   sku: string | null;
+  brand?: string | null;
   is_active: boolean;
   is_gangguan: boolean;
 };
@@ -39,6 +40,7 @@ export function AddTopupProductModal({ isOpen, onClose, onSuccess }: AddTopupPro
       const selling_price = Number(formData.get("selling_price"));
       const cost_price = Number(formData.get("cost_price"));
       const sku = formData.get("sku") as string;
+      const brand = formData.get("brand") as string;
       const is_active = formData.get("is_active") === "true";
       const is_gangguan = formData.get("is_gangguan") === "true";
 
@@ -48,6 +50,7 @@ export function AddTopupProductModal({ isOpen, onClose, onSuccess }: AddTopupPro
         selling_price,
         cost_price,
         sku,
+        brand,
         is_active,
         is_gangguan,
       });
@@ -118,6 +121,16 @@ export function AddTopupProductModal({ isOpen, onClose, onSuccess }: AddTopupPro
                 name="sku"
                 type="text"
                 placeholder="e.g. ML-86"
+                className="border-border w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="text-foreground mb-1 block font-medium">Brand</label>
+              <input
+                name="brand"
+                type="text"
+                placeholder="e.g. Moonton"
                 className="border-border w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>
@@ -225,6 +238,7 @@ export function EditTopupProductModal({
       const selling_price = Number(formData.get("selling_price"));
       const cost_price = Number(formData.get("cost_price"));
       const sku = formData.get("sku") as string;
+      const brand = formData.get("brand") as string;
       const is_active = formData.get("is_active") === "true";
       const is_gangguan = formData.get("is_gangguan") === "true";
 
@@ -234,6 +248,7 @@ export function EditTopupProductModal({
         selling_price,
         cost_price,
         sku,
+        brand,
         is_active,
         is_gangguan,
       });
@@ -306,6 +321,17 @@ export function EditTopupProductModal({
                 name="sku"
                 type="text"
                 defaultValue={product.sku || ""}
+                className="border-border w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="text-foreground mb-1 block font-medium">Brand</label>
+              <input
+                name="brand"
+                type="text"
+                defaultValue={product.brand || ""}
+                placeholder="e.g. Moonton"
                 className="border-border w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>

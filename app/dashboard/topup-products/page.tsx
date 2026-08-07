@@ -1,4 +1,4 @@
- "use client";
+"use client";
 
 import React, { useState, useEffect, useCallback } from "react";
 import {
@@ -21,7 +21,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 type TopupProduct = {
   id: string;
   game_slug: string;
-  game_name?: string;
+  brand?: string | null;
   title: string;
   selling_price: number;
   cost_price: number;
@@ -287,7 +287,7 @@ export default function TopupProductsPage() {
                     <td className="text-foreground px-6 py-4 font-medium">{p.title}</td>
                     <td className="px-6 py-4">
                       <span className="inline-flex items-center rounded-full border border-blue-100 bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700">
-                        {p.game_name || p.game_slug}
+                        {p.brand || "-"}
                       </span>
                     </td>
                     <td className="text-muted-foreground px-6 py-4 font-mono text-xs">
