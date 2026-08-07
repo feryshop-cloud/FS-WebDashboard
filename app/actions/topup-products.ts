@@ -71,7 +71,23 @@ export async function getTopupProducts(filters: TopupProductsFilters = {}) {
       return { data: null, totalCount: 0, error: error.message };
     }
 
-    return { data, totalCount: count || 0, error: null };
+    const {
+      data: games,
+      error: gamesError,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } = await (supabase as any).from("games").select("slug, name");
+    if (gamesError) {
+      logger.error("Error fetching games for topup products", { error: gamesError });
+    }
+    const gameNames = new Map<string, string>();
+    for (const g of games ?? []) gameNames.set(g.slug, g.name);
+
+    const rows = (data ?? []).map((p: Record<string, unknown>) => ({
+      ...p,
+      game_name: gameNames.get(p.game_slug as string) ?? (p.game_slug as string),
+    }));
+
+    return { data: rows, totalCount: count || 0, error: null };
   });
 }
 

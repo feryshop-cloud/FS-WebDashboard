@@ -89,19 +89,6 @@ export async function createProblemCase(formData: FormData) {
       throw new Error("Failed to create problem case: " + error.message);
     }
 
-    // Also log to audit
-    const { data: userData } = await supabase.auth.getUser();
-    if (userData.user) {
-      await supabase.from("audit_logs").insert([
-        {
-          user_id: userData.user.id,
-          module: "Akun Bermasalah",
-          action: "CREATE",
-          description: `Membuat tiket problem case baru: ${case_number} (${issue_type})`,
-        },
-      ]);
-    }
-
     revalidatePath("/dashboard/problem-cases");
   });
 }
@@ -114,18 +101,6 @@ export async function deleteProblemCase(id: string) {
     if (error) {
       logger.error("Error deleting problem case", { error });
       throw new Error("Gagal menghapus problem case: " + error.message);
-    }
-
-    const { data: userData } = await supabase.auth.getUser();
-    if (userData.user) {
-      await supabase.from("audit_logs").insert([
-        {
-          user_id: userData.user.id,
-          module: "Akun Bermasalah",
-          action: "DELETE",
-          description: `Menghapus tiket problem case ID: ${id}`,
-        },
-      ]);
     }
 
     revalidatePath("/dashboard/problem-cases");
@@ -143,18 +118,6 @@ export async function updateProblemCase(
     if (error) {
       logger.error("Error updating problem case", { error });
       throw new Error("Gagal mengolah/mengubah problem case: " + error.message);
-    }
-
-    const { data: userData } = await supabase.auth.getUser();
-    if (userData.user) {
-      await supabase.from("audit_logs").insert([
-        {
-          user_id: userData.user.id,
-          module: "Akun Bermasalah",
-          action: "UPDATE",
-          description: `Mengubah tiket problem case ID: ${id}`,
-        },
-      ]);
     }
 
     revalidatePath("/dashboard/problem-cases");

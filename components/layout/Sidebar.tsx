@@ -17,6 +17,7 @@ import {
   Activity,
   AlertTriangle,
   FileText,
+  Tag,
   Settings,
   Shield,
   ChevronLeft,
@@ -84,6 +85,7 @@ const navGroups: { title: string; items: NavItem[] }[] = [
     items: [
       { label: "Problem Cases", icon: AlertTriangle, href: "/dashboard/problem-cases" },
       { label: "Template Promosi", icon: FileText, href: "/dashboard/templates" },
+      { label: "Kode Promo", icon: Tag, href: "/dashboard/promo-codes" },
     ],
   },
   {

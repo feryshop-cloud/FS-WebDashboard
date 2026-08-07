@@ -1,4 +1,4 @@
-"use client";
+ "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
 import {
@@ -21,6 +21,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 type TopupProduct = {
   id: string;
   game_slug: string;
+  game_name?: string;
   title: string;
   selling_price: number;
   cost_price: number;
@@ -132,7 +133,7 @@ export default function TopupProductsPage() {
     sortOrder !== "asc";
 
   const sortOptions = [
-    { value: "game_slug", label: "Game Slug" },
+    { value: "game_slug", label: "Game" },
     { value: "title", label: "Nama Produk" },
     { value: "selling_price", label: "Harga Jual" },
     { value: "cost_price", label: "Harga Modal" },
@@ -176,7 +177,7 @@ export default function TopupProductsPage() {
       <div className="border-border bg-card flex flex-col gap-4 rounded-xl border p-4 shadow-sm">
         <div className="flex flex-wrap items-center gap-3">
           {/* Search */}
-          <div className="relative min-w-[200px] flex-1">
+          <div className="relative min-w-50 flex-1">
             <Search className="text-faint-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <input
               type="text"
@@ -188,7 +189,7 @@ export default function TopupProductsPage() {
           </div>
 
           {/* Sort By */}
-          <div className="relative min-w-[160px]">
+          <div className="relative min-w-40">
             <select
               value={sortBy}
               onChange={(e) => handleSortChange(e.target.value)}
@@ -272,7 +273,7 @@ export default function TopupProductsPage() {
               <thead className="border-border bg-muted text-muted-foreground border-b text-xs font-semibold tracking-wider uppercase">
                 <tr>
                   <th className="px-6 py-3.5">Nama Produk</th>
-                  <th className="px-6 py-3.5">Game Slug</th>
+                  <th className="px-6 py-3.5">Game</th>
                   <th className="px-6 py-3.5">SKU</th>
                   <th className="px-6 py-3.5">Harga Jual</th>
                   <th className="px-6 py-3.5">Harga Modal</th>
@@ -286,7 +287,7 @@ export default function TopupProductsPage() {
                     <td className="text-foreground px-6 py-4 font-medium">{p.title}</td>
                     <td className="px-6 py-4">
                       <span className="inline-flex items-center rounded-full border border-blue-100 bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700">
-                        {p.game_slug}
+                        {p.game_name || p.game_slug}
                       </span>
                     </td>
                     <td className="text-muted-foreground px-6 py-4 font-mono text-xs">
