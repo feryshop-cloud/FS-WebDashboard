@@ -112,6 +112,17 @@ export default function TopupOrdersPage() {
     });
   };
 
+  const handlePageSizeChange = (size: number) => {
+    if (size === pagination.pageSize) return;
+    loadOrders({
+      search: searchQuery,
+      paymentStatus,
+      buyStatus,
+      page: 1,
+      pageSize: size,
+    });
+  };
+
   const handleExportCSV = () => {
     if (orders.length === 0) return;
 
@@ -432,10 +443,29 @@ export default function TopupOrdersPage() {
 
         {/* Pagination */}
         <div className="border-border-soft bg-card flex flex-col items-center justify-between gap-3 border-t px-6 py-4 sm:flex-row">
-          <div className="text-muted-foreground text-sm">
-            Menampilkan <span className="text-foreground font-semibold">{startFrom}</span> -{" "}
-            <span className="text-foreground font-semibold">{endTo}</span> dari{" "}
-            <span className="text-foreground font-semibold">{pagination.total}</span> pesanan
+          <div className="flex flex-col items-center gap-3 sm:flex-row">
+            <div className="text-muted-foreground text-sm">
+              Menampilkan <span className="text-foreground font-semibold">{startFrom}</span> -{" "}
+              <span className="text-foreground font-semibold">{endTo}</span> dari{" "}
+              <span className="text-foreground font-semibold">{pagination.total}</span> pesanan
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground text-xs whitespace-nowrap">
+                Tampil per hal:
+              </span>
+              <select
+                value={pagination.pageSize}
+                onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+                disabled={isLoading}
+                className="border-border bg-card text-foreground rounded-md border px-2 py-1.5 text-xs focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none disabled:opacity-50"
+              >
+                {[10, 20, 50, 100].map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
           <div className="flex items-center gap-1">
             <button

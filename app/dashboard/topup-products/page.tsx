@@ -38,9 +38,9 @@ export default function TopupProductsPage() {
   const [error, setError] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
-  const itemsPerPage = 10;
 
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
+  const itemsPerPage = parseInt(searchParams.get("limit") || "10", 10);
   const searchQuery = searchParams.get("search") || "";
   const sortBy = searchParams.get("sortBy") || "game_slug";
   const sortOrder = (searchParams.get("sortOrder") || "asc") as "asc" | "desc";
@@ -83,7 +83,7 @@ export default function TopupProductsPage() {
         setIsLoading(false);
       }
     },
-    [currentPage, searchQuery, sortBy, sortOrder, isActiveFilter, isGangguanFilter],
+    [currentPage, searchQuery, sortBy, sortOrder, isActiveFilter, isGangguanFilter, itemsPerPage],
   );
 
   useEffect(() => {
@@ -110,6 +110,14 @@ export default function TopupProductsPage() {
 
   const handleResetFilters = () => {
     router.push("/dashboard/topup-products");
+  };
+
+  const handlePageSizeChange = (size: number) => {
+    if (size === itemsPerPage) return;
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("limit", String(size));
+    params.set("page", "1");
+    router.push(`/dashboard/topup-products?${params.toString()}`);
   };
 
   const handleSortChange = (newSortBy: string) => {
@@ -329,6 +337,7 @@ export default function TopupProductsPage() {
             totalItems={totalCount || products.length}
             itemsPerPage={itemsPerPage}
             onPageChange={(page) => handleFilterChange("page", String(page))}
+            onPageSizeChange={handlePageSizeChange}
             itemLabel="produk"
           />
         )}

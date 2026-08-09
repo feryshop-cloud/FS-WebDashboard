@@ -38,7 +38,7 @@ export default function LedgerPage() {
   const [typeFilter, setTypeFilter] = useState("ALL");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const itemsPerPage = 10;
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Actions & Modals state
   const [editingLedger, setEditingLedger] = useState<LedgerRecord | null>(null);
@@ -79,7 +79,13 @@ export default function LedgerPage() {
     return () => {
       isMounted = false;
     };
-  }, [currentPage, accountId]);
+  }, [currentPage, accountId, itemsPerPage]);
+
+  const handlePageSizeChange = (size: number) => {
+    if (size === itemsPerPage) return;
+    setCurrentPage(1);
+    setItemsPerPage(size);
+  };
 
   const closeAddManual = () => {
     if (isAddManualClosing || isSubmitting) return;
@@ -411,6 +417,7 @@ export default function LedgerPage() {
           totalItems={totalCount || ledgers.length}
           itemsPerPage={itemsPerPage}
           onPageChange={(page) => setCurrentPage(page)}
+          onPageSizeChange={handlePageSizeChange}
           itemLabel="mutasi"
         />
       </div>

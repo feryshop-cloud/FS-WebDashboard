@@ -7,7 +7,11 @@ interface PaginationProps {
   itemsPerPage: number;
   onPageChange: (page: number) => void;
   itemLabel?: string;
+  onPageSizeChange?: (size: number) => void;
+  pageSizeOptions?: number[];
 }
+
+const DEFAULT_PAGE_SIZES = [10, 25, 50, 100];
 
 export const Pagination: React.FC<PaginationProps> = ({
   currentPage,
@@ -15,17 +19,41 @@ export const Pagination: React.FC<PaginationProps> = ({
   itemsPerPage,
   onPageChange,
   itemLabel = "data",
+  onPageSizeChange,
+  pageSizeOptions = DEFAULT_PAGE_SIZES,
 }) => {
   const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
   const startItem = totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
+  const options = pageSizeOptions.some((s) => s === itemsPerPage)
+    ? pageSizeOptions
+    : [...pageSizeOptions, itemsPerPage].sort((a, b) => a - b);
+
   return (
     <div className="border-border-soft bg-card flex flex-col gap-4 border-t px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
-      <div className="text-muted-foreground text-sm">
-        Menampilkan <span className="text-foreground font-semibold">{startItem}</span> -{" "}
-        <span className="text-foreground font-semibold">{endItem}</span> dari{" "}
-        <span className="text-foreground font-semibold">{totalItems}</span> {itemLabel}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="text-muted-foreground text-sm">
+          Menampilkan <span className="text-foreground font-semibold">{startItem}</span> -{" "}
+          <span className="text-foreground font-semibold">{endItem}</span> dari{" "}
+          <span className="text-foreground font-semibold">{totalItems}</span> {itemLabel}
+        </div>
+        {onPageSizeChange && (
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground text-xs whitespace-nowrap">Tampil per hal:</span>
+            <select
+              value={itemsPerPage}
+              onChange={(e) => onPageSizeChange(Number(e.target.value))}
+              className="border-border bg-card text-foreground rounded-md border px-2 py-1.5 text-xs focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+            >
+              {options.map((size) => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
       <div className="flex items-center gap-2">
         <button

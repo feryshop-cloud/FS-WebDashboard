@@ -17,14 +17,14 @@ import { AuditLog } from "@/types/database";
 
 type AuditLogWithUser = AuditLog & { public_users?: { full_name?: string | null } | null };
 
-const PAGE_SIZE = 50;
+const PAGE_SIZES = [25, 50, 100, 200];
 
 export default function AuditLogPage() {
   const [logs, setLogs] = useState<AuditLogWithUser[]>([]);
   const [pagination, setPagination] = useState({
     total: 0,
     page: 1,
-    pageSize: PAGE_SIZE,
+    pageSize: 50,
     totalPages: 1,
   });
   const [isLoading, setIsLoading] = useState(true);
@@ -49,12 +49,17 @@ export default function AuditLogPage() {
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadData({ page: 1, pageSize: PAGE_SIZE });
+    loadData({ page: 1, pageSize: 50 });
   }, [loadData]);
 
   const handlePageChange = (nextPage: number) => {
     if (nextPage < 1 || nextPage > pagination.totalPages) return;
     loadData({ page: nextPage, pageSize: pagination.pageSize });
+  };
+
+  const handlePageSizeChange = (size: number) => {
+    if (size === pagination.pageSize) return;
+    loadData({ page: 1, pageSize: size });
   };
 
   const startFrom = pagination.total === 0 ? 0 : (pagination.page - 1) * pagination.pageSize + 1;
@@ -205,10 +210,29 @@ export default function AuditLogPage() {
 
         {/* Pagination */}
         <div className="border-border-soft bg-card flex flex-col items-center justify-between gap-3 border-t px-6 py-4 sm:flex-row">
-          <div className="text-muted-foreground text-sm">
-            Menampilkan <span className="text-foreground font-semibold">{startFrom}</span> -{" "}
-            <span className="text-foreground font-semibold">{endTo}</span> dari{" "}
-            <span className="text-foreground font-semibold">{pagination.total}</span> catatan
+          <div className="flex flex-col items-center gap-3 sm:flex-row">
+            <div className="text-muted-foreground text-sm">
+              Menampilkan <span className="text-foreground font-semibold">{startFrom}</span> -{" "}
+              <span className="text-foreground font-semibold">{endTo}</span> dari{" "}
+              <span className="text-foreground font-semibold">{pagination.total}</span> catatan
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground text-xs whitespace-nowrap">
+                Tampil per hal:
+              </span>
+              <select
+                value={pagination.pageSize}
+                onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+                disabled={isLoading}
+                className="border-border bg-card text-foreground rounded-md border px-2 py-1.5 text-xs focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none disabled:opacity-50"
+              >
+                {PAGE_SIZES.map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
           <div className="flex items-center gap-1">
             <button
