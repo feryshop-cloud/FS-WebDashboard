@@ -31,9 +31,9 @@ export function InventoryHeader({ categories }: InventoryHeaderProps) {
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="flex w-full items-center justify-center gap-2 rounded-[10px] bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-blue-200 transition-all hover:bg-blue-700 hover:shadow-md hover:shadow-blue-200 active:bg-blue-800 sm:w-auto"
+          className="group flex w-full items-center justify-center gap-2 rounded-[10px] bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-blue-200 transition-all hover:bg-blue-700 hover:shadow-md hover:shadow-blue-200 active:scale-[0.98] active:bg-blue-800 sm:w-auto"
         >
-          <Plus className="h-5 w-5" />
+          <Plus className="h-5 w-5 transition-transform group-hover:scale-110" />
           Tambah Stok Baru
         </button>
       </div>

@@ -14,6 +14,7 @@ type Game = { id: string; name: string; slug: string };
 
 export default function InventoryPage() {
   const [isAddStockOpen, setIsAddStockOpen] = useState(false);
+  const [isAddStockClosing, setIsAddStockClosing] = useState(false);
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [games, setGames] = useState<Game[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -21,6 +22,20 @@ export default function InventoryPage() {
   const [error, setError] = useState("");
   const [activeCategory, setActiveCategory] = useState("Semua");
   const [isExporting, setIsExporting] = useState(false);
+
+  const closeAddStock = () => {
+    if (isAddStockClosing) return;
+    setIsAddStockClosing(true);
+    setTimeout(() => {
+      setIsAddStockClosing(false);
+      setIsAddStockOpen(false);
+    }, 200);
+  };
+
+  const openAddStock = () => {
+    setError("");
+    setIsAddStockOpen(true);
+  };
 
   const loadInventory = async () => {
     try {
@@ -61,7 +76,7 @@ export default function InventoryPage() {
       setError("");
       const result = await addInventoryItem(formData);
       if (result.success) {
-        setIsAddStockOpen(false);
+        closeAddStock();
         loadInventory();
       } else {
         setError(result.error || "Gagal menambah stok.");
@@ -140,8 +155,8 @@ export default function InventoryPage() {
             {isExporting ? "Mengekspor..." : "Export Data"}
           </button>
           <button
-            onClick={() => setIsAddStockOpen(true)}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700"
+            onClick={openAddStock}
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700 active:scale-[0.97]"
           >
             <Plus className="h-4 w-4" />
             Tambah Stok
@@ -350,9 +365,19 @@ export default function InventoryPage() {
       </div>
 
       {/* Tambah Stok Modal (Slide-over Drawer) */}
-      {isAddStockOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm">
-          <div className="animate-in slide-in-from-right bg-card flex h-full w-full max-w-md flex-col shadow-2xl duration-300">
+      {(isAddStockOpen || isAddStockClosing) && (
+        <div
+          onClick={closeAddStock}
+          className={`fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm ${
+            isAddStockClosing ? "fs-overlay-out" : "fs-overlay-in"
+          }`}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={`bg-card flex h-full w-full max-w-md flex-col shadow-2xl ${
+              isAddStockClosing ? "fs-drawer-out" : "fs-drawer-in"
+            }`}
+          >
             <div className="border-border-soft bg-muted flex items-center justify-between border-b px-6 py-5">
               <div>
                 <h2 className="text-foreground text-lg font-bold">Tambah Stok Baru</h2>
@@ -361,17 +386,20 @@ export default function InventoryPage() {
                 </p>
               </div>
               <button
-                onClick={() => setIsAddStockOpen(false)}
+                onClick={closeAddStock}
                 className="bg-card text-faint-foreground hover:text-muted-foreground rounded-full p-2 shadow-sm transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            <form action={handleAddStock} className="flex flex-1 flex-col overflow-hidden">
+            <form
+              action={handleAddStock}
+              className="fs-rise-in flex flex-1 flex-col overflow-hidden"
+            >
               <div className="flex-1 space-y-5 overflow-y-auto p-6">
                 {error && (
-                  <div className="rounded-lg border border-rose-100 bg-rose-50 p-3 text-sm text-rose-600">
+                  <div className="fs-drop-in rounded-lg border border-rose-100 bg-rose-50 p-3 text-sm text-rose-600">
                     {error}
                   </div>
                 )}

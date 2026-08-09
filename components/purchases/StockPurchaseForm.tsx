@@ -260,7 +260,7 @@ export function StockPurchaseForm({ accounts }: { accounts: Account[] }) {
               </div>
 
               {paymentStatus === "LUNAS" && (
-                <div className="animate-in fade-in slide-in-from-top-2 space-y-1.5">
+                <div className="fs-drop-in space-y-1.5">
                   <label className="text-foreground text-sm font-bold">
                     Source Account (Rekening) <span className="text-red-500">*</span>
                   </label>

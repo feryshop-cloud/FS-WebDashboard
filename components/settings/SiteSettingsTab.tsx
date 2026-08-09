@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
-import { Settings2, Pencil, Check, X, Loader2, ChevronDown, ChevronRight } from "lucide-react";
+import React, { useState, useMemo, useRef, useCallback } from "react";
+import { Settings2, Pencil, Check, X, Loader2, ChevronDown } from "lucide-react";
 import { updateSiteSetting } from "@/actions/settings";
 
 type SettingRow = {
@@ -204,18 +204,35 @@ function GroupCard({
   groupKey,
   rows,
   onRefresh,
+  open,
+  onToggle,
 }: {
   groupKey: string;
   rows: SettingRow[];
   onRefresh: () => void;
+  open: boolean;
+  onToggle: () => void;
 }) {
-  const [open, setOpen] = useState(true);
+  const sectionRef = useRef<HTMLDivElement>(null);
   const label = GROUP_LABELS[groupKey] ?? groupKey.toUpperCase();
 
+  const handleToggle = () => {
+    const willOpen = !open;
+    if (willOpen) {
+      requestAnimationFrame(() => {
+        sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      });
+    }
+    onToggle();
+  };
+
   return (
-    <div className="border-border-soft bg-card rounded-xl border shadow-sm">
+    <div
+      ref={sectionRef}
+      className="scroll-mt-20 border-border-soft bg-card rounded-xl border shadow-sm"
+    >
       <button
-        onClick={() => setOpen((o) => !o)}
+        onClick={handleToggle}
         className="hover:bg-muted flex w-full items-center justify-between rounded-t-xl px-5 py-3.5"
       >
         <div className="flex items-center gap-2">
@@ -225,26 +242,33 @@ function GroupCard({
             {rows.length}
           </span>
         </div>
-        {open ? (
-          <ChevronDown className="text-faint-foreground h-4 w-4" />
-        ) : (
-          <ChevronRight className="text-faint-foreground h-4 w-4" />
-        )}
+        <ChevronDown
+          className={`text-faint-foreground h-4 w-4 transition-transform duration-300 ${
+            open ? "rotate-0" : "-rotate-90"
+          }`}
+        />
       </button>
 
-      {open && (
-        <div className="border-border-soft border-t px-5">
-          {rows.map((s) => (
-            <SettingRowItem key={s.key} setting={s} onRefresh={onRefresh} />
-          ))}
+      <div
+        className={`grid transition-[grid-template-rows] duration-300 ease-out ${
+          open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+        }`}
+      >
+        <div className="overflow-hidden">
+          <div className="border-border-soft border-t px-5">
+            {rows.map((s) => (
+              <SettingRowItem key={s.key} setting={s} onRefresh={onRefresh} />
+            ))}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
 
 export function SiteSettingsTab({ settings, errorMsg, onRefresh }: SiteSettingsTabProps) {
   const groups = useMemo(() => groupSettings(settings), [settings]);
+  const [openGroup, setOpenGroup] = useState<string | null>(null);
 
   // Preferred order
   const orderedKeys = ["general", "seo", "theme", "social", "footer", "_other"].filter(
@@ -253,6 +277,13 @@ export function SiteSettingsTab({ settings, errorMsg, onRefresh }: SiteSettingsT
   // Any unrecognized groups not in the order list
   const extraKeys = Object.keys(groups).filter((k) => !orderedKeys.includes(k));
   const allKeys = [...orderedKeys, ...extraKeys];
+
+  const toggleGroup = useCallback(
+    (groupKey: string) => {
+      setOpenGroup((prev) => (prev === groupKey ? null : groupKey));
+    },
+    [],
+  );
 
   return (
     <div className="space-y-4">
@@ -269,7 +300,7 @@ export function SiteSettingsTab({ settings, errorMsg, onRefresh }: SiteSettingsT
       ) : (
         <div className="space-y-3">
           <p className="text-faint-foreground text-xs">
-            {settings.length} pengaturan ditemukan. Arahkan kursor ke baris untuk mengedit.
+            {settings.length} pengaturan ditemukan. Klik grup untuk mengubah statusnya.
           </p>
           {allKeys.map((groupKey) => (
             <GroupCard
@@ -277,6 +308,8 @@ export function SiteSettingsTab({ settings, errorMsg, onRefresh }: SiteSettingsT
               groupKey={groupKey}
               rows={groups[groupKey]}
               onRefresh={onRefresh}
+              open={openGroup === groupKey}
+              onToggle={() => toggleGroup(groupKey)}
             />
           ))}
         </div>

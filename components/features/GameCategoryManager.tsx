@@ -40,6 +40,8 @@ export function GameCategoryManager({
   const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [prevCategories, setPrevCategories] = useState(initialCategories);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isDrawerClosing, setIsDrawerClosing] = useState(false);
   const [title, setTitle] = useState("");
   const [gameSlug, setGameSlug] = useState("");
   const [selectedIcon, setSelectedIcon] = useState("");
@@ -53,6 +55,27 @@ export function GameCategoryManager({
     setPrevCategories(initialCategories);
     setCategories(initialCategories);
   }
+
+  const openDrawerNew = () => {
+    if (isDrawerClosing) return;
+    setEditingId(null);
+    setTitle("");
+    setGameSlug("");
+    setSelectedIcon("");
+    setIsActive(true);
+    setError(null);
+    setSuccess(false);
+    setIsDrawerOpen(true);
+  };
+
+  const closeDrawer = () => {
+    if (isDrawerClosing || isPending) return;
+    setIsDrawerClosing(true);
+    setTimeout(() => {
+      setIsDrawerClosing(false);
+      setIsDrawerOpen(false);
+    }, 200);
+  };
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
@@ -68,6 +91,7 @@ export function GameCategoryManager({
   };
 
   const handleEditClick = (cat: Category) => {
+    if (isDrawerClosing) return;
     setEditingId(cat.id);
     setTitle(cat.title);
     setGameSlug(cat.game_slug);
@@ -75,6 +99,7 @@ export function GameCategoryManager({
     setIsActive(cat.is_active ?? true);
     setError(null);
     setSuccess(false);
+    setIsDrawerOpen(true);
   };
 
   const handleCancelEdit = () => {
@@ -85,6 +110,7 @@ export function GameCategoryManager({
     setIsActive(true);
     setError(null);
     setSuccess(false);
+    setIsDrawerOpen(false);
   };
 
   const handleToggleStatus = (cat: Category) => {
@@ -159,6 +185,7 @@ export function GameCategoryManager({
         setSelectedIcon("");
         setIsActive(true);
         router.refresh();
+        closeDrawer();
       } else {
         setError(result.error || "Terjadi kesalahan saat menyimpan kategori.");
       }
@@ -180,81 +207,99 @@ export function GameCategoryManager({
         </div>
       </div>
 
-      {/* Form — full width, fields in a row */}
-      <div className="border-border-soft bg-card overflow-hidden rounded-xl border shadow-sm">
-        <div className="border-border-soft bg-muted/50 flex items-center justify-between border-b px-5 py-3.5">
-          <h3 className="text-foreground text-sm font-semibold">
-            {editingId ? "Edit Kategori" : "Tambah Kategori"}
-          </h3>
-          {editingId && (
-            <button
-              type="button"
-              onClick={handleCancelEdit}
-              className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-[10px] p-1"
-              title="Batal edit"
+      {/* Drawer — Tambah / Edit Kategori */}
+      {(isDrawerOpen || isDrawerClosing) && (
+        <div
+          className={`fixed inset-0 z-50 flex items-center justify-end bg-slate-900/50 backdrop-blur-sm ${
+            isDrawerClosing ? "fs-overlay-out" : "fs-overlay-in"
+          }`}
+          onClick={closeDrawer}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={`bg-card flex h-full w-full max-w-lg flex-col border-border-soft border-l shadow-2xl ${
+              isDrawerClosing ? "fs-drawer-out" : "fs-drawer-in"
+            }`}
+          >
+            <div className="border-border-soft flex items-center justify-between border-b px-6 py-5">
+              <div>
+                <h3 className="text-foreground text-base font-bold">
+                  {editingId ? "Edit Kategori" : "Tambah Kategori"}
+                </h3>
+                <p className="text-muted-foreground mt-0.5 text-xs">
+                  {editingId
+                    ? "Perbarui detail kategori game."
+                    : "Tambahkan kategori game baru."}
+                </p>
+              </div>
+              <button
+                onClick={closeDrawer}
+                disabled={isPending}
+                className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-lg p-1 transition-colors disabled:opacity-50"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <form
+              onSubmit={handleSubmit}
+              className="fs-rise-in flex flex-1 flex-col overflow-hidden"
             >
-              <X className="h-4 w-4" />
-            </button>
-          )}
-        </div>
-        <div className="p-5">
-          <form onSubmit={handleSubmit}>
-            {error && (
-              <div className="mb-4 rounded-[10px] bg-rose-50 p-3 text-sm text-rose-600 ring-1 ring-rose-200">
-                {error}
-              </div>
-            )}
-            {success && (
-              <div className="mb-4 flex items-center gap-2 rounded-[10px] bg-emerald-50 p-3 text-sm text-emerald-700 ring-1 ring-emerald-200">
-                <Check className="h-4 w-4" /> Kategori berhasil disimpan!
-              </div>
-            )}
+              <div className="flex-1 space-y-4 overflow-y-auto p-6">
+                {error && (
+                  <div className="fs-drop-in rounded-[10px] bg-rose-50 p-3 text-sm text-rose-600 ring-1 ring-rose-200">
+                    {error}
+                  </div>
+                )}
+                {success && (
+                  <div className="rounded-[10px] bg-emerald-50 p-3 text-sm text-emerald-700 ring-1 ring-emerald-200">
+                    <Check className="h-4 w-4" /> Kategori berhasil disimpan!
+                  </div>
+                )}
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="space-y-1.5">
-                <label
-                  className="text-muted-foreground block text-xs font-semibold tracking-wide uppercase"
-                  htmlFor="cat-title"
-                >
-                  Judul Kategori
-                </label>
-                <input
-                  id="cat-title"
-                  type="text"
-                  required
-                  value={title}
-                  onChange={handleTitleChange}
-                  placeholder="e.g. Diamond Top Up"
-                  className="border-border bg-card text-foreground placeholder:text-faint-foreground w-full rounded-[10px] border px-3.5 py-2.5 text-sm transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
-                />
-              </div>
+                <div className="space-y-1.5">
+                  <label
+                    className="text-muted-foreground block text-xs font-semibold tracking-wide uppercase"
+                    htmlFor="cat-title"
+                  >
+                    Judul Kategori
+                  </label>
+                  <input
+                    id="cat-title"
+                    type="text"
+                    required
+                    value={title}
+                    onChange={handleTitleChange}
+                    placeholder="e.g. Diamond Top Up"
+                    className="border-border bg-card text-foreground placeholder:text-faint-foreground w-full rounded-[10px] border px-3.5 py-2.5 text-sm transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                  />
+                </div>
 
-              <div className="space-y-1.5">
-                <label
-                  className="text-muted-foreground block text-xs font-semibold tracking-wide uppercase"
-                  htmlFor="cat-slug"
-                >
-                  Game Slug
-                </label>
-                <input
-                  id="cat-slug"
-                  type="text"
-                  required
-                  value={gameSlug}
-                  onChange={(e) => setGameSlug(e.target.value)}
-                  placeholder="mobile-legends"
-                  className="border-border bg-card text-foreground placeholder:text-faint-foreground w-full rounded-[10px] border px-3.5 py-2.5 font-mono text-sm transition-colors placeholder:font-sans focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
-                />
-              </div>
+                <div className="space-y-1.5">
+                  <label
+                    className="text-muted-foreground block text-xs font-semibold tracking-wide uppercase"
+                    htmlFor="cat-slug"
+                  >
+                    Game Slug
+                  </label>
+                  <input
+                    id="cat-slug"
+                    type="text"
+                    required
+                    value={gameSlug}
+                    onChange={(e) => setGameSlug(e.target.value)}
+                    placeholder="mobile-legends"
+                    className="bg-card text-foreground placeholder:text-faint-foreground border-border w-full rounded-[10px] border px-3.5 py-2.5 font-mono text-sm transition-colors placeholder:font-sans focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                  />
+                </div>
 
-              <div className="space-y-1.5">
-                <label className="text-muted-foreground block text-xs font-semibold tracking-wide uppercase">
-                  Ikon
-                </label>
-                <CategoryIconPicker value={selectedIcon} onChange={setSelectedIcon} />
-              </div>
+                <div className="space-y-1.5">
+                  <label className="text-muted-foreground block text-xs font-semibold tracking-wide uppercase">
+                    Ikon
+                  </label>
+                  <CategoryIconPicker value={selectedIcon} onChange={setSelectedIcon} />
+                </div>
 
-              <div className="flex flex-col justify-end gap-2">
                 {editingId && (
                   <label className="flex cursor-pointer items-center gap-2.5">
                     <div className="relative inline-flex items-center">
@@ -271,11 +316,14 @@ export function GameCategoryManager({
                     </span>
                   </label>
                 )}
-                <div className="flex gap-2">
+              </div>
+
+              <div className="border-border-soft bg-card border-t p-6">
+                <div className="flex w-full flex-col gap-2">
                   <button
                     type="submit"
                     disabled={isPending || !title || !gameSlug}
-                    className="inline-flex flex-1 items-center justify-center gap-2 rounded-[10px] bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-70"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-[10px] bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
                   >
                     {isPending ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -284,24 +332,28 @@ export function GameCategoryManager({
                     ) : (
                       <Plus className="h-4 w-4" strokeWidth={2.5} />
                     )}
-                    <span>{isPending ? "Menyimpan..." : editingId ? "Simpan" : "Tambah"}</span>
+                    <span>
+                      {isPending
+                        ? "Menyimpan..."
+                        : editingId
+                          ? "Simpan Kategori"
+                          : "Tambah Kategori"}
+                    </span>
                   </button>
-                  {editingId && (
-                    <button
-                      type="button"
-                      onClick={handleCancelEdit}
-                      disabled={isPending}
-                      className="bg-muted text-foreground hover:bg-muted inline-flex items-center justify-center rounded-[10px] px-3 py-2.5 text-sm font-medium transition-all"
-                    >
-                      Batal
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={closeDrawer}
+                    disabled={isPending}
+                    className="text-muted-foreground hover:bg-muted inline-flex w-full items-center justify-center rounded-[10px] px-4 py-2 text-xs font-semibold disabled:opacity-50"
+                  >
+                    Batal
+                  </button>
                 </div>
               </div>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* List — full width below */}
       <div>
@@ -312,6 +364,14 @@ export function GameCategoryManager({
             <span className="bg-muted text-muted-foreground ml-auto inline-flex items-center rounded-[10px] px-2.5 py-0.5 text-xs font-medium">
               {categories.length} Total
             </span>
+            <button
+              type="button"
+              onClick={openDrawerNew}
+              className="inline-flex items-center gap-1.5 rounded-[10px] bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition-all hover:bg-blue-700 active:scale-[0.97]"
+            >
+              <Plus className="h-3.5 w-3.5" strokeWidth={2.5} />
+              Tambah Kategori
+            </button>
           </div>
 
           <div className="overflow-x-auto">

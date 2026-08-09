@@ -27,6 +27,7 @@ type Account = Database["public"]["Tables"]["accounts"]["Row"];
 
 export default function TradeInPage() {
   const [isAddTTOpen, setIsAddTTOpen] = useState(false);
+  const [isAddTTClosing, setIsAddTTClosing] = useState(false);
   const [deals, setDeals] = useState<Deal[]>([]);
   const [stocks, setStocks] = useState<InventoryItem[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -62,13 +63,27 @@ export default function TradeInPage() {
     loadData();
   }, []);
 
+  const closeAddTT = () => {
+    if (isAddTTClosing || isSubmitting) return;
+    setIsAddTTClosing(true);
+    setTimeout(() => {
+      setIsAddTTClosing(false);
+      setIsAddTTOpen(false);
+    }, 200);
+  };
+
+  const openAddTT = () => {
+    if (isAddTTClosing) return;
+    setIsAddTTOpen(true);
+  };
+
   const handleAddTT = async (formData: FormData) => {
     try {
       setIsSubmitting(true);
       setError("");
       await createTukarTambah(formData);
-      setIsAddTTOpen(false);
       loadData();
+      closeAddTT();
     } catch (err: unknown) {
       setError(getErrorMessage(err));
     } finally {
@@ -96,8 +111,8 @@ export default function TradeInPage() {
             Export Data
           </button>
           <button
-            onClick={() => setIsAddTTOpen(true)}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700"
+            onClick={openAddTT}
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 active:scale-[0.97]"
           >
             <Plus className="h-4 w-4" />
             Buat Transaksi TT
@@ -263,9 +278,19 @@ export default function TradeInPage() {
       )}
 
       {/* Buat TT Baru Modal */}
-      {isAddTTOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm">
-          <div className="animate-in slide-in-from-right bg-card flex h-full w-full max-w-md flex-col shadow-2xl duration-300">
+      {(isAddTTOpen || isAddTTClosing) && (
+        <div
+          className={`fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm ${
+            isAddTTClosing ? "fs-overlay-out" : "fs-overlay-in"
+          }`}
+          onClick={closeAddTT}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={`bg-card flex h-full w-full max-w-md flex-col shadow-2xl ${
+              isAddTTClosing ? "fs-drawer-out" : "fs-drawer-in"
+            }`}
+          >
             <div className="border-border-soft bg-muted flex items-center justify-between border-b px-6 py-5">
               <div>
                 <h2 className="text-foreground text-lg font-bold">Transaksi Tukar Tambah</h2>
@@ -274,16 +299,16 @@ export default function TradeInPage() {
                 </p>
               </div>
               <button
-                onClick={() => setIsAddTTOpen(false)}
+                onClick={closeAddTT}
                 className="bg-card text-faint-foreground hover:text-muted-foreground rounded-full p-2 shadow-sm transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <form action={handleAddTT} className="flex flex-1 flex-col overflow-hidden">
+            <form action={handleAddTT} className="fs-rise-in flex flex-1 flex-col overflow-hidden">
               <div className="flex-1 space-y-6 overflow-y-auto p-6">
                 {error && (
-                  <div className="rounded-lg border border-rose-100 bg-rose-50 p-3 text-sm text-rose-600">
+                  <div className="fs-drop-in rounded-lg border border-rose-100 bg-rose-50 p-3 text-sm text-rose-600">
                     {error}
                   </div>
                 )}
@@ -406,7 +431,7 @@ export default function TradeInPage() {
                 {/* Selisih & Payment Calculation */}
                 {(priceOut > 0 || ttValue > 0) && (
                   <div
-                    className={`rounded-xl border p-4 ${selisih < 0 ? "border-emerald-100 bg-emerald-50" : selisih > 0 ? "border-rose-100 bg-rose-50" : "border-border-soft bg-muted"}`}
+                    className={`fs-drop-in rounded-xl border p-4 ${selisih < 0 ? "border-emerald-100 bg-emerald-50" : selisih > 0 ? "border-rose-100 bg-rose-50" : "border-border-soft bg-muted"}`}
                   >
                     <h3 className="text-foreground mb-2 text-sm font-semibold">
                       Selisih Transaksi

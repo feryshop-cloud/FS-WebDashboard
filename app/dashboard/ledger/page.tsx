@@ -43,6 +43,8 @@ export default function LedgerPage() {
   // Actions & Modals state
   const [editingLedger, setEditingLedger] = useState<LedgerRecord | null>(null);
   const [isAddManualOpen, setIsAddManualOpen] = useState(false);
+  const [isAddManualClosing, setIsAddManualClosing] = useState(false);
+  const [isEditClosing, setIsEditClosing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -79,13 +81,43 @@ export default function LedgerPage() {
     };
   }, [currentPage, accountId]);
 
+  const closeAddManual = () => {
+    if (isAddManualClosing || isSubmitting) return;
+    setIsAddManualClosing(true);
+    setTimeout(() => {
+      setIsAddManualClosing(false);
+      setIsAddManualOpen(false);
+    }, 200);
+  };
+
+  const openAddManual = () => {
+    setError("");
+    if (isAddManualClosing) return;
+    setIsAddManualOpen(true);
+  };
+
+  const editLedger = (tx: LedgerRecord) => {
+    if (isEditClosing) return;
+    setError("");
+    setEditingLedger(tx);
+  };
+
+  const closeEdit = () => {
+    if (isEditClosing || isSubmitting) return;
+    setIsEditClosing(true);
+    setTimeout(() => {
+      setIsEditClosing(false);
+      setEditingLedger(null);
+    }, 200);
+  };
+
   const handleAddManual = async (formData: FormData) => {
     try {
       setIsSubmitting(true);
       setError("");
       await addManualLedger(formData);
-      setIsAddManualOpen(false);
       loadLedgerData();
+      closeAddManual();
     } catch (err: unknown) {
       setError(getErrorMessage(err));
     } finally {
@@ -99,8 +131,8 @@ export default function LedgerPage() {
       setIsSubmitting(true);
       setError("");
       await updateLedger(editingLedger.id, formData);
-      setEditingLedger(null);
       loadLedgerData();
+      closeEdit();
     } catch (err: unknown) {
       setError(getErrorMessage(err));
     } finally {
@@ -196,11 +228,8 @@ export default function LedgerPage() {
             Export Excel
           </button>
           <button
-            onClick={() => {
-              setError("");
-              setIsAddManualOpen(true);
-            }}
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-transparent bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700"
+            onClick={openAddManual}
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-transparent bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700 active:scale-[0.97]"
           >
             <Plus className="h-4 w-4" />
             Catat Kas Manual
@@ -348,10 +377,7 @@ export default function LedgerPage() {
                       <td className="px-6 py-4 text-center whitespace-nowrap">
                         <div className="flex items-center justify-center gap-2">
                           <button
-                            onClick={() => {
-                              setError("");
-                              setEditingLedger(tx);
-                            }}
+                            onClick={() => editLedger(tx)}
                             className="rounded-[10px] p-1.5 text-blue-500 transition-colors hover:bg-blue-50 hover:text-blue-700"
                             title="Edit Catatan"
                           >
@@ -390,9 +416,19 @@ export default function LedgerPage() {
       </div>
 
       {/* Add Manual Ledger Modal */}
-      {isAddManualOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm">
-          <div className="animate-in slide-in-from-right bg-card flex h-full w-full max-w-md flex-col shadow-2xl duration-200">
+      {(isAddManualOpen || isAddManualClosing) && (
+        <div
+          className={`fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm ${
+            isAddManualClosing ? "fs-overlay-out" : "fs-overlay-in"
+          }`}
+          onClick={closeAddManual}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={`bg-card flex h-full w-full max-w-md flex-col shadow-2xl ${
+              isAddManualClosing ? "fs-drawer-out" : "fs-drawer-in"
+            }`}
+          >
             <div className="border-border-soft bg-muted/50 flex items-center justify-between border-b px-6 py-5">
               <div>
                 <h2 className="text-foreground text-base font-bold">Catat Kas Manual</h2>
@@ -401,16 +437,16 @@ export default function LedgerPage() {
                 </p>
               </div>
               <button
-                onClick={() => setIsAddManualOpen(false)}
+                onClick={closeAddManual}
                 className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-lg p-1.5"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <form action={handleAddManual} className="flex flex-1 flex-col overflow-hidden">
+            <form action={handleAddManual} className="fs-rise-in flex flex-1 flex-col overflow-hidden">
               <div className="flex-1 space-y-4 overflow-y-auto p-6">
                 {error && (
-                  <div className="rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs font-medium text-rose-700">
+                  <div className="fs-drop-in rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs font-medium text-rose-700">
                     {error}
                   </div>
                 )}
@@ -473,7 +509,7 @@ export default function LedgerPage() {
               <div className="border-border-soft bg-muted/50 flex items-center justify-end gap-3 border-t p-6">
                 <button
                   type="button"
-                  onClick={() => setIsAddManualOpen(false)}
+                  onClick={closeAddManual}
                   className="text-muted-foreground hover:bg-muted rounded-lg px-4 py-2 text-xs font-semibold"
                 >
                   Batal
@@ -500,8 +536,18 @@ export default function LedgerPage() {
 
       {/* Edit Ledger Modal */}
       {editingLedger && (
-        <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm">
-          <div className="animate-in slide-in-from-right bg-card flex h-full w-full max-w-md flex-col shadow-2xl duration-200">
+        <div
+          className={`fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm ${
+            isEditClosing ? "fs-overlay-out" : "fs-overlay-in"
+          }`}
+          onClick={closeEdit}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={`bg-card flex h-full w-full max-w-md flex-col shadow-2xl ${
+              isEditClosing ? "fs-drawer-out" : "fs-drawer-in"
+            }`}
+          >
             <div className="border-border-soft bg-muted/50 flex items-center justify-between border-b px-6 py-5">
               <div>
                 <h2 className="text-foreground text-base font-bold">Edit Catatan Transaksi</h2>
@@ -510,16 +556,16 @@ export default function LedgerPage() {
                 </p>
               </div>
               <button
-                onClick={() => setEditingLedger(null)}
+                onClick={closeEdit}
                 className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-lg p-1.5"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <form action={handleUpdate} className="flex flex-1 flex-col overflow-hidden">
+            <form action={handleUpdate} className="fs-rise-in flex flex-1 flex-col overflow-hidden">
               <div className="flex-1 space-y-4 overflow-y-auto p-6">
                 {error && (
-                  <div className="rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs font-medium text-rose-700">
+                  <div className="fs-drop-in rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs font-medium text-rose-700">
                     {error}
                   </div>
                 )}
@@ -556,7 +602,7 @@ export default function LedgerPage() {
               <div className="border-border-soft bg-muted/50 flex items-center justify-end gap-3 border-t p-6">
                 <button
                   type="button"
-                  onClick={() => setEditingLedger(null)}
+                  onClick={closeEdit}
                   className="text-muted-foreground hover:bg-muted rounded-lg px-4 py-2 text-xs font-semibold"
                 >
                   Batal

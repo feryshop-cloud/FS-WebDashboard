@@ -61,7 +61,7 @@ export function InventoryRowActions({ item, games, onRefresh }: InventoryRowActi
       {isOpenMenu && (
         <>
           <div className="fixed inset-0 z-20" onClick={() => setIsOpenMenu(false)} />
-          <div className="border-border bg-card absolute right-0 z-30 mt-1 w-36 rounded-lg border py-1 shadow-lg">
+          <div className="fs-drop-in border-border bg-card absolute right-0 z-30 mt-1 w-36 rounded-lg border py-1 shadow-lg">
             <button
               onClick={() => {
                 setIsOpenMenu(false);

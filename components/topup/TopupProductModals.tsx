@@ -25,8 +25,18 @@ interface AddTopupProductModalProps {
 export function AddTopupProductModal({ isOpen, onClose, onSuccess }: AddTopupProductModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [isClosing, setIsClosing] = useState(false);
 
   if (!isOpen) return null;
+
+  const handleClose = () => {
+    if (isClosing || isSubmitting) return;
+    setIsClosing(true);
+    setTimeout(() => {
+      setIsClosing(false);
+      onClose();
+    }, 200);
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -57,7 +67,11 @@ export function AddTopupProductModal({ isOpen, onClose, onSuccess }: AddTopupPro
 
       if (res.success) {
         onSuccess();
-        onClose();
+        setIsClosing(true);
+        setTimeout(() => {
+          setIsClosing(false);
+          onClose();
+        }, 200);
       } else {
         setError(res.error || "Gagal menambahkan produk.");
       }
@@ -69,15 +83,25 @@ export function AddTopupProductModal({ isOpen, onClose, onSuccess }: AddTopupPro
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm">
-      <div className="animate-in slide-in-from-right bg-card flex h-full w-full max-w-md flex-col shadow-2xl duration-300">
+    <div
+      className={`fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm ${
+        isClosing ? "fs-overlay-out" : "fs-overlay-in"
+      }`}
+      onClick={handleClose}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className={`bg-card flex h-full w-full max-w-md flex-col shadow-2xl ${
+          isClosing ? "fs-drawer-out" : "fs-drawer-in"
+        }`}
+      >
         <div className="border-border-soft bg-muted flex items-center justify-between border-b px-6 py-5">
           <div>
             <h2 className="text-foreground text-lg font-bold">Tambah Produk Top-Up</h2>
             <p className="text-muted-foreground mt-1 text-xs">Tambah katalog item top-up baru.</p>
           </div>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             disabled={isSubmitting}
             className="bg-card text-faint-foreground hover:text-muted-foreground rounded-full p-2 shadow-sm transition-colors disabled:opacity-50"
           >
@@ -85,10 +109,10 @@ export function AddTopupProductModal({ isOpen, onClose, onSuccess }: AddTopupPro
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-1 flex-col overflow-hidden">
+        <form onSubmit={handleSubmit} className="fs-rise-in flex flex-1 flex-col overflow-hidden">
           <div className="flex-1 space-y-4 overflow-y-auto p-6 text-sm">
             {error && (
-              <div className="rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs text-rose-600">
+              <div className="fs-drop-in rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs text-rose-600">
                 {error}
               </div>
             )}
@@ -223,8 +247,18 @@ export function EditTopupProductModal({
 }: EditTopupProductModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [isClosing, setIsClosing] = useState(false);
 
   if (!isOpen) return null;
+
+  const handleClose = () => {
+    if (isClosing || isSubmitting) return;
+    setIsClosing(true);
+    setTimeout(() => {
+      setIsClosing(false);
+      onClose();
+    }, 200);
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -255,7 +289,11 @@ export function EditTopupProductModal({
 
       if (res.success) {
         onSuccess();
-        onClose();
+        setIsClosing(true);
+        setTimeout(() => {
+          setIsClosing(false);
+          onClose();
+        }, 200);
       } else {
         setError(res.error || "Gagal meng-update produk.");
       }
@@ -267,8 +305,18 @@ export function EditTopupProductModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm">
-      <div className="animate-in slide-in-from-right bg-card flex h-full w-full max-w-md flex-col shadow-2xl duration-300">
+    <div
+      className={`fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm ${
+        isClosing ? "fs-overlay-out" : "fs-overlay-in"
+      }`}
+      onClick={handleClose}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className={`bg-card flex h-full w-full max-w-md flex-col shadow-2xl ${
+          isClosing ? "fs-drawer-out" : "fs-drawer-in"
+        }`}
+      >
         <div className="border-border-soft bg-muted flex items-center justify-between border-b px-6 py-5">
           <div>
             <h2 className="text-foreground text-lg font-bold">Edit Produk Top-Up</h2>
@@ -277,7 +325,7 @@ export function EditTopupProductModal({
             </p>
           </div>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             disabled={isSubmitting}
             className="bg-card text-faint-foreground hover:text-muted-foreground rounded-full p-2 shadow-sm transition-colors disabled:opacity-50"
           >
@@ -285,10 +333,10 @@ export function EditTopupProductModal({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-1 flex-col overflow-hidden">
+        <form onSubmit={handleSubmit} className="fs-rise-in flex flex-1 flex-col overflow-hidden">
           <div className="flex-1 space-y-4 overflow-y-auto p-6 text-sm">
             {error && (
-              <div className="rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs text-rose-600">
+              <div className="fs-drop-in rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs text-rose-600">
                 {error}
               </div>
             )}

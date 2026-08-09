@@ -30,8 +30,11 @@ type Account = Database["public"]["Tables"]["accounts"]["Row"];
 
 export default function AccountsPage() {
   const [isAddAccountOpen, setIsAddAccountOpen] = useState(false);
+  const [isAddAccountClosing, setIsAddAccountClosing] = useState(false);
   const [isMutasiOpen, setIsMutasiOpen] = useState(false);
+  const [isMutasiClosing, setIsMutasiClosing] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
+  const [isEditAccountClosing, setIsEditAccountClosing] = useState(false);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -80,13 +83,52 @@ export default function AccountsPage() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const closeAddAccount = () => {
+    if (isAddAccountClosing || isSubmitting) return;
+    setIsAddAccountClosing(true);
+    setTimeout(() => {
+      setIsAddAccountClosing(false);
+      setIsAddAccountOpen(false);
+    }, 200);
+  };
+
+  const openAddAccount = () => {
+    setError("");
+    if (isAddAccountClosing) return;
+    setIsAddAccountOpen(true);
+  };
+
+  const closeEditAccount = () => {
+    if (isEditAccountClosing || isSubmitting) return;
+    setIsEditAccountClosing(true);
+    setTimeout(() => {
+      setIsEditAccountClosing(false);
+      setEditingAccount(null);
+    }, 200);
+  };
+
+  const closeMutasi = () => {
+    if (isMutasiClosing || isSubmitting) return;
+    setIsMutasiClosing(true);
+    setTimeout(() => {
+      setIsMutasiClosing(false);
+      setIsMutasiOpen(false);
+    }, 200);
+  };
+
+  const openMutasi = () => {
+    setError("");
+    if (isMutasiClosing) return;
+    setIsMutasiOpen(true);
+  };
+
   const handleAddAccount = async (formData: FormData) => {
     try {
       setIsSubmitting(true);
       setError("");
       await addAccount(formData);
-      setIsAddAccountOpen(false);
       loadAccounts();
+      closeAddAccount();
     } catch (err: unknown) {
       setError(getErrorMessage(err));
     } finally {
@@ -100,8 +142,8 @@ export default function AccountsPage() {
       setIsSubmitting(true);
       setError("");
       await updateAccount(editingAccount.id, formData);
-      setEditingAccount(null);
       loadAccounts();
+      closeEditAccount();
     } catch (err: unknown) {
       setError(getErrorMessage(err));
     } finally {
@@ -130,8 +172,8 @@ export default function AccountsPage() {
       setIsSubmitting(true);
       setError("");
       await transferBalance(formData);
-      setIsMutasiOpen(false);
       loadAccounts();
+      closeMutasi();
     } catch (err: unknown) {
       setError(getErrorMessage(err));
     } finally {
@@ -166,21 +208,15 @@ export default function AccountsPage() {
         </div>
         <div className="flex items-center gap-3">
           <button
-            onClick={() => {
-              setError("");
-              setIsMutasiOpen(true);
-            }}
-            className="border-border bg-card text-foreground hover:bg-muted hover:text-foreground inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold shadow-sm transition-all"
+            onClick={openMutasi}
+            className="border-border bg-card text-foreground hover:bg-muted hover:text-foreground inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold shadow-sm transition-all active:scale-[0.97]"
           >
             <ArrowRightLeft className="h-4 w-4" />
             Mutasi Saldo
           </button>
           <button
-            onClick={() => {
-              setError("");
-              setIsAddAccountOpen(true);
-            }}
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-transparent bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700"
+            onClick={openAddAccount}
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-transparent bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700 active:scale-[0.97]"
           >
             <Plus className="h-4 w-4" />
             Tambah Rekening
@@ -277,7 +313,7 @@ export default function AccountsPage() {
                       {isMenuOpen && (
                         <div
                           ref={menuRef}
-                          className="animate-in fade-in slide-in-from-top-2 border-border-soft bg-card absolute top-8 right-0 z-30 w-44 rounded-xl border p-1.5 shadow-xl duration-150"
+                          className="fs-drop-in border-border-soft bg-card absolute top-8 right-0 z-30 w-44 rounded-xl border p-1.5 shadow-xl"
                         >
                           <button
                             onClick={() => {
@@ -342,9 +378,19 @@ export default function AccountsPage() {
       )}
 
       {/* Add Account Modal */}
-      {isAddAccountOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm">
-          <div className="animate-in slide-in-from-right bg-card flex h-full w-full max-w-md flex-col shadow-2xl duration-200">
+      {(isAddAccountOpen || isAddAccountClosing) && (
+        <div
+          className={`fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm ${
+            isAddAccountClosing ? "fs-overlay-out" : "fs-overlay-in"
+          }`}
+          onClick={closeAddAccount}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={`bg-card flex h-full w-full max-w-md flex-col shadow-2xl ${
+              isAddAccountClosing ? "fs-drawer-out" : "fs-drawer-in"
+            }`}
+          >
             <div className="border-border-soft bg-muted/50 flex items-center justify-between border-b px-6 py-5">
               <div>
                 <h2 className="text-foreground text-base font-bold">Tambah Rekening Baru</h2>
@@ -353,16 +399,16 @@ export default function AccountsPage() {
                 </p>
               </div>
               <button
-                onClick={() => setIsAddAccountOpen(false)}
+                onClick={closeAddAccount}
                 className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-lg p-1.5"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <form action={handleAddAccount} className="flex flex-1 flex-col overflow-hidden">
+            <form action={handleAddAccount} className="fs-rise-in flex flex-1 flex-col overflow-hidden">
               <div className="flex-1 space-y-4 overflow-y-auto p-6">
                 {error && (
-                  <div className="rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs font-medium text-rose-700">
+                  <div className="fs-drop-in rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs font-medium text-rose-700">
                     {error}
                   </div>
                 )}
@@ -408,7 +454,7 @@ export default function AccountsPage() {
               <div className="border-border-soft bg-muted/50 flex items-center justify-end gap-3 border-t p-6">
                 <button
                   type="button"
-                  onClick={() => setIsAddAccountOpen(false)}
+                  onClick={closeAddAccount}
                   className="text-muted-foreground hover:bg-muted rounded-lg px-4 py-2 text-xs font-semibold"
                 >
                   Batal
@@ -435,8 +481,18 @@ export default function AccountsPage() {
 
       {/* Edit Account Modal */}
       {editingAccount && (
-        <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm">
-          <div className="animate-in slide-in-from-right bg-card flex h-full w-full max-w-md flex-col shadow-2xl duration-200">
+        <div
+          className={`fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm ${
+            isEditAccountClosing ? "fs-overlay-out" : "fs-overlay-in"
+          }`}
+          onClick={closeEditAccount}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={`bg-card flex h-full w-full max-w-md flex-col shadow-2xl ${
+              isEditAccountClosing ? "fs-drawer-out" : "fs-drawer-in"
+            }`}
+          >
             <div className="border-border-soft bg-muted/50 flex items-center justify-between border-b px-6 py-5">
               <div>
                 <h2 className="text-foreground text-base font-bold">Edit Rekening</h2>
@@ -445,16 +501,16 @@ export default function AccountsPage() {
                 </p>
               </div>
               <button
-                onClick={() => setEditingAccount(null)}
+                onClick={closeEditAccount}
                 className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-lg p-1.5"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <form action={handleUpdateAccount} className="flex flex-1 flex-col overflow-hidden">
+            <form action={handleUpdateAccount} className="fs-rise-in flex flex-1 flex-col overflow-hidden">
               <div className="flex-1 space-y-4 overflow-y-auto p-6">
                 {error && (
-                  <div className="rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs font-medium text-rose-700">
+                  <div className="fs-drop-in rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs font-medium text-rose-700">
                     {error}
                   </div>
                 )}
@@ -514,7 +570,7 @@ export default function AccountsPage() {
               <div className="border-border-soft bg-muted/50 flex items-center justify-end gap-3 border-t p-6">
                 <button
                   type="button"
-                  onClick={() => setEditingAccount(null)}
+                  onClick={closeEditAccount}
                   className="text-muted-foreground hover:bg-muted rounded-lg px-4 py-2 text-xs font-semibold"
                 >
                   Batal
@@ -540,9 +596,19 @@ export default function AccountsPage() {
       )}
 
       {/* Mutasi Modal */}
-      {isMutasiOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm">
-          <div className="animate-in slide-in-from-right bg-card flex h-full w-full max-w-md flex-col shadow-2xl duration-200">
+      {(isMutasiOpen || isMutasiClosing) && (
+        <div
+          className={`fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm ${
+            isMutasiClosing ? "fs-overlay-out" : "fs-overlay-in"
+          }`}
+          onClick={closeMutasi}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={`bg-card flex h-full w-full max-w-md flex-col shadow-2xl ${
+              isMutasiClosing ? "fs-drawer-out" : "fs-drawer-in"
+            }`}
+          >
             <div className="border-border-soft bg-muted/50 flex items-center justify-between border-b px-6 py-5">
               <div>
                 <h2 className="text-foreground text-base font-bold">Mutasi Saldo</h2>
@@ -551,16 +617,16 @@ export default function AccountsPage() {
                 </p>
               </div>
               <button
-                onClick={() => setIsMutasiOpen(false)}
+                onClick={closeMutasi}
                 className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-lg p-1.5"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <form action={handleMutasi} className="flex flex-1 flex-col overflow-hidden">
+            <form action={handleMutasi} className="fs-rise-in flex flex-1 flex-col overflow-hidden">
               <div className="flex-1 space-y-4 overflow-y-auto p-6">
                 {error && (
-                  <div className="rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs font-medium text-rose-700">
+                  <div className="fs-drop-in rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs font-medium text-rose-700">
                     {error}
                   </div>
                 )}
@@ -618,7 +684,7 @@ export default function AccountsPage() {
               <div className="border-border-soft bg-muted/50 flex items-center justify-end gap-3 border-t p-6">
                 <button
                   type="button"
-                  onClick={() => setIsMutasiOpen(false)}
+                  onClick={closeMutasi}
                   className="text-muted-foreground hover:bg-muted rounded-lg px-4 py-2 text-xs font-semibold"
                 >
                   Batal

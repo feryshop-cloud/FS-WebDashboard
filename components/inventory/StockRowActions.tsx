@@ -48,7 +48,7 @@ export function StockRowActions({ stock, categories = [] }: StockRowActionsProps
       {isMenuOpen && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setIsMenuOpen(false)} />
-          <div className="animate-in fade-in zoom-in-95 border-border-soft bg-card absolute right-0 z-20 mt-10 w-48 rounded-[10px] border py-1 shadow-lg">
+          <div className="fs-drop-in border-border-soft bg-card absolute right-0 z-20 mt-10 w-48 rounded-[10px] border py-1 shadow-lg">
             <button
               onClick={() => {
                 setIsMenuOpen(false);

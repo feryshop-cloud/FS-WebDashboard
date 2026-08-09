@@ -42,7 +42,9 @@ export default function ProblemCasesPage() {
 
   // Modal states
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isAddClosing, setIsAddClosing] = useState(false);
   const [selectedCase, setSelectedCase] = useState<ProblemCaseWithRelations | null>(null);
+  const [isDetailClosing, setIsDetailClosing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -85,7 +87,23 @@ export default function ProblemCasesPage() {
     };
   }, []);
 
+  const openAdd = () => {
+    setError("");
+    if (isAddClosing) return;
+    setIsAddOpen(true);
+  };
+
+  const closeAdd = () => {
+    if (isAddClosing || isSubmitting) return;
+    setIsAddClosing(true);
+    setTimeout(() => {
+      setIsAddClosing(false);
+      setIsAddOpen(false);
+    }, 200);
+  };
+
   const handleOpenDetail = (c: ProblemCaseWithRelations) => {
+    if (isDetailClosing) return;
     setError("");
     setSelectedCase(c);
     setEditStatus((c.status as string) || "OPEN");
@@ -93,13 +111,22 @@ export default function ProblemCasesPage() {
     setEditIssueType((c.issue_type as string) || "");
   };
 
+  const closeDetail = () => {
+    if (isDetailClosing || isSubmitting) return;
+    setIsDetailClosing(true);
+    setTimeout(() => {
+      setIsDetailClosing(false);
+      setSelectedCase(null);
+    }, 200);
+  };
+
   const handleAddCase = async (formData: FormData) => {
     try {
       setIsSubmitting(true);
       setError("");
       await createProblemCase(formData);
-      setIsAddOpen(false);
       loadData();
+      closeAdd();
     } catch (err: unknown) {
       setError(getErrorMessage(err));
     } finally {
@@ -118,8 +145,8 @@ export default function ProblemCasesPage() {
         chronology: editChronology,
         issue_type: editIssueType,
       });
-      setSelectedCase(null);
       loadData();
+      closeDetail();
     } catch (err: unknown) {
       setError(getErrorMessage(err));
     } finally {
@@ -171,11 +198,8 @@ export default function ProblemCasesPage() {
         </div>
         <div className="flex items-center gap-3">
           <button
-            onClick={() => {
-              setError("");
-              setIsAddOpen(true);
-            }}
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-transparent bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700"
+            onClick={openAdd}
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-transparent bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700 active:scale-[0.97]"
           >
             <Plus className="h-4 w-4" />
             Buat Case Baru
@@ -340,9 +364,19 @@ export default function ProblemCasesPage() {
       </div>
 
       {/* Buat Case Baru Modal */}
-      {isAddOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm">
-          <div className="animate-in slide-in-from-right bg-card flex h-full w-full max-w-md flex-col shadow-2xl duration-200">
+      {(isAddOpen || isAddClosing) && (
+        <div
+          className={`fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm ${
+            isAddClosing ? "fs-overlay-out" : "fs-overlay-in"
+          }`}
+          onClick={closeAdd}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={`bg-card flex h-full w-full max-w-md flex-col shadow-2xl ${
+              isAddClosing ? "fs-drawer-out" : "fs-drawer-in"
+            }`}
+          >
             <div className="border-border-soft bg-muted/50 flex items-center justify-between border-b px-6 py-5">
               <div>
                 <h2 className="text-foreground text-base font-bold">Buat Case Baru</h2>
@@ -351,16 +385,16 @@ export default function ProblemCasesPage() {
                 </p>
               </div>
               <button
-                onClick={() => setIsAddOpen(false)}
+                onClick={closeAdd}
                 className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-lg p-1.5"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <form action={handleAddCase} className="flex flex-1 flex-col overflow-hidden">
+            <form action={handleAddCase} className="fs-rise-in flex flex-1 flex-col overflow-hidden">
               <div className="flex-1 space-y-4 overflow-y-auto p-6">
                 {error && (
-                  <div className="rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs font-medium text-rose-700">
+                  <div className="fs-drop-in rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs font-medium text-rose-700">
                     {error}
                   </div>
                 )}
@@ -458,7 +492,7 @@ export default function ProblemCasesPage() {
               <div className="border-border-soft bg-muted/50 flex items-center justify-end gap-3 border-t p-6">
                 <button
                   type="button"
-                  onClick={() => setIsAddOpen(false)}
+                  onClick={closeAdd}
                   className="text-muted-foreground hover:bg-muted rounded-lg px-4 py-2 text-xs font-semibold"
                 >
                   Batal
@@ -485,8 +519,18 @@ export default function ProblemCasesPage() {
 
       {/* Detail & Update Status Modal */}
       {selectedCase && (
-        <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm">
-          <div className="animate-in slide-in-from-right bg-card flex h-full w-full max-w-md flex-col shadow-2xl duration-200">
+        <div
+          className={`fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm ${
+            isDetailClosing ? "fs-overlay-out" : "fs-overlay-in"
+          }`}
+          onClick={closeDetail}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={`bg-card flex h-full w-full max-w-md flex-col shadow-2xl ${
+              isDetailClosing ? "fs-drawer-out" : "fs-drawer-in"
+            }`}
+          >
             <div className="border-border-soft bg-muted/50 flex items-center justify-between border-b px-6 py-5">
               <div>
                 <h2 className="text-foreground text-base font-bold">
@@ -497,16 +541,16 @@ export default function ProblemCasesPage() {
                 </p>
               </div>
               <button
-                onClick={() => setSelectedCase(null)}
+                onClick={closeDetail}
                 className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-lg p-1.5"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <form onSubmit={handleUpdateCase} className="flex flex-1 flex-col overflow-hidden">
+            <form onSubmit={handleUpdateCase} className="fs-rise-in flex flex-1 flex-col overflow-hidden">
               <div className="flex-1 space-y-4 overflow-y-auto p-6">
                 {error && (
-                  <div className="rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs font-medium text-rose-700">
+                  <div className="fs-drop-in rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs font-medium text-rose-700">
                     {error}
                   </div>
                 )}
@@ -578,7 +622,7 @@ export default function ProblemCasesPage() {
               <div className="border-border-soft bg-muted/50 flex items-center justify-end gap-3 border-t p-6">
                 <button
                   type="button"
-                  onClick={() => setSelectedCase(null)}
+                  onClick={closeDetail}
                   className="text-muted-foreground hover:bg-muted rounded-lg px-4 py-2 text-xs font-semibold"
                 >
                   Batal

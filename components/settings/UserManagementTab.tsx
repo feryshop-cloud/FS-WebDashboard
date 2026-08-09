@@ -31,6 +31,7 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
   const [searchQuery, setSearchQuery] = useState("");
   const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalClosing, setIsModalClosing] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [formError, setFormError] = useState("");
   const [actionError, setActionError] = useState("");
@@ -113,6 +114,21 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
     }
   };
 
+  const openModal = () => {
+    if (isModalClosing) return;
+    setFormError("");
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    if (isModalClosing || isCreating) return;
+    setIsModalClosing(true);
+    setTimeout(() => {
+      setIsModalClosing(false);
+      setIsModalOpen(false);
+    }, 200);
+  };
+
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError("");
@@ -132,9 +148,9 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
         setFormError(res.error || "Gagal membuat pengguna.");
         return;
       }
-      setIsModalOpen(false);
       setForm({ email: "", password: "", full_name: "", role_id: "" });
       onRefresh();
+      closeModal();
     } catch (err) {
       console.error(err);
       setFormError("Terjadi kesalahan saat membuat pengguna.");
@@ -190,15 +206,12 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
 
         <div className="flex flex-col gap-2 sm:items-end">
           <button
-            onClick={() => setIsModalOpen(true)}
-            className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow"
+            onClick={openModal}
+            className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow active:scale-[0.97]"
           >
             <Plus className="h-4 w-4" />
             Tambah Pengguna Baru
           </button>
-          <div className="rounded-lg border border-blue-100 bg-blue-50 px-3 py-1.5 text-xs leading-relaxed text-blue-700">
-            Pengguna non-admin tetap dibuat otomatis saat login/signup pertama.
-          </div>
         </div>
       </div>
 
@@ -323,17 +336,28 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
       </div>
 
       {/* Create User Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {(isModalOpen || isModalClosing) && (
+        <div
+          className={`fixed inset-0 z-50 flex items-center justify-end bg-slate-900/50 backdrop-blur-sm ${
+            isModalClosing ? "fs-overlay-out" : "fs-overlay-in"
+          }`}
+          onClick={closeModal}
+        >
           <div
-            className="absolute inset-0 bg-slate-900/50"
-            onClick={() => !isCreating && setIsModalOpen(false)}
-          />
-          <div className="border-border-soft bg-card relative w-full max-w-md rounded-xl border shadow-xl">
-            <div className="border-border-soft flex items-center justify-between border-b px-6 py-4">
-              <h3 className="text-foreground text-base font-bold">Tambah Pengguna Baru</h3>
+            onClick={(e) => e.stopPropagation()}
+            className={`bg-card flex h-full w-full max-w-md flex-col border-border-soft border-l shadow-2xl ${
+              isModalClosing ? "fs-drawer-out" : "fs-drawer-in"
+            }`}
+          >
+            <div className="border-border-soft flex items-center justify-between border-b px-6 py-5">
+              <div>
+                <h3 className="text-foreground text-base font-bold">Tambah Pengguna Baru</h3>
+                <p className="text-muted-foreground mt-0.5 text-xs">
+                  Buat akun pengguna dengan mengisi data berikut.
+                </p>
+              </div>
               <button
-                onClick={() => setIsModalOpen(false)}
+                onClick={closeModal}
                 disabled={isCreating}
                 className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-lg p-1 transition-colors disabled:opacity-50"
               >
@@ -341,103 +365,107 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
               </button>
             </div>
 
-            <form onSubmit={handleCreateUser} className="flex flex-col gap-4 p-6">
-              {formError && (
-                <div className="rounded-lg border border-rose-100 bg-rose-50 px-3 py-2 text-sm text-rose-700">
-                  {formError}
+            <form onSubmit={handleCreateUser} className="fs-rise-in flex flex-1 flex-col overflow-hidden">
+              <div className="flex-1 space-y-4 overflow-y-auto p-6">
+                {formError && (
+                  <div className="fs-drop-in rounded-lg border border-rose-100 bg-rose-50 px-3 py-2 text-sm text-rose-700">
+                    {formError}
+                  </div>
+                )}
+
+                <div className="flex flex-col gap-1.5">
+                  <label
+                    htmlFor="new-user-name"
+                    className="text-muted-foreground text-xs font-semibold"
+                  >
+                    Nama Lengkap
+                  </label>
+                  <input
+                    id="new-user-name"
+                    type="text"
+                    value={form.full_name}
+                    onChange={(e) => setForm({ ...form, full_name: e.target.value })}
+                    placeholder="Nama lengkap pengguna"
+                    className="border-border rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                  />
                 </div>
-              )}
 
-              <div className="flex flex-col gap-1.5">
-                <label
-                  htmlFor="new-user-name"
-                  className="text-muted-foreground text-xs font-semibold"
-                >
-                  Nama Lengkap
-                </label>
-                <input
-                  id="new-user-name"
-                  type="text"
-                  value={form.full_name}
-                  onChange={(e) => setForm({ ...form, full_name: e.target.value })}
-                  placeholder="Nama lengkap pengguna"
-                  className="border-border rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
-                />
+                <div className="flex flex-col gap-1.5">
+                  <label
+                    htmlFor="new-user-email"
+                    className="text-muted-foreground text-xs font-semibold"
+                  >
+                    Email
+                  </label>
+                  <input
+                    id="new-user-email"
+                    type="email"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    placeholder="nama@perusahaan.com"
+                    className="border-border rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label
+                    htmlFor="new-user-password"
+                    className="text-muted-foreground text-xs font-semibold"
+                  >
+                    Password
+                  </label>
+                  <input
+                    id="new-user-password"
+                    type="password"
+                    value={form.password}
+                    onChange={(e) => setForm({ ...form, password: e.target.value })}
+                    placeholder="Minimal 6 karakter"
+                    minLength={6}
+                    className="border-border rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label
+                    htmlFor="new-user-role"
+                    className="text-muted-foreground text-xs font-semibold"
+                  >
+                    Role
+                  </label>
+                  <select
+                    id="new-user-role"
+                    value={form.role_id}
+                    onChange={(e) => setForm({ ...form, role_id: e.target.value })}
+                    className="border-border bg-card rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                  >
+                    <option value="">-- Pilih Role --</option>
+                    {roles.map((r) => (
+                      <option key={r.id} value={r.id}>
+                        {r.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
-              <div className="flex flex-col gap-1.5">
-                <label
-                  htmlFor="new-user-email"
-                  className="text-muted-foreground text-xs font-semibold"
-                >
-                  Email
-                </label>
-                <input
-                  id="new-user-email"
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  placeholder="nama@perusahaan.com"
-                  className="border-border rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
-                />
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label
-                  htmlFor="new-user-password"
-                  className="text-muted-foreground text-xs font-semibold"
-                >
-                  Password
-                </label>
-                <input
-                  id="new-user-password"
-                  type="password"
-                  value={form.password}
-                  onChange={(e) => setForm({ ...form, password: e.target.value })}
-                  placeholder="Minimal 6 karakter"
-                  minLength={6}
-                  className="border-border rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
-                />
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label
-                  htmlFor="new-user-role"
-                  className="text-muted-foreground text-xs font-semibold"
-                >
-                  Role
-                </label>
-                <select
-                  id="new-user-role"
-                  value={form.role_id}
-                  onChange={(e) => setForm({ ...form, role_id: e.target.value })}
-                  className="border-border bg-card rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
-                >
-                  <option value="">-- Pilih Role --</option>
-                  {roles.map((r) => (
-                    <option key={r.id} value={r.id}>
-                      {r.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  disabled={isCreating}
-                  className="border-border text-muted-foreground hover:bg-muted rounded-lg border px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50"
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  disabled={isCreating}
-                  className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
-                >
-                  {isCreating ? "Membuat..." : "Buat Pengguna"}
-                </button>
+              <div className="border-border-soft bg-card border-t p-6">
+                <div className="flex w-full flex-col gap-2">
+                  <button
+                    type="submit"
+                    disabled={isCreating}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    {isCreating ? "Membuat..." : "Buat Pengguna"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={closeModal}
+                    disabled={isCreating}
+                    className="text-muted-foreground hover:bg-muted inline-flex w-full items-center justify-center rounded-lg px-4 py-2 text-xs font-semibold disabled:opacity-50"
+                  >
+                    Batal
+                  </button>
+                </div>
               </div>
             </form>
           </div>

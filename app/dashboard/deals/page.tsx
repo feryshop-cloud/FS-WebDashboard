@@ -18,6 +18,7 @@ type Account = Database["public"]["Tables"]["accounts"]["Row"];
 
 export default function DealsPage() {
   const [isAddDealOpen, setIsAddDealOpen] = useState(false);
+  const [isAddDealClosing, setIsAddDealClosing] = useState(false);
   const [deals, setDeals] = useState<Deal[]>([]);
   const [stocks, setStocks] = useState<InventoryItem[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -49,13 +50,27 @@ export default function DealsPage() {
     loadData();
   }, []);
 
+  const closeAddDeal = () => {
+    if (isAddDealClosing || isSubmitting) return;
+    setIsAddDealClosing(true);
+    setTimeout(() => {
+      setIsAddDealClosing(false);
+      setIsAddDealOpen(false);
+    }, 200);
+  };
+
+  const openAddDeal = () => {
+    if (isAddDealClosing) return;
+    setIsAddDealOpen(true);
+  };
+
   const handleAddDeal = async (formData: FormData) => {
     try {
       setIsSubmitting(true);
       setError("");
       await createPenjualan(formData);
-      setIsAddDealOpen(false);
       loadData();
+      closeAddDeal();
     } catch (err: unknown) {
       setError(getErrorMessage(err));
     } finally {
@@ -132,8 +147,8 @@ export default function DealsPage() {
             {isExporting ? "Mengekspor..." : "Export Excel"}
           </button>
           <button
-            onClick={() => setIsAddDealOpen(true)}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700"
+            onClick={openAddDeal}
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 active:scale-[0.97]"
           >
             <Plus className="h-4 w-4" />
             Buat Deal Baru
@@ -336,9 +351,19 @@ export default function DealsPage() {
       </div>
 
       {/* Buat Deal Baru Modal (Slide-over / Modal) */}
-      {isAddDealOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm">
-          <div className="animate-in slide-in-from-right bg-card flex h-full w-full max-w-md flex-col shadow-2xl duration-300">
+      {(isAddDealOpen || isAddDealClosing) && (
+        <div
+          className={`fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm ${
+            isAddDealClosing ? "fs-overlay-out" : "fs-overlay-in"
+          }`}
+          onClick={closeAddDeal}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={`bg-card flex h-full w-full max-w-md flex-col shadow-2xl ${
+              isAddDealClosing ? "fs-drawer-out" : "fs-drawer-in"
+            }`}
+          >
             <div className="border-border-soft bg-muted flex items-center justify-between border-b px-6 py-5">
               <div>
                 <h2 className="text-foreground text-lg font-bold">Buat Deal Baru</h2>
@@ -347,16 +372,16 @@ export default function DealsPage() {
                 </p>
               </div>
               <button
-                onClick={() => setIsAddDealOpen(false)}
+                onClick={closeAddDeal}
                 className="bg-card text-faint-foreground hover:text-muted-foreground rounded-full p-2 shadow-sm transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <form action={handleAddDeal} className="flex flex-1 flex-col overflow-hidden">
+            <form action={handleAddDeal} className="fs-rise-in flex flex-1 flex-col overflow-hidden">
               <div className="flex-1 space-y-6 overflow-y-auto p-6">
                 {error && (
-                  <div className="rounded-lg border border-rose-100 bg-rose-50 p-3 text-sm text-rose-600">
+                  <div className="fs-drop-in rounded-lg border border-rose-100 bg-rose-50 p-3 text-sm text-rose-600">
                     {error}
                   </div>
                 )}

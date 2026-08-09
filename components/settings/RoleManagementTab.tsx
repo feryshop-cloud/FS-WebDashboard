@@ -36,6 +36,7 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
 
   // Modal State for New Role
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalClosing, setIsModalClosing] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [formError, setFormError] = useState("");
   const [newRoleName, setNewRoleName] = useState("");
@@ -78,6 +79,21 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
     }
   };
 
+  const openModal = () => {
+    if (isModalClosing) return;
+    setFormError("");
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    if (isModalClosing || isCreating) return;
+    setIsModalClosing(true);
+    setTimeout(() => {
+      setIsModalClosing(false);
+      setIsModalOpen(false);
+    }, 200);
+  };
+
   const handleCreateRole = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError("");
@@ -95,10 +111,10 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
         return;
       }
 
-      setIsModalOpen(false);
       setNewRoleName("");
       setNewRoleDesc("");
       onRefresh();
+      closeModal();
     } catch (err) {
       console.error(err);
       setFormError("Gagal membuat role baru.");
@@ -142,7 +158,7 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
               Daftar Role Sistem
             </h3>
             <button
-              onClick={() => setIsModalOpen(true)}
+              onClick={openModal}
               className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700"
             >
               <Plus className="h-3.5 w-3.5" />
@@ -308,66 +324,86 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
       </div>
 
       {/* Modal Add Role */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm">
-          <div className="bg-card w-full max-w-md space-y-4 rounded-2xl p-6 shadow-xl">
-            <div className="border-border-soft flex items-center justify-between border-b pb-3">
-              <h3 className="text-foreground text-base font-bold">Tambah Role Baru</h3>
+      {(isModalOpen || isModalClosing) && (
+        <div
+          className={`fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm ${
+            isModalClosing ? "fs-overlay-out" : "fs-overlay-in"
+          }`}
+          onClick={closeModal}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={`bg-card flex h-full w-full max-w-md flex-col border-border-soft border-l shadow-2xl ${
+              isModalClosing ? "fs-drawer-out" : "fs-drawer-in"
+            }`}
+          >
+            <div className="border-border-soft flex items-center justify-between border-b px-6 py-5">
+              <div>
+                <h3 className="text-foreground text-base font-bold">Tambah Role Baru</h3>
+                <p className="text-muted-foreground mt-0.5 text-xs">
+                  Buat role custom beserta hak aksesnya.
+                </p>
+              </div>
               <button
-                onClick={() => setIsModalOpen(false)}
+                onClick={closeModal}
                 className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-lg p-1"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            {formError && (
-              <div className="rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs font-medium text-rose-700">
-                {formError}
-              </div>
-            )}
+            <form onSubmit={handleCreateRole} className="fs-rise-in flex flex-1 flex-col overflow-hidden">
+              <div className="flex-1 space-y-4 overflow-y-auto p-6">
+                {formError && (
+                  <div className="fs-drop-in rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs font-medium text-rose-700">
+                    {formError}
+                  </div>
+                )}
 
-            <form onSubmit={handleCreateRole} className="space-y-4">
-              <div>
-                <label className="text-foreground mb-1 block text-xs font-medium">
-                  Nama Role <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="misal: STAFF_FINANCE, CS_OFFICER"
-                  value={newRoleName}
-                  onChange={(e) => setNewRoleName(e.target.value)}
-                  className="border-border w-full rounded-lg border px-3 py-2 text-sm uppercase focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
-                />
+                <div>
+                  <label className="text-foreground mb-1 block text-xs font-medium">
+                    Nama Role <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="misal: STAFF_FINANCE, CS_OFFICER"
+                    value={newRoleName}
+                    onChange={(e) => setNewRoleName(e.target.value)}
+                    className="border-border w-full rounded-lg border px-3 py-2 text-sm uppercase focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-foreground mb-1 block text-xs font-medium">Deskripsi</label>
+                  <textarea
+                    rows={3}
+                    placeholder="Keterangan tugas atau tanggung jawab role ini..."
+                    value={newRoleDesc}
+                    onChange={(e) => setNewRoleDesc(e.target.value)}
+                    className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="text-foreground mb-1 block text-xs font-medium">Deskripsi</label>
-                <textarea
-                  rows={3}
-                  placeholder="Keterangan tugas atau tanggung jawab role ini..."
-                  value={newRoleDesc}
-                  onChange={(e) => setNewRoleDesc(e.target.value)}
-                  className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
-                />
-              </div>
-
-              <div className="border-border-soft flex items-center justify-end gap-3 border-t pt-3">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="text-muted-foreground hover:bg-muted rounded-lg px-4 py-2 text-xs font-semibold"
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  disabled={isCreating}
-                  className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
-                >
-                  {isCreating && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                  Simpan Role
-                </button>
+              <div className="border-border-soft bg-card border-t p-6">
+                <div className="flex w-full flex-col gap-2">
+                  <button
+                    type="submit"
+                    disabled={isCreating}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    {isCreating && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                    Simpan Role
+                  </button>
+                  <button
+                    type="button"
+                    onClick={closeModal}
+                    disabled={isCreating}
+                    className="text-muted-foreground hover:bg-muted inline-flex w-full items-center justify-center rounded-lg px-4 py-2 text-xs font-semibold disabled:opacity-50"
+                  >
+                    Batal
+                  </button>
+                </div>
               </div>
             </form>
           </div>

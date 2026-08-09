@@ -15,6 +15,7 @@ type Account = { id: string; name: string; is_active: boolean; balance: number }
 
 export default function PurchasesPage() {
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isAddClosing, setIsAddClosing] = useState(false);
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [games, setGames] = useState<Game[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -27,6 +28,20 @@ export default function PurchasesPage() {
 
   // Form State
   const [selectedStatus, setSelectedStatus] = useState<"LUNAS" | "PENDING">("LUNAS");
+
+  const closeAdd = () => {
+    if (isAddClosing) return;
+    setIsAddClosing(true);
+    setTimeout(() => {
+      setIsAddClosing(false);
+      setIsAddOpen(false);
+    }, 200);
+  };
+
+  const openAdd = () => {
+    setError("");
+    setIsAddOpen(true);
+  };
 
   const loadData = async () => {
     try {
@@ -102,7 +117,7 @@ export default function PurchasesPage() {
       if (res.error) {
         setError(res.error);
       } else {
-        setIsAddOpen(false);
+        closeAdd();
         loadData();
       }
     } catch (err: unknown) {
@@ -157,11 +172,8 @@ export default function PurchasesPage() {
             Export Data
           </button>
           <button
-            onClick={() => {
-              setError("");
-              setIsAddOpen(true);
-            }}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700"
+            onClick={openAdd}
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700 active:scale-[0.97]"
           >
             <Plus className="h-4 w-4" />
             Catat Pembelian Baru
@@ -196,11 +208,13 @@ export default function PurchasesPage() {
                 {statusFilter === "PENDING" && "Pending"}
               </span>
             </span>
-            <ChevronDown className="text-faint-foreground h-4 w-4" />
+            <ChevronDown
+              className={`text-faint-foreground h-4 w-4 transition-transform duration-200 ${isFilterDropdownOpen ? "rotate-180" : ""}`}
+            />
           </button>
 
           {isFilterDropdownOpen && (
-            <div className="border-border-soft bg-card absolute top-full right-0 z-10 mt-2 w-48 rounded-xl border py-1 shadow-lg">
+            <div className="fs-drop-in border-border-soft bg-card absolute top-full right-0 z-10 mt-2 w-48 rounded-xl border py-1 shadow-lg">
               <button
                 onClick={() => {
                   setStatusFilter("ALL");
@@ -381,9 +395,19 @@ export default function PurchasesPage() {
       </div>
 
       {/* Buat Pembelian Baru Modal (Slide-over Drawer) */}
-      {isAddOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm">
-          <div className="animate-in slide-in-from-right bg-card flex h-full w-full max-w-md flex-col shadow-2xl duration-300">
+      {(isAddOpen || isAddClosing) && (
+        <div
+          onClick={closeAdd}
+          className={`fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm ${
+            isAddClosing ? "fs-overlay-out" : "fs-overlay-in"
+          }`}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={`bg-card flex h-full w-full max-w-md flex-col shadow-2xl ${
+              isAddClosing ? "fs-drawer-out" : "fs-drawer-in"
+            }`}
+          >
             <div className="border-border-soft bg-muted flex items-center justify-between border-b px-6 py-5">
               <div>
                 <h2 className="text-foreground text-lg font-bold">Catat Pembelian Baru</h2>
@@ -392,17 +416,17 @@ export default function PurchasesPage() {
                 </p>
               </div>
               <button
-                onClick={() => setIsAddOpen(false)}
+                onClick={closeAdd}
                 className="bg-card text-faint-foreground hover:text-muted-foreground rounded-full p-2 shadow-sm transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            <form onSubmit={handleAddPurchase} className="flex flex-1 flex-col overflow-hidden">
+            <form onSubmit={handleAddPurchase} className="fs-rise-in flex flex-1 flex-col overflow-hidden">
               <div className="flex-1 space-y-5 overflow-y-auto p-6">
                 {error && (
-                  <div className="rounded-lg border border-rose-100 bg-rose-50 p-3 text-sm text-rose-600">
+                  <div className="fs-drop-in rounded-lg border border-rose-100 bg-rose-50 p-3 text-sm text-rose-600">
                     {error}
                   </div>
                 )}
@@ -534,7 +558,7 @@ export default function PurchasesPage() {
                 </div>
 
                 {selectedStatus === "LUNAS" && (
-                  <div className="animate-in fade-in rounded-xl border border-blue-100 bg-blue-50/50 p-4 duration-200">
+                  <div className="fs-drop-in rounded-xl border border-blue-100 bg-blue-50/50 p-4">
                     <label className="text-foreground mb-1 block text-xs font-semibold">
                       Sumber Rekening / Metode Pembayaran
                     </label>

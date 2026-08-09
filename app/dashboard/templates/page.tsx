@@ -32,6 +32,7 @@ export default function TemplatesPage() {
 
   // Add modal state
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isAddClosing, setIsAddClosing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Edit inline state
@@ -75,14 +76,28 @@ export default function TemplatesPage() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const openAdd = () => {
+    if (isAddClosing) return;
+    setIsAddOpen(true);
+  };
+
+  const closeModal = () => {
+    if (isAddClosing || isSubmitting) return;
+    setIsAddClosing(true);
+    setTimeout(() => {
+      setIsAddClosing(false);
+      setIsAddOpen(false);
+    }, 200);
+  };
+
   const handleAddSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       setIsSubmitting(true);
       const formData = new FormData(e.currentTarget);
       await addTemplate(formData);
-      setIsAddOpen(false);
       loadTemplatesData();
+      closeModal();
     } catch (err) {
       console.error(err);
     } finally {
@@ -143,8 +158,8 @@ export default function TemplatesPage() {
           </p>
         </div>
         <button
-          onClick={() => setIsAddOpen(true)}
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 sm:w-auto"
+          onClick={openAdd}
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 active:scale-[0.97] sm:w-auto"
         >
           <Plus className="h-4 w-4" />
           Tambah Template
@@ -272,72 +287,102 @@ export default function TemplatesPage() {
       )}
 
       {/* Add Modal */}
-      {isAddOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-          <div className="bg-card w-full max-w-md rounded-xl p-6 shadow-xl">
-            <div className="border-border-soft flex items-center justify-between border-b pb-3">
-              <h3 className="text-foreground text-base font-bold">Tambah Template Baru</h3>
+      {(isAddOpen || isAddClosing) && (
+        <div
+          className={`fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm ${
+            isAddClosing ? "fs-overlay-out" : "fs-overlay-in"
+          }`}
+          onClick={closeModal}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={`bg-card flex h-full w-full max-w-md flex-col shadow-2xl ${
+              isAddClosing ? "fs-drawer-out" : "fs-drawer-in"
+            }`}
+          >
+            <div className="border-border-soft flex items-center justify-between border-b px-6 py-5">
+              <div>
+                <h2 className="text-foreground text-base font-bold">Tambah Template Baru</h2>
+                <p className="text-muted-foreground mt-0.5 text-xs">
+                  Buat format teks baru untuk postingan, invoice, atau chat.
+                </p>
+              </div>
               <button
-                onClick={() => setIsAddOpen(false)}
-                className="text-faint-foreground hover:bg-muted rounded-full p-1"
+                onClick={closeModal}
+                className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-lg p-1.5"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <form onSubmit={handleAddSubmit} className="mt-4 flex flex-col gap-4">
-              <div>
-                <label className="text-foreground mb-1 block text-xs font-semibold">
-                  Nama Template
-                </label>
-                <input
-                  name="name"
-                  required
-                  placeholder="Mis. Template Postingan MLBB"
-                  className="border-border w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-blue-500"
-                />
+            <form onSubmit={handleAddSubmit} className="fs-rise-in flex flex-1 flex-col overflow-hidden">
+              <div className="flex-1 space-y-4 overflow-y-auto p-6">
+                <div>
+                  <label className="text-foreground mb-1 block text-xs font-semibold">
+                    Nama Template
+                  </label>
+                  <input
+                    name="name"
+                    required
+                    placeholder="Mis. Template Postingan MLBB"
+                    className="border-border w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="text-foreground mb-1 block text-xs font-semibold">
+                    Kategori / Tipe
+                  </label>
+                  <select
+                    name="type"
+                    required
+                    className="border-border w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-blue-500"
+                  >
+                    <option value="Social Media">Social Media</option>
+                    <option value="Invoice/Struk">Invoice/Struk</option>
+                    <option value="WhatsApp">WhatsApp</option>
+                    <option value="Lainnya">Lainnya</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-foreground mb-1 block text-xs font-semibold">
+                    Isi Teks Template
+                  </label>
+                  <textarea
+                    name="content"
+                    required
+                    rows={5}
+                    placeholder="Format teks..."
+                    className="border-border w-full rounded-lg border px-3 py-2 font-mono text-xs outline-none focus:border-blue-500"
+                  />
+                </div>
               </div>
-              <div>
-                <label className="text-foreground mb-1 block text-xs font-semibold">
-                  Kategori / Tipe
-                </label>
-                <select
-                  name="type"
-                  required
-                  className="border-border w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-blue-500"
-                >
-                  <option value="Social Media">Social Media</option>
-                  <option value="Invoice/Struk">Invoice/Struk</option>
-                  <option value="WhatsApp">WhatsApp</option>
-                  <option value="Lainnya">Lainnya</option>
-                </select>
-              </div>
-              <div>
-                <label className="text-foreground mb-1 block text-xs font-semibold">
-                  Isi Teks Template
-                </label>
-                <textarea
-                  name="content"
-                  required
-                  rows={5}
-                  placeholder="Format teks..."
-                  className="border-border w-full rounded-lg border px-3 py-2 font-mono text-xs outline-none focus:border-blue-500"
-                />
-              </div>
-              <div className="mt-2 flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsAddOpen(false)}
-                  className="bg-muted text-muted-foreground hover:bg-muted rounded-lg px-4 py-2 text-xs font-semibold"
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
-                >
-                  {isSubmitting ? "Menyimpan..." : "Simpan Template"}
-                </button>
+              <div className="border-border-soft bg-card border-t p-6">
+                <div className="flex w-full flex-col gap-2">
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        <span>Menyimpan...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Save className="h-3.5 w-3.5" />
+                        <span>Simpan Template</span>
+                      </>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={closeModal}
+                    disabled={isSubmitting}
+                    className="text-muted-foreground hover:bg-muted inline-flex w-full items-center justify-center rounded-lg px-4 py-2 text-xs font-semibold disabled:opacity-50"
+                  >
+                    Batal
+                  </button>
+                </div>
               </div>
             </form>
           </div>

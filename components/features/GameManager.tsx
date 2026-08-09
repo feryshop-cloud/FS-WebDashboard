@@ -45,6 +45,10 @@ export function GameManager({
   const [prevGames, setPrevGames] = useState(initialGames);
   const [editingId, setEditingId] = useState<string | null>(null);
 
+  // Drawer state
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isDrawerClosing, setIsDrawerClosing] = useState(false);
+
   // Form state
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
@@ -61,8 +65,23 @@ export function GameManager({
     setGames(initialGames);
   }
 
-  const resetForm = () => {
+  const openDrawerNew = () => {
+    if (isDrawerClosing) return;
+    resetFields();
     setEditingId(null);
+    setIsDrawerOpen(true);
+  };
+
+  const closeDrawer = () => {
+    if (isDrawerClosing || isPending) return;
+    setIsDrawerClosing(true);
+    setTimeout(() => {
+      setIsDrawerClosing(false);
+      setIsDrawerOpen(false);
+    }, 200);
+  };
+
+  const resetFields = () => {
     setName("");
     setSlug("");
     setIsActive(true);
@@ -70,6 +89,11 @@ export function GameManager({
     setFields([]);
     setError(null);
     setSuccess(false);
+  };
+
+  const resetForm = () => {
+    setEditingId(null);
+    resetFields();
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,6 +110,7 @@ export function GameManager({
   };
 
   const handleEditClick = (game: Game) => {
+    if (isDrawerClosing) return;
     setEditingId(game.id);
     setName(game.name);
     setSlug(game.slug);
@@ -94,6 +119,7 @@ export function GameManager({
     setFields(parseFields(game.instructions));
     setError(null);
     setSuccess(false);
+    setIsDrawerOpen(true);
   };
 
   const handleToggleStatus = (game: Game) => {
@@ -160,112 +186,130 @@ export function GameManager({
         </div>
       </div>
 
-      {/* Form — full width */}
-      <div className="border-border-soft bg-card overflow-hidden rounded-xl border shadow-sm">
-        <div className="border-border-soft bg-muted/50 flex items-center justify-between border-b px-5 py-3.5">
-          <h3 className="text-foreground text-sm font-semibold">
-            {editingId ? "Edit Game" : "Tambah Game"}
-          </h3>
-          {editingId && (
-            <button
-              type="button"
-              onClick={resetForm}
-              className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-[10px] p-1"
-              title="Batal edit"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          )}
-        </div>
-        <div className="p-5">
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            {error && (
-              <div className="rounded-[10px] bg-rose-50 p-3 text-sm text-rose-600 ring-1 ring-rose-200">
-                {error}
+      {/* Drawer — Tambah / Edit Game */}
+      {(isDrawerOpen || isDrawerClosing) && (
+        <div
+          className={`fixed inset-0 z-50 flex items-center justify-end bg-slate-900/50 backdrop-blur-sm ${
+            isDrawerClosing ? "fs-overlay-out" : "fs-overlay-in"
+          }`}
+          onClick={closeDrawer}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={`bg-card flex h-full w-full max-w-lg flex-col border-border-soft border-l shadow-2xl ${
+              isDrawerClosing ? "fs-drawer-out" : "fs-drawer-in"
+            }`}
+          >
+            <div className="border-border-soft flex items-center justify-between border-b px-6 py-5">
+              <div>
+                <h3 className="text-foreground text-base font-bold">
+                  {editingId ? "Edit Game" : "Tambah Game"}
+                </h3>
+                <p className="text-muted-foreground mt-0.5 text-xs">
+                  {editingId
+                    ? "Perbarui detail game dan field input order."
+                    : "Tambahkan game baru beserta field input order."}
+                </p>
               </div>
-            )}
-            {success && (
-              <div className="flex items-center gap-2 rounded-[10px] bg-emerald-50 p-3 text-sm text-emerald-700 ring-1 ring-emerald-200">
-                <Check className="h-4 w-4" /> Game berhasil disimpan!
-              </div>
-            )}
+              <button
+                onClick={closeDrawer}
+                disabled={isPending}
+                className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-lg p-1 transition-colors disabled:opacity-50"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
 
-            {/* Basic fields row */}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="space-y-1.5">
-                <label
-                  className="text-muted-foreground block text-xs font-semibold tracking-wide uppercase"
-                  htmlFor="game-name"
-                >
-                  Nama Game
-                </label>
-                <input
-                  id="game-name"
-                  type="text"
-                  required
-                  value={name}
-                  onChange={handleNameChange}
-                  placeholder="e.g. Mobile Legends"
-                  className="border-border bg-card text-foreground placeholder:text-faint-foreground w-full rounded-[10px] border px-3.5 py-2.5 text-sm transition-colors focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-none"
-                />
-              </div>
+            <form onSubmit={handleSubmit} className="fs-rise-in flex flex-1 flex-col overflow-hidden">
+              <div className="flex-1 space-y-4 overflow-y-auto p-6">
+                {error && (
+                  <div className="fs-drop-in rounded-[10px] bg-rose-50 p-3 text-sm text-rose-600 ring-1 ring-rose-200">
+                    {error}
+                  </div>
+                )}
+                {success && (
+                  <div className="rounded-[10px] bg-emerald-50 p-3 text-sm text-emerald-700 ring-1 ring-emerald-200">
+                    <Check className="h-4 w-4" /> Game berhasil disimpan!
+                  </div>
+                )}
 
-              <div className="space-y-1.5">
-                <label
-                  className="text-muted-foreground block text-xs font-semibold tracking-wide uppercase"
-                  htmlFor="game-slug"
-                >
-                  Slug
-                </label>
-                <input
-                  id="game-slug"
-                  type="text"
-                  value={slug}
-                  onChange={(e) => setSlug(e.target.value)}
-                  placeholder="auto dari nama game"
-                  className="border-border bg-card text-foreground placeholder:text-faint-foreground w-full rounded-[10px] border px-3.5 py-2.5 font-mono text-sm transition-colors placeholder:font-sans focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-none"
-                />
-              </div>
-
-              {editingId && (
-                <div className="flex flex-col justify-end gap-2.5">
-                  <label className="flex cursor-pointer items-center gap-2.5">
-                    <div className="relative inline-flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={isActive}
-                        onChange={(e) => setIsActive(e.target.checked)}
-                        className="peer sr-only"
-                      />
-                      <div className="peer bg-muted after:border-input after:bg-card h-5 w-9 rounded-full transition-colors peer-checked:bg-emerald-500 after:absolute after:top-[2px] after:left-[2px] after:h-4 after:w-4 after:rounded-full after:border after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white" />
-                    </div>
-                    <span className="text-foreground text-sm font-medium">
-                      {isActive ? "Aktif" : "Nonaktif"}
-                    </span>
+                <div className="space-y-1.5">
+                  <label
+                    className="text-muted-foreground block text-xs font-semibold tracking-wide uppercase"
+                    htmlFor="game-name"
+                  >
+                    Nama Game
                   </label>
-                  <label className="flex cursor-pointer items-center gap-2.5">
-                    <div className="relative inline-flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={isPopular}
-                        onChange={(e) => setIsPopular(e.target.checked)}
-                        className="peer sr-only"
-                      />
-                      <div className="peer bg-muted after:border-input after:bg-card h-5 w-9 rounded-full transition-colors peer-checked:bg-amber-400 after:absolute after:top-[2px] after:left-[2px] after:h-4 after:w-4 after:rounded-full after:border after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white" />
-                    </div>
-                    <span className="text-foreground text-sm font-medium">
-                      {isPopular ? "Populer" : "Tidak Populer"}
-                    </span>
-                  </label>
+                  <input
+                    id="game-name"
+                    type="text"
+                    required
+                    value={name}
+                    onChange={handleNameChange}
+                    placeholder="e.g. Mobile Legends"
+                    className="border-border bg-card text-foreground placeholder:text-faint-foreground w-full rounded-[10px] border px-3.5 py-2.5 text-sm transition-colors focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-none"
+                  />
                 </div>
-              )}
 
-              <div className="flex items-end">
-                <div className="flex w-full gap-2">
+                <div className="space-y-1.5">
+                  <label
+                    className="text-muted-foreground block text-xs font-semibold tracking-wide uppercase"
+                    htmlFor="game-slug"
+                  >
+                    Slug
+                  </label>
+                  <input
+                    id="game-slug"
+                    type="text"
+                    value={slug}
+                    onChange={(e) => setSlug(e.target.value)}
+                    placeholder="auto dari nama game"
+                    className="border-border bg-card text-foreground placeholder:text-faint-foreground w-full rounded-[10px] border px-3.5 py-2.5 font-mono text-sm transition-colors placeholder:font-sans focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-none"
+                  />
+                </div>
+
+                {editingId && (
+                  <div className="flex items-center gap-6">
+                    <label className="flex cursor-pointer items-center gap-2.5">
+                      <div className="relative inline-flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={isActive}
+                          onChange={(e) => setIsActive(e.target.checked)}
+                          className="peer sr-only"
+                        />
+                        <div className="peer bg-muted after:border-input after:bg-card h-5 w-9 rounded-full transition-colors peer-checked:bg-emerald-500 after:absolute after:top-[2px] after:left-[2px] after:h-4 after:w-4 after:rounded-full after:border after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white" />
+                      </div>
+                      <span className="text-foreground text-sm font-medium">
+                        {isActive ? "Aktif" : "Nonaktif"}
+                      </span>
+                    </label>
+                    <label className="flex cursor-pointer items-center gap-2.5">
+                      <div className="relative inline-flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={isPopular}
+                          onChange={(e) => setIsPopular(e.target.checked)}
+                          className="peer sr-only"
+                        />
+                        <div className="peer bg-muted after:border-input after:bg-card h-5 w-9 rounded-full transition-colors peer-checked:bg-amber-400 after:absolute after:top-[2px] after:left-[2px] after:h-4 after:w-4 after:rounded-full after:border after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white" />
+                      </div>
+                      <span className="text-foreground text-sm font-medium">
+                        {isPopular ? "Populer" : "Tidak Populer"}
+                      </span>
+                    </label>
+                  </div>
+                )}
+
+                <DynamicInputBuilder fields={fields} onChange={setFields} />
+              </div>
+
+              <div className="border-border-soft bg-card border-t p-6">
+                <div className="flex w-full flex-col gap-2">
                   <button
                     type="submit"
                     disabled={isPending || !name}
-                    className="inline-flex flex-1 items-center justify-center gap-2 rounded-[10px] bg-violet-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-violet-700 focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-70"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-[10px] bg-violet-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-70"
                   >
                     {isPending ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -274,27 +318,22 @@ export function GameManager({
                     ) : (
                       <Plus className="h-4 w-4" strokeWidth={2.5} />
                     )}
-                    <span>{isPending ? "Menyimpan..." : editingId ? "Simpan" : "Tambah"}</span>
+                    <span>{isPending ? "Menyimpan..." : editingId ? "Simpan Game" : "Tambah Game"}</span>
                   </button>
-                  {editingId && (
-                    <button
-                      type="button"
-                      onClick={resetForm}
-                      disabled={isPending}
-                      className="bg-muted text-foreground hover:bg-muted inline-flex items-center justify-center rounded-[10px] px-3 py-2.5 text-sm font-medium transition-all"
-                    >
-                      Batal
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={closeDrawer}
+                    disabled={isPending}
+                    className="text-muted-foreground hover:bg-muted inline-flex w-full items-center justify-center rounded-[10px] px-4 py-2 text-xs font-semibold disabled:opacity-50"
+                  >
+                    Batal
+                  </button>
                 </div>
               </div>
-            </div>
-
-            {/* Dynamic field builder — full width, only shown when form is active */}
-            <DynamicInputBuilder fields={fields} onChange={setFields} />
-          </form>
+            </form>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* List — full width below */}
       <div className="border-border-soft bg-card overflow-hidden rounded-xl border shadow-sm">
@@ -304,6 +343,14 @@ export function GameManager({
           <span className="bg-muted text-muted-foreground ml-auto inline-flex items-center rounded-[10px] px-2.5 py-0.5 text-xs font-medium">
             {games.length} Total
           </span>
+          <button
+            type="button"
+            onClick={openDrawerNew}
+            className="inline-flex items-center gap-1.5 rounded-[10px] bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white transition-all hover:bg-violet-700 active:scale-[0.97]"
+          >
+            <Plus className="h-3.5 w-3.5" strokeWidth={2.5} />
+            Tambah Game
+          </button>
         </div>
 
         <div className="overflow-x-auto">

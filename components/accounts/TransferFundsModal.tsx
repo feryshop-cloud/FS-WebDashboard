@@ -213,7 +213,7 @@ export function TransferFundsModal({ isOpen, onClose, accounts }: TransferFundsM
 
             {/* Calculation Breakdown Panel */}
             {(amount > 0 || adminFee > 0) && (
-              <div className="animate-in fade-in slide-in-from-top-2 border-border bg-muted space-y-2.5 rounded-[10px] border p-4 duration-150">
+              <div className="fs-drop-in border-border bg-muted space-y-2.5 rounded-[10px] border p-4">
                 <h4 className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
                   Rincian Pengurangan Saldo
                 </h4>

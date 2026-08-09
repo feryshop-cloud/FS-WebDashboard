@@ -30,7 +30,7 @@ export default async function AddInventoryPage() {
       </div>
 
       {/* Form Container */}
-      <div className="border-border bg-card rounded-[10px] border p-8">
+      <div className="fs-rise-in border-border bg-card rounded-[10px] border p-8">
         <AddInventoryForm games={games || []} />
       </div>
     </div>

@@ -61,7 +61,7 @@ export function AddInventoryForm({ games }: { games: Game[] }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <div className="rounded-[10px] bg-rose-50 p-3 text-sm text-rose-600 ring-1 ring-rose-200">
+        <div className="fs-drop-in rounded-[10px] bg-rose-50 p-3 text-sm text-rose-600 ring-1 ring-rose-200">
           {error}
         </div>
       )}
@@ -80,11 +80,13 @@ export function AddInventoryForm({ games }: { games: Game[] }) {
                 ? games.find((g) => g.id === selectedGameId)?.name
                 : "Select a game..."}
             </span>
-            <ChevronDown className="text-faint-foreground h-4 w-4" />
+            <ChevronDown
+              className={`text-faint-foreground h-4 w-4 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+            />
           </button>
 
           {isOpen && (
-            <div className="border-border bg-card absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-[10px] border py-1">
+            <div className="fs-drop-in border-border bg-card absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-[10px] border py-1">
               {games.map((game) => (
                 <button
                   key={game.id}
@@ -128,7 +130,8 @@ export function AddInventoryForm({ games }: { games: Game[] }) {
             {images.map((img, idx) => (
               <div
                 key={idx}
-                className="group border-border bg-muted relative aspect-square overflow-hidden rounded-[10px] border"
+                className="fs-pop-in group border-border bg-muted relative aspect-square overflow-hidden rounded-[10px] border"
+                style={{ animationDelay: `${Math.min(idx, 5) * 40}ms` }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img

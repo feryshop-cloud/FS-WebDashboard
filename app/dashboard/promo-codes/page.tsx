@@ -51,6 +51,7 @@ export default function PromoCodesPage() {
   const [error, setError] = useState("");
 
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isAddClosing, setIsAddClosing] = useState(false);
   const [editing, setEditing] = useState<number | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
 
@@ -87,13 +88,24 @@ export default function PromoCodesPage() {
   const setField = (k: keyof FormState, v: string | boolean) =>
     setForm((prev) => ({ ...prev, [k]: v }));
 
+  const closeModal = () => {
+    if (isAddClosing || isSubmitting) return;
+    setIsAddClosing(true);
+    setTimeout(() => {
+      setIsAddClosing(false);
+      setIsAddOpen(false);
+    }, 200);
+  };
+
   const openAdd = () => {
+    if (isAddClosing) return;
     setForm(emptyForm);
     setEditing(null);
     setIsAddOpen(true);
   };
 
   const openEdit = (p: PromoCodeRow) => {
+    if (isAddClosing) return;
     setForm({
       code: p.code,
       discount_type: p.discount_type,
@@ -134,8 +146,8 @@ export default function PromoCodesPage() {
       } else {
         await createPromoCode(fd);
       }
-      setIsAddOpen(false);
       await loadData(true);
+      closeModal();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal menyimpan kode promo.");
     } finally {
@@ -176,7 +188,7 @@ export default function PromoCodesPage() {
         </div>
         <button
           onClick={openAdd}
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 sm:w-auto"
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 active:scale-[0.97] sm:w-auto"
         >
           <Plus className="h-4 w-4" />
           Tambah Kode Promo
@@ -290,162 +302,193 @@ export default function PromoCodesPage() {
       )}
 
       {/* Create / Edit Modal */}
-      {isAddOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-          <div className="bg-card max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-xl p-6 shadow-xl">
-            <div className="border-border-soft flex items-center justify-between border-b pb-3">
-              <h3 className="text-foreground text-base font-bold">
-                {editing !== null ? "Edit Kode Promo" : "Tambah Kode Promo"}
-              </h3>
+      {(isAddOpen || isAddClosing) && (
+        <div
+          className={`fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm ${
+            isAddClosing ? "fs-overlay-out" : "fs-overlay-in"
+          }`}
+          onClick={closeModal}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={`bg-card flex h-full w-full max-w-md flex-col shadow-2xl ${
+              isAddClosing ? "fs-drawer-out" : "fs-drawer-in"
+            }`}
+          >
+            <div className="border-border-soft flex items-center justify-between border-b px-6 py-5">
+              <div>
+                <h2 className="text-foreground text-base font-bold">
+                  {editing !== null ? "Edit Kode Promo" : "Tambah Kode Promo"}
+                </h2>
+                <p className="text-muted-foreground mt-0.5 text-xs">
+                  {editing !== null
+                    ? "Ubah pengaturan kode promo."
+                    : "Buat kode promo baru untuk storefront."}
+                </p>
+              </div>
               <button
-                onClick={() => setIsAddOpen(false)}
-                className="text-faint-foreground hover:bg-muted rounded-full p-1"
+                onClick={closeModal}
+                className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-lg p-1.5"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-2">
-                  <label className="text-foreground mb-1 block text-xs font-semibold">
-                    Kode Promo
-                  </label>
-                  <input
-                    value={form.code}
-                    onChange={(e) => setField("code", e.target.value.toUpperCase())}
-                    required
-                    placeholder="CONTOH10"
-                    className="border-border w-full rounded-lg border px-3 py-2 font-mono text-sm uppercase outline-none focus:border-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-foreground mb-1 block text-xs font-semibold">
-                    Tipe Diskon
-                  </label>
-                  <select
-                    value={form.discount_type}
-                    onChange={(e) => setField("discount_type", e.target.value)}
-                    className="border-border w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-blue-500"
-                  >
-                    <option value="percent">Persen (%)</option>
-                    <option value="fixed">Nominal (Rp)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="text-foreground mb-1 block text-xs font-semibold">
-                    Nilai Diskon
-                  </label>
-                  <input
-                    type="number"
-                    value={form.discount_value}
-                    onChange={(e) => setField("discount_value", e.target.value)}
-                    required
-                    min="1"
-                    placeholder="10 / 5000"
-                    className="border-border w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-foreground mb-1 block text-xs font-semibold">
-                    Min Order (Rp)
-                  </label>
-                  <input
-                    type="number"
-                    value={form.min_order}
-                    onChange={(e) => setField("min_order", e.target.value)}
-                    min="0"
-                    className="border-border w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-foreground mb-1 block text-xs font-semibold">
-                    Maks Diskon (Rp)
-                  </label>
-                  <input
-                    type="number"
-                    value={form.max_discount}
-                    onChange={(e) => setField("max_discount", e.target.value)}
-                    min="0"
-                    placeholder="0 = tanpa batas"
-                    className="border-border w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-foreground mb-1 block text-xs font-semibold">
-                    Kuota Total
-                  </label>
-                  <input
-                    type="number"
-                    value={form.quota}
-                    onChange={(e) => setField("quota", e.target.value)}
-                    min="0"
-                    placeholder="100"
-                    className="border-border w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-blue-500"
-                  />
-                </div>
-
-                <div className="flex items-end pb-1">
-                  <label className="flex items-center gap-2 text-sm font-semibold">
+            <form onSubmit={handleSubmit} className="fs-rise-in flex flex-1 flex-col overflow-hidden">
+              <div className="flex-1 space-y-4 overflow-y-auto p-6">
+                {error && (
+                  <div className="fs-drop-in rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs font-medium text-rose-700">
+                    {error}
+                  </div>
+                )}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="col-span-2">
+                    <label className="text-foreground mb-1 block text-xs font-semibold">
+                      Kode Promo
+                    </label>
                     <input
-                      type="checkbox"
-                      checked={form.is_active}
-                      onChange={(e) => setField("is_active", e.target.checked)}
-                      className="h-4 w-4"
+                      value={form.code}
+                      onChange={(e) => setField("code", e.target.value.toUpperCase())}
+                      required
+                      placeholder="CONTOH10"
+                      className="border-border w-full rounded-lg border px-3 py-2 font-mono text-sm uppercase outline-none focus:border-blue-500"
                     />
-                    Aktif
-                  </label>
-                </div>
+                  </div>
 
-                <div>
-                  <label className="text-foreground mb-1 block text-xs font-semibold">Mulai</label>
-                  <input
-                    type="datetime-local"
-                    value={form.start_date}
-                    onChange={(e) => setField("start_date", e.target.value)}
-                    className="border-border w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-blue-500"
-                  />
-                </div>
+                  <div>
+                    <label className="text-foreground mb-1 block text-xs font-semibold">
+                      Tipe Diskon
+                    </label>
+                    <select
+                      value={form.discount_type}
+                      onChange={(e) => setField("discount_type", e.target.value)}
+                      className="border-border w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-blue-500"
+                    >
+                      <option value="percent">Persen (%)</option>
+                      <option value="fixed">Nominal (Rp)</option>
+                    </select>
+                  </div>
 
-                <div>
-                  <label className="text-foreground mb-1 block text-xs font-semibold">
-                    Berakhir
-                  </label>
-                  <input
-                    type="datetime-local"
-                    value={form.end_date}
-                    onChange={(e) => setField("end_date", e.target.value)}
-                    className="border-border w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-blue-500"
-                  />
+                  <div>
+                    <label className="text-foreground mb-1 block text-xs font-semibold">
+                      Nilai Diskon
+                    </label>
+                    <input
+                      type="number"
+                      value={form.discount_value}
+                      onChange={(e) => setField("discount_value", e.target.value)}
+                      required
+                      min="1"
+                      placeholder="10 / 5000"
+                      className="border-border w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-foreground mb-1 block text-xs font-semibold">
+                      Min Order (Rp)
+                    </label>
+                    <input
+                      type="number"
+                      value={form.min_order}
+                      onChange={(e) => setField("min_order", e.target.value)}
+                      min="0"
+                      className="border-border w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-foreground mb-1 block text-xs font-semibold">
+                      Maks Diskon (Rp)
+                    </label>
+                    <input
+                      type="number"
+                      value={form.max_discount}
+                      onChange={(e) => setField("max_discount", e.target.value)}
+                      min="0"
+                      placeholder="0 = tanpa batas"
+                      className="border-border w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-foreground mb-1 block text-xs font-semibold">
+                      Kuota Total
+                    </label>
+                    <input
+                      type="number"
+                      value={form.quota}
+                      onChange={(e) => setField("quota", e.target.value)}
+                      min="0"
+                      placeholder="100"
+                      className="border-border w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-blue-500"
+                    />
+                  </div>
+
+                  <div className="flex items-end pb-1">
+                    <label className="flex items-center gap-2 text-sm font-semibold">
+                      <input
+                        type="checkbox"
+                        checked={form.is_active}
+                        onChange={(e) => setField("is_active", e.target.checked)}
+                        className="h-4 w-4"
+                      />
+                      Aktif
+                    </label>
+                  </div>
+
+                  <div>
+                    <label className="text-foreground mb-1 block text-xs font-semibold">Mulai</label>
+                    <input
+                      type="datetime-local"
+                      value={form.start_date}
+                      onChange={(e) => setField("start_date", e.target.value)}
+                      className="border-border w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-foreground mb-1 block text-xs font-semibold">
+                      Berakhir
+                    </label>
+                    <input
+                      type="datetime-local"
+                      value={form.end_date}
+                      onChange={(e) => setField("end_date", e.target.value)}
+                      className="border-border w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-blue-500"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="border-border-soft mt-2 flex justify-end gap-2 border-t pt-4">
-                <button
-                  type="button"
-                  onClick={() => setIsAddOpen(false)}
-                  disabled={isSubmitting}
-                  className="bg-muted text-muted-foreground hover:bg-muted rounded-lg px-4 py-2 text-xs font-semibold disabled:opacity-50"
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="inline-flex items-center gap-1 rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
-                >
-                  {isSubmitting ? (
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                  ) : (
-                    <Save className="h-3 w-3" />
-                  )}
-                  {isSubmitting ? "Menyimpan..." : editing !== null ? "Simpan Perubahan" : "Simpan"}
-                </button>
+              <div className="border-border-soft bg-card border-t p-6">
+                <div className="flex w-full flex-col gap-2">
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        <span>Menyimpan...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Save className="h-3.5 w-3.5" />
+                        <span>{editing !== null ? "Simpan Perubahan" : "Simpan Kode Promo"}</span>
+                      </>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={closeModal}
+                    disabled={isSubmitting}
+                    className="text-muted-foreground hover:bg-muted inline-flex w-full items-center justify-center rounded-lg px-4 py-2 text-xs font-semibold disabled:opacity-50"
+                  >
+                    Batal
+                  </button>
+                </div>
               </div>
             </form>
           </div>

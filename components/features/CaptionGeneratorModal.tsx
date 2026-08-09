@@ -79,7 +79,7 @@ export function CaptionGeneratorModal({
               <span>Salin</span>
             </button>
           ) : (
-            <div className="animate-in fade-in slide-in-from-bottom-2 space-y-4 rounded-[10px] border border-blue-100 bg-blue-50/50 p-6 text-center">
+            <div className="fs-drop-in space-y-4 rounded-[10px] border border-blue-100 bg-blue-50/50 p-6 text-center">
               <div className="mb-2 flex justify-center text-blue-600">
                 <Check className="h-10 w-10 rounded-[10px] bg-blue-100 p-2" />
               </div>

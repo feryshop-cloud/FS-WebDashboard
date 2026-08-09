@@ -76,13 +76,13 @@ export function EditStockModal({ stock, isOpen, onClose, categories = [] }: Edit
   const labelClass = "text-sm font-medium text-foreground";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm">
+    <div className="fs-overlay-in fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm">
       <div
-        className="absolute inset-0 transition-opacity"
+        className="absolute inset-0"
         onClick={!isPending ? onClose : undefined}
       />
 
-      <div className="animate-in slide-in-from-right bg-card relative flex h-full w-full max-w-md flex-col overflow-hidden shadow-2xl duration-300">
+      <div className="fs-drawer-in bg-card relative flex h-full w-full max-w-md flex-col overflow-hidden shadow-2xl">
         <div className="border-border-soft bg-muted flex shrink-0 items-center justify-between border-b px-6 py-4">
           <h2 className="text-foreground text-lg font-bold">Edit Stok Akun</h2>
           <button
@@ -96,12 +96,12 @@ export function EditStockModal({ stock, isOpen, onClose, categories = [] }: Edit
 
         <div className="flex-1 overflow-y-auto p-6">
           {errorMsg && (
-            <div className="mb-6 rounded-[10px] border border-red-100 bg-red-50 p-4 text-sm font-medium text-red-700">
+            <div className="fs-drop-in mb-6 rounded-[10px] border border-red-100 bg-red-50 p-4 text-sm font-medium text-red-700">
               {errorMsg}
             </div>
           )}
 
-          <form id="edit-stock-form" action={handleSubmit} className="space-y-5">
+          <form id="edit-stock-form" action={handleSubmit} className="fs-rise-in space-y-5">
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
               <div className="space-y-1.5">
                 <label className={labelClass}>

@@ -440,3 +440,84 @@
 [data-theme="dark"] .hover\:file\:bg-blue-100:hover {
   background-color: #1e40af;
 }
+
+/*
+ * Form surface motion primitives. Feryshop owns its timing language:
+ * calm entrance (backdrop softens, drawer settles from the right),
+ * list items queue in, errors drop, presses lift. Transform + opacity
+ * only; reduced-motion users get the rested state instantly.
+ */
+@keyframes fs-overlay-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes fs-overlay-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes fs-drawer-in {
+  from {
+    transform: translateX(36px);
+    opacity: 0;
+  }
+}
+@keyframes fs-drawer-out {
+  to {
+    transform: translateX(36px);
+    opacity: 0;
+  }
+}
+@keyframes fs-rise-in {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+}
+@keyframes fs-drop-in {
+  from {
+    transform: translateY(-6px);
+    opacity: 0;
+  }
+}
+@keyframes fs-pop-in {
+  from {
+    transform: scale(0.96);
+    opacity: 0;
+  }
+}
+
+.fs-overlay-in {
+  animation: fs-overlay-in 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.fs-overlay-out {
+  animation: fs-overlay-out 180ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+.fs-drawer-in {
+  animation: fs-drawer-in 360ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.fs-drawer-out {
+  animation: fs-drawer-out 220ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+.fs-rise-in {
+  animation: fs-rise-in 280ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.fs-drop-in {
+  animation: fs-drop-in 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.fs-pop-in {
+  animation: fs-pop-in 160ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fs-overlay-in,
+  .fs-overlay-out,
+  .fs-drawer-in,
+  .fs-drawer-out,
+  .fs-rise-in,
+  .fs-drop-in,
+  .fs-pop-in {
+    animation: none;
+  }
+}
