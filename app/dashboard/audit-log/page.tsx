@@ -1,28 +1,64 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Search, Filter, Calendar, ChevronDown, Download, Loader2 } from "lucide-react";
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  Search,
+  Filter,
+  Calendar,
+  ChevronDown,
+  Download,
+  Loader2,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { formatDate } from "@/lib/utils";
-import { getAuditLogs } from "@/app/actions/audit-log";
+import { getAuditLogs, AuditLogFilters, AuditLogResult } from "@/app/actions/audit-log";
 import { AuditLog } from "@/types/database";
 
 type AuditLogWithUser = AuditLog & { public_users?: { full_name?: string | null } | null };
 
+const PAGE_SIZE = 50;
+
 export default function AuditLogPage() {
   const [logs, setLogs] = useState<AuditLogWithUser[]>([]);
+  const [pagination, setPagination] = useState({
+    total: 0,
+    page: 1,
+    pageSize: PAGE_SIZE,
+    totalPages: 1,
+  });
   const [isLoading, setIsLoading] = useState(true);
 
-  const loadData = async () => {
+  const loadData = useCallback(async (filters: AuditLogFilters = {}) => {
     setIsLoading(true);
-    const logsData = await getAuditLogs();
-    setLogs((logsData as unknown as AuditLogWithUser[]) || []);
-    setIsLoading(false);
-  };
+    try {
+      const result = (await getAuditLogs(filters)) as AuditLogResult;
+      setLogs((result.data as unknown as AuditLogWithUser[]) || []);
+      setPagination({
+        total: result.total,
+        page: result.page,
+        pageSize: result.pageSize,
+        totalPages: result.totalPages,
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadData();
-  }, []);
+    loadData({ page: 1, pageSize: PAGE_SIZE });
+  }, [loadData]);
+
+  const handlePageChange = (nextPage: number) => {
+    if (nextPage < 1 || nextPage > pagination.totalPages) return;
+    loadData({ page: nextPage, pageSize: pagination.pageSize });
+  };
+
+  const startFrom = pagination.total === 0 ? 0 : (pagination.page - 1) * pagination.pageSize + 1;
+  const endTo = Math.min(pagination.page * pagination.pageSize, pagination.total);
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 pb-8">
@@ -165,6 +201,36 @@ export default function AuditLogPage() {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Pagination */}
+        <div className="border-border-soft bg-card flex flex-col items-center justify-between gap-3 border-t px-6 py-4 sm:flex-row">
+          <div className="text-muted-foreground text-sm">
+            Menampilkan <span className="text-foreground font-semibold">{startFrom}</span> -{" "}
+            <span className="text-foreground font-semibold">{endTo}</span> dari{" "}
+            <span className="text-foreground font-semibold">{pagination.total}</span> catatan
+          </div>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => handlePageChange(pagination.page - 1)}
+              disabled={pagination.page <= 1 || isLoading}
+              className="border-border text-muted-foreground hover:bg-muted inline-flex items-center gap-1 rounded-md border px-3 py-1.5 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Sebelumnya
+            </button>
+            <span className="text-foreground px-3 text-sm font-medium">
+              Hal {pagination.page} / {pagination.totalPages}
+            </span>
+            <button
+              onClick={() => handlePageChange(pagination.page + 1)}
+              disabled={pagination.page >= pagination.totalPages || isLoading}
+              className="border-border text-muted-foreground hover:bg-muted inline-flex items-center gap-1 rounded-md border px-3 py-1.5 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Selanjutnya
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
