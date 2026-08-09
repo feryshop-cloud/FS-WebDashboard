@@ -333,7 +333,7 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className={`bg-card flex h-full w-full max-w-md flex-col border-border-soft border-l shadow-2xl ${
+            className={`bg-card border-border-soft flex h-full w-full max-w-md flex-col border-l shadow-2xl ${
               isModalClosing ? "fs-drawer-out" : "fs-drawer-in"
             }`}
           >
@@ -352,7 +352,10 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
               </button>
             </div>
 
-            <form onSubmit={handleCreateRole} className="fs-rise-in flex flex-1 flex-col overflow-hidden">
+            <form
+              onSubmit={handleCreateRole}
+              className="fs-rise-in flex flex-1 flex-col overflow-hidden"
+            >
               <div className="flex-1 space-y-4 overflow-y-auto p-6">
                 {formError && (
                   <div className="fs-drop-in rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs font-medium text-rose-700">
@@ -374,7 +377,9 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
                 </div>
 
                 <div>
-                  <label className="text-foreground mb-1 block text-xs font-medium">Deskripsi</label>
+                  <label className="text-foreground mb-1 block text-xs font-medium">
+                    Deskripsi
+                  </label>
                   <textarea
                     rows={3}
                     placeholder="Keterangan tugas atau tanggung jawab role ini..."

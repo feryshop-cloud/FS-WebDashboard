@@ -196,7 +196,7 @@ export function GameManager({
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className={`bg-card flex h-full w-full max-w-lg flex-col border-border-soft border-l shadow-2xl ${
+            className={`bg-card border-border-soft flex h-full w-full max-w-lg flex-col border-l shadow-2xl ${
               isDrawerClosing ? "fs-drawer-out" : "fs-drawer-in"
             }`}
           >
@@ -220,7 +220,10 @@ export function GameManager({
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="fs-rise-in flex flex-1 flex-col overflow-hidden">
+            <form
+              onSubmit={handleSubmit}
+              className="fs-rise-in flex flex-1 flex-col overflow-hidden"
+            >
               <div className="flex-1 space-y-4 overflow-y-auto p-6">
                 {error && (
                   <div className="fs-drop-in rounded-[10px] bg-rose-50 p-3 text-sm text-rose-600 ring-1 ring-rose-200">
@@ -318,7 +321,9 @@ export function GameManager({
                     ) : (
                       <Plus className="h-4 w-4" strokeWidth={2.5} />
                     )}
-                    <span>{isPending ? "Menyimpan..." : editingId ? "Simpan Game" : "Tambah Game"}</span>
+                    <span>
+                      {isPending ? "Menyimpan..." : editingId ? "Simpan Game" : "Tambah Game"}
+                    </span>
                   </button>
                   <button
                     type="button"

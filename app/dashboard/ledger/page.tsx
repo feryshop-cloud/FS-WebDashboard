@@ -443,7 +443,10 @@ export default function LedgerPage() {
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <form action={handleAddManual} className="fs-rise-in flex flex-1 flex-col overflow-hidden">
+            <form
+              action={handleAddManual}
+              className="fs-rise-in flex flex-1 flex-col overflow-hidden"
+            >
               <div className="flex-1 space-y-4 overflow-y-auto p-6">
                 {error && (
                   <div className="fs-drop-in rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs font-medium text-rose-700">

@@ -334,7 +334,10 @@ export default function PromoCodesPage() {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="fs-rise-in flex flex-1 flex-col overflow-hidden">
+            <form
+              onSubmit={handleSubmit}
+              className="fs-rise-in flex flex-1 flex-col overflow-hidden"
+            >
               <div className="flex-1 space-y-4 overflow-y-auto p-6">
                 {error && (
                   <div className="fs-drop-in rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs font-medium text-rose-700">
@@ -438,7 +441,9 @@ export default function PromoCodesPage() {
                   </div>
 
                   <div>
-                    <label className="text-foreground mb-1 block text-xs font-semibold">Mulai</label>
+                    <label className="text-foreground mb-1 block text-xs font-semibold">
+                      Mulai
+                    </label>
                     <input
                       type="datetime-local"
                       value={form.start_date}

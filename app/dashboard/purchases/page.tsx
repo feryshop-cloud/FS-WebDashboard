@@ -423,7 +423,10 @@ export default function PurchasesPage() {
               </button>
             </div>
 
-            <form onSubmit={handleAddPurchase} className="fs-rise-in flex flex-1 flex-col overflow-hidden">
+            <form
+              onSubmit={handleAddPurchase}
+              className="fs-rise-in flex flex-1 flex-col overflow-hidden"
+            >
               <div className="flex-1 space-y-5 overflow-y-auto p-6">
                 {error && (
                   <div className="fs-drop-in rounded-lg border border-rose-100 bg-rose-50 p-3 text-sm text-rose-600">

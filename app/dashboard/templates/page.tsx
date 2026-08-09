@@ -314,7 +314,10 @@ export default function TemplatesPage() {
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <form onSubmit={handleAddSubmit} className="fs-rise-in flex flex-1 flex-col overflow-hidden">
+            <form
+              onSubmit={handleAddSubmit}
+              className="fs-rise-in flex flex-1 flex-col overflow-hidden"
+            >
               <div className="flex-1 space-y-4 overflow-y-auto p-6">
                 <div>
                   <label className="text-foreground mb-1 block text-xs font-semibold">

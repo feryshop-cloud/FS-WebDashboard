@@ -378,7 +378,10 @@ export default function DealsPage() {
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <form action={handleAddDeal} className="fs-rise-in flex flex-1 flex-col overflow-hidden">
+            <form
+              action={handleAddDeal}
+              className="fs-rise-in flex flex-1 flex-col overflow-hidden"
+            >
               <div className="flex-1 space-y-6 overflow-y-auto p-6">
                 {error && (
                   <div className="fs-drop-in rounded-lg border border-rose-100 bg-rose-50 p-3 text-sm text-rose-600">

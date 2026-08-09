@@ -229,7 +229,7 @@ function GroupCard({
   return (
     <div
       ref={sectionRef}
-      className="scroll-mt-20 border-border-soft bg-card rounded-xl border shadow-sm"
+      className="border-border-soft bg-card scroll-mt-20 rounded-xl border shadow-sm"
     >
       <button
         onClick={handleToggle}
@@ -278,12 +278,9 @@ export function SiteSettingsTab({ settings, errorMsg, onRefresh }: SiteSettingsT
   const extraKeys = Object.keys(groups).filter((k) => !orderedKeys.includes(k));
   const allKeys = [...orderedKeys, ...extraKeys];
 
-  const toggleGroup = useCallback(
-    (groupKey: string) => {
-      setOpenGroup((prev) => (prev === groupKey ? null : groupKey));
-    },
-    [],
-  );
+  const toggleGroup = useCallback((groupKey: string) => {
+    setOpenGroup((prev) => (prev === groupKey ? null : groupKey));
+  }, []);
 
   return (
     <div className="space-y-4">

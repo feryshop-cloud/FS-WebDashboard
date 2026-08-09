@@ -77,10 +77,7 @@ export function EditStockModal({ stock, isOpen, onClose, categories = [] }: Edit
 
   return (
     <div className="fs-overlay-in fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm">
-      <div
-        className="absolute inset-0"
-        onClick={!isPending ? onClose : undefined}
-      />
+      <div className="absolute inset-0" onClick={!isPending ? onClose : undefined} />
 
       <div className="fs-drawer-in bg-card relative flex h-full w-full max-w-md flex-col overflow-hidden shadow-2xl">
         <div className="border-border-soft bg-muted flex shrink-0 items-center justify-between border-b px-6 py-4">

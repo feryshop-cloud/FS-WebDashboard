@@ -217,7 +217,7 @@ export function GameCategoryManager({
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className={`bg-card flex h-full w-full max-w-lg flex-col border-border-soft border-l shadow-2xl ${
+            className={`bg-card border-border-soft flex h-full w-full max-w-lg flex-col border-l shadow-2xl ${
               isDrawerClosing ? "fs-drawer-out" : "fs-drawer-in"
             }`}
           >
@@ -227,9 +227,7 @@ export function GameCategoryManager({
                   {editingId ? "Edit Kategori" : "Tambah Kategori"}
                 </h3>
                 <p className="text-muted-foreground mt-0.5 text-xs">
-                  {editingId
-                    ? "Perbarui detail kategori game."
-                    : "Tambahkan kategori game baru."}
+                  {editingId ? "Perbarui detail kategori game." : "Tambahkan kategori game baru."}
                 </p>
               </div>
               <button
