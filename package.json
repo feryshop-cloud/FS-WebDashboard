@@ -9,6 +9,7 @@
     "start": "next start",
     "start:railway": "HOSTNAME=:: node .next/standalone/server.js",
     "create-admin": "node --env-file=.env.local scripts/create-admin-user.ts",
+    "seed:inbox": "node --env-file=.env.local scripts/seed-master-inbox.js",
     "lint": "eslint",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

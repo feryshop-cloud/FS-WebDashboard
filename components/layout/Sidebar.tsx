@@ -71,7 +71,10 @@ const navGroups: { title: string; items: NavItem[] }[] = [
   },
   {
     title: "FerryMail",
-    items: [{ label: "Inbox", icon: Mail, href: "/dashboard/ferrymail" }],
+    items: [
+      { label: "Inbox", icon: Mail, href: "/dashboard/ferrymail" },
+      { label: "Kelola Akun", icon: Settings, href: "/dashboard/mail-accounts" },
+    ],
   },
   {
     title: "Laporan Keuangan",

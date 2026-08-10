@@ -13,22 +13,46 @@ import {
   MoreVertical,
   ArrowLeft,
   Star,
+  Mail,
+  MailOpen,
+  Archive,
+  ArchiveRestore,
+  Trash2,
 } from "lucide-react";
 import { useFerryMail } from "@/lib/hooks/features/useFerryMail";
 
 export default function FerryMailPage() {
   const {
-    data: { filteredEmails },
-    uiState: { selectedEmail, searchQuery, copied, activeTab, allFilteredChecked },
+    data: { filteredEmails, accounts, isLoadingAccounts },
+    uiState: {
+      selectedEmail,
+      searchQuery,
+      copied,
+      activeTab,
+      allFilteredChecked,
+      selectedAccountId,
+      isDeleting,
+      checkedCount,
+      openMenu,
+    },
+    refs: { menuRef },
     actions: {
       setSelectedEmail,
       setSearchQuery,
       setActiveTab,
+      setSelectedAccountId,
       handleCopy,
       toggleCheck,
       toggleStar,
       toggleAllChecks,
       reloadInbox,
+      handleDeleteEmail,
+      handleBulkDelete,
+      markAsRead,
+      setOpenMenu,
+      archiveEmail,
+      restoreEmail,
+      bulkArchive,
     },
   } = useFerryMail();
 
@@ -57,9 +81,57 @@ export default function FerryMailPage() {
               >
                 <RefreshCw className="h-4 w-4" />
               </button>
-              <button className="hover:bg-muted rounded p-1 transition-colors">
-                <MoreVertical className="h-4 w-4" />
-              </button>
+              {checkedCount > 0 && (
+                <>
+                  <button
+                    onClick={bulkArchive}
+                    className="hover:bg-muted text-foreground rounded p-1 transition-colors"
+                    title={`Arsipkan ${checkedCount} email`}
+                  >
+                    <Archive className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={handleBulkDelete}
+                    disabled={isDeleting}
+                    className="hover:bg-rose-50 text-rose-600 rounded p-1 transition-colors disabled:opacity-50"
+                    title={`Hapus ${checkedCount} email`}
+                  >
+                    <Trash2 className={`h-4 w-4 ${isDeleting ? "animate-pulse" : ""}`} />
+                  </button>
+                </>
+              )}
+              <div className="relative">
+                <button
+                  onClick={() => setOpenMenu(!openMenu)}
+                  className={`hover:bg-muted rounded p-1 transition-colors ${
+                    openMenu ? "bg-muted text-foreground" : ""
+                  }`}
+                  title="Opsi lainnya"
+                >
+                  <MoreVertical className="h-4 w-4" />
+                </button>
+                {openMenu && (
+                  <div
+                    ref={menuRef}
+                    className="fs-drop-in border-border-soft bg-card absolute top-8 left-0 z-30 w-48 rounded-xl border p-1.5 shadow-xl"
+                  >
+                    <button
+                      onClick={markAsRead}
+                      className="text-foreground hover:bg-muted flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium transition-colors"
+                    >
+                      <MailOpen className="h-3.5 w-3.5 text-blue-600" />
+                      Tandai sudah dibaca
+                    </button>
+                    <button
+                      onClick={bulkArchive}
+                      className="text-foreground hover:bg-muted flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium transition-colors"
+                    >
+                      <Archive className="h-3.5 w-3.5 text-amber-600" />
+                      Arsipkan
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Tabs */}
@@ -97,10 +169,38 @@ export default function FerryMailPage() {
                 <Star className="h-4 w-4" />
                 Favorit
               </button>
+              <button
+                onClick={() => setActiveTab("arsip")}
+                className={`flex items-center gap-2 border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
+                  activeTab === "arsip"
+                    ? "border-blue-600 text-blue-600"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground border-transparent"
+                }`}
+              >
+                <Archive className="h-4 w-4" />
+                Arsip
+              </button>
             </div>
 
-            {/* Right Side: Search */}
+            {/* Right Side: Account picker + Search */}
             <div className="ml-auto flex items-center gap-2 pb-2">
+              <div className="relative">
+                <Mail className="text-faint-foreground absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2" />
+                <select
+                  value={selectedAccountId}
+                  onChange={(e) => setSelectedAccountId(e.target.value)}
+                  disabled={isLoadingAccounts}
+                  className="border-border bg-muted/60 text-foreground rounded-lg border py-1.5 pr-8 pl-9 text-xs font-semibold focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none disabled:opacity-60"
+                  aria-label="Pilih akun email"
+                >
+                  <option value="all">Semua akun</option>
+                  {accounts.map((acc) => (
+                    <option key={acc.id} value={acc.id}>
+                      {acc.display_name || acc.email}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <div className="relative w-64">
                 <Search className="text-faint-foreground absolute top-1/2 left-3.5 h-3.5 w-3.5 -translate-y-1/2" />
                 <input
@@ -118,9 +218,13 @@ export default function FerryMailPage() {
           <div className="flex-1 overflow-y-auto">
             {filteredEmails.length === 0 ? (
               <div className="flex h-64 flex-col items-center justify-center gap-2">
-                <Inbox className="text-faint-foreground h-8 w-8" />
+                {activeTab === "arsip" ? (
+                  <Archive className="text-faint-foreground h-8 w-8" />
+                ) : (
+                  <Inbox className="text-faint-foreground h-8 w-8" />
+                )}
                 <span className="text-muted-foreground text-sm font-medium">
-                  Kotak masuk kosong
+                  {activeTab === "arsip" ? "Tidak ada email di arsip" : "Kotak masuk kosong"}
                 </span>
               </div>
             ) : (
@@ -160,13 +264,25 @@ export default function FerryMailPage() {
                   </div>
 
                   {/* Sender Name */}
-                  <div className="text-foreground w-40 shrink-0 truncate pr-4 text-sm font-bold">
+                  <div
+                    className={`w-40 shrink-0 truncate pr-4 text-sm ${
+                      email.isRead
+                        ? "text-muted-foreground font-medium"
+                        : "text-foreground font-bold"
+                    }`}
+                  >
                     {email.sender}
                   </div>
 
                   {/* Subject & Snippet */}
                   <div className="min-w-0 flex-1 pr-4">
-                    <span className="text-foreground truncate text-sm font-semibold">
+                    <span
+                      className={`truncate text-sm ${
+                        email.isRead
+                          ? "text-muted-foreground font-medium"
+                          : "text-foreground font-semibold"
+                      }`}
+                    >
                       {email.subject}
                     </span>
                     <span className="text-muted-foreground mx-2 text-xs font-semibold">—</span>
@@ -195,6 +311,33 @@ export default function FerryMailPage() {
             >
               <ArrowLeft className="h-4 w-4" />
             </button>
+            <div className="ml-auto flex items-center gap-1">
+              {selectedEmail.isArchived ? (
+                <button
+                  onClick={() => restoreEmail(selectedEmail)}
+                  className="hover:bg-muted text-foreground rounded-lg p-1.5 transition-colors"
+                  title="Pulihkan dari arsip"
+                >
+                  <ArchiveRestore className="h-4 w-4" />
+                </button>
+              ) : (
+                <button
+                  onClick={() => archiveEmail(selectedEmail)}
+                  className="hover:bg-muted text-foreground rounded-lg p-1.5 transition-colors"
+                  title="Arsipkan email"
+                >
+                  <Archive className="h-4 w-4" />
+                </button>
+              )}
+              <button
+                onClick={() => handleDeleteEmail(selectedEmail)}
+                disabled={isDeleting}
+                className="text-rose-600 hover:bg-rose-50 rounded-lg p-1.5 transition-colors disabled:opacity-50"
+                title="Hapus email"
+              >
+                <Trash2 className={`h-4 w-4 ${isDeleting ? "animate-pulse" : ""}`} />
+              </button>
+            </div>
           </div>
 
           {/* Email Body */}

@@ -288,6 +288,36 @@ export type Database = {
           },
         ];
       };
+      email_accounts: {
+        Row: {
+          created_at: string;
+          display_name: string | null;
+          email: string;
+          id: string;
+          is_active: boolean;
+          last_synced_at: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          display_name?: string | null;
+          email: string;
+          id?: string;
+          is_active?: boolean;
+          last_synced_at?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          display_name?: string | null;
+          email?: string;
+          id?: string;
+          is_active?: boolean;
+          last_synced_at?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       finance_ledger: {
         Row: {
           account_id: string | null;
@@ -443,7 +473,10 @@ export type Database = {
         Row: {
           category: string | null;
           created_at: string;
+          email_account_id: string | null;
           id: string;
+          is_archived: boolean;
+          is_read: boolean;
           message_id: string;
           otp_code: string | null;
           raw_body_snippet: string | null;
@@ -456,7 +489,10 @@ export type Database = {
         Insert: {
           category?: string | null;
           created_at?: string;
+          email_account_id?: string | null;
           id?: string;
+          is_archived?: boolean;
+          is_read?: boolean;
           message_id: string;
           otp_code?: string | null;
           raw_body_snippet?: string | null;
@@ -469,7 +505,10 @@ export type Database = {
         Update: {
           category?: string | null;
           created_at?: string;
+          email_account_id?: string | null;
           id?: string;
+          is_archived?: boolean;
+          is_read?: boolean;
           message_id?: string;
           otp_code?: string | null;
           raw_body_snippet?: string | null;
