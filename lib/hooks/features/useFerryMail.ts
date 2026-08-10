@@ -264,8 +264,8 @@ export function useFerryMail() {
   };
 
   const reloadInbox = () => {
-    startTransition(() => {
-      void mutate();
+    startTransition(async () => {
+      await mutate();
     });
   };
 
