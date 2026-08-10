@@ -174,7 +174,7 @@ async function main() {
       full_name: adminFullName,
       email: adminEmail,
       role_id: roleId,
-      status: "Aktif",
+      status: "ACTIVE",
       updated_at: new Date().toISOString(),
     },
     {
