@@ -299,52 +299,70 @@ export default function CashflowPage() {
           </div>
 
           <div className="flex-1 overflow-x-auto">
-            {isLoading ? (
-              <div className="flex items-center justify-center py-24">
-                <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-              </div>
-            ) : filteredEntries.length === 0 ? (
-              <div className="text-faint-foreground py-24 text-center text-sm">
-                Tidak ada transaksi kas untuk periode ini.
-              </div>
-            ) : (
-              <table className="divide-border-soft min-w-full divide-y text-sm">
-                <thead className="bg-muted/60 sticky top-0">
+            <table className="divide-border-soft min-w-full divide-y text-sm">
+              <thead className="bg-muted/60 sticky top-0">
+                <tr>
+                  <th
+                    scope="col"
+                    className="text-muted-foreground px-6 py-3.5 text-left text-xs font-bold tracking-wider uppercase"
+                  >
+                    Tanggal
+                  </th>
+                  <th
+                    scope="col"
+                    className="text-muted-foreground px-6 py-3.5 text-left text-xs font-bold tracking-wider uppercase"
+                  >
+                    Rekening
+                  </th>
+                  <th
+                    scope="col"
+                    className="text-muted-foreground px-6 py-3.5 text-left text-xs font-bold tracking-wider uppercase"
+                  >
+                    Tipe
+                  </th>
+                  <th
+                    scope="col"
+                    className="text-muted-foreground px-6 py-3.5 text-left text-xs font-bold tracking-wider uppercase"
+                  >
+                    Keterangan
+                  </th>
+                  <th
+                    scope="col"
+                    className="text-muted-foreground px-6 py-3.5 text-right text-xs font-bold tracking-wider uppercase"
+                  >
+                    Jumlah
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-border-soft bg-card divide-y">
+                {isLoading ? (
+                  [1, 2, 3, 4, 5].map((i) => (
+                    <tr key={i} className="animate-pulse">
+                      <td className="px-6 py-4">
+                        <div className="bg-muted h-4 w-16 rounded"></div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="bg-muted h-4 w-24 rounded"></div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="bg-muted h-4 w-16 rounded"></div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="bg-muted h-4 w-40 rounded"></div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="bg-muted ml-auto h-4 w-20 rounded"></div>
+                      </td>
+                    </tr>
+                  ))
+                ) : filteredEntries.length === 0 ? (
                   <tr>
-                    <th
-                      scope="col"
-                      className="text-muted-foreground px-6 py-3.5 text-left text-xs font-bold tracking-wider uppercase"
-                    >
-                      Tanggal
-                    </th>
-                    <th
-                      scope="col"
-                      className="text-muted-foreground px-6 py-3.5 text-left text-xs font-bold tracking-wider uppercase"
-                    >
-                      Rekening
-                    </th>
-                    <th
-                      scope="col"
-                      className="text-muted-foreground px-6 py-3.5 text-left text-xs font-bold tracking-wider uppercase"
-                    >
-                      Tipe
-                    </th>
-                    <th
-                      scope="col"
-                      className="text-muted-foreground px-6 py-3.5 text-left text-xs font-bold tracking-wider uppercase"
-                    >
-                      Keterangan
-                    </th>
-                    <th
-                      scope="col"
-                      className="text-muted-foreground px-6 py-3.5 text-right text-xs font-bold tracking-wider uppercase"
-                    >
-                      Jumlah
-                    </th>
+                    <td colSpan={5} className="text-faint-foreground py-24 text-center text-sm">
+                      Tidak ada transaksi kas untuk periode ini.
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-border-soft bg-card divide-y">
-                  {filteredEntries.map((entry) => {
+                ) : (
+                  filteredEntries.map((entry) => {
                     const isPositive = Number(entry.amount) > 0;
 
                     let badgeColor = "bg-muted text-foreground border-border";
@@ -417,10 +435,10 @@ export default function CashflowPage() {
                         </td>
                       </tr>
                     );
-                  })}
-                </tbody>
-              </table>
-            )}
+                  })
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

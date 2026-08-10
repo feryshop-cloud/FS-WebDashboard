@@ -1,14 +1,7 @@
 "use client";
 
 import React from "react";
-import {
-  Calendar,
-  Download,
-  TrendingUp,
-  TrendingDown,
-  Activity,
-  Loader2,
-} from "lucide-react";
+import { Calendar, Download, TrendingUp, TrendingDown, Activity } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
 import { useProfitLossReport } from "@/lib/hooks/features/useProfitLossReport";
 
@@ -22,8 +15,45 @@ export default function ProfitLossPage() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex animate-pulse justify-between gap-4">
+          <div className="space-y-2">
+            <div className="bg-muted h-8 w-48 rounded"></div>
+            <div className="bg-muted h-4 w-72 rounded"></div>
+          </div>
+          <div className="bg-muted h-10 w-32 rounded"></div>
+        </div>
+        {/* 3 Cards */}
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="border-border-soft bg-card flex h-24 animate-pulse items-center gap-4 rounded-xl border px-6 py-5 shadow-sm"
+            >
+              <div className="bg-muted h-12 w-12 rounded-full"></div>
+              <div className="flex-1 space-y-2">
+                <div className="bg-muted h-3 w-20 rounded"></div>
+                <div className="bg-muted h-6 w-32 rounded"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+        {/* Big Table Card */}
+        <div className="border-border bg-card flex animate-pulse flex-col rounded-xl border shadow-sm">
+          <div className="border-border space-y-2 border-b px-6 py-5">
+            <div className="bg-muted h-5 w-48 rounded"></div>
+            <div className="bg-muted h-3 w-72 rounded"></div>
+          </div>
+          <div className="space-y-4 p-6">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="border-border-soft flex justify-between border-b py-2">
+                <div className="bg-muted h-4 w-32 rounded"></div>
+                <div className="bg-muted h-4 w-16 rounded"></div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
