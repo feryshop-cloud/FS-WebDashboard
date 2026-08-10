@@ -206,7 +206,15 @@ export default function PurchasesPage() {
         isLunas ? "Lunas" : "Pending",
       ];
     });
-    const header = ["SKU", "Nama Item", "Kategori", "Supplier", "Harga Modal", "Metode Pembayaran", "Status"];
+    const header = [
+      "SKU",
+      "Nama Item",
+      "Kategori",
+      "Supplier",
+      "Harga Modal",
+      "Metode Pembayaran",
+      "Status",
+    ];
     const csv = [header, ...rows]
       .map((row) => row.map((cell) => `"${String(cell).replaceAll('"', '""')}"`).join(","))
       .join("\n");
@@ -276,7 +284,7 @@ export default function PurchasesPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             aria-label="Cari ID pembelian, item, atau supplier"
-            className="border-border bg-muted text-foreground block w-full rounded-lg border py-2 pr-3 pl-10 placeholder-placeholder transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 sm:text-sm"
+            className="border-border bg-muted text-foreground placeholder-placeholder block w-full rounded-lg border py-2 pr-3 pl-10 transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 sm:text-sm"
             placeholder="Cari ID pembelian, item, atau supplier..."
           />
         </div>
@@ -505,8 +513,7 @@ export default function PurchasesPage() {
               {filteredPurchases.length === 0 ? 0 : pageStart + 1}
             </span>{" "}
             - <span className="text-foreground font-semibold">{pageStart + pageItems.length}</span>{" "}
-            dari{" "}
-            <span className="text-foreground font-semibold">{filteredPurchases.length}</span>{" "}
+            dari <span className="text-foreground font-semibold">{filteredPurchases.length}</span>{" "}
             pembelian
           </div>
           {filteredPurchases.length > 0 && (

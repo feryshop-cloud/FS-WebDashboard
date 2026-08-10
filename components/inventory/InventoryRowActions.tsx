@@ -128,9 +128,7 @@ export function InventoryRowActions({ item, games, onRefresh }: InventoryRowActi
             </div>
             <p id="delete-stock-desc" className="text-muted-foreground mb-4 text-sm">
               Apakah Anda yakin ingin menghapus stok{" "}
-              <span className="text-foreground font-semibold">
-                {item.title_reference || "ini"}
-              </span>
+              <span className="text-foreground font-semibold">{item.title_reference || "ini"}</span>
               ? Tindakan ini tidak dapat dibatalkan.
             </p>
             {deleteError && (

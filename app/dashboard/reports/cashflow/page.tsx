@@ -457,7 +457,7 @@ export default function CashflowPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Cari transaksi..."
-                className="border-border bg-card text-foreground w-full rounded-lg border py-1.5 pr-3 pl-9 text-xs font-semibold placeholder-placeholder focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                className="border-border bg-card text-foreground placeholder-placeholder w-full rounded-lg border py-1.5 pr-3 pl-9 text-xs font-semibold focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
               />
             </div>
           </div>

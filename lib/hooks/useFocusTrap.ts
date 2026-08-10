@@ -23,7 +23,9 @@ export function useFocusTrap<T extends HTMLElement>(
     if (!container) return;
 
     previouslyFocused.current =
-      restoreTarget instanceof HTMLElement ? restoreTarget : (document.activeElement as HTMLElement | null);
+      restoreTarget instanceof HTMLElement
+        ? restoreTarget
+        : (document.activeElement as HTMLElement | null);
     container.focus();
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -44,7 +46,10 @@ export function useFocusTrap<T extends HTMLElement>(
       const first = focusables[0];
       const last = focusables[focusables.length - 1];
 
-      if (event.shiftKey && (document.activeElement === first || document.activeElement === container)) {
+      if (
+        event.shiftKey &&
+        (document.activeElement === first || document.activeElement === container)
+      ) {
         event.preventDefault();
         last.focus();
       } else if (!event.shiftKey && document.activeElement === last) {

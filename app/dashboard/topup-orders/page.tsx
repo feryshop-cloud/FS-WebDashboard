@@ -260,7 +260,7 @@ export default function TopupOrdersPage() {
             onKeyDown={(e) => {
               if (e.key === "Enter") handleApplyFilters();
             }}
-            className="border-border bg-muted text-foreground block w-full rounded-lg border py-2 pr-3 pl-10 placeholder-placeholder transition-all outline-none focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className="border-border bg-muted text-foreground placeholder-placeholder block w-full rounded-lg border py-2 pr-3 pl-10 transition-all outline-none focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             placeholder="Cari order ID, nickname, atau ID game..."
           />
         </div>

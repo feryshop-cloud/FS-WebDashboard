@@ -41,8 +41,7 @@ export default function InventoryPage() {
     const handlePointerDown = (event: MouseEvent | TouchEvent) => {
       const target = event.target as Node;
       const categoryInside =
-        categoryButtonRef.current?.contains(target) ||
-        categoryMenuRef.current?.contains(target);
+        categoryButtonRef.current?.contains(target) || categoryMenuRef.current?.contains(target);
       const statusInside =
         statusButtonRef.current?.contains(target) || statusMenuRef.current?.contains(target);
 
@@ -90,7 +89,11 @@ export default function InventoryPage() {
     setIsAddStockOpen(true);
   };
 
-  const addStockRef = useFocusTrap<HTMLDivElement>(isAddStockOpen || isAddStockClosing, null, closeAddStock);
+  const addStockRef = useFocusTrap<HTMLDivElement>(
+    isAddStockOpen || isAddStockClosing,
+    null,
+    closeAddStock,
+  );
 
   const loadInventory = async () => {
     try {
@@ -197,12 +200,7 @@ export default function InventoryPage() {
     return filteredInventory.filter((item) => {
       if (activeStatus !== "Semua Status" && item.status !== activeStatus) return false;
       if (!searchQueryLower) return true;
-      const haystack = [
-        item.public_id,
-        item.title_reference,
-        item.games?.name,
-        item.account_specs,
-      ]
+      const haystack = [item.public_id, item.title_reference, item.games?.name, item.account_specs]
         .filter((v): v is string => Boolean(v))
         .join(" ")
         .toLowerCase();
@@ -258,7 +256,7 @@ export default function InventoryPage() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="border-border bg-muted text-foreground block w-full rounded-lg border py-2 pr-3 pl-10 placeholder-placeholder transition-all outline-none focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className="border-border bg-muted text-foreground placeholder-placeholder block w-full rounded-lg border py-2 pr-3 pl-10 transition-all outline-none focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             placeholder="Cari ID stok, kategori, atau nama akun..."
           />
         </div>
@@ -292,7 +290,7 @@ export default function InventoryPage() {
                       setIsCategoryDropdownOpen(false);
                     }}
                     className={`hover:bg-muted block w-full px-4 py-2 text-left text-sm ${
-                      activeCategory === name ? "text-blue-600 font-semibold" : "text-foreground"
+                      activeCategory === name ? "font-semibold text-blue-600" : "text-foreground"
                     }`}
                   >
                     {name}
@@ -327,7 +325,7 @@ export default function InventoryPage() {
                       setIsStatusDropdownOpen(false);
                     }}
                     className={`hover:bg-muted block w-full px-4 py-2 text-left text-sm ${
-                      activeStatus === status ? "text-blue-600 font-semibold" : "text-foreground"
+                      activeStatus === status ? "font-semibold text-blue-600" : "text-foreground"
                     }`}
                   >
                     {status}
@@ -470,11 +468,14 @@ export default function InventoryPage() {
                         </span>
                       </td>
                       <td className="text-foreground px-6 py-4 text-sm">
-                        <span className="block max-w-62.5 truncate font-medium" title={item.title_reference || "-"}>
+                        <span
+                          className="block max-w-62.5 truncate font-medium"
+                          title={item.title_reference || "-"}
+                        >
                           {item.title_reference || "-"}
                         </span>
                       </td>
-                      <td className="text-muted-foreground px-6 py-4 font-mono text-right text-sm font-medium tabular-nums whitespace-nowrap">
+                      <td className="text-muted-foreground px-6 py-4 text-right font-mono text-sm font-medium whitespace-nowrap tabular-nums">
                         {formatRupiah(Number(item.capital_price))}
                       </td>
                       <td className="px-6 py-4 text-right text-sm whitespace-nowrap">

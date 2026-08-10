@@ -128,7 +128,7 @@ export default function TradeInPage() {
           </div>
           <input
             type="text"
-            className="border-border bg-muted text-foreground block w-full rounded-lg border py-2 pr-3 pl-10 placeholder-placeholder transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 sm:text-sm"
+            className="border-border bg-muted text-foreground placeholder-placeholder block w-full rounded-lg border py-2 pr-3 pl-10 transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 sm:text-sm"
             placeholder="Cari ID transaksi, nama customer..."
           />
         </div>

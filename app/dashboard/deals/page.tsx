@@ -188,7 +188,7 @@ export default function DealsPage() {
           </div>
           <input
             type="text"
-            className="border-border bg-muted text-foreground block w-full rounded-lg border py-2 pr-3 pl-10 placeholder-placeholder transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 sm:text-sm"
+            className="border-border bg-muted text-foreground placeholder-placeholder block w-full rounded-lg border py-2 pr-3 pl-10 transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 sm:text-sm"
             placeholder="Cari nomor deal, customer, atau stok..."
           />
         </div>
@@ -545,10 +545,8 @@ export default function DealsPage() {
             </div>
             <p id="delete-deal-desc" className="text-muted-foreground mb-4 text-sm">
               Apakah Anda yakin ingin menghapus transaksi{" "}
-              <span className="text-foreground font-semibold">
-                {deleteTarget.deal_number}
-              </span>
-              ? Tindakan ini tidak dapat dibatalkan.
+              <span className="text-foreground font-semibold">{deleteTarget.deal_number}</span>?
+              Tindakan ini tidak dapat dibatalkan.
             </p>
             {deleteError && (
               <div role="alert" className="mb-4 rounded-lg bg-rose-50 p-3 text-xs text-rose-600">

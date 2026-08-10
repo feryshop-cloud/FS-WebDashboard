@@ -118,7 +118,11 @@ export default function LedgerPage() {
     }, 200);
   };
 
-  const addManualRef = useFocusTrap<HTMLDivElement>(isAddManualOpen || isAddManualClosing, null, closeAddManual);
+  const addManualRef = useFocusTrap<HTMLDivElement>(
+    isAddManualOpen || isAddManualClosing,
+    null,
+    closeAddManual,
+  );
   const editRef = useFocusTrap<HTMLDivElement>(!!editingLedger, null, closeEdit);
 
   const handleAddManual = async (formData: FormData) => {
@@ -257,7 +261,7 @@ export default function LedgerPage() {
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="border-border bg-muted/70 text-foreground focus:bg-card block w-full rounded-xl border py-2 pr-3 pl-10 placeholder-placeholder transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 sm:text-sm"
+            className="border-border bg-muted/70 text-foreground focus:bg-card placeholder-placeholder block w-full rounded-xl border py-2 pr-3 pl-10 transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 sm:text-sm"
             placeholder="Cari referensi, catatan, atau ID..."
           />
         </div>
@@ -370,7 +374,10 @@ export default function LedgerPage() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex max-w-[280px] flex-col">
-                          <span className="text-foreground truncate font-semibold" title={tx.ref_id ? `Ref: ${tx.ref_id}` : "-"}>
+                          <span
+                            className="text-foreground truncate font-semibold"
+                            title={tx.ref_id ? `Ref: ${tx.ref_id}` : "-"}
+                          >
                             {tx.ref_id ? `Ref: ${tx.ref_id}` : "-"}
                           </span>
                           <span
