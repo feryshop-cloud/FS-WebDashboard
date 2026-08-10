@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Calendar,
   Download,
@@ -12,73 +12,15 @@ import {
   Loader2,
 } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
-import { getProfitLossReport } from "@/app/actions/reports";
-
-interface ProfitLossBreakdownItem {
-  label: string;
-  amount: number;
-}
-
-interface ProfitLossReportData {
-  revenue?: number;
-  cogs?: number;
-  netProfit?: number;
-  breakdown?: {
-    income?: ProfitLossBreakdownItem[];
-    expenses?: ProfitLossBreakdownItem[];
-  };
-  // Legacy fields (kept for backward compat)
-  totalRevenue?: number;
-  totalHPP?: number;
-  grossProfit?: number;
-  totalOperationalExpenses?: number;
-  grossProfitMargin?: number;
-  netProfitMargin?: number;
-  revenueItems?: Array<{ name: string; amount: number }>;
-  hppItems?: Array<{ name: string; amount: number }>;
-  expenseItems?: Array<{ name: string; amount: number }>;
-}
+import { useProfitLossReport } from "@/lib/hooks/features/useProfitLossReport";
 
 export default function ProfitLossPage() {
-  const [reportData, setReportData] = useState<ProfitLossReportData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [periodFilter, setPeriodFilter] = useState("ALL");
-
-  const getDateRange = (filter: string) => {
-    const now = new Date();
-    if (filter === "TODAY") {
-      const start = new Date(now.setHours(0, 0, 0, 0)).toISOString();
-      const end = new Date(now.setHours(23, 59, 59, 999)).toISOString();
-      return { startDate: start, endDate: end };
-    }
-    if (filter === "7_DAYS") {
-      const start = new Date(now.setDate(now.getDate() - 7)).toISOString();
-      return { startDate: start, endDate: undefined };
-    }
-    if (filter === "THIS_MONTH") {
-      const start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-      return { startDate: start, endDate: undefined };
-    }
-    if (filter === "THIS_YEAR") {
-      const start = new Date(now.getFullYear(), 0, 1).toISOString();
-      return { startDate: start, endDate: undefined };
-    }
-    return { startDate: undefined, endDate: undefined };
-  };
-
-  useEffect(() => {
-    let isMounted = true;
-    const { startDate, endDate } = getDateRange(periodFilter);
-    getProfitLossReport(startDate, endDate).then((data) => {
-      if (isMounted) {
-        setReportData(data);
-        setIsLoading(false);
-      }
-    });
-    return () => {
-      isMounted = false;
-    };
-  }, [periodFilter]);
+  const {
+    data: { reportData, grossProfit, totalExpenses },
+    isLoading,
+    uiState: { periodFilter },
+    actions: { setPeriodFilter },
+  } = useProfitLossReport();
 
   if (isLoading) {
     return (
@@ -95,11 +37,6 @@ export default function ProfitLossPage() {
       </div>
     );
   }
-
-  const grossProfit = (reportData.revenue ?? 0) - (reportData.cogs ?? 0);
-  const totalExpenses = (reportData.breakdown?.expenses ?? [])
-    .slice(1)
-    .reduce((acc: number, curr: ProfitLossBreakdownItem) => acc + curr.amount, 0);
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6 pb-8">
@@ -199,88 +136,85 @@ export default function ProfitLossPage() {
               <h3 className="mb-3 flex items-center gap-2 text-xs font-bold tracking-wider text-emerald-600 uppercase">
                 <ArrowUpRight className="h-4 w-4" /> Pendapatan (Revenue)
               </h3>
-              <div className="divide-border-soft border-border-soft bg-muted divide-y rounded-lg border">
-                {(reportData.breakdown?.income ?? []).map(
-                  (item: ProfitLossBreakdownItem, idx: number) => (
-                    <div key={idx} className="flex items-center justify-between px-4 py-3">
-                      <span className="text-foreground text-sm font-medium">{item.label}</span>
-                      <span className="text-foreground text-sm font-semibold">
-                        {formatRupiah(item.amount)}
-                      </span>
-                    </div>
-                  ),
-                )}
-                <div className="border-border bg-card flex items-center justify-between rounded-b-lg border-t-2 px-4 py-3">
-                  <span className="text-foreground text-sm font-bold">Total Pendapatan</span>
-                  <span className="text-sm font-bold text-emerald-600">
-                    {formatRupiah(reportData.revenue ?? 0)}
-                  </span>
+              <div className="divide-border-soft border-border-soft divide-y rounded-xl border px-5 py-2">
+                {(reportData.breakdown?.income || []).map((item, idx) => (
+                  <div key={idx} className="flex items-center justify-between py-3 text-sm">
+                    <span className="text-muted-foreground font-medium">{item.label}</span>
+                    <span className="text-foreground font-semibold">
+                      {formatRupiah(item.amount)}
+                    </span>
+                  </div>
+                ))}
+                <div className="flex items-center justify-between py-3 text-sm font-bold">
+                  <span className="text-foreground">Total Pendapatan Bersih</span>
+                  <span className="text-emerald-600">{formatRupiah(reportData.revenue ?? 0)}</span>
                 </div>
               </div>
             </div>
 
-            {/* HPP */}
+            {/* HARGA POKOK PENJUALAN */}
             <div>
               <h3 className="mb-3 flex items-center gap-2 text-xs font-bold tracking-wider text-rose-600 uppercase">
-                <ArrowDownRight className="h-4 w-4" /> Harga Pokok Penjualan (HPP)
+                <ArrowDownRight className="h-4 w-4" /> Harga Pokok Penjualan (COGS)
               </h3>
-              <div className="divide-border-soft border-border-soft bg-muted divide-y rounded-lg border">
-                <div className="flex items-center justify-between px-4 py-3">
-                  <span className="text-foreground text-sm font-medium">
-                    {reportData.breakdown?.expenses?.[0]?.label}
+              <div className="divide-border-soft border-border-soft divide-y rounded-xl border px-5 py-2">
+                <div className="flex items-center justify-between py-3 text-sm">
+                  <span className="text-muted-foreground font-medium">
+                    Beban Pokok Penjualan (HPP)
                   </span>
-                  <span className="text-foreground text-sm font-semibold">
-                    ({formatRupiah(reportData.breakdown?.expenses?.[0]?.amount ?? 0)})
+                  <span className="text-foreground font-semibold">
+                    {formatRupiah(reportData.cogs ?? 0)}
                   </span>
                 </div>
-                <div className="border-border bg-card flex items-center justify-between rounded-b-lg border-t-2 px-4 py-3">
-                  <span className="text-foreground text-sm font-bold">Total HPP</span>
-                  <span className="text-sm font-bold text-rose-600">
-                    ({formatRupiah(reportData.cogs ?? 0)})
-                  </span>
+                <div className="flex items-center justify-between py-3 text-sm font-bold">
+                  <span className="text-foreground">Total Harga Pokok Penjualan</span>
+                  <span className="text-rose-600">({formatRupiah(reportData.cogs ?? 0)})</span>
                 </div>
               </div>
             </div>
 
             {/* LABA KOTOR */}
-            <div className="flex items-center justify-between rounded-lg border border-blue-100 bg-blue-50/50 px-4 py-4">
-              <span className="text-foreground text-base font-bold">Laba Kotor (Gross Profit)</span>
-              <span className="text-lg font-bold text-blue-700">{formatRupiah(grossProfit)}</span>
+            <div className="bg-muted/50 rounded-xl px-5 py-4">
+              <div className="flex items-center justify-between text-sm font-bold">
+                <span className="text-foreground">LABA KOTOR (Gross Profit)</span>
+                <span className="text-foreground">{formatRupiah(grossProfit)}</span>
+              </div>
             </div>
 
             {/* BEBAN OPERASIONAL */}
             <div>
-              <h3 className="mb-3 flex items-center gap-2 text-xs font-bold tracking-wider text-orange-600 uppercase">
+              <h3 className="mb-3 flex items-center gap-2 text-xs font-bold tracking-wider text-rose-600 uppercase">
                 <ArrowDownRight className="h-4 w-4" /> Beban Operasional & Lainnya
               </h3>
-              <div className="divide-border-soft border-border-soft bg-muted divide-y rounded-lg border">
-                {(reportData.breakdown?.expenses ?? [])
-                  .slice(1)
-                  .map((item: ProfitLossBreakdownItem, idx: number) => (
-                    <div key={idx} className="flex items-center justify-between px-4 py-3">
-                      <span className="text-foreground text-sm font-medium">{item.label}</span>
-                      <span className="text-foreground text-sm font-semibold">
-                        ({formatRupiah(item.amount)})
-                      </span>
-                    </div>
-                  ))}
-                <div className="border-border bg-card flex items-center justify-between rounded-b-lg border-t-2 px-4 py-3">
-                  <span className="text-foreground text-sm font-bold">Total Beban</span>
-                  <span className="text-sm font-bold text-orange-600">
-                    ({formatRupiah(totalExpenses)})
-                  </span>
+              <div className="divide-border-soft border-border-soft divide-y rounded-xl border px-5 py-2">
+                {(reportData.breakdown?.expenses || []).slice(1).map((item, idx) => (
+                  <div key={idx} className="flex items-center justify-between py-3 text-sm">
+                    <span className="text-muted-foreground font-medium">{item.label}</span>
+                    <span className="text-foreground font-semibold">
+                      {formatRupiah(item.amount)}
+                    </span>
+                  </div>
+                ))}
+                {(!reportData.breakdown?.expenses || reportData.breakdown.expenses.length <= 1) && (
+                  <div className="py-3 text-center text-xs font-medium text-blue-500">
+                    Tidak ada pengeluaran operasional lain.
+                  </div>
+                )}
+                <div className="flex items-center justify-between py-3 text-sm font-bold">
+                  <span className="text-foreground">Total Beban Operasional</span>
+                  <span className="text-rose-600">({formatRupiah(totalExpenses)})</span>
                 </div>
               </div>
             </div>
 
             {/* LABA BERSIH */}
-            <div className="mt-4 flex items-center justify-between rounded-xl bg-slate-900 px-6 py-5 shadow-md">
-              <span className="text-lg font-bold tracking-wide text-white">
-                Laba Bersih (Net Profit)
-              </span>
-              <span className="text-2xl font-bold tracking-tight text-emerald-400">
-                {formatRupiah(reportData.netProfit ?? 0)}
-              </span>
+            <div className="border-t-2 border-dashed pt-4">
+              <div className="flex items-center justify-between rounded-xl border border-blue-100 bg-blue-50/50 px-6 py-5 text-sm font-bold">
+                <span className="text-base text-blue-900">LABA BERSIH (Net Profit)</span>
+                <span className="text-lg text-blue-700">
+                  {formatRupiah(reportData.netProfit ?? 0)}
+                </span>
+              </div>
             </div>
           </div>
         </div>

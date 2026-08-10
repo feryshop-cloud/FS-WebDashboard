@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React from "react";
 import {
   Search,
   Filter,
@@ -12,58 +12,16 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
-import { getAuditLogs, AuditLogFilters, AuditLogResult } from "@/app/actions/audit-log";
-import { AuditLog } from "@/types/database";
-
-type AuditLogWithUser = AuditLog & { public_users?: { full_name?: string | null } | null };
+import { useAuditLog } from "@/lib/hooks/features/useAuditLog";
 
 const PAGE_SIZES = [25, 50, 100, 200];
 
 export default function AuditLogPage() {
-  const [logs, setLogs] = useState<AuditLogWithUser[]>([]);
-  const [pagination, setPagination] = useState({
-    total: 0,
-    page: 1,
-    pageSize: 50,
-    totalPages: 1,
-  });
-  const [isLoading, setIsLoading] = useState(true);
-
-  const loadData = useCallback(async (filters: AuditLogFilters = {}) => {
-    setIsLoading(true);
-    try {
-      const result = (await getAuditLogs(filters)) as AuditLogResult;
-      setLogs((result.data as unknown as AuditLogWithUser[]) || []);
-      setPagination({
-        total: result.total,
-        page: result.page,
-        pageSize: result.pageSize,
-        totalPages: result.totalPages,
-      });
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadData({ page: 1, pageSize: 50 });
-  }, [loadData]);
-
-  const handlePageChange = (nextPage: number) => {
-    if (nextPage < 1 || nextPage > pagination.totalPages) return;
-    loadData({ page: nextPage, pageSize: pagination.pageSize });
-  };
-
-  const handlePageSizeChange = (size: number) => {
-    if (size === pagination.pageSize) return;
-    loadData({ page: 1, pageSize: size });
-  };
-
-  const startFrom = pagination.total === 0 ? 0 : (pagination.page - 1) * pagination.pageSize + 1;
-  const endTo = Math.min(pagination.page * pagination.pageSize, pagination.total);
+  const {
+    data: { logs, pagination, startFrom, endTo },
+    isLoading,
+    actions: { handlePageChange, handlePageSizeChange },
+  } = useAuditLog();
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 pb-8">

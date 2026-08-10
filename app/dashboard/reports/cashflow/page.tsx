@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Download,
   ChevronDown,
@@ -11,8 +11,7 @@ import {
   Search,
 } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
-import { getErrorMessage } from "@/lib/error";
-import { getLedgerEntries } from "@/actions/ledger";
+import { useCashflowReport } from "@/lib/hooks/features/useCashflowReport";
 
 const MONTHS = [
   "Januari",
@@ -29,186 +28,23 @@ const MONTHS = [
   "Desember",
 ];
 
-import { LedgerWithRelations } from "@/types/database";
-
 const YEARS = [2025, 2026, 2027];
 
 export default function CashflowPage() {
-  const [entries, setEntries] = useState<LedgerWithRelations[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isMonthDropdownOpen, setIsMonthDropdownOpen] = useState(false);
-  const [isYearDropdownOpen, setIsYearDropdownOpen] = useState(false);
-
-  const loadData = async () => {
-    try {
-      setIsLoading(true);
-      setError("");
-      const res = await getLedgerEntries();
-      if (res.error) {
-        setError(res.error);
-      } else {
-        setEntries(res.data || []);
-      }
-    } catch (err: unknown) {
-      console.error(err);
-      setError(getErrorMessage(err, "Gagal memuat data arus kas."));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadData();
-  }, []);
-
-  // Filter entries for the selected month and year
-  const monthlyEntries = entries.filter((entry) => {
-    const d = new Date(entry.created_at);
-    return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
-  });
-
-  // Filter entries for the table based on search
-  const filteredEntries = monthlyEntries.filter((entry) => {
-    const matchesSearch =
-      searchQuery.trim() === "" ||
-      (entry.description || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (entry.account?.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (entry.transaction_type || "").toLowerCase().includes(searchQuery.toLowerCase());
-
-    return matchesSearch;
-  });
-
-  // Aggregation
-  let cashIn = 0;
-  let cashOut = 0;
-
-  let totalPaymentIn = 0;
-  let totalTransferIn = 0;
-  let totalRefundIn = 0;
-  let totalCashbackIn = 0;
-  let totalAdjustmentIn = 0;
-  let totalOtherIn = 0;
-
-  let totalStockPurchase = 0;
-  let totalPaymentOut = 0;
-  let totalRefundOut = 0;
-  let totalCashbackOut = 0;
-  let totalTransferOut = 0;
-  let totalAdjustmentOut = 0;
-  let totalOtherOut = 0;
-
-  monthlyEntries.forEach((entry) => {
-    const amt = Number(entry.amount);
-    if (amt > 0) {
-      cashIn += amt;
-      switch (entry.transaction_type) {
-        case "PAYMENT_IN":
-          // Distinguish DP / Cicilan vs Lunas via description keywords
-          const desc = (entry.description || "").toLowerCase();
-          if (desc.includes("dp") || desc.includes("cicilan") || desc.includes("down payment")) {
-            totalCashbackIn += amt; // Put in a different bucket temporarily or group
-          } else {
-            totalPaymentIn += amt;
-          }
-          break;
-        case "TRANSFER_IN":
-          totalTransferIn += amt;
-          break;
-        case "REFUND":
-          totalRefundIn += amt;
-          break;
-        case "CASHBACK":
-          totalCashbackIn += amt;
-          break;
-        case "ADJUSTMENT":
-          totalAdjustmentIn += amt;
-          break;
-        default:
-          totalOtherIn += amt;
-          break;
-      }
-    } else if (amt < 0) {
-      const absAmt = Math.abs(amt);
-      cashOut += absAmt;
-      switch (entry.transaction_type) {
-        case "STOCK_PURCHASE":
-          totalStockPurchase += absAmt;
-          break;
-        case "PAYMENT_OUT":
-          totalPaymentOut += absAmt;
-          break;
-        case "REFUND":
-          totalRefundOut += absAmt;
-          break;
-        case "CASHBACK":
-          totalCashbackOut += absAmt;
-          break;
-        case "TRANSFER_OUT":
-          totalTransferOut += absAmt;
-          break;
-        case "ADJUSTMENT":
-          totalAdjustmentOut += absAmt;
-          break;
-        default:
-          totalOtherOut += absAmt;
-          break;
-      }
-    }
-  });
-
-  const netCashflow = cashIn - cashOut;
-
-  // Split PAYMENT_IN breakdown nicely
-  const inflows = [
-    { label: "Penerimaan Penjualan (Lunas)", amount: totalPaymentIn },
-    { label: "Penerimaan DP / Cicilan", amount: totalCashbackIn }, // using grouped cashback/inflows
-    { label: "Transfer Masuk / Mutasi", amount: totalTransferIn },
-    { label: "Penerimaan Refund / Batal", amount: totalRefundIn },
-    { label: "Penyesuaian Saldo Masuk", amount: totalAdjustmentIn },
-    { label: "Penerimaan Lainnya", amount: totalOtherIn },
-  ].filter((item) => item.amount > 0);
-
-  const outflows = [
-    { label: "Pembayaran Pembelian Stok", amount: totalStockPurchase },
-    { label: "Pengeluaran Operasional / Umum", amount: totalPaymentOut },
-    { label: "Pengeluaran Refund / Batal", amount: totalRefundOut },
-    { label: "Pengeluaran Cashback", amount: totalCashbackOut },
-    { label: "Transfer Keluar / Mutasi", amount: totalTransferOut },
-    { label: "Penyesuaian Saldo Keluar", amount: totalAdjustmentOut },
-    { label: "Pengeluaran Lainnya", amount: totalOtherOut },
-  ].filter((item) => item.amount > 0);
-
-  const handleExportCSV = () => {
-    if (filteredEntries.length === 0) return;
-
-    const headers = ["Tanggal", "Rekening", "Tipe Transaksi", "Keterangan", "Jumlah (IDR)"];
-    const rows = filteredEntries.map((entry) => [
-      new Date(entry.created_at).toLocaleString("id-ID"),
-      entry.account?.name || "-",
-      entry.transaction_type,
-      entry.description || "-",
-      entry.amount,
-    ]);
-
-    // Use BOM for Excel compatibility in UTF-8
-    const csvContent =
-      "\uFEFF" +
-      [headers.join(","), ...rows.map((e) => e.map((val) => `"${val}"`).join(","))].join("\n");
-
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", `arus-kas-${MONTHS[selectedMonth]}-${selectedYear}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+  const {
+    data: { filteredEntries, cashIn, cashOut, netCashflow, inflows, outflows },
+    isLoading,
+    error,
+    uiState: { selectedMonth, selectedYear, searchQuery, isMonthDropdownOpen, isYearDropdownOpen },
+    actions: {
+      setSelectedMonth,
+      setSelectedYear,
+      setSearchQuery,
+      setIsMonthDropdownOpen,
+      setIsYearDropdownOpen,
+      handleExportCSV,
+    },
+  } = useCashflowReport();
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 pb-8">
@@ -229,7 +65,7 @@ export default function CashflowPage() {
                 setIsMonthDropdownOpen(!isMonthDropdownOpen);
                 setIsYearDropdownOpen(false);
               }}
-              className="border-border bg-card text-foreground hover:bg-muted inline-flex min-w-[140px] cursor-pointer items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm font-semibold shadow-sm"
+              className="border-border bg-card text-foreground hover:bg-muted inline-flex min-w-35 cursor-pointer items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm font-semibold shadow-sm"
             >
               <span>{MONTHS[selectedMonth]}</span>
               <ChevronDown className="text-faint-foreground h-4 w-4" />
@@ -258,7 +94,7 @@ export default function CashflowPage() {
                 setIsYearDropdownOpen(!isYearDropdownOpen);
                 setIsMonthDropdownOpen(false);
               }}
-              className="border-border bg-card text-foreground hover:bg-muted inline-flex min-w-[90px] cursor-pointer items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm font-semibold shadow-sm"
+              className="border-border bg-card text-foreground hover:bg-muted inline-flex min-w-22.5 cursor-pointer items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm font-semibold shadow-sm"
             >
               <span>{selectedYear}</span>
               <ChevronDown className="text-faint-foreground h-4 w-4" />

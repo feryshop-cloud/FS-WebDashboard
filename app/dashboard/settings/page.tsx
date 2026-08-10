@@ -1,14 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React from "react";
 import { Users, FolderTree, Shield, RefreshCw, Gamepad2, Settings2 } from "lucide-react";
-import {
-  getCategories,
-  getUsersList,
-  getRolesList,
-  getGamesList,
-  getSiteSettings,
-} from "@/actions/settings";
+import { useSettings, ActiveTab } from "@/lib/hooks/features/useSettings";
 import { GameCategoryManager } from "@/components/features/GameCategoryManager";
 import { GameManager } from "@/components/features/GameManager";
 import { UserManagementTab } from "@/components/settings/UserManagementTab";
@@ -16,79 +10,14 @@ import { RoleManagementTab } from "@/components/settings/RoleManagementTab";
 import { SiteSettingsTab } from "@/components/settings/SiteSettingsTab";
 import type { Database } from "@/types/database.types";
 
-type ActiveTab = "users" | "roles" | "categories" | "games" | "site";
-
-type SiteSettingRow = {
-  key: string;
-  value: unknown;
-  description: string | null;
-  updated_at: string;
-};
-
 export default function SettingsPage() {
-  const [activeTab, setActiveTab] = useState<ActiveTab>("users");
-
-  const [categories, setCategories] = useState<unknown[]>([]);
-  const [categoriesError, setCategoriesError] = useState<string>("");
-
-  const [users, setUsers] = useState<unknown[]>([]);
-  const [usersError, setUsersError] = useState<string>("");
-
-  const [roles, setRoles] = useState<unknown[]>([]);
-  const [rolesError, setRolesError] = useState<string>("");
-
-  const [games, setGames] = useState<unknown[]>([]);
-  const [gamesError, setGamesError] = useState<string>("");
-
-  const [siteSettings, setSiteSettings] = useState<SiteSettingRow[]>([]);
-  const [siteSettingsError, setSiteSettingsError] = useState<string>("");
-
-  const [isLoading, setIsLoading] = useState(true);
-
-  const loadData = async () => {
-    setIsLoading(true);
-    try {
-      const [catRes, userRes, roleRes, gameRes, siteRes] = await Promise.all([
-        getCategories(),
-        getUsersList(),
-        getRolesList(),
-        getGamesList(),
-        getSiteSettings(),
-      ]);
-
-      if (catRes.error) setCategoriesError(catRes.error);
-      else setCategories(catRes.data || []);
-
-      if (userRes.error) setUsersError(userRes.error);
-      else setUsers(userRes.data || []);
-
-      if (roleRes.error) setRolesError(roleRes.error);
-      else setRoles(roleRes.data || []);
-
-      if (gameRes.error) setGamesError(gameRes.error);
-      else setGames(gameRes.data || []);
-
-      if (siteRes.error) setSiteSettingsError(siteRes.error);
-      else setSiteSettings((siteRes.data ?? []) as SiteSettingRow[]);
-    } catch (err) {
-      console.error("Error loading settings data:", err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    let isMounted = true;
-    const init = async () => {
-      if (isMounted) {
-        await loadData();
-      }
-    };
-    init();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const {
+    data: { categories, users, roles, games, siteSettings },
+    errors: { categoriesError, usersError, rolesError, gamesError, siteSettingsError },
+    isLoading,
+    uiState: { activeTab },
+    actions: { setActiveTab, loadData },
+  } = useSettings();
 
   const navItems: { id: ActiveTab; label: string; icon: React.ReactNode }[] = [
     { id: "users", label: "Manajemen User", icon: <Users className="h-5 w-5" /> },

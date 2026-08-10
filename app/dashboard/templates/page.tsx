@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Copy,
   Edit,
@@ -13,139 +13,37 @@ import {
   Trash2,
   Loader2,
 } from "lucide-react";
-import { getTemplates, addTemplate, updateTemplate, deleteTemplate } from "@/app/actions/templates";
-
-interface TemplateItem {
-  id: string;
-  name: string;
-  type: string;
-  content: string;
-  created_at?: string;
-  updated_at?: string;
-}
+import { useTemplates } from "@/lib/hooks/features/useTemplates";
 
 export default function TemplatesPage() {
-  const [templates, setTemplates] = useState<TemplateItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [copiedId, setCopiedId] = useState<string | null>(null);
-
-  // Add modal state
-  const [isAddOpen, setIsAddOpen] = useState(false);
-  const [isAddClosing, setIsAddClosing] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Edit inline state
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editContent, setEditContent] = useState("");
-  const [editName, setEditName] = useState("");
-  const [editType, setEditType] = useState("");
-
-  const loadTemplatesData = async () => {
-    try {
-      setIsLoading(true);
-      const data = await getTemplates();
-      setTemplates(data as unknown as TemplateItem[]);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    let isMounted = true;
-    getTemplates()
-      .then((data) => {
-        if (isMounted) {
-          setTemplates(data as unknown as TemplateItem[]);
-        }
-      })
-      .catch((err) => console.error(err))
-      .finally(() => {
-        if (isMounted) setIsLoading(false);
-      });
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  const handleCopy = (id: string, text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
-  };
-
-  const openAdd = () => {
-    if (isAddClosing) return;
-    setIsAddOpen(true);
-  };
-
-  const closeModal = () => {
-    if (isAddClosing || isSubmitting) return;
-    setIsAddClosing(true);
-    setTimeout(() => {
-      setIsAddClosing(false);
-      setIsAddOpen(false);
-    }, 200);
-  };
-
-  const handleAddSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    try {
-      setIsSubmitting(true);
-      const formData = new FormData(e.currentTarget);
-      await addTemplate(formData);
-      loadTemplatesData();
-      closeModal();
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleStartEdit = (tpl: TemplateItem) => {
-    setEditingId(tpl.id);
-    setEditName(tpl.name);
-    setEditType(tpl.type);
-    setEditContent(tpl.content);
-  };
-
-  const handleSaveEdit = async (id: string) => {
-    try {
-      setIsSubmitting(true);
-      const formData = new FormData();
-      formData.append("name", editName);
-      formData.append("type", editType);
-      formData.append("content", editContent);
-
-      await updateTemplate(id, formData);
-      setEditingId(null);
-      loadTemplatesData();
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    if (!confirm("Apakah Anda yakin ingin menghapus template ini?")) return;
-    try {
-      await deleteTemplate(id);
-      loadTemplatesData();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const filteredTemplates = templates.filter(
-    (t) =>
-      t.name.toLowerCase().includes(search.toLowerCase()) ||
-      t.type.toLowerCase().includes(search.toLowerCase()) ||
-      t.content.toLowerCase().includes(search.toLowerCase()),
-  );
+  const {
+    data: { filteredTemplates },
+    isLoading,
+    isSubmitting,
+    uiState: {
+      search,
+      copiedId,
+      isAddOpen,
+      isAddClosing,
+      editingId,
+      editContent,
+      editName,
+      editType,
+    },
+    actions: {
+      setSearch,
+      openAdd,
+      closeModal,
+      handleAddSubmit,
+      handleStartEdit,
+      handleSaveEdit,
+      handleDelete,
+      setEditContent,
+      setEditName,
+      setEditType,
+      handleCopy,
+    },
+  } = useTemplates();
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 pb-8">
@@ -227,12 +125,6 @@ export default function TemplatesPage() {
                       className="border-input text-foreground w-full rounded border p-2 font-mono text-xs outline-none focus:border-blue-500"
                     />
                     <div className="flex justify-end gap-2">
-                      <button
-                        onClick={() => setEditingId(null)}
-                        className="bg-muted text-muted-foreground hover:bg-muted inline-flex items-center gap-1 rounded px-2.5 py-1 text-xs font-semibold"
-                      >
-                        <X className="h-3 w-3" /> Batal
-                      </button>
                       <button
                         onClick={() => handleSaveEdit(tpl.id)}
                         disabled={isSubmitting}

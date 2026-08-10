@@ -1,15 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { Shield, Key, Check, Loader2, Plus, Trash2, X } from "lucide-react";
-import { updateRolePermissions, createRole, deleteRole } from "@/actions/settings";
-
-type Role = {
-  id: string;
-  name: string;
-  description: string | null;
-  permissions?: unknown;
-};
+import { useRoleManagement, Role } from "@/lib/hooks/features/useRoleManagement";
 
 interface RoleManagementTabProps {
   roles: Role[];
@@ -30,117 +23,32 @@ const DEFAULT_PERMISSIONS_KEYS = [
 const SYSTEM_ROLES = ["OWNER", "ADMIN", "MEMBER"];
 
 export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagementTabProps) {
-  const [selectedRole, setSelectedRole] = useState<Role | null>(roles[0] || null);
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveMessage, setSaveMessage] = useState("");
-
-  // Modal State for New Role
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isModalClosing, setIsModalClosing] = useState(false);
-  const [isCreating, setIsCreating] = useState(false);
-  const [formError, setFormError] = useState("");
-  const [newRoleName, setNewRoleName] = useState("");
-  const [newRoleDesc, setNewRoleDesc] = useState("");
-
-  const activePermissions: Record<string, boolean> =
-    typeof selectedRole?.permissions === "object" && selectedRole?.permissions !== null
-      ? (selectedRole.permissions as Record<string, boolean>)
-      : {};
-
-  const handleTogglePermission = (key: string) => {
-    if (!selectedRole) return;
-    const updated = {
-      ...activePermissions,
-      [key]: !activePermissions[key],
-    };
-    setSelectedRole({
-      ...selectedRole,
-      permissions: updated,
-    });
-  };
-
-  const handleSavePermissions = async () => {
-    if (!selectedRole) return;
-    try {
-      setIsSaving(true);
-      setSaveMessage("");
-      const res = await updateRolePermissions(selectedRole.id, activePermissions);
-
-      if (res.success) {
-        setSaveMessage("Hak akses berhasil disimpan!");
-        onRefresh();
-      } else {
-        setSaveMessage(res.error || "Gagal menyimpan hak akses.");
-      }
-    } catch (err) {
-      setSaveMessage(err instanceof Error ? err.message : "Terjadi kesalahan.");
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const openModal = () => {
-    if (isModalClosing) return;
-    setFormError("");
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    if (isModalClosing || isCreating) return;
-    setIsModalClosing(true);
-    setTimeout(() => {
-      setIsModalClosing(false);
-      setIsModalOpen(false);
-    }, 200);
-  };
-
-  const handleCreateRole = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormError("");
-
-    if (!newRoleName.trim()) {
-      setFormError("Nama role wajib diisi.");
-      return;
-    }
-
-    try {
-      setIsCreating(true);
-      const res = await createRole(newRoleName, newRoleDesc);
-      if (!res.success) {
-        setFormError(res.error || "Gagal membuat role.");
-        return;
-      }
-
-      setNewRoleName("");
-      setNewRoleDesc("");
-      onRefresh();
-      closeModal();
-    } catch (err) {
-      console.error(err);
-      setFormError("Gagal membuat role baru.");
-    } finally {
-      setIsCreating(false);
-    }
-  };
-
-  const handleDeleteRole = async (roleId: string, roleName: string) => {
-    if (!confirm(`Apakah Anda yakin ingin menghapus role ${roleName}?`)) return;
-
-    try {
-      const res = await deleteRole(roleId);
-      if (!res.success) {
-        setSaveMessage(res.error || "Gagal menghapus role.");
-        return;
-      }
-
-      if (selectedRole?.id === roleId) {
-        setSelectedRole(roles.find((r) => r.id !== roleId) || null);
-      }
-      onRefresh();
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const {
+    uiState: {
+      selectedRole,
+      isSaving,
+      saveMessage,
+      isModalOpen,
+      isModalClosing,
+      isCreating,
+      formError,
+      newRoleName,
+      newRoleDesc,
+      activePermissions,
+    },
+    actions: {
+      setSelectedRole,
+      setSaveMessage,
+      setNewRoleName,
+      setNewRoleDesc,
+      handleTogglePermission,
+      handleSavePermissions,
+      openModal,
+      closeModal,
+      handleCreateRole,
+      handleDeleteRole,
+    },
+  } = useRoleManagement(roles, onRefresh);
 
   return (
     <div className="space-y-6">

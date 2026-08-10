@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { Suspense } from "react";
 import {
   Search,
   ShoppingBag,
@@ -12,133 +12,34 @@ import {
   ArrowUpDown,
 } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
-import { getTopupProducts } from "@/app/actions/topup-products";
+import { useTopupProducts } from "@/lib/hooks/features/useTopupProducts";
 import { AddTopupProductModal } from "@/components/topup/TopupProductModals";
 import { TopupProductRowActions } from "@/components/topup/TopupProductRowActions";
 import { Pagination } from "@/components/ui/Pagination";
-import { useRouter, useSearchParams } from "next/navigation";
 
-type TopupProduct = {
-  id: string;
-  game_slug: string;
-  brand?: string | null;
-  title: string;
-  selling_price: number;
-  cost_price: number;
-  sku: string | null;
-  is_active: boolean;
-  is_gangguan: boolean;
-};
-
-export default function TopupProductsPage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [products, setProducts] = useState<TopupProduct[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [totalCount, setTotalCount] = useState(0);
-
-  const currentPage = parseInt(searchParams.get("page") || "1", 10);
-  const itemsPerPage = parseInt(searchParams.get("limit") || "10", 10);
-  const searchQuery = searchParams.get("search") || "";
-  const sortBy = searchParams.get("sortBy") || "game_slug";
-  const sortOrder = (searchParams.get("sortOrder") || "asc") as "asc" | "desc";
-  const isActiveFilter = searchParams.get("isActive") || "";
-  const isGangguanFilter = searchParams.get("isGangguan") || "";
-
-  const loadProducts = useCallback(
-    async (
-      filters: {
-        page?: number;
-        search?: string;
-        sortBy?: string;
-        sortOrder?: string;
-        isActive?: string;
-        isGangguan?: string;
-      } = {},
-    ) => {
-      try {
-        setIsLoading(true);
-        setError("");
-        const res = await getTopupProducts({
-          page: filters.page ?? currentPage,
-          limit: itemsPerPage,
-          search: filters.search ?? searchQuery,
-          sortBy: filters.sortBy ?? sortBy,
-          sortOrder: (filters.sortOrder ?? sortOrder) as "asc" | "desc",
-          isActive: filters.isActive ?? isActiveFilter,
-          isGangguan: filters.isGangguan ?? isGangguanFilter,
-        });
-
-        if (res.error) {
-          setError(res.error);
-        } else {
-          setProducts((res.data as TopupProduct[]) || []);
-          setTotalCount(res.totalCount || 0);
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Gagal mengambil data produk");
-      } finally {
-        setIsLoading(false);
-      }
+function TopupProductsContent() {
+  const {
+    data: { products, totalCount, currentPage, itemsPerPage },
+    isLoading,
+    error,
+    uiState: {
+      isAddModalOpen,
+      searchQuery,
+      sortBy,
+      sortOrder,
+      isActiveFilter,
+      isGangguanFilter,
+      hasActiveFilters,
     },
-    [currentPage, searchQuery, sortBy, sortOrder, isActiveFilter, isGangguanFilter, itemsPerPage],
-  );
-
-  useEffect(() => {
-    let isMounted = true;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadProducts().finally(() => {
-      if (isMounted) setIsLoading(false);
-    });
-    return () => {
-      isMounted = false;
-    };
-  }, [loadProducts]);
-
-  const handleFilterChange = (key: string, value: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (value) {
-      params.set(key, value);
-    } else {
-      params.delete(key);
-    }
-    params.set("page", "1");
-    router.push(`/dashboard/topup-products?${params.toString()}`);
-  };
-
-  const handleResetFilters = () => {
-    router.push("/dashboard/topup-products");
-  };
-
-  const handlePageSizeChange = (size: number) => {
-    if (size === itemsPerPage) return;
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("limit", String(size));
-    params.set("page", "1");
-    router.push(`/dashboard/topup-products?${params.toString()}`);
-  };
-
-  const handleSortChange = (newSortBy: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (sortBy === newSortBy) {
-      const newOrder = sortOrder === "asc" ? "desc" : "asc";
-      params.set("sortOrder", newOrder);
-    } else {
-      params.set("sortBy", newSortBy);
-      params.set("sortOrder", "asc");
-    }
-    params.set("page", "1");
-    router.push(`/dashboard/topup-products?${params.toString()}`);
-  };
-
-  const hasActiveFilters =
-    searchQuery ||
-    isActiveFilter ||
-    isGangguanFilter ||
-    sortBy !== "game_slug" ||
-    sortOrder !== "asc";
+    actions: {
+      setIsAddModalOpen,
+      handleFilterChange,
+      handleResetFilters,
+      handlePageSizeChange,
+      handleSortChange,
+      loadProducts,
+    },
+  } = useTopupProducts();
 
   const sortOptions = [
     { value: "game_slug", label: "Game" },
@@ -350,5 +251,19 @@ export default function TopupProductsPage() {
         onSuccess={() => loadProducts()}
       />
     </div>
+  );
+}
+
+export default function TopupProductsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-64 items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        </div>
+      }
+    >
+      <TopupProductsContent />
+    </Suspense>
   );
 }
