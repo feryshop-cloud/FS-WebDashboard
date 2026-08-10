@@ -135,15 +135,15 @@ export default function ProfitLossPage() {
             <div>
               <h3 className="text-foreground border-b pb-2 text-sm font-bold">Pendapatan</h3>
               <div className="divide-y text-sm">
-                {reportData.breakdown?.revenue?.map((rev, idx) => (
+                {reportData.breakdown?.income?.map((rev, idx) => (
                   <div key={idx} className="flex items-center justify-between py-3">
-                    <span className="text-muted-foreground font-medium">{rev.category}</span>
+                    <span className="text-muted-foreground font-medium">{rev.label}</span>
                     <span className="text-foreground font-semibold">
                       {formatRupiah(rev.amount)}
                     </span>
                   </div>
                 ))}
-                {(!reportData.breakdown?.revenue || reportData.breakdown.revenue.length === 0) && (
+                {(!reportData.breakdown?.income || reportData.breakdown.income.length === 0) && (
                   <div className="py-3 text-center text-xs font-medium text-blue-500">
                     Tidak ada pendapatan operasional tercatat.
                   </div>
@@ -188,7 +188,7 @@ export default function ProfitLossPage() {
               <div className="divide-y text-sm">
                 {reportData.breakdown?.expenses?.map((exp, idx) => (
                   <div key={idx} className="flex items-center justify-between py-3">
-                    <span className="text-muted-foreground font-medium">{exp.category}</span>
+                    <span className="text-muted-foreground font-medium">{exp.label}</span>
                     <span className="text-foreground font-semibold">
                       {formatRupiah(exp.amount)}
                     </span>

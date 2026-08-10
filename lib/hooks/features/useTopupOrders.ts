@@ -232,7 +232,7 @@ export function useTopupOrders() {
       handleExportCSV,
       handleOpenOrder,
       handleSaveOrder,
-      loadOrders: () => mutate(),
+      loadOrders: (_filters?: unknown) => mutate(),
     },
   };
 }
