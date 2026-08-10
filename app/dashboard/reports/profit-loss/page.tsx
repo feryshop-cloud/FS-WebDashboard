@@ -7,8 +7,6 @@ import {
   TrendingUp,
   TrendingDown,
   Activity,
-  ArrowUpRight,
-  ArrowDownRight,
   Loader2,
 } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
@@ -24,7 +22,7 @@ export default function ProfitLossPage() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto flex min-h-[60vh] max-w-6xl items-center justify-center">
+      <div className="flex min-h-[60vh] items-center justify-center">
         <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
       </div>
     );
@@ -32,14 +30,14 @@ export default function ProfitLossPage() {
 
   if (!reportData) {
     return (
-      <div className="mx-auto flex min-h-[60vh] max-w-6xl items-center justify-center">
+      <div className="flex min-h-[60vh] items-center justify-center">
         <p className="text-muted-foreground">Gagal memuat laporan laba rugi.</p>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-6 pb-8">
+    <>
       {/* Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
@@ -58,109 +56,114 @@ export default function ProfitLossPage() {
               onChange={(e) => setPeriodFilter(e.target.value)}
               className="text-foreground cursor-pointer bg-transparent pr-4 font-medium outline-none"
             >
-              <option value="ALL">Semua Waktu</option>
-              <option value="TODAY">Hari Ini</option>
-              <option value="7_DAYS">7 Hari Terakhir</option>
               <option value="THIS_MONTH">Bulan Ini</option>
+              <option value="LAST_MONTH">Bulan Lalu</option>
               <option value="THIS_YEAR">Tahun Ini</option>
             </select>
           </div>
-          <button className="border-border bg-card text-foreground hover:bg-muted hover:text-foreground inline-flex items-center justify-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium shadow-sm transition-colors">
+          <button className="border-border bg-card text-foreground hover:bg-muted hover:text-foreground inline-flex items-center justify-center gap-2 rounded-lg border px-4 py-2 text-sm font-semibold shadow-sm transition-colors">
             <Download className="h-4 w-4" />
-            Export PDF
+            Eksport Laporan
           </button>
         </div>
       </div>
 
-      {/* Top Metric Cards */}
+      {/* 2. SUMMARY CARDS */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <div className="border-border-soft bg-card flex flex-col justify-between rounded-xl border px-6 py-5 shadow-sm">
-          <div className="mb-4 flex items-center justify-between">
-            <span className="text-muted-foreground text-sm font-bold tracking-wider uppercase">
-              Total Pendapatan
-            </span>
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
-              <TrendingUp className="h-4 w-4" />
-            </div>
+        {/* TOTAL INCOME */}
+        <div className="border-border-soft bg-card flex items-center gap-4 rounded-xl border px-6 py-5 shadow-sm">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+            <TrendingUp className="h-6 w-6" />
           </div>
           <div>
-            <h3 className="text-foreground text-3xl font-bold tracking-tight">
+            <span className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
+              Total Pendapatan (Omzet)
+            </span>
+            <h3 className="text-foreground text-2xl font-bold tracking-tight">
               {formatRupiah(reportData.revenue ?? 0)}
             </h3>
           </div>
         </div>
 
-        <div className="border-border-soft bg-card flex flex-col justify-between rounded-xl border px-6 py-5 shadow-sm">
-          <div className="mb-4 flex items-center justify-between">
-            <span className="text-muted-foreground text-sm font-bold tracking-wider uppercase">
-              Total HPP / Modal Stok
-            </span>
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-rose-50 text-rose-600">
-              <TrendingDown className="h-4 w-4" />
-            </div>
+        {/* HPP (COGS) */}
+        <div className="border-border-soft bg-card flex items-center gap-4 rounded-xl border px-6 py-5 shadow-sm">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-orange-50 text-orange-600">
+            <TrendingDown className="h-6 w-6" />
           </div>
           <div>
-            <h3 className="text-foreground text-3xl font-bold tracking-tight">
+            <span className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
+              Beban Pokok Penjualan (HPP)
+            </span>
+            <h3 className="text-foreground text-2xl font-bold tracking-tight">
               {formatRupiah(reportData.cogs ?? 0)}
             </h3>
           </div>
         </div>
 
-        <div className="border-border-soft bg-card flex flex-col justify-between rounded-xl border border-b-4 border-b-blue-500 px-6 py-5 shadow-sm">
-          <div className="mb-4 flex items-center justify-between">
-            <span className="text-sm font-bold tracking-wider text-blue-600 uppercase">
-              Laba Bersih
-            </span>
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50 text-blue-600">
-              <Activity className="h-4 w-4" />
-            </div>
+        {/* LABA KOTOR */}
+        <div className="border-border-soft bg-card flex items-center gap-4 rounded-xl border px-6 py-5 shadow-sm">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+            <Activity className="h-6 w-6" />
           </div>
           <div>
-            <h3 className="text-3xl font-bold tracking-tight text-blue-700">
-              {formatRupiah(reportData.netProfit ?? 0)}
+            <span className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
+              Total Laba Kotor
+            </span>
+            <h3 className="text-foreground text-2xl font-bold tracking-tight">
+              {formatRupiah(grossProfit)}
             </h3>
           </div>
         </div>
       </div>
 
-      {/* Structured P&L Table */}
-      <div className="border-border-soft bg-card mt-2 overflow-hidden rounded-xl border shadow-sm">
-        <div className="border-border-soft bg-muted/50 border-b px-6 py-4">
-          <h2 className="text-foreground text-base font-bold">Rincian Laba Rugi</h2>
+      {/* 3. REPORT DETAIL STATEMENT */}
+      <div className="border-border bg-card flex flex-col rounded-xl border shadow-sm">
+        <div className="border-border flex items-center justify-between border-b px-6 py-5">
+          <div>
+            <h2 className="text-foreground text-base font-bold">
+              Laporan Laba Rugi Struktur Standar
+            </h2>
+            <p className="text-muted-foreground mt-0.5 text-xs">
+              Sajian rincian pendapatan operasional dan beban komersial periode terpilih.
+            </p>
+          </div>
         </div>
 
         <div className="p-6">
-          <div className="mx-auto max-w-4xl space-y-6">
+          <div className="space-y-6">
             {/* PENDAPATAN */}
             <div>
-              <h3 className="mb-3 flex items-center gap-2 text-xs font-bold tracking-wider text-emerald-600 uppercase">
-                <ArrowUpRight className="h-4 w-4" /> Pendapatan (Revenue)
-              </h3>
-              <div className="divide-border-soft border-border-soft divide-y rounded-xl border px-5 py-2">
-                {(reportData.breakdown?.income || []).map((item, idx) => (
-                  <div key={idx} className="flex items-center justify-between py-3 text-sm">
-                    <span className="text-muted-foreground font-medium">{item.label}</span>
+              <h3 className="text-foreground border-b pb-2 text-sm font-bold">Pendapatan</h3>
+              <div className="divide-y text-sm">
+                {reportData.breakdown?.revenue?.map((rev, idx) => (
+                  <div key={idx} className="flex items-center justify-between py-3">
+                    <span className="text-muted-foreground font-medium">{rev.category}</span>
                     <span className="text-foreground font-semibold">
-                      {formatRupiah(item.amount)}
+                      {formatRupiah(rev.amount)}
                     </span>
                   </div>
                 ))}
+                {(!reportData.breakdown?.revenue || reportData.breakdown.revenue.length === 0) && (
+                  <div className="py-3 text-center text-xs font-medium text-blue-500">
+                    Tidak ada pendapatan operasional tercatat.
+                  </div>
+                )}
                 <div className="flex items-center justify-between py-3 text-sm font-bold">
-                  <span className="text-foreground">Total Pendapatan Bersih</span>
-                  <span className="text-emerald-600">{formatRupiah(reportData.revenue ?? 0)}</span>
+                  <span className="text-foreground">Total Pendapatan</span>
+                  <span className="text-foreground">{formatRupiah(reportData.revenue ?? 0)}</span>
                 </div>
               </div>
             </div>
 
             {/* HARGA POKOK PENJUALAN */}
             <div>
-              <h3 className="mb-3 flex items-center gap-2 text-xs font-bold tracking-wider text-rose-600 uppercase">
-                <ArrowDownRight className="h-4 w-4" /> Harga Pokok Penjualan (COGS)
+              <h3 className="text-foreground border-b pb-2 text-sm font-bold">
+                Harga Pokok Penjualan (HPP)
               </h3>
-              <div className="divide-border-soft border-border-soft divide-y rounded-xl border px-5 py-2">
-                <div className="flex items-center justify-between py-3 text-sm">
+              <div className="divide-y text-sm">
+                <div className="flex items-center justify-between py-3">
                   <span className="text-muted-foreground font-medium">
-                    Beban Pokok Penjualan (HPP)
+                    Beban Pokok Penjualan HPP
                   </span>
                   <span className="text-foreground font-semibold">
                     {formatRupiah(reportData.cogs ?? 0)}
@@ -173,31 +176,28 @@ export default function ProfitLossPage() {
               </div>
             </div>
 
-            {/* LABA KOTOR */}
-            <div className="bg-muted/50 rounded-xl px-5 py-4">
-              <div className="flex items-center justify-between text-sm font-bold">
-                <span className="text-foreground">LABA KOTOR (Gross Profit)</span>
-                <span className="text-foreground">{formatRupiah(grossProfit)}</span>
-              </div>
+            {/* LABA KOTOR STATS */}
+            <div className="bg-muted/30 flex items-center justify-between rounded-lg border-t border-b px-3 py-3 text-sm font-bold">
+              <span className="text-foreground">TOTAL LABA KOTOR</span>
+              <span className="text-foreground">{formatRupiah(grossProfit)}</span>
             </div>
 
-            {/* BEBAN OPERASIONAL */}
+            {/* BIAYA OPERASIONAL */}
             <div>
-              <h3 className="mb-3 flex items-center gap-2 text-xs font-bold tracking-wider text-rose-600 uppercase">
-                <ArrowDownRight className="h-4 w-4" /> Beban Operasional & Lainnya
-              </h3>
-              <div className="divide-border-soft border-border-soft divide-y rounded-xl border px-5 py-2">
-                {(reportData.breakdown?.expenses || []).slice(1).map((item, idx) => (
-                  <div key={idx} className="flex items-center justify-between py-3 text-sm">
-                    <span className="text-muted-foreground font-medium">{item.label}</span>
+              <h3 className="text-foreground border-b pb-2 text-sm font-bold">Beban Operasional</h3>
+              <div className="divide-y text-sm">
+                {reportData.breakdown?.expenses?.map((exp, idx) => (
+                  <div key={idx} className="flex items-center justify-between py-3">
+                    <span className="text-muted-foreground font-medium">{exp.category}</span>
                     <span className="text-foreground font-semibold">
-                      {formatRupiah(item.amount)}
+                      {formatRupiah(exp.amount)}
                     </span>
                   </div>
                 ))}
-                {(!reportData.breakdown?.expenses || reportData.breakdown.expenses.length <= 1) && (
+                {(!reportData.breakdown?.expenses ||
+                  reportData.breakdown.expenses.length === 0) && (
                   <div className="py-3 text-center text-xs font-medium text-blue-500">
-                    Tidak ada pengeluaran operasional lain.
+                    Tidak ada pengeluaran operasional tercatat.
                   </div>
                 )}
                 <div className="flex items-center justify-between py-3 text-sm font-bold">
@@ -219,6 +219,6 @@ export default function ProfitLossPage() {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
