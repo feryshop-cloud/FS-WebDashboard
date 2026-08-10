@@ -1,7 +1,6 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import React, { useState, useEffect } from "react";
+import React, { Suspense } from "react";
 import {
   Search,
   Filter,
@@ -17,211 +16,42 @@ import {
   X,
 } from "lucide-react";
 import { formatRupiah, formatDate } from "@/lib/utils";
-import { getErrorMessage } from "@/lib/error";
-import { getLedgers, addManualLedger, updateLedger, deleteLedger } from "@/app/actions/ledger";
-import { getAccounts } from "@/app/actions/accounts";
 import { Pagination } from "@/components/ui/Pagination";
-import { useFocusTrap } from "@/lib/hooks/useFocusTrap";
-import { LedgerWithRelations } from "@/types/database";
-import type { Database } from "@/types/database.types";
+import { useLedger } from "@/lib/hooks/features/useLedger";
 
-type LedgerRecord = LedgerWithRelations;
-type Account = Database["public"]["Tables"]["accounts"]["Row"];
-
-export default function LedgerPage() {
-  const searchParams = useSearchParams();
-  const accountId = searchParams.get("accountId") || undefined;
-
-  const [ledgers, setLedgers] = useState<LedgerRecord[]>([]);
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [typeFilter, setTypeFilter] = useState("ALL");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-
-  // Actions & Modals state
-  const [editingLedger, setEditingLedger] = useState<LedgerRecord | null>(null);
-  const [isAddManualOpen, setIsAddManualOpen] = useState(false);
-  const [isAddManualClosing, setIsAddManualClosing] = useState(false);
-  const [isEditClosing, setIsEditClosing] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
-  const [error, setError] = useState("");
-
-  const loadLedgerData = () => {
-    setIsLoading(true);
-    Promise.all([getLedgers(currentPage, itemsPerPage, accountId), getAccounts()])
-      .then(([ledgerRes, accountsData]) => {
-        setLedgers((ledgerRes.data as LedgerRecord[]) || []);
-        setTotalCount(ledgerRes.totalCount || 0);
-        setAccounts(accountsData || []);
-      })
-      .catch((err) => console.error(err))
-      .finally(() => setIsLoading(false));
-  };
-
-  useEffect(() => {
-    let isMounted = true;
-    Promise.all([getLedgers(currentPage, itemsPerPage, accountId), getAccounts()])
-      .then(([ledgerRes, accountsData]) => {
-        if (isMounted) {
-          setLedgers((ledgerRes.data as LedgerRecord[]) || []);
-          setTotalCount(ledgerRes.totalCount || 0);
-          setAccounts(accountsData || []);
-        }
-      })
-      .catch((err) => console.error(err))
-      .finally(() => {
-        if (isMounted) setIsLoading(false);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [currentPage, accountId, itemsPerPage]);
-
-  const handlePageSizeChange = (size: number) => {
-    if (size === itemsPerPage) return;
-    setCurrentPage(1);
-    setItemsPerPage(size);
-  };
-
-  const closeAddManual = () => {
-    if (isAddManualClosing || isSubmitting) return;
-    setIsAddManualClosing(true);
-    setTimeout(() => {
-      setIsAddManualClosing(false);
-      setIsAddManualOpen(false);
-    }, 200);
-  };
-
-  const openAddManual = () => {
-    setError("");
-    if (isAddManualClosing) return;
-    setIsAddManualOpen(true);
-  };
-
-  const editLedger = (tx: LedgerRecord) => {
-    if (isEditClosing) return;
-    setError("");
-    setEditingLedger(tx);
-  };
-
-  const closeEdit = () => {
-    if (isEditClosing || isSubmitting) return;
-    setIsEditClosing(true);
-    setTimeout(() => {
-      setIsEditClosing(false);
-      setEditingLedger(null);
-    }, 200);
-  };
-
-  const addManualRef = useFocusTrap<HTMLDivElement>(
-    isAddManualOpen || isAddManualClosing,
-    null,
-    closeAddManual,
-  );
-  const editRef = useFocusTrap<HTMLDivElement>(!!editingLedger, null, closeEdit);
-
-  const handleAddManual = async (formData: FormData) => {
-    try {
-      setIsSubmitting(true);
-      setError("");
-      await addManualLedger(formData);
-      loadLedgerData();
-      closeAddManual();
-    } catch (err: unknown) {
-      setError(getErrorMessage(err));
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleUpdate = async (formData: FormData) => {
-    if (!editingLedger) return;
-    try {
-      setIsSubmitting(true);
-      setError("");
-      await updateLedger(editingLedger.id, formData);
-      loadLedgerData();
-      closeEdit();
-    } catch (err: unknown) {
-      setError(getErrorMessage(err));
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleDelete = async (tx: LedgerRecord) => {
-    if (!confirm(`Apakah Anda yakin ingin menghapus entri kas ini (${tx.notes || tx.id})?`)) return;
-
-    try {
-      setIsDeletingId(tx.id);
-      setError("");
-      await deleteLedger(tx.id);
-      loadLedgerData();
-    } catch (err: unknown) {
-      alert(getErrorMessage(err));
-    } finally {
-      setIsDeletingId(null);
-    }
-  };
-
-  const filteredLedgers = ledgers.filter((item) => {
-    const matchesSearch =
-      !searchTerm ||
-      item.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.notes?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.ref_id?.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const record = item as unknown as Record<string, unknown>;
-    const matchesType =
-      typeFilter === "ALL" || record.type === typeFilter || record.transaction_type === typeFilter;
-
-    return matchesSearch && matchesType;
-  });
-
-  const handleExportExcel = () => {
-    if (filteredLedgers.length === 0) {
-      alert("Tidak ada data transaksi untuk diekspor.");
-      return;
-    }
-
-    const headers = [
-      "Tanggal",
-      "ID Transaksi",
-      "Tipe Transaksi",
-      "Rekening",
-      "Referensi",
-      "Catatan",
-      "Nominal (Rp)",
-    ];
-
-    const rows = filteredLedgers.map((tx) => [
-      formatDate(tx.created_at),
-      tx.id,
-      tx.transaction_type,
-      tx.accounts?.name || "-",
-      tx.ref_id || "-",
-      `"${(tx.notes || "-").replace(/"/g, '""')}"`,
-      tx.amount,
-    ]);
-
-    const csvContent =
-      "\uFEFF" + [headers.join(","), ...rows.map((row) => row.join(","))].join("\n");
-
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    const today = new Date().toISOString().split("T")[0];
-    link.setAttribute("href", url);
-    link.setAttribute("download", `buku_kas_ledger_${today}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+function LedgerPageContent() {
+  const {
+    data: { ledgers, accounts, filteredLedgers, totalCount },
+    isLoading,
+    isSubmitting,
+    isDeletingId,
+    error,
+    uiState: {
+      searchTerm,
+      typeFilter,
+      currentPage,
+      itemsPerPage,
+      editingLedger,
+      isAddManualOpen,
+      isAddManualClosing,
+      isEditClosing,
+    },
+    refs: { addManualRef, editRef },
+    actions: {
+      setSearchTerm,
+      setTypeFilter,
+      setCurrentPage,
+      handlePageSizeChange,
+      openAddManual,
+      closeAddManual,
+      editLedger,
+      closeEdit,
+      handleAddManual,
+      handleUpdate,
+      handleDelete,
+      handleExportExcel,
+    },
+  } = useLedger();
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 pb-8">
@@ -324,7 +154,6 @@ export default function LedgerPage() {
                 filteredLedgers.map((tx) => {
                   const isPositive = Number(tx.amount) >= 0;
 
-                  // Determine Badge styling based on transaction type
                   let typeBadge = "bg-muted text-muted-foreground border-border";
                   let IconType = ArrowUpRight;
                   if ((tx.transaction_type as string) === "Pembayaran Masuk") {
@@ -373,7 +202,7 @@ export default function LedgerPage() {
                         {tx.accounts?.name || "-"}
                       </td>
                       <td className="px-6 py-4">
-                        <div className="flex max-w-[280px] flex-col">
+                        <div className="flex max-w-70 flex-col">
                           <span
                             className="text-foreground truncate font-semibold"
                             title={tx.ref_id ? `Ref: ${tx.ref_id}` : "-"}
@@ -671,5 +500,19 @@ export default function LedgerPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function LedgerPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        </div>
+      }
+    >
+      <LedgerPageContent />
+    </Suspense>
   );
 }

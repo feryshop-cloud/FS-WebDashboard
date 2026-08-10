@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Search,
   Filter,
@@ -13,137 +13,30 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { formatRupiah, formatDate } from "@/lib/utils";
-import { getErrorMessage } from "@/lib/error";
-import { getDeals, createPenjualan, deleteDeal } from "@/app/actions/deals";
-import { getInventory } from "@/app/actions/inventory";
-import { getAccounts } from "@/app/actions/accounts";
 import { Pagination } from "@/components/ui/Pagination";
-import type { Database } from "@/types/database.types";
-import { DealWithRelations } from "@/types/database";
-
-type Deal = DealWithRelations;
-type InventoryItem = Database["public"]["Tables"]["inventory"]["Row"] & {
-  games: { name: string; slug: string } | null;
-};
-type Account = Database["public"]["Tables"]["accounts"]["Row"];
+import { useDeals } from "@/lib/hooks/features/useDeals";
 
 export default function DealsPage() {
-  const [isAddDealOpen, setIsAddDealOpen] = useState(false);
-  const [isAddDealClosing, setIsAddDealClosing] = useState(false);
-  const [deals, setDeals] = useState<Deal[]>([]);
-  const [stocks, setStocks] = useState<InventoryItem[]>([]);
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState("");
-  const [isExporting, setIsExporting] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [deleteTarget, setDeleteTarget] = useState<Deal | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [deleteError, setDeleteError] = useState("");
-
-  const loadData = async () => {
-    try {
-      setIsLoading(true);
-      const [dealsData, stocksResult, accountsData] = await Promise.all([
-        getDeals(),
-        getInventory(),
-        getAccounts(),
-      ]);
-      setDeals((dealsData as unknown as DealWithRelations[]) || []);
-      setStocks((stocksResult.data || []).filter((s) => s.status === "AVAILABLE")); // Only available items
-      setAccounts(accountsData || []);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadData();
-  }, []);
-
-  const closeAddDeal = () => {
-    if (isAddDealClosing || isSubmitting) return;
-    setIsAddDealClosing(true);
-    setTimeout(() => {
-      setIsAddDealClosing(false);
-      setIsAddDealOpen(false);
-    }, 200);
-  };
-
-  const openAddDeal = () => {
-    if (isAddDealClosing) return;
-    setIsAddDealOpen(true);
-  };
-
-  const handleAddDeal = async (formData: FormData) => {
-    try {
-      setIsSubmitting(true);
-      setError("");
-      await createPenjualan(formData);
-      loadData();
-      closeAddDeal();
-    } catch (err: unknown) {
-      setError(getErrorMessage(err));
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleExportExcel = async () => {
-    try {
-      setIsExporting(true);
-      const params = new URLSearchParams();
-      // Bisa tambahkan status filter di sini kalau UI Deals nanti punya state activeFilter
-      const routePrefix = process.env.NEXT_PUBLIC_BASE_PATH?.trim();
-      const basePath =
-        routePrefix && routePrefix !== "/" ? `/${routePrefix.replace(/^\/+|\/+$/g, "")}` : "";
-
-      const response = await fetch(`${basePath}/api/export/deals?${params.toString()}`);
-      if (!response.ok) {
-        throw new Error("Gagal mengekspor data");
-      }
-
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", `Laporan_Deals_${new Date().toISOString().split("T")[0]}.xlsx`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error: unknown) {
-      console.error(error);
-      const message = error instanceof Error ? error.message : "Gagal mengunduh Excel";
-      alert(message);
-    } finally {
-      setIsExporting(false);
-    }
-  };
-
-  const handleDeleteDeal = async () => {
-    if (!deleteTarget) return;
-    try {
-      setIsDeleting(true);
-      setDeleteError("");
-      await deleteDeal(deleteTarget.id);
-      setDeleteTarget(null);
-      loadData();
-    } catch (err: unknown) {
-      setDeleteError(getErrorMessage(err));
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-
-  const totalPages = Math.max(1, Math.ceil(deals.length / itemsPerPage));
-  const safePage = Math.min(currentPage, totalPages);
-  const pageStart = (safePage - 1) * itemsPerPage;
-  const pageItems = deals.slice(pageStart, pageStart + itemsPerPage);
+  const {
+    data: { deals, stocks, accounts, pageItems, safePage },
+    isLoading,
+    isSubmitting,
+    isExporting,
+    isDeleting,
+    error,
+    deleteError,
+    uiState: { isAddDealOpen, isAddDealClosing, itemsPerPage, deleteTarget },
+    actions: {
+      openAddDeal,
+      closeAddDeal,
+      handleAddDeal,
+      handleExportExcel,
+      handleDeleteDeal,
+      setDeleteTarget,
+      setCurrentPage,
+      setItemsPerPage,
+    },
+  } = useDeals();
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 pb-8">
@@ -193,14 +86,14 @@ export default function DealsPage() {
           />
         </div>
         <div className="flex w-full items-center gap-3 sm:w-auto">
-          <button className="border-border bg-card text-foreground hover:bg-muted inline-flex w-full min-w-[140px] items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm font-medium sm:w-auto">
+          <button className="border-border bg-card text-foreground hover:bg-muted inline-flex w-full min-w-35 items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm font-medium sm:w-auto">
             <div className="flex items-center gap-2">
               <Filter className="text-faint-foreground h-4 w-4" />
               <span>Semua Status</span>
             </div>
             <ChevronDown className="text-faint-foreground h-4 w-4" />
           </button>
-          <button className="border-border bg-card text-foreground hover:bg-muted inline-flex w-full min-w-[140px] items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm font-medium sm:w-auto">
+          <button className="border-border bg-card text-foreground hover:bg-muted inline-flex w-full min-w-35 items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm font-medium sm:w-auto">
             <span>Pilih Tanggal</span>
             <ChevronDown className="text-faint-foreground h-4 w-4" />
           </button>
@@ -310,7 +203,7 @@ export default function DealsPage() {
                         {deal.customers?.name || "-"}
                       </td>
                       <td className="text-muted-foreground px-6 py-4 text-sm whitespace-nowrap">
-                        <span className="block max-w-[200px] truncate" title={stockName}>
+                        <span className="block max-w-50 truncate" title={stockName}>
                           {stockName}
                         </span>
                       </td>
@@ -532,7 +425,7 @@ export default function DealsPage() {
           aria-modal="true"
           aria-labelledby="delete-deal-title"
           aria-describedby="delete-deal-desc"
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-60 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
         >
           <div className="border-border bg-card w-full max-w-sm rounded-xl border p-6 shadow-xl">
             <div className="mb-4 flex items-center gap-3 text-rose-600">

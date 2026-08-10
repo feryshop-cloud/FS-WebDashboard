@@ -1,217 +1,45 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React from "react";
 import { Search, Filter, Plus, ChevronDown, Download, X, Loader2 } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
-import { getInventory, addInventoryItem, getGames } from "@/app/actions/inventory";
 import { InventoryRowActions } from "@/components/inventory/InventoryRowActions";
 import { Pagination } from "@/components/ui/Pagination";
-import { useFocusTrap } from "@/lib/hooks/useFocusTrap";
-import type { Database } from "@/types/database.types";
-
-type InventoryItem = Database["public"]["Tables"]["inventory"]["Row"] & {
-  games: { name: string; slug: string } | null;
-};
-type Game = { id: string; name: string; slug: string };
+import { useInventory } from "@/lib/hooks/features/useInventory";
 
 export default function InventoryPage() {
-  const [isAddStockOpen, setIsAddStockOpen] = useState(false);
-  const [isAddStockClosing, setIsAddStockClosing] = useState(false);
-  const [inventory, setInventory] = useState<InventoryItem[]>([]);
-  const [games, setGames] = useState<Game[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState("");
-  const [activeCategory, setActiveCategory] = useState("Semua");
-  const [activeStatus, setActiveStatus] = useState("Semua Status");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isExporting, setIsExporting] = useState(false);
-  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
-  const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const categoryButtonRef = useRef<HTMLButtonElement>(null);
-  const categoryMenuRef = useRef<HTMLDivElement>(null);
-  const statusButtonRef = useRef<HTMLButtonElement>(null);
-  const statusMenuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!isCategoryDropdownOpen && !isStatusDropdownOpen) return;
-
-    const handlePointerDown = (event: MouseEvent | TouchEvent) => {
-      const target = event.target as Node;
-      const categoryInside =
-        categoryButtonRef.current?.contains(target) || categoryMenuRef.current?.contains(target);
-      const statusInside =
-        statusButtonRef.current?.contains(target) || statusMenuRef.current?.contains(target);
-
-      if (isCategoryDropdownOpen && !categoryInside) {
-        setIsCategoryDropdownOpen(false);
-      }
-      if (isStatusDropdownOpen && !statusInside) {
-        setIsStatusDropdownOpen(false);
-      }
-    };
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") return;
-      if (isCategoryDropdownOpen) {
-        setIsCategoryDropdownOpen(false);
-        categoryButtonRef.current?.focus();
-      }
-      if (isStatusDropdownOpen) {
-        setIsStatusDropdownOpen(false);
-        statusButtonRef.current?.focus();
-      }
-    };
-
-    document.addEventListener("mousedown", handlePointerDown);
-    document.addEventListener("touchstart", handlePointerDown);
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("mousedown", handlePointerDown);
-      document.removeEventListener("touchstart", handlePointerDown);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isCategoryDropdownOpen, isStatusDropdownOpen]);
-
-  const closeAddStock = () => {
-    if (isAddStockClosing) return;
-    setIsAddStockClosing(true);
-    setTimeout(() => {
-      setIsAddStockClosing(false);
-      setIsAddStockOpen(false);
-    }, 200);
-  };
-
-  const openAddStock = () => {
-    setError("");
-    setIsAddStockOpen(true);
-  };
-
-  const addStockRef = useFocusTrap<HTMLDivElement>(
-    isAddStockOpen || isAddStockClosing,
-    null,
-    closeAddStock,
-  );
-
-  const loadInventory = async () => {
-    try {
-      setIsLoading(true);
-      const result = await getInventory();
-      if (result.error) {
-        console.error("Error loading inventory:", result.error);
-      } else {
-        setInventory(result.data || []);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const loadGames = async () => {
-    try {
-      const result = await getGames();
-      if (!result.error && result.data) {
-        setGames(result.data);
-      }
-    } catch (err) {
-      console.error("Error loading games:", err);
-    }
-  };
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadInventory();
-    loadGames();
-  }, []);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setCurrentPage(1);
-  }, [activeCategory, activeStatus, searchQuery, inventory.length]);
-
-  const handleAddStock = async (formData: FormData) => {
-    try {
-      setIsSubmitting(true);
-      setError("");
-      const result = await addInventoryItem(formData);
-      if (result.success) {
-        closeAddStock();
-        loadInventory();
-      } else {
-        setError(result.error || "Gagal menambah stok.");
-      }
-    } catch (err) {
-      setError((err as { message?: string }).message || "Gagal menambah stok.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleExportExcel = async () => {
-    try {
-      setIsExporting(true);
-      const params = new URLSearchParams();
-      // If we wanted to pass gameId, we'd need to find it from activeCategory
-      if (activeCategory !== "Semua") {
-        const game = games.find((g) => g.name === activeCategory);
-        if (game) params.set("gameId", game.id);
-      }
-      const routePrefix = process.env.NEXT_PUBLIC_BASE_PATH?.trim();
-      const basePath =
-        routePrefix && routePrefix !== "/" ? `/${routePrefix.replace(/^\/+|\/+$/g, "")}` : "";
-
-      const response = await fetch(`${basePath}/api/export/inventory?${params.toString()}`);
-      if (!response.ok) {
-        throw new Error("Gagal mengekspor data");
-      }
-
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute(
-        "download",
-        `Laporan_Inventory_${new Date().toISOString().split("T")[0]}.xlsx`,
-      );
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error: unknown) {
-      console.error(error);
-      const message = error instanceof Error ? error.message : "Gagal mengunduh Excel";
-      alert(message);
-    } finally {
-      setIsExporting(false);
-    }
-  };
-
-  const filteredInventory = useMemo(() => {
-    return activeCategory === "Semua"
-      ? inventory
-      : inventory.filter((item) => item.games?.name === activeCategory);
-  }, [inventory, activeCategory]);
-
-  const displayedInventory = useMemo(() => {
-    const searchQueryLower = searchQuery.trim().toLowerCase();
-    return filteredInventory.filter((item) => {
-      if (activeStatus !== "Semua Status" && item.status !== activeStatus) return false;
-      if (!searchQueryLower) return true;
-      const haystack = [item.public_id, item.title_reference, item.games?.name, item.account_specs]
-        .filter((v): v is string => Boolean(v))
-        .join(" ")
-        .toLowerCase();
-      return haystack.includes(searchQueryLower);
-    });
-  }, [filteredInventory, activeStatus, searchQuery]);
-
-  const totalPages = Math.max(1, Math.ceil(displayedInventory.length / itemsPerPage));
-  const safePage = Math.min(currentPage, totalPages);
-  const pageStart = (safePage - 1) * itemsPerPage;
-  const pageItems = displayedInventory.slice(pageStart, pageStart + itemsPerPage);
+  const {
+    data: { inventory, games, displayedInventory, pageItems, safePage },
+    isLoading,
+    isSubmitting,
+    isExporting,
+    error,
+    uiState: {
+      activeCategory,
+      activeStatus,
+      searchQuery,
+      itemsPerPage,
+      isAddStockOpen,
+      isAddStockClosing,
+      isCategoryDropdownOpen,
+      isStatusDropdownOpen,
+    },
+    refs: { categoryButtonRef, categoryMenuRef, statusButtonRef, statusMenuRef, addStockRef },
+    actions: {
+      openAddStock,
+      closeAddStock,
+      handleAddStock,
+      handleExportExcel,
+      setActiveCategory,
+      setActiveStatus,
+      setSearchQuery,
+      setCurrentPage,
+      setItemsPerPage,
+      setIsCategoryDropdownOpen,
+      setIsStatusDropdownOpen,
+      loadInventory,
+    },
+  } = useInventory();
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 pb-8">
@@ -264,7 +92,7 @@ export default function InventoryPage() {
           <div className="relative w-full sm:w-auto">
             <button
               ref={categoryButtonRef}
-              onClick={() => setIsCategoryDropdownOpen((o) => !o)}
+              onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
               aria-expanded={isCategoryDropdownOpen}
               aria-haspopup="menu"
               className="border-border bg-card text-foreground hover:bg-muted inline-flex w-full min-w-35 items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm font-medium sm:w-auto"
@@ -302,7 +130,7 @@ export default function InventoryPage() {
           <div className="relative w-full sm:w-auto">
             <button
               ref={statusButtonRef}
-              onClick={() => setIsStatusDropdownOpen((o) => !o)}
+              onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
               aria-expanded={isStatusDropdownOpen}
               aria-haspopup="menu"
               className="border-border bg-card text-foreground hover:bg-muted inline-flex w-full min-w-35 items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm font-medium sm:w-auto"
@@ -425,12 +253,6 @@ export default function InventoryPage() {
                 <tr>
                   <td colSpan={7} className="text-muted-foreground px-6 py-8 text-center text-sm">
                     Belum ada data stok.
-                  </td>
-                </tr>
-              ) : filteredInventory.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="text-muted-foreground px-6 py-8 text-center text-sm">
-                    Tidak ada stok untuk kategori ini.
                   </td>
                 </tr>
               ) : displayedInventory.length === 0 ? (

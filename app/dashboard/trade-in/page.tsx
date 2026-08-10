@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Search,
   Filter,
@@ -12,86 +12,17 @@ import {
   Loader2,
 } from "lucide-react";
 import { formatRupiah, formatDate } from "@/lib/utils";
-import { getErrorMessage } from "@/lib/error";
-import { getTradeInDeals, createTukarTambah } from "@/app/actions/trade-in";
-import { getInventory } from "@/app/actions/inventory";
-import { getAccounts } from "@/app/actions/accounts";
-import type { Database } from "@/types/database.types";
-import { TradeInWithRelations } from "@/types/database";
-
-type Deal = TradeInWithRelations;
-type InventoryItem = Database["public"]["Tables"]["inventory"]["Row"] & {
-  games: { name: string; slug: string } | null;
-};
-type Account = Database["public"]["Tables"]["accounts"]["Row"];
+import { useTradeIn } from "@/lib/hooks/features/useTradeIn";
 
 export default function TradeInPage() {
-  const [isAddTTOpen, setIsAddTTOpen] = useState(false);
-  const [isAddTTClosing, setIsAddTTClosing] = useState(false);
-  const [deals, setDeals] = useState<Deal[]>([]);
-  const [stocks, setStocks] = useState<InventoryItem[]>([]);
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState("");
-
-  // Form states for dynamic cash calc
-  const [priceOut, setPriceOut] = useState(0);
-  const [ttValue, setTtValue] = useState(0);
-  const [paymentAmount, setPaymentAmount] = useState(0);
-
-  const loadData = async () => {
-    try {
-      setIsLoading(true);
-      const [dealsData, stocksResult, accountsData] = await Promise.all([
-        getTradeInDeals(),
-        getInventory(),
-        getAccounts(),
-      ]);
-      setDeals((dealsData as unknown as TradeInWithRelations[]) || []);
-      setStocks((stocksResult.data || []).filter((s) => s.status === "AVAILABLE"));
-      setAccounts(accountsData || []);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadData();
-  }, []);
-
-  const closeAddTT = () => {
-    if (isAddTTClosing || isSubmitting) return;
-    setIsAddTTClosing(true);
-    setTimeout(() => {
-      setIsAddTTClosing(false);
-      setIsAddTTOpen(false);
-    }, 200);
-  };
-
-  const openAddTT = () => {
-    if (isAddTTClosing) return;
-    setIsAddTTOpen(true);
-  };
-
-  const handleAddTT = async (formData: FormData) => {
-    try {
-      setIsSubmitting(true);
-      setError("");
-      await createTukarTambah(formData);
-      loadData();
-      closeAddTT();
-    } catch (err: unknown) {
-      setError(getErrorMessage(err));
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const selisih = ttValue - priceOut;
+  const {
+    data: { deals, stocks, accounts, selisih },
+    isLoading,
+    isSubmitting,
+    error,
+    uiState: { isAddTTOpen, isAddTTClosing, priceOut, ttValue, paymentAmount },
+    actions: { openAddTT, closeAddTT, handleAddTT, setPriceOut, setTtValue, setPaymentAmount },
+  } = useTradeIn();
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 pb-8">
@@ -133,7 +64,7 @@ export default function TradeInPage() {
           />
         </div>
         <div className="flex w-full items-center gap-3 sm:w-auto">
-          <button className="border-border bg-card text-foreground hover:bg-muted inline-flex w-full min-w-[140px] items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm font-medium sm:w-auto">
+          <button className="border-border bg-card text-foreground hover:bg-muted inline-flex w-full min-w-35 items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm font-medium sm:w-auto">
             <div className="flex items-center gap-2">
               <Filter className="text-faint-foreground h-4 w-4" />
               <span>Filter Status</span>
@@ -227,7 +158,7 @@ export default function TradeInPage() {
                   </div>
 
                   {/* ARROW SEPARATOR */}
-                  <div className="col-span-1 flex hidden justify-center lg:col-span-1 lg:flex">
+                  <div className="hidden justify-center lg:col-span-1 lg:flex">
                     <ArrowRightLeft className="text-faint-foreground h-6 w-6" />
                   </div>
 
@@ -392,7 +323,7 @@ export default function TradeInPage() {
 
                 {/* Customer In Section */}
                 <div className="space-y-3">
-                  <h3 className="text-faint-foreground text-xs font-bold tracking-wider text-emerald-600 uppercase">
+                  <h3 className="text-faint-foreground text-xs font-bold tracking-wider uppercase">
                     Aset Masuk (Dari Customer)
                   </h3>
                   <div>

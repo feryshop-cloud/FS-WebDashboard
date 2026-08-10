@@ -1,24 +1,12 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React from "react";
 import { Search, Shield, CheckCircle2, XCircle, Plus, X, SearchX, Command } from "lucide-react";
-import { updateUserRole, toggleUserStatus, createAdminUser } from "@/actions/settings";
-
-type Role = {
-  id: string;
-  name: string;
-  description: string | null;
-};
-
-type UserRecord = {
-  id: string;
-  full_name: string;
-  email?: string | null;
-  status: string | null;
-  role_id: string | null;
-  created_at: string;
-  roles?: { id: string; name: string; description: string | null } | null;
-};
+import {
+  useUserManagement,
+  type UserRecord,
+  type Role,
+} from "@/lib/hooks/features/useUserManagement";
 
 interface UserManagementTabProps {
   users: UserRecord[];
@@ -28,136 +16,24 @@ interface UserManagementTabProps {
 }
 
 export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserManagementTabProps) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isModalClosing, setIsModalClosing] = useState(false);
-  const [isCreating, setIsCreating] = useState(false);
-  const [formError, setFormError] = useState("");
-  const [actionError, setActionError] = useState("");
-  const searchInputRef = useRef<HTMLInputElement>(null);
-
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-    full_name: "",
-    role_id: "",
-  });
-
-  // Global Keyboard Shortcut: '/' or 'Ctrl+K' to focus search input
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (
-        (e.key === "/" || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k")) &&
-        document.activeElement !== searchInputRef.current
-      ) {
-        // Prevent typing '/' into input when focusing
-        const isInputOrTextarea = ["INPUT", "TEXTAREA"].includes(
-          (document.activeElement?.tagName || "").toUpperCase(),
-        );
-        if (!isInputOrTextarea) {
-          e.preventDefault();
-          searchInputRef.current?.focus();
-        }
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
-
-  const queryLower = searchQuery.trim().toLowerCase();
-
-  const filteredUsers = users.filter((u) => {
-    if (!queryLower) return true;
-    return (
-      u.full_name?.toLowerCase().includes(queryLower) ||
-      u.email?.toLowerCase().includes(queryLower) ||
-      u.id?.toLowerCase().includes(queryLower) ||
-      u.roles?.name?.toLowerCase().includes(queryLower) ||
-      u.status?.toLowerCase().includes(queryLower)
-    );
-  });
-
-  const handleRoleChange = async (userId: string, newRoleId: string) => {
-    setActionError("");
-    try {
-      setUpdatingUserId(userId);
-      const res = await updateUserRole(userId, newRoleId);
-      if (res && !res.success) {
-        setActionError(res.error || "Gagal mengubah role pengguna.");
-        return;
-      }
-      onRefresh();
-    } catch (err) {
-      console.error(err);
-      setActionError("Gagal mengubah role pengguna.");
-    } finally {
-      setUpdatingUserId(null);
-    }
-  };
-
-  const handleToggleStatus = async (userId: string, currentStatus: string | null) => {
-    setActionError("");
-    try {
-      setUpdatingUserId(userId);
-      const res = await toggleUserStatus(userId, currentStatus || "ACTIVE");
-      if (res && !res.success) {
-        setActionError(res.error || "Gagal mengubah status pengguna.");
-        return;
-      }
-      onRefresh();
-    } catch (err) {
-      console.error(err);
-      setActionError("Gagal mengubah status pengguna.");
-    } finally {
-      setUpdatingUserId(null);
-    }
-  };
-
-  const openModal = () => {
-    if (isModalClosing) return;
-    setFormError("");
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    if (isModalClosing || isCreating) return;
-    setIsModalClosing(true);
-    setTimeout(() => {
-      setIsModalClosing(false);
-      setIsModalOpen(false);
-    }, 200);
-  };
-
-  const handleCreateUser = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormError("");
-    if (!form.email || !form.password || !form.full_name) {
-      setFormError("Email, password, dan nama lengkap wajib diisi.");
-      return;
-    }
-    try {
-      setIsCreating(true);
-      const res = await createAdminUser(
-        form.email,
-        form.password,
-        form.full_name,
-        form.role_id || null,
-      );
-      if (!res.success) {
-        setFormError(res.error || "Gagal membuat pengguna.");
-        return;
-      }
-      setForm({ email: "", password: "", full_name: "", role_id: "" });
-      onRefresh();
-      closeModal();
-    } catch (err) {
-      console.error(err);
-      setFormError("Terjadi kesalahan saat membuat pengguna.");
-    } finally {
-      setIsCreating(false);
-    }
-  };
+  const {
+    data: { filteredUsers },
+    isCreating,
+    updatingUserId,
+    formError,
+    actionError,
+    uiState: { searchQuery, isModalOpen, isModalClosing, form },
+    refs: { searchInputRef },
+    actions: {
+      setSearchQuery,
+      setForm,
+      openModal,
+      closeModal,
+      handleRoleChange,
+      handleToggleStatus,
+      handleCreateUser,
+    },
+  } = useUserManagement(users, onRefresh);
 
   return (
     <div className="space-y-6">

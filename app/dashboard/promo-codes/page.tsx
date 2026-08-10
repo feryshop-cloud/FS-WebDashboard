@@ -1,175 +1,19 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React from "react";
 import { Plus, Search, Trash2, Edit, X, Save, Loader2, Tag } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
-import {
-  getPromoCodes,
-  createPromoCode,
-  updatePromoCode,
-  deletePromoCode,
-  type PromoCodeRow,
-} from "@/app/actions/promo-codes";
-
-type FormState = {
-  code: string;
-  discount_type: string;
-  discount_value: string;
-  min_order: string;
-  max_discount: string;
-  quota: string;
-  is_active: boolean;
-  start_date: string;
-  end_date: string;
-};
-
-const emptyForm: FormState = {
-  code: "",
-  discount_type: "percent",
-  discount_value: "",
-  min_order: "0",
-  max_discount: "0",
-  quota: "100",
-  is_active: true,
-  start_date: "",
-  end_date: "",
-};
-
-const toDateTimeLocal = (v?: string | null) => {
-  if (!v) return "";
-  const d = new Date(v);
-  if (Number.isNaN(d.getTime())) return "";
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-};
+import { usePromoCodes, type PromoCodeRow } from "@/lib/hooks/features/usePromoCodes";
 
 export default function PromoCodesPage() {
-  const [promos, setPromos] = useState<PromoCodeRow[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState("");
-
-  const [isAddOpen, setIsAddOpen] = useState(false);
-  const [isAddClosing, setIsAddClosing] = useState(false);
-  const [editing, setEditing] = useState<number | null>(null);
-  const [form, setForm] = useState<FormState>(emptyForm);
-
-  const loadData = useCallback(async (showSpinner = false) => {
-    try {
-      if (showSpinner) setIsLoading(true);
-      setError("");
-      const data = await getPromoCodes();
-      setPromos(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal memuat kode promo.");
-    } finally {
-      if (showSpinner) setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    let isMounted = true;
-    getPromoCodes()
-      .then((data) => {
-        if (isMounted) setPromos(data);
-      })
-      .catch((err) => {
-        if (isMounted) setError(err instanceof Error ? err.message : "Gagal memuat kode promo.");
-      })
-      .finally(() => {
-        if (isMounted) setIsLoading(false);
-      });
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  const setField = (k: keyof FormState, v: string | boolean) =>
-    setForm((prev) => ({ ...prev, [k]: v }));
-
-  const closeModal = () => {
-    if (isAddClosing || isSubmitting) return;
-    setIsAddClosing(true);
-    setTimeout(() => {
-      setIsAddClosing(false);
-      setIsAddOpen(false);
-    }, 200);
-  };
-
-  const openAdd = () => {
-    if (isAddClosing) return;
-    setForm(emptyForm);
-    setEditing(null);
-    setIsAddOpen(true);
-  };
-
-  const openEdit = (p: PromoCodeRow) => {
-    if (isAddClosing) return;
-    setForm({
-      code: p.code,
-      discount_type: p.discount_type,
-      discount_value: String(p.discount_value ?? ""),
-      min_order: String(p.min_order ?? "0"),
-      max_discount: String(p.max_discount ?? "0"),
-      quota: String(p.quota ?? 100),
-      is_active: p.is_active !== false,
-      start_date: toDateTimeLocal(p.start_date),
-      end_date: toDateTimeLocal(p.end_date),
-    });
-    setEditing(p.id);
-    setIsAddOpen(true);
-  };
-
-  const buildFormData = () => {
-    const fd = new FormData();
-    fd.append("code", form.code);
-    fd.append("discount_type", form.discount_type);
-    fd.append("discount_value", String(Number(form.discount_value) || 0));
-    fd.append("min_order", String(Number(form.min_order) || 0));
-    fd.append("max_discount", String(Number(form.max_discount) || 0));
-    fd.append("quota", String(Number(form.quota) || 100));
-    fd.append("is_active", form.is_active ? "on" : "off");
-    fd.append("start_date", form.start_date || "");
-    fd.append("end_date", form.end_date || "");
-    return fd;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setError("");
-    try {
-      const fd = buildFormData();
-      if (editing !== null) {
-        await updatePromoCode(editing, fd);
-      } else {
-        await createPromoCode(fd);
-      }
-      await loadData(true);
-      closeModal();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal menyimpan kode promo.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleDelete = async (id: number, code: string) => {
-    if (!confirm(`Hapus kode promo ${code}?`)) return;
-    setIsSubmitting(true);
-    setError("");
-    try {
-      await deletePromoCode(id);
-      await loadData(true);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal menghapus kode promo.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const filtered = promos.filter((p) => p.code.toLowerCase().includes(search.toLowerCase()));
+  const {
+    data: { filtered },
+    isLoading,
+    isSubmitting,
+    error,
+    uiState: { search, isAddOpen, isAddClosing, editing, form },
+    actions: { setSearch, setField, openAdd, openEdit, closeModal, handleSave, handleDelete },
+  } = usePromoCodes();
 
   const discountLabel = (p: PromoCodeRow) =>
     p.discount_type === "percent"
@@ -225,7 +69,7 @@ export default function PromoCodesPage() {
         </div>
       ) : (
         <div className="border-border-soft bg-card overflow-x-auto rounded-xl border shadow-sm">
-          <table className="w-full min-w-[720px] text-left text-sm">
+          <table className="w-full min-w-180 text-left text-sm">
             <thead className="border-border-soft bg-muted/50 text-faint-foreground border-b text-xs font-bold uppercase">
               <tr>
                 <th className="px-5 py-3">Kode</th>
@@ -334,10 +178,7 @@ export default function PromoCodesPage() {
               </button>
             </div>
 
-            <form
-              onSubmit={handleSubmit}
-              className="fs-rise-in flex flex-1 flex-col overflow-hidden"
-            >
+            <form onSubmit={handleSave} className="fs-rise-in flex flex-1 flex-col overflow-hidden">
               <div className="flex-1 space-y-4 overflow-y-auto p-6">
                 {error && (
                   <div className="fs-drop-in rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs font-medium text-rose-700">

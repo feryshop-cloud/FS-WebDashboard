@@ -1,0 +1,203 @@
+"use client";
+
+import { useState, useEffect, useCallback, useMemo } from "react";
+import {
+  getPromoCodes,
+  createPromoCode,
+  updatePromoCode,
+  deletePromoCode,
+  type PromoCodeRow,
+} from "@/app/actions/promo-codes";
+
+export type FormState = {
+  code: string;
+  discount_type: string;
+  discount_value: string;
+  min_order: string;
+  max_discount: string;
+  quota: string;
+  is_active: boolean;
+  start_date: string;
+  end_date: string;
+};
+
+export const emptyForm: FormState = {
+  code: "",
+  discount_type: "percent",
+  discount_value: "",
+  min_order: "0",
+  max_discount: "0",
+  quota: "100",
+  is_active: true,
+  start_date: "",
+  end_date: "",
+};
+
+export const toDateTimeLocal = (v?: string | null) => {
+  if (!v) return "";
+  const d = new Date(v);
+  if (Number.isNaN(d.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
+
+export function usePromoCodes() {
+  const [promos, setPromos] = useState<PromoCodeRow[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isAddClosing, setIsAddClosing] = useState(false);
+  const [editing, setEditing] = useState<number | null>(null);
+  const [form, setForm] = useState<FormState>(emptyForm);
+
+  const loadData = useCallback(async (showSpinner = false) => {
+    try {
+      if (showSpinner) setIsLoading(true);
+      setError("");
+      const data = await getPromoCodes();
+      setPromos(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Gagal memuat kode promo.");
+    } finally {
+      if (showSpinner) setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+    getPromoCodes()
+      .then((data) => {
+        if (isMounted) setPromos(data);
+      })
+      .catch((err) => {
+        if (isMounted) setError(err instanceof Error ? err.message : "Gagal memuat kode promo.");
+      })
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const setField = (k: keyof FormState, v: string | boolean) =>
+    setForm((prev) => ({ ...prev, [k]: v }));
+
+  const closeModal = () => {
+    if (isAddClosing || isSubmitting) return;
+    setIsAddClosing(true);
+    setTimeout(() => {
+      setIsAddClosing(false);
+      setIsAddOpen(false);
+    }, 200);
+  };
+
+  const openAdd = () => {
+    setError("");
+    setEditing(null);
+    setForm(emptyForm);
+    setIsAddOpen(true);
+  };
+
+  const openEdit = (p: PromoCodeRow) => {
+    setError("");
+    setEditing(p.id);
+    setForm({
+      code: p.code,
+      discount_type: p.discount_type,
+      discount_value: String(p.discount_value),
+      min_order: String(p.min_order ?? 0),
+      max_discount: String(p.max_discount ?? 0),
+      quota: String(p.quota ?? 0),
+      is_active: p.is_active,
+      start_date: toDateTimeLocal(p.start_date),
+      end_date: toDateTimeLocal(p.end_date),
+    });
+    setIsAddOpen(true);
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setIsSubmitting(true);
+
+    try {
+      const payload = {
+        code: form.code.trim().toUpperCase(),
+        discount_type: form.discount_type as "percent" | "fixed",
+        discount_value: parseFloat(form.discount_value) || 0,
+        min_order: parseFloat(form.min_order) || 0,
+        max_discount: parseFloat(form.max_discount) || 0,
+        quota: parseInt(form.quota, 10) || 0,
+        is_active: form.is_active,
+        start_date: form.start_date ? new Date(form.start_date).toISOString() : null,
+        end_date: form.end_date ? new Date(form.end_date).toISOString() : null,
+      };
+
+      if (!payload.code || payload.discount_value <= 0) {
+        throw new Error("Kode promo dan nilai diskon wajib diisi dengan benar.");
+      }
+
+      if (editing) {
+        await updatePromoCode(editing, payload);
+      } else {
+        await createPromoCode(payload);
+      }
+
+      closeModal();
+      await loadData();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Gagal menyimpan promo.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (id: number, code: string) => {
+    if (!confirm(`Hapus kode promo "${code}"?`)) return;
+    try {
+      await deletePromoCode(id);
+      await loadData();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Gagal menghapus promo.");
+    }
+  };
+
+  const filtered = useMemo(() => {
+    return promos.filter((p) => p.code.toLowerCase().includes(search.toLowerCase()));
+  }, [promos, search]);
+
+  return {
+    data: {
+      promos,
+      filtered,
+    },
+    isLoading,
+    isSubmitting,
+    error,
+    uiState: {
+      search,
+      isAddOpen,
+      isAddClosing,
+      editing,
+      form,
+    },
+    helpers: {
+      toDateTimeLocal,
+    },
+    actions: {
+      setSearch,
+      setField,
+      openAdd,
+      openEdit,
+      closeModal,
+      handleSave,
+      handleDelete,
+      loadData,
+    },
+  };
+}
+export { PromoCodeRow };

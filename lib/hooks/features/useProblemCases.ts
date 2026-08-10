@@ -1,0 +1,233 @@
+"use client";
+
+import { useState, useEffect, useMemo } from "react";
+import { getErrorMessage } from "@/lib/error";
+import {
+  getProblemCases,
+  createProblemCase,
+  updateProblemCase,
+  deleteProblemCase,
+} from "@/app/actions/problem-cases";
+import { getDeals } from "@/app/actions/deals";
+import { getInventory } from "@/app/actions/inventory";
+import {
+  ProblemCaseWithRelations,
+  DealWithRelations,
+  InventoryItemWithGame,
+} from "@/types/database";
+
+export const PROBLEM_CASE_STATUS_LABEL: Record<string, string> = {
+  OPEN: "Open",
+  IN_PROGRESS: "Ditindaklanjuti",
+  WAITING_CUSTOMER: "Menunggu Customer",
+  WAITING_THIRD_PARTY: "Menunggu Pihak Ketiga",
+  RESOLVED: "Selesai",
+  CANNOT_RESOLVE: "Tidak Bisa Diselesaikan",
+  PERMANENT: "Permanen",
+  REFUND: "Refund",
+  CANCEL: "Cancel",
+};
+
+export function useProblemCases() {
+  const [cases, setCases] = useState<ProblemCaseWithRelations[]>([]);
+  const [deals, setDeals] = useState<DealWithRelations[]>([]);
+  const [stocks, setStocks] = useState<InventoryItemWithGame[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL");
+
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isAddClosing, setIsAddClosing] = useState(false);
+  const [selectedCase, setSelectedCase] = useState<ProblemCaseWithRelations | null>(null);
+  const [isDetailClosing, setIsDetailClosing] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
+  const [error, setError] = useState("");
+  const [relatedType, setRelatedType] = useState("NONE");
+
+  const [editStatus, setEditStatus] = useState("");
+  const [editChronology, setEditChronology] = useState("");
+  const [editIssueType, setEditIssueType] = useState("");
+
+  const loadData = () => {
+    setIsLoading(true);
+    Promise.all([getProblemCases(), getDeals(), getInventory()])
+      .then(([casesData, dealsData, stocksResult]) => {
+        setCases(casesData || []);
+        setDeals((dealsData as unknown as DealWithRelations[]) || []);
+        setStocks(stocksResult.data || []);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setIsLoading(false));
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+    Promise.all([getProblemCases(), getDeals(), getInventory()])
+      .then(([casesData, dealsData, stocksResult]) => {
+        if (isMounted) {
+          setCases(casesData || []);
+          setDeals((dealsData as unknown as DealWithRelations[]) || []);
+          setStocks(stocksResult.data || []);
+        }
+      })
+      .catch((err) => console.error(err))
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const openAdd = () => {
+    setError("");
+    if (isAddClosing) return;
+    setIsAddOpen(true);
+  };
+
+  const closeAdd = () => {
+    if (isAddClosing || isSubmitting) return;
+    setIsAddClosing(true);
+    setTimeout(() => {
+      setIsAddClosing(false);
+      setIsAddOpen(false);
+    }, 200);
+  };
+
+  const handleOpenDetail = (c: ProblemCaseWithRelations) => {
+    if (isDetailClosing) return;
+    setError("");
+    setSelectedCase(c);
+    setEditStatus((c.status as string) || "OPEN");
+    setEditChronology((c.chronology as string) || "");
+    setEditIssueType((c.issue_type as string) || "");
+  };
+
+  const closeDetail = () => {
+    if (isDetailClosing || isSubmitting) return;
+    setIsDetailClosing(true);
+    setTimeout(() => {
+      setIsDetailClosing(false);
+      setSelectedCase(null);
+    }, 200);
+  };
+
+  const handleAddCase = async (formData: FormData) => {
+    try {
+      setIsSubmitting(true);
+      setError("");
+      await createProblemCase(formData);
+      loadData();
+      closeAdd();
+    } catch (err: unknown) {
+      setError(getErrorMessage(err));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleUpdateCase = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedCase) return;
+    try {
+      setIsSubmitting(true);
+      setError("");
+      await updateProblemCase(selectedCase.id, {
+        status: editStatus,
+        chronology: editChronology,
+        issue_type: editIssueType,
+      });
+      loadData();
+      closeDetail();
+    } catch (err: unknown) {
+      setError(getErrorMessage(err));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteCase = async (id: string, code?: string | null) => {
+    if (!confirm(`Apakah Anda yakin ingin menghapus kasus kendala ${code || id}?`)) return;
+    try {
+      setIsDeletingId(id);
+      setError("");
+      await deleteProblemCase(id);
+      loadData();
+    } catch (err: unknown) {
+      alert(getErrorMessage(err));
+    } finally {
+      setIsDeletingId(null);
+    }
+  };
+
+  const filteredCases = useMemo(() => {
+    const termLower = searchTerm.trim().toLowerCase();
+    return cases.filter((c) => {
+      const matchesSearch =
+        !termLower ||
+        c.case_code?.toLowerCase().includes(termLower) ||
+        c.title?.toLowerCase().includes(termLower) ||
+        c.reporter_name?.toLowerCase().includes(termLower) ||
+        c.chronology?.toLowerCase().includes(termLower);
+
+      const matchesStatus = statusFilter === "ALL" || c.status === statusFilter;
+
+      return matchesSearch && matchesStatus;
+    });
+  }, [cases, searchTerm, statusFilter]);
+
+  const getStatusBadge = (status: string) => {
+    if (status === "OPEN") return "bg-rose-50 text-rose-600 border-rose-100";
+    if (status === "IN_PROGRESS") return "bg-amber-50 text-amber-600 border-amber-100";
+    if (status === "RESOLVED") return "bg-emerald-50 text-emerald-600 border-emerald-100";
+    return "bg-muted text-muted-foreground border-border";
+  };
+
+  return {
+    data: {
+      cases,
+      deals,
+      stocks,
+      filteredCases,
+    },
+    isLoading,
+    isSubmitting,
+    isDeletingId,
+    error,
+    uiState: {
+      searchTerm,
+      statusFilter,
+      isAddOpen,
+      isAddClosing,
+      selectedCase,
+      isDetailClosing,
+      relatedType,
+      editStatus,
+      editChronology,
+      editIssueType,
+    },
+    helpers: {
+      PROBLEM_CASE_STATUS_LABEL,
+      getStatusBadge,
+    },
+    actions: {
+      setSearchTerm,
+      setStatusFilter,
+      openAdd,
+      closeAdd,
+      handleOpenDetail,
+      closeDetail,
+      setRelatedType,
+      setEditStatus,
+      setEditChronology,
+      setEditIssueType,
+      handleAddCase,
+      handleUpdateCase,
+      handleDeleteCase,
+      loadData,
+    },
+  };
+}

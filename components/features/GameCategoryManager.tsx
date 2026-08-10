@@ -9,23 +9,13 @@ import {
   toggleGameCategoryStatus,
 } from "@/actions/settings";
 import type { Database } from "@/types/database.types";
+import { Loader2, Plus, Check, LayoutGrid, X } from "lucide-react";
 import {
-  Loader2,
-  Plus,
-  Check,
-  FolderTree,
-  Edit2,
-  Trash2,
-  Power,
-  LayoutGrid,
-  X,
-} from "lucide-react";
-import {
-  CategoryIcon,
   CategoryIconPicker,
   LUCIDE_PREFIX,
   lucideIconName,
 } from "@/components/features/CategoryIconPicker";
+import { GameCategoryTable } from "./GameCategoryTable";
 
 type Category = Database["public"]["Tables"]["categories"]["Row"];
 
@@ -50,7 +40,6 @@ export function GameCategoryManager({
   const [success, setSuccess] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  // Keep local state in sync when server props revalidate
   if (initialCategories !== prevCategories) {
     setPrevCategories(initialCategories);
     setCategories(initialCategories);
@@ -102,15 +91,53 @@ export function GameCategoryManager({
     setIsDrawerOpen(true);
   };
 
-  const handleCancelEdit = () => {
-    setEditingId(null);
-    setTitle("");
-    setGameSlug("");
-    setSelectedIcon("");
-    setIsActive(true);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     setError(null);
     setSuccess(false);
-    setIsDrawerOpen(false);
+
+    if (!title || !gameSlug) {
+      setError("Judul dan Game Slug wajib diisi.");
+      return;
+    }
+
+    const logoValue = selectedIcon ? `${LUCIDE_PREFIX}${selectedIcon}` : null;
+
+    startTransition(async () => {
+      let res;
+      if (editingId) {
+        res = await updateGameCategory(
+          editingId,
+          title,
+          gameSlug,
+          logoValue || undefined,
+          isActive,
+        );
+      } else {
+        res = await addGameCategory(title, gameSlug, logoValue || undefined);
+      }
+
+      if (res.success) {
+        setSuccess(true);
+        router.refresh();
+        closeDrawer();
+      } else {
+        setError(res.error || "Gagal menyimpan kategori.");
+      }
+    });
+  };
+
+  const handleDelete = (id: number) => {
+    if (!confirm("Yakin ingin menghapus kategori ini?")) return;
+    startTransition(async () => {
+      const res = await deleteGameCategory(id);
+      if (res.success) {
+        setCategories((prev) => prev.filter((c) => c.id !== id));
+        router.refresh();
+      } else {
+        alert(res.error || "Gagal menghapus kategori.");
+      }
+    });
   };
 
   const handleToggleStatus = (cat: Category) => {
@@ -118,86 +145,26 @@ export function GameCategoryManager({
     setCategories((prev) =>
       prev.map((c) => (c.id === cat.id ? { ...c, is_active: nextStatus } : c)),
     );
-    startTransition(async () => {
-      const result = await toggleGameCategoryStatus(cat.id, nextStatus);
-      if (!result.success) {
-        setCategories(initialCategories);
-        alert(`Gagal mengubah status: ${result.error}`);
-      } else {
-        router.refresh();
-      }
-    });
-  };
-
-  const handleDelete = (id: number) => {
-    if (!window.confirm("Yakin ingin menghapus kategori ini?")) return;
-    setCategories((prev) => prev.filter((c) => c.id !== id));
-    if (editingId === id) handleCancelEdit();
-    startTransition(async () => {
-      const result = await deleteGameCategory(id);
-      if (!result.success) {
-        setCategories(initialCategories);
-        alert(`Gagal menghapus: ${result.error}`);
-      } else {
-        router.refresh();
-      }
-    });
-  };
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError(null);
-    setSuccess(false);
 
     startTransition(async () => {
-      const finalLogo = selectedIcon ? `${LUCIDE_PREFIX}${selectedIcon}` : null;
-
-      let result: { success: boolean; error?: string; data?: Category | null };
-      if (editingId) {
-        result = await updateGameCategory(
-          editingId,
-          title,
-          gameSlug,
-          finalLogo || undefined,
-          isActive,
+      const res = await toggleGameCategoryStatus(cat.id, nextStatus);
+      if (!res.success) {
+        setCategories((prev) =>
+          prev.map((c) => (c.id === cat.id ? { ...c, is_active: cat.is_active } : c)),
         );
-        if (result.success) {
-          setCategories((prev) =>
-            prev.map((c) =>
-              c.id === editingId
-                ? { ...c, title, game_slug: gameSlug, logo: finalLogo, is_active: isActive }
-                : c,
-            ),
-          );
-        }
+        alert(res.error || "Gagal mengubah status kategori.");
       } else {
-        result = await addGameCategory(title, gameSlug, finalLogo || undefined);
-        if (result.success && result.data) {
-          setCategories((prev) => [...prev, result.data as Category]);
-        }
-      }
-
-      if (result.success) {
-        setSuccess(true);
-        setEditingId(null);
-        setTitle("");
-        setGameSlug("");
-        setSelectedIcon("");
-        setIsActive(true);
         router.refresh();
-        closeDrawer();
-      } else {
-        setError(result.error || "Terjadi kesalahan saat menyimpan kategori.");
       }
     });
   };
 
   return (
-    <div className="flex flex-col gap-5">
-      {/* Section header */}
+    <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-blue-50 text-blue-600">
-          <LayoutGrid className="h-[18px] w-[18px]" strokeWidth={1.5} />
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+          <LayoutGrid className="h-4.5 w-4.5" strokeWidth={1.5} />
         </div>
         <div>
           <h2 className="text-foreground text-base font-bold">Master Kategori Game</h2>
@@ -307,7 +274,7 @@ export function GameCategoryManager({
                         onChange={(e) => setIsActive(e.target.checked)}
                         className="peer sr-only"
                       />
-                      <div className="peer bg-muted after:border-input after:bg-card h-5 w-9 rounded-full transition-colors peer-checked:bg-emerald-500 after:absolute after:top-[2px] after:left-[2px] after:h-4 after:w-4 after:rounded-full after:border after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white" />
+                      <div className="peer bg-muted after:border-input after:bg-card h-5 w-9 rounded-full transition-colors peer-checked:bg-emerald-500 after:absolute after:top-0.5 after:left-0.5 after:h-4 after:w-4 after:rounded-full after:border after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white" />
                     </div>
                     <span className="text-foreground text-sm font-medium">
                       {isActive ? "Aktif" : "Nonaktif"}
@@ -353,150 +320,16 @@ export function GameCategoryManager({
         </div>
       )}
 
-      {/* List — full width below */}
-      <div>
-        <div className="border-border-soft bg-card overflow-hidden rounded-xl border shadow-sm">
-          <div className="border-border-soft bg-muted/50 flex items-center gap-2 border-b px-5 py-3.5">
-            <FolderTree className="text-faint-foreground h-4 w-4" strokeWidth={1.5} />
-            <h3 className="text-foreground text-sm font-semibold">Daftar Kategori</h3>
-            <span className="bg-muted text-muted-foreground ml-auto inline-flex items-center rounded-[10px] px-2.5 py-0.5 text-xs font-medium">
-              {categories.length} Total
-            </span>
-            <button
-              type="button"
-              onClick={openDrawerNew}
-              className="inline-flex items-center gap-1.5 rounded-[10px] bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition-all hover:bg-blue-700 active:scale-[0.97]"
-            >
-              <Plus className="h-3.5 w-3.5" strokeWidth={2.5} />
-              Tambah Kategori
-            </button>
-          </div>
-
-          <div className="overflow-x-auto">
-            {errorMsg ? (
-              <div className="bg-rose-50/50 p-6 text-sm text-rose-600">{errorMsg}</div>
-            ) : categories.length > 0 ? (
-              <table className="w-full text-left text-sm">
-                <thead className="border-border-soft bg-muted/70 text-muted-foreground border-b text-xs font-semibold tracking-wider uppercase">
-                  <tr>
-                    <th scope="col" className="px-5 py-3.5">
-                      Logo
-                    </th>
-                    <th scope="col" className="px-5 py-3.5">
-                      Judul Kategori
-                    </th>
-                    <th scope="col" className="px-5 py-3.5">
-                      Slug
-                    </th>
-                    <th scope="col" className="px-5 py-3.5 text-center">
-                      Status
-                    </th>
-                    <th scope="col" className="px-5 py-3.5 text-right">
-                      Dibuat
-                    </th>
-                    <th scope="col" className="px-5 py-3.5 text-center">
-                      Aksi
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-border-soft text-muted-foreground divide-y">
-                  {categories.map((cat: Category) => (
-                    <tr
-                      key={cat.id}
-                      className={`hover:bg-muted/50 transition-colors ${!cat.is_active ? "opacity-60" : ""}`}
-                    >
-                      <td className="px-5 py-3.5">
-                        {lucideIconName(cat.logo) ? (
-                          <div className="flex h-8 w-8 items-center justify-center rounded-[10px] border border-blue-100 bg-blue-50 text-blue-600">
-                            <CategoryIcon name={lucideIconName(cat.logo)!} className="h-4 w-4" />
-                          </div>
-                        ) : cat.logo ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={cat.logo}
-                            alt={cat.title}
-                            className="h-8 w-8 rounded-[10px] object-cover"
-                          />
-                        ) : (
-                          <div className="border-border bg-muted text-faint-foreground flex h-8 w-8 items-center justify-center rounded-[10px] border text-xs">
-                            ?
-                          </div>
-                        )}
-                      </td>
-                      <td className="text-foreground px-5 py-3.5 font-medium">{cat.title}</td>
-                      <td className="px-5 py-3.5">
-                        <span className="text-muted-foreground font-mono text-xs">
-                          {cat.game_slug}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3.5 text-center">
-                        <button
-                          onClick={() => handleToggleStatus(cat)}
-                          disabled={isPending}
-                          title={
-                            cat.is_active ? "Klik untuk menonaktifkan" : "Klik untuk mengaktifkan"
-                          }
-                          className="inline-flex items-center gap-1 focus:outline-none"
-                        >
-                          {cat.is_active ? (
-                            <span className="inline-flex items-center gap-1 rounded-[10px] border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-100">
-                              <Power className="h-3 w-3 text-emerald-600" /> Aktif
-                            </span>
-                          ) : (
-                            <span className="border-border bg-muted text-muted-foreground hover:bg-muted inline-flex items-center gap-1 rounded-[10px] border px-2.5 py-1 text-xs font-semibold transition-colors">
-                              <Power className="text-faint-foreground h-3 w-3" /> Nonaktif
-                            </span>
-                          )}
-                        </button>
-                      </td>
-                      <td className="px-5 py-3.5 text-right">
-                        <span className="text-faint-foreground text-xs">
-                          {new Date(cat.created_at).toLocaleDateString("id-ID", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          })}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3.5 text-center">
-                        <div className="flex items-center justify-center gap-2">
-                          <button
-                            onClick={() => handleEditClick(cat)}
-                            className="tap-large rounded-[10px] text-blue-500 transition-colors hover:bg-blue-50 hover:text-blue-700"
-                            title="Edit"
-                          >
-                            <Edit2 className="h-3.5 w-3.5" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(cat.id)}
-                            className="text-faint-foreground tap-large rounded-[10px] transition-colors hover:bg-rose-50 hover:text-rose-600"
-                            title="Hapus"
-                            disabled={isPending}
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <div className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
-                <div className="bg-muted text-faint-foreground flex h-12 w-12 items-center justify-center rounded-xl">
-                  <FolderTree className="h-6 w-6" strokeWidth={1.5} />
-                </div>
-                <div>
-                  <p className="text-foreground text-sm font-semibold">Belum ada kategori</p>
-                  <p className="text-faint-foreground mt-0.5 text-xs">
-                    Tambahkan kategori menggunakan form di atas.
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+      {/* Table */}
+      <GameCategoryTable
+        categories={categories}
+        errorMsg={errorMsg}
+        isPending={isPending}
+        onOpenDrawerNew={openDrawerNew}
+        onEditClick={handleEditClick}
+        onToggleStatus={handleToggleStatus}
+        onDelete={handleDelete}
+      />
     </div>
   );
 }
