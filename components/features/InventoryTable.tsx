@@ -130,7 +130,13 @@ export function InventoryTable({ inventory, hideActions = false }: InventoryTabl
                     <td className="truncate px-3 py-2">
                       <StatusBadge
                         label={item.status}
-                        tone={item.status === "AVAILABLE" ? "emerald" : item.status === "SOLD" ? "blue" : "neutral"}
+                        tone={
+                          item.status === "AVAILABLE"
+                            ? "emerald"
+                            : item.status === "SOLD"
+                              ? "blue"
+                              : "neutral"
+                        }
                       />
                     </td>
                     <td className="text-muted-foreground truncate px-3 py-2">

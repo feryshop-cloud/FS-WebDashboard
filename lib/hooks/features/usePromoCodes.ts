@@ -128,7 +128,10 @@ export function usePromoCodes() {
       const payload = new FormData();
       payload.set("code", form.code.trim().toUpperCase());
       payload.set("discount_type", form.discount_type);
-      payload.set("discount_value", parseFloat(form.discount_value) ? String(form.discount_value) : "0");
+      payload.set(
+        "discount_value",
+        parseFloat(form.discount_value) ? String(form.discount_value) : "0",
+      );
       payload.set("min_order", parseFloat(form.min_order) ? String(form.min_order) : "0");
       payload.set("max_discount", parseFloat(form.max_discount) ? String(form.max_discount) : "0");
       payload.set("quota", parseInt(form.quota, 10) ? String(form.quota) : "0");

@@ -3,15 +3,7 @@ import { LucideIcon } from "lucide-react";
 import { cn } from "./cn";
 
 export type BadgeTone =
-  | "neutral"
-  | "emerald"
-  | "blue"
-  | "amber"
-  | "orange"
-  | "rose"
-  | "red"
-  | "violet"
-  | "slate";
+  "neutral" | "emerald" | "blue" | "amber" | "orange" | "rose" | "red" | "violet" | "slate";
 
 export const TONE_CLASS: Record<BadgeTone, { badge: string; icon: string }> = {
   neutral: {
@@ -109,7 +101,5 @@ const DEAL_LABEL: Record<string, string> = {
 };
 
 export function DealStatusBadge({ status }: { status: string }) {
-  return (
-    <StatusBadge label={DEAL_LABEL[status] ?? status} tone={DEAL_TONE[status] ?? "neutral"} />
-  );
+  return <StatusBadge label={DEAL_LABEL[status] ?? status} tone={DEAL_TONE[status] ?? "neutral"} />;
 }

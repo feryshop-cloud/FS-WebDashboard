@@ -102,10 +102,7 @@ function LedgerPageContent() {
           >
             {tx.ref_id ? `Ref: ${tx.ref_id}` : "-"}
           </span>
-          <span
-            className="text-muted-foreground mt-0.5 truncate text-xs"
-            title={tx.notes || "-"}
-          >
+          <span className="text-muted-foreground mt-0.5 truncate text-xs" title={tx.notes || "-"}>
             {tx.notes || "-"}
           </span>
         </div>

@@ -103,7 +103,8 @@ export default function InventoryPage() {
       key: "capital",
       header: "Harga Modal",
       align: "right",
-      className: "font-mono text-sm font-medium whitespace-nowrap tabular-nums text-muted-foreground",
+      className:
+        "font-mono text-sm font-medium whitespace-nowrap tabular-nums text-muted-foreground",
       render: (item) => formatRupiah(Number(item.capital_price)),
     },
     {
@@ -260,10 +261,7 @@ export default function InventoryPage() {
           labelledById="add-stock-drawer-title"
           drawerRef={addStockRef as React.Ref<HTMLDivElement>}
         >
-          <form
-            action={handleAddStock}
-            className="fs-rise-in flex flex-1 flex-col overflow-hidden"
-          >
+          <form action={handleAddStock} className="fs-rise-in flex flex-1 flex-col overflow-hidden">
             <div className="flex-1 space-y-5 overflow-y-auto p-6">
               {error && (
                 <div className="fs-drop-in rounded-lg border border-rose-100 bg-rose-50 p-3 text-sm text-rose-600">
