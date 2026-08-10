@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
+import useSWR from "swr";
 import { getErrorMessage } from "@/lib/error";
 import {
   getProblemCases,
@@ -29,11 +30,6 @@ export const PROBLEM_CASE_STATUS_LABEL: Record<string, string> = {
 };
 
 export function useProblemCases() {
-  const [cases, setCases] = useState<ProblemCaseWithRelations[]>([]);
-  const [deals, setDeals] = useState<DealWithRelations[]>([]);
-  const [stocks, setStocks] = useState<InventoryItemWithGame[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
 
@@ -50,37 +46,38 @@ export function useProblemCases() {
   const [editChronology, setEditChronology] = useState("");
   const [editIssueType, setEditIssueType] = useState("");
 
+  const {
+    data: cases = [],
+    isLoading: casesLoading,
+    mutate: mutateCases,
+  } = useSWR<ProblemCaseWithRelations[]>("problem-cases", async () => {
+    return (await getProblemCases()) || [];
+  });
+
+  const {
+    data: deals = [],
+    isLoading: dealsLoading,
+    mutate: mutateDeals,
+  } = useSWR<DealWithRelations[]>("deals", async () => {
+    return ((await getDeals()) as unknown as DealWithRelations[]) || [];
+  });
+
+  const {
+    data: stocks = [],
+    isLoading: stocksLoading,
+    mutate: mutateStocks,
+  } = useSWR<InventoryItemWithGame[]>("inventory", async () => {
+    const result = await getInventory();
+    return (result.data || []) as InventoryItemWithGame[];
+  });
+
+  const isLoading = casesLoading || dealsLoading || stocksLoading;
+
   const loadData = () => {
-    setIsLoading(true);
-    Promise.all([getProblemCases(), getDeals(), getInventory()])
-      .then(([casesData, dealsData, stocksResult]) => {
-        setCases(casesData || []);
-        setDeals((dealsData as unknown as DealWithRelations[]) || []);
-        setStocks(stocksResult.data || []);
-      })
-      .catch((err) => console.error(err))
-      .finally(() => setIsLoading(false));
+    mutateCases();
+    mutateDeals();
+    mutateStocks();
   };
-
-  useEffect(() => {
-    let isMounted = true;
-    Promise.all([getProblemCases(), getDeals(), getInventory()])
-      .then(([casesData, dealsData, stocksResult]) => {
-        if (isMounted) {
-          setCases(casesData || []);
-          setDeals((dealsData as unknown as DealWithRelations[]) || []);
-          setStocks(stocksResult.data || []);
-        }
-      })
-      .catch((err) => console.error(err))
-      .finally(() => {
-        if (isMounted) setIsLoading(false);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
 
   const openAdd = () => {
     setError("");

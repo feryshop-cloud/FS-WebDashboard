@@ -1,4 +1,7 @@
-import { useState, useEffect, useTransition } from "react";
+"use client";
+
+import { useState } from "react";
+import useSWR from "swr";
 import { getTemplates, addTemplate, updateTemplate, deleteTemplate } from "@/app/actions/templates";
 
 export interface TemplateItem {
@@ -11,8 +14,6 @@ export interface TemplateItem {
 }
 
 export function useTemplates() {
-  const [templates, setTemplates] = useState<TemplateItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -27,36 +28,17 @@ export function useTemplates() {
   const [editName, setEditName] = useState("");
   const [editType, setEditType] = useState("");
 
-  const [, startTransition] = useTransition();
+  const {
+    data: templates = [],
+    isLoading,
+    mutate,
+  } = useSWR<TemplateItem[]>("templates", async () => {
+    return (await getTemplates()) as unknown as TemplateItem[];
+  });
 
-  const loadTemplatesData = async () => {
-    try {
-      setIsLoading(true);
-      const data = await getTemplates();
-      setTemplates(data as unknown as TemplateItem[]);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
+  const loadTemplatesData = () => {
+    mutate();
   };
-
-  useEffect(() => {
-    let active = true;
-    getTemplates()
-      .then((data) => {
-        if (!active) return;
-        setTemplates(data as unknown as TemplateItem[]);
-      })
-      .catch((err) => console.error(err))
-      .finally(() => {
-        if (active) setIsLoading(false);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, []);
 
   const handleCopy = (id: string, text: string) => {
     navigator.clipboard.writeText(text);
@@ -84,7 +66,7 @@ export function useTemplates() {
       setIsSubmitting(true);
       const formData = new FormData(e.currentTarget);
       await addTemplate(formData);
-      await loadTemplatesData();
+      loadTemplatesData();
       closeModal();
     } catch (err) {
       console.error(err);
@@ -110,7 +92,7 @@ export function useTemplates() {
 
       await updateTemplate(id, formData);
       setEditingId(null);
-      await loadTemplatesData();
+      loadTemplatesData();
     } catch (err) {
       console.error(err);
     } finally {
@@ -122,7 +104,7 @@ export function useTemplates() {
     if (!confirm("Apakah Anda yakin ingin menghapus template ini?")) return;
     try {
       await deleteTemplate(id);
-      await loadTemplatesData();
+      loadTemplatesData();
     } catch (err) {
       console.error(err);
     }
@@ -165,7 +147,7 @@ export function useTemplates() {
       setEditName,
       setEditType,
       setEditingId,
-      loadTemplatesData: () => startTransition(() => loadTemplatesData()),
+      loadTemplatesData,
       handleCopy,
     },
   };

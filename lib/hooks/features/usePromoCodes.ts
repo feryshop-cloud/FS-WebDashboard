@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useMemo } from "react";
+import useSWR from "swr";
 import {
   getPromoCodes,
   createPromoCode,
@@ -42,8 +43,6 @@ export const toDateTimeLocal = (v?: string | null) => {
 };
 
 export function usePromoCodes() {
-  const [promos, setPromos] = useState<PromoCodeRow[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -53,35 +52,17 @@ export function usePromoCodes() {
   const [editing, setEditing] = useState<number | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
 
-  const loadData = useCallback(async (showSpinner = false) => {
-    try {
-      if (showSpinner) setIsLoading(true);
-      setError("");
-      const data = await getPromoCodes();
-      setPromos(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal memuat kode promo.");
-    } finally {
-      if (showSpinner) setIsLoading(false);
-    }
-  }, []);
+  const {
+    data: promos = [],
+    isLoading,
+    mutate,
+  } = useSWR<PromoCodeRow[]>("promo-codes", async () => {
+    return (await getPromoCodes()) || [];
+  });
 
-  useEffect(() => {
-    let isMounted = true;
-    getPromoCodes()
-      .then((data) => {
-        if (isMounted) setPromos(data);
-      })
-      .catch((err) => {
-        if (isMounted) setError(err instanceof Error ? err.message : "Gagal memuat kode promo.");
-      })
-      .finally(() => {
-        if (isMounted) setIsLoading(false);
-      });
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const loadData = () => {
+    mutate();
+  };
 
   const setField = (k: keyof FormState, v: string | boolean) =>
     setForm((prev) => ({ ...prev, [k]: v }));
@@ -153,7 +134,7 @@ export function usePromoCodes() {
       }
 
       closeModal();
-      await loadData();
+      loadData();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal menyimpan promo.");
     } finally {
@@ -165,7 +146,7 @@ export function usePromoCodes() {
     if (!confirm(`Hapus kode promo "${code}"?`)) return;
     try {
       await deletePromoCode(id);
-      await loadData();
+      loadData();
     } catch (err) {
       alert(err instanceof Error ? err.message : "Gagal menghapus promo.");
     }
