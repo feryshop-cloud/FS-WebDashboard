@@ -25,7 +25,7 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
   }
 
   return (
-    <div className="bg-muted/50 mx-auto min-h-screen max-w-[1400px] space-y-6 p-6 md:p-8">
+    <>
       <DealDetailHeader
         dealId={deal.id}
         stockId={deal.stock_id}
@@ -195,6 +195,6 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

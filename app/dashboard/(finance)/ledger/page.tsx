@@ -149,7 +149,7 @@ function LedgerPageContent() {
   ];
 
   return (
-    <div className="mx-auto flex max-w-7xl flex-col gap-6 pb-8">
+    <>
       <PageHeader
         title="Buku Kas / Ledger"
         subtitle="Catatan riwayat seluruh pergerakan uang masuk, keluar, dan mutasi internal."
@@ -397,7 +397,7 @@ function LedgerPageContent() {
           </form>
         </SlideOverDrawer>
       )}
-    </div>
+    </>
   );
 }
 

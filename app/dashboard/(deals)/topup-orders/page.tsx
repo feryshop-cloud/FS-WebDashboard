@@ -52,7 +52,7 @@ export default function TopupOrdersPage() {
   } = useTopupOrders();
 
   return (
-    <div className="mx-auto flex max-w-7xl flex-col gap-6 pb-8">
+    <>
       {/* Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
@@ -538,6 +538,6 @@ export default function TopupOrdersPage() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
