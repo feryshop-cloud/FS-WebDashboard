@@ -1,12 +1,23 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Search, Filter, Plus, FileText, ChevronDown, X, Loader2, Trash2 } from "lucide-react";
+import {
+  Search,
+  Filter,
+  Plus,
+  FileText,
+  ChevronDown,
+  X,
+  Loader2,
+  Trash2,
+  AlertTriangle,
+} from "lucide-react";
 import { formatRupiah, formatDate } from "@/lib/utils";
 import { getErrorMessage } from "@/lib/error";
 import { getDeals, createPenjualan, deleteDeal } from "@/app/actions/deals";
 import { getInventory } from "@/app/actions/inventory";
 import { getAccounts } from "@/app/actions/accounts";
+import { Pagination } from "@/components/ui/Pagination";
 import type { Database } from "@/types/database.types";
 import { DealWithRelations } from "@/types/database";
 
@@ -26,6 +37,11 @@ export default function DealsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [isExporting, setIsExporting] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [deleteTarget, setDeleteTarget] = useState<Deal | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   const loadData = async () => {
     try {
@@ -109,17 +125,25 @@ export default function DealsPage() {
     }
   };
 
-  const handleDeleteDeal = async (id: string, dealNumber: string) => {
-    if (!window.confirm(`Apakah Anda yakin ingin menghapus transaksi "${dealNumber}"?`)) {
-      return;
-    }
+  const handleDeleteDeal = async () => {
+    if (!deleteTarget) return;
     try {
-      await deleteDeal(id);
+      setIsDeleting(true);
+      setDeleteError("");
+      await deleteDeal(deleteTarget.id);
+      setDeleteTarget(null);
       loadData();
     } catch (err: unknown) {
-      alert("Gagal menghapus deal: " + getErrorMessage(err));
+      setDeleteError(getErrorMessage(err));
+    } finally {
+      setIsDeleting(false);
     }
   };
+
+  const totalPages = Math.max(1, Math.ceil(deals.length / itemsPerPage));
+  const safePage = Math.min(currentPage, totalPages);
+  const pageStart = (safePage - 1) * itemsPerPage;
+  const pageItems = deals.slice(pageStart, pageStart + itemsPerPage);
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 pb-8">
@@ -148,7 +172,7 @@ export default function DealsPage() {
           </button>
           <button
             onClick={openAddDeal}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 active:scale-[0.97]"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-transparent bg-purple-600 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-purple-200 transition-all hover:bg-purple-700 active:scale-[0.97]"
           >
             <Plus className="h-4 w-4" />
             Buat Deal Baru
@@ -164,7 +188,7 @@ export default function DealsPage() {
           </div>
           <input
             type="text"
-            className="border-border bg-muted text-foreground block w-full rounded-lg border py-2 pr-3 pl-10 placeholder-slate-400 transition-all outline-none focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className="border-border bg-muted text-foreground block w-full rounded-lg border py-2 pr-3 pl-10 placeholder-placeholder transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 sm:text-sm"
             placeholder="Cari nomor deal, customer, atau stok..."
           />
         </div>
@@ -243,7 +267,7 @@ export default function DealsPage() {
               {isLoading ? (
                 <tr>
                   <td colSpan={8} className="px-6 py-12 text-center">
-                    <Loader2 className="mx-auto h-8 w-8 animate-spin text-blue-600" />
+                    <Loader2 className="mx-auto h-8 w-8 animate-spin text-purple-600" />
                   </td>
                 </tr>
               ) : deals.length === 0 ? (
@@ -252,8 +276,14 @@ export default function DealsPage() {
                     Belum ada transaksi.
                   </td>
                 </tr>
+              ) : pageItems.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="text-muted-foreground px-6 py-8 text-center text-sm">
+                    Tidak ada transaksi pada halaman ini.
+                  </td>
+                </tr>
               ) : (
-                deals.map((deal) => {
+                pageItems.map((deal) => {
                   let badgeClass = "bg-muted text-muted-foreground border-border";
                   if (
                     (deal.status as string) === "Lunas" ||
@@ -316,9 +346,10 @@ export default function DealsPage() {
                       </td>
                       <td className="px-6 py-4 text-center text-sm font-medium whitespace-nowrap">
                         <button
-                          onClick={() => handleDeleteDeal(deal.id, deal.deal_number)}
+                          onClick={() => setDeleteTarget(deal)}
                           title="Hapus Deal"
-                          className="rounded-md p-1.5 text-rose-600 transition-colors hover:bg-rose-50 hover:text-rose-700"
+                          aria-label={`Hapus deal ${deal.deal_number}`}
+                          className="tap-large rounded-md text-rose-600 transition-colors hover:bg-rose-50 hover:text-rose-700"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -331,28 +362,26 @@ export default function DealsPage() {
           </table>
         </div>
 
-        {/* Pagination Mockup */}
-        <div className="border-border-soft bg-card flex items-center justify-between border-t px-6 py-4">
-          <div className="text-muted-foreground text-sm">
-            Menampilkan{" "}
-            <span className="text-foreground font-semibold">{deals.length > 0 ? 1 : 0}</span> -{" "}
-            <span className="text-foreground font-semibold">{deals.length}</span> dari{" "}
-            <span className="text-foreground font-semibold">{deals.length}</span> transaksi
-          </div>
-          <div className="flex gap-1">
-            <button className="border-border text-faint-foreground cursor-not-allowed rounded-md border px-3 py-1 text-sm">
-              Sebelummnya
-            </button>
-            <button className="border-border text-foreground hover:bg-muted rounded-md border px-3 py-1 text-sm font-medium">
-              Selanjutnya
-            </button>
-          </div>
-        </div>
+        {/* Pagination */}
+        <Pagination
+          currentPage={safePage}
+          totalItems={deals.length}
+          itemsPerPage={itemsPerPage}
+          onPageChange={(page) => setCurrentPage(page)}
+          onPageSizeChange={(size) => {
+            setItemsPerPage(size);
+            setCurrentPage(1);
+          }}
+          itemLabel="transaksi"
+        />
       </div>
 
       {/* Buat Deal Baru Modal (Slide-over / Modal) */}
       {(isAddDealOpen || isAddDealClosing) && (
         <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="deal-drawer-title"
           className={`fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm ${
             isAddDealClosing ? "fs-overlay-out" : "fs-overlay-in"
           }`}
@@ -366,14 +395,17 @@ export default function DealsPage() {
           >
             <div className="border-border-soft bg-muted flex items-center justify-between border-b px-6 py-5">
               <div>
-                <h2 className="text-foreground text-lg font-bold">Buat Deal Baru</h2>
+                <h2 id="deal-drawer-title" className="text-foreground text-lg font-bold">
+                  Buat Deal Baru
+                </h2>
                 <p className="text-muted-foreground mt-1 text-xs">
                   Isi form transaksi penjualan atau booking.
                 </p>
               </div>
               <button
                 onClick={closeAddDeal}
-                className="bg-card text-faint-foreground hover:text-muted-foreground rounded-full p-2 shadow-sm transition-colors"
+                aria-label="Tutup form Buat Deal Baru"
+                className="bg-card text-faint-foreground hover:text-muted-foreground tap-large rounded-full shadow-sm transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -395,7 +427,7 @@ export default function DealsPage() {
                   <select
                     name="stock_id"
                     required
-                    className="border-border w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
                   >
                     <option value="">-- Pilih Stok Tersedia --</option>
                     {stocks.map((stock) => (
@@ -413,7 +445,7 @@ export default function DealsPage() {
                     name="customer_name"
                     required
                     type="text"
-                    className="border-border w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
                     placeholder="Mis. Budi Santoso"
                   />
                 </div>
@@ -424,7 +456,7 @@ export default function DealsPage() {
                   <input
                     name="customer_phone"
                     type="text"
-                    className="border-border w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
                     placeholder="Mis. 08123456789"
                   />
                 </div>
@@ -437,7 +469,7 @@ export default function DealsPage() {
                     required
                     type="number"
                     min="1"
-                    className="border-border w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
                     placeholder="Rp 0"
                   />
                 </div>
@@ -453,7 +485,7 @@ export default function DealsPage() {
                         name="payment_amount"
                         type="number"
                         min="0"
-                        className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
                         placeholder="Rp 0"
                         defaultValue={0}
                       />
@@ -464,7 +496,7 @@ export default function DealsPage() {
                       </label>
                       <select
                         name="account_id"
-                        className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
                       >
                         <option value="">-- Pilih Rekening (Kosongkan jika 0) --</option>
                         {accounts
@@ -483,12 +515,63 @@ export default function DealsPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-blue-700 disabled:opacity-50"
+                  className="w-full rounded-lg bg-purple-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm shadow-purple-200 transition-colors hover:bg-purple-700 disabled:opacity-50"
                 >
                   {isSubmitting ? "Memproses..." : "Proses Transaksi"}
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Hapus Deal Confirmation Dialogs */}
+      {deleteTarget && (
+        <div
+          role="alertdialog"
+          aria-modal="true"
+          aria-labelledby="delete-deal-title"
+          aria-describedby="delete-deal-desc"
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+        >
+          <div className="border-border bg-card w-full max-w-sm rounded-xl border p-6 shadow-xl">
+            <div className="mb-4 flex items-center gap-3 text-rose-600">
+              <div className="rounded-full bg-rose-50 p-2">
+                <AlertTriangle className="h-6 w-6" />
+              </div>
+              <h3 id="delete-deal-title" className="text-foreground text-lg font-bold">
+                Hapus Deal?
+              </h3>
+            </div>
+            <p id="delete-deal-desc" className="text-muted-foreground mb-4 text-sm">
+              Apakah Anda yakin ingin menghapus transaksi{" "}
+              <span className="text-foreground font-semibold">
+                {deleteTarget.deal_number}
+              </span>
+              ? Tindakan ini tidak dapat dibatalkan.
+            </p>
+            {deleteError && (
+              <div role="alert" className="mb-4 rounded-lg bg-rose-50 p-3 text-xs text-rose-600">
+                {deleteError}
+              </div>
+            )}
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                disabled={isDeleting}
+                className="border-border text-foreground hover:bg-muted rounded-lg border px-4 py-2 text-xs font-medium"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleDeleteDeal}
+                disabled={isDeleting}
+                className="flex items-center gap-1.5 rounded-lg bg-rose-600 px-4 py-2 text-xs font-semibold text-white hover:bg-rose-700 disabled:opacity-50"
+              >
+                {isDeleting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                {isDeleting ? "Menghapus..." : "Hapus"}
+              </button>
+            </div>
           </div>
         </div>
       )}

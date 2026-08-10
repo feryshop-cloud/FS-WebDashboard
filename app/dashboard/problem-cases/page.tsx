@@ -217,7 +217,7 @@ export default function ProblemCasesPage() {
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="border-border bg-muted/70 text-foreground focus:bg-card block w-full rounded-xl border py-2 pr-3 pl-10 placeholder-slate-400 transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 sm:text-sm"
+            className="border-border bg-muted/70 text-foreground focus:bg-card block w-full rounded-xl border py-2 pr-3 pl-10 placeholder-placeholder transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 sm:text-sm"
             placeholder="Cari ID case, tipe masalah, atau customer..."
           />
         </div>

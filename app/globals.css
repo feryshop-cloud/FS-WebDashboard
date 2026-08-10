@@ -34,6 +34,7 @@
   --color-faint-foreground: var(--faint-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-placeholder: var(--placeholder);
 
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
@@ -100,7 +101,7 @@
     --foreground: #f1f5f9;
     --border: #334155;
     --border-soft: #334155;
-    --faint-foreground: #94a3b8;
+    --faint-foreground: #64748b;
     --card: #1e293b;
     --card-foreground: #f1f5f9;
     --muted: #1e293b;
@@ -519,5 +520,22 @@
   .fs-drop-in,
   .fs-pop-in {
     animation: none;
+  }
+}
+
+/*
+ * Touch target lift. Desktop keeps the muted, dense padding of the ledger
+ * world; coarse pointers (tablets, phones, touch laptops) get 44px+ hit
+ * areas without reworking the layout. Applies to icon-only row actions,
+ * pagination controls, and small inline buttons.
+ */
+.tap-large {
+  padding: 0.375rem;
+}
+@media (pointer: coarse) {
+  .tap-large {
+    padding: 0.625rem;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
   }
 }

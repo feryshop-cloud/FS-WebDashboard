@@ -51,7 +51,7 @@ export function TopupProductRowActions({ product, onRefresh }: TopupProductRowAc
     <div className="relative inline-block text-left" onClick={(e) => e.stopPropagation()}>
       <button
         onClick={() => setIsOpenMenu(!isOpenMenu)}
-        className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-md p-1.5 focus:outline-none"
+        className="text-faint-foreground hover:bg-muted hover:text-muted-foreground tap-large rounded-md focus:outline-none"
       >
         <MoreHorizontal className="h-5 w-5" />
       </button>
@@ -123,7 +123,7 @@ export function TopupProductRowActions({ product, onRefresh }: TopupProductRowAc
               <button
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className="flex items-center gap-1.5 rounded-lg bg-rose-600 px-4 py-2 text-xs font-semibold text-white hover:bg-rose-700 disabled:opacity-50"
+                className="tap-large flex items-center gap-1.5 rounded-lg bg-rose-600 text-xs font-semibold text-white hover:bg-rose-700 disabled:opacity-50"
               >
                 {isDeleting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                 Hapus

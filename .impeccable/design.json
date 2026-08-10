@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-08-06T01:48:05.683Z",
+  "generatedAt": "2026-08-10T01:19:29.000Z",
   "title": "Design System: Feryshop Dashboard",
   "extensions": {
     "colorMeta": {
@@ -109,10 +109,40 @@
           "#CBD5E1"
         ]
       },
+      "ink-faint": {
+        "role": "neutral",
+        "displayName": "Faint Ink",
+        "canonical": "#94A3B8",
+        "tonalRamp": [
+          "#020617",
+          "#0F172A",
+          "#1E293B",
+          "#334155",
+          "#475569",
+          "#64748B",
+          "#94A3B8",
+          "#E2E8F0"
+        ]
+      },
       "line": {
         "role": "neutral",
         "displayName": "Hairline",
         "canonical": "#E2E8F0",
+        "tonalRamp": [
+          "#0F172A",
+          "#334155",
+          "#64748B",
+          "#94A3B8",
+          "#CBD5E1",
+          "#E2E8F0",
+          "#F1F5F9",
+          "#F8FAFC"
+        ]
+      },
+      "line-soft": {
+        "role": "neutral",
+        "displayName": "Soft Hairline",
+        "canonical": "#F1F5F9",
         "tonalRamp": [
           "#0F172A",
           "#334155",
@@ -139,10 +169,40 @@
           "#ECFDF5"
         ]
       },
+      "success-bg": {
+        "role": "semantic",
+        "displayName": "Success Background",
+        "canonical": "#ECFDF5",
+        "tonalRamp": [
+          "#064E3B",
+          "#065F46",
+          "#047857",
+          "#059669",
+          "#10B981",
+          "#34D399",
+          "#6EE7B7",
+          "#ECFDF5"
+        ]
+      },
       "warning": {
         "role": "semantic",
         "displayName": "Soft Amber",
         "canonical": "#D97706",
+        "tonalRamp": [
+          "#78350F",
+          "#92400E",
+          "#B45309",
+          "#D97706",
+          "#F59E0B",
+          "#FBBF24",
+          "#FCD34D",
+          "#FFFBEB"
+        ]
+      },
+      "warning-bg": {
+        "role": "semantic",
+        "displayName": "Warning Background",
+        "canonical": "#FFFBEB",
         "tonalRamp": [
           "#78350F",
           "#92400E",
@@ -169,6 +229,21 @@
           "#FEF2F2"
         ]
       },
+      "danger-bg": {
+        "role": "semantic",
+        "displayName": "Danger Background",
+        "canonical": "#FEF2F2",
+        "tonalRamp": [
+          "#7F1D1D",
+          "#991B1B",
+          "#B91C1C",
+          "#DC2626",
+          "#EF4444",
+          "#F87171",
+          "#FCA5A5",
+          "#FEF2F2"
+        ]
+      },
       "violet": {
         "role": "semantic",
         "displayName": "Calm Violet",
@@ -184,10 +259,40 @@
           "#FAF5FF"
         ]
       },
+      "violet-bg": {
+        "role": "semantic",
+        "displayName": "Violet Background",
+        "canonical": "#FAF5FF",
+        "tonalRamp": [
+          "#581C87",
+          "#6B21A8",
+          "#7E22CE",
+          "#9333EA",
+          "#A855F7",
+          "#C084FC",
+          "#D8B4FE",
+          "#FAF5FF"
+        ]
+      },
       "orange": {
         "role": "semantic",
         "displayName": "Warm Orange",
         "canonical": "#EA580C",
+        "tonalRamp": [
+          "#7C2D12",
+          "#9A3412",
+          "#C2410C",
+          "#EA580C",
+          "#F97316",
+          "#FB923C",
+          "#FDBA74",
+          "#FFF7ED"
+        ]
+      },
+      "orange-bg": {
+        "role": "semantic",
+        "displayName": "Orange Background",
+        "canonical": "#FFF7ED",
         "tonalRamp": [
           "#7C2D12",
           "#9A3412",
@@ -408,6 +513,10 @@
         "displayName": "Label",
         "purpose": "Uppercase micro-labels, sidebar groups, stat labels, table headers."
       },
+      "micro": {
+        "displayName": "Micro",
+        "purpose": "Dense-table metadata and status chips (10px/11px)."
+      },
       "mono": {
         "displayName": "Mono",
         "purpose": "Prices, codes, and sensitive numeric values so columns align."
@@ -508,7 +617,7 @@
       "kind": "button",
       "refersTo": "button-primary",
       "description": "Calm Blue primary action; hover deepens to blue-700.",
-      "html": "\u003cbutton class=\"ds-btn-primary\"\u003e\u003csvg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003e\u003cpath d=\"M12 5v14M5 12h14\"/\u003e\u003c/svg\u003eTambah Stok\u003c/button\u003e",
+      "html": "<button class=\"ds-btn-primary\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 5v14M5 12h14\"/></svg>Tambah Stok</button>",
       "css": ".ds-btn-primary { display:inline-flex; align-items:center; justify-content:center; gap:8px; border:none; cursor:pointer; border-radius:10px; background:#2563EB; color:#fff; padding:10px 24px; font-family:inherit; font-size:14px; font-weight:600; box-shadow:0 1px 2px rgba(0,0,0,.05), 0 2px 10px -3px rgba(37,99,235,.2); transition:background-color .2s; } .ds-btn-primary:hover { background:#1D4ED8; } .ds-btn-primary:focus-visible { outline:2px solid #2563EB; outline-offset:2px; } .ds-btn-primary:active { background:#1E40AF; } .ds-btn-primary:disabled { cursor:not-allowed; opacity:.7; } .ds-btn-primary svg { width:16px; height:16px; }"
     },
     {
@@ -516,7 +625,7 @@
       "kind": "button",
       "refersTo": "button-secondary",
       "description": "Quiet outline button for exports, filters, and cancels.",
-      "html": "\u003cbutton class=\"ds-btn-secondary\"\u003eExport\u003c/button\u003e",
+      "html": "<button class=\"ds-btn-secondary\">Export</button>",
       "css": ".ds-btn-secondary { display:inline-flex; align-items:center; justify-content:center; gap:8px; cursor:pointer; border-radius:10px; border:1px solid #D1D5DB; background:#fff; color:#374151; padding:10px 20px; font-family:inherit; font-size:14px; font-weight:600; box-shadow:0 1px 2px rgba(0,0,0,.05); transition:background-color .2s; } .ds-btn-secondary:hover { background:#F9FAFB; } .ds-btn-secondary:focus-visible { outline:2px solid #2563EB; outline-offset:2px; } .ds-btn-secondary:disabled { cursor:not-allowed; opacity:.6; }"
     },
     {
@@ -524,7 +633,7 @@
       "kind": "button",
       "refersTo": "button-danger",
       "description": "Destructive confirmation; red fill with tinted red glow.",
-      "html": "\u003cbutton class=\"ds-btn-danger\"\u003eHapus\u003c/button\u003e",
+      "html": "<button class=\"ds-btn-danger\">Hapus</button>",
       "css": ".ds-btn-danger { display:inline-flex; align-items:center; justify-content:center; gap:8px; cursor:pointer; border:none; border-radius:10px; background:#DC2626; color:#fff; padding:10px 20px; font-family:inherit; font-size:14px; font-weight:600; box-shadow:0 1px 2px rgba(0,0,0,.05), 0 2px 10px -3px rgba(220,38,38,.2); transition:background-color .2s; } .ds-btn-danger:hover { background:#B91C1C; } .ds-btn-danger:focus-visible { outline:2px solid #DC2626; outline-offset:2px; } .ds-btn-danger:disabled { cursor:not-allowed; opacity:.7; }"
     },
     {
@@ -532,7 +641,7 @@
       "kind": "input",
       "refersTo": "input-field",
       "description": "White field with hairline border; Calm Blue focus ring.",
-      "html": "\u003clabel style=\"display:block;font-size:12px;font-weight:500;color:#64748B;margin-bottom:6px;\"\u003eHarga Modal\u003c/label\u003e\u003cinput class=\"ds-input\" type=\"text\" placeholder=\"Rp 500.000\"\u003e",
+      "html": "<label style=\"display:block;font-size:12px;font-weight:500;color:#64748B;margin-bottom:6px;\">Harga Modal</label><input class=\"ds-input\" type=\"text\" placeholder=\"Rp 500.000\">",
       "css": ".ds-input { width:100%; box-sizing:border-box; border-radius:10px; border:1px solid #D1D5DB; background:#fff; color:#0F172A; padding:10px 16px; font-family:inherit; font-size:14px; outline:none; transition:border-color .15s, box-shadow .15s; } .ds-input::placeholder { color:#94A3B8; } .ds-input:focus { border-color:#3B82F6; box-shadow:0 0 0 2px rgba(59,130,246,.5); } .ds-input:disabled { background:#F9FAFB; color:#9CA3AF; cursor:not-allowed; }"
     },
     {
@@ -540,7 +649,7 @@
       "kind": "chip",
       "refersTo": "badge-status",
       "description": "Muted tinted status chip with 50-bg, 600-text, hairline ring.",
-      "html": "\u003cspan class=\"ds-badge ds-badge-success\"\u003eTersedia\u003c/span\u003e \u003cspan class=\"ds-badge ds-badge-warning\"\u003eBooking\u003c/span\u003e \u003cspan class=\"ds-badge ds-badge-danger\"\u003eBermasalah\u003c/span\u003e",
+      "html": "<span class=\"ds-badge ds-badge-success\">Tersedia</span> <span class=\"ds-badge ds-badge-warning\">Booking</span> <span class=\"ds-badge ds-badge-danger\">Bermasalah</span>",
       "css": ".ds-badge { display:inline-flex; align-items:center; border-radius:10px; padding:4px 10px; font-family:inherit; font-size:12px; font-weight:500; line-height:1.4; } .ds-badge-success { background:#ECFDF5; color:#059669; box-shadow:inset 0 0 0 1px rgba(167,243,208,.5); } .ds-badge-warning { background:#FFFBEB; color:#D97706; box-shadow:inset 0 0 0 1px rgba(253,230,138,.5); } .ds-badge-danger { background:#FEF2F2; color:#DC2626; box-shadow:inset 0 0 0 1px rgba(254,202,202,.5); }"
     },
     {
@@ -548,7 +657,7 @@
       "kind": "card",
       "refersTo": "card-surface",
       "description": "Pure white metric/panel card with hairline border and rest shadow.",
-      "html": "\u003cdiv class=\"ds-card\"\u003e\u003cdiv style=\"font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#64748B;\"\u003eOmzet\u003c/div\u003e\u003cdiv style=\"margin-top:8px;font-size:24px;font-weight:700;letter-spacing:-.025em;color:#0F172A;\"\u003eRp 12.450.000\u003c/div\u003e\u003c/div\u003e",
+      "html": "<div class=\"ds-card\"><div style=\"font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#64748B;\">Omzet</div><div style=\"margin-top:8px;font-size:24px;font-weight:700;letter-spacing:-.025em;color:#0F172A;\">Rp 12.450.000</div></div>",
       "css": ".ds-card { border-radius:12px; border:1px solid #F1F5F9; background:#fff; padding:24px; box-shadow:0 1px 2px rgba(0,0,0,.05); }"
     },
     {
@@ -556,18 +665,18 @@
       "kind": "nav",
       "refersTo": "nav-item-active",
       "description": "Collapsible rail item; active state is Calm Blue Halo fill.",
-      "html": "\u003cnav style=\"display:flex;flex-direction:column;gap:4px;width:240px;\"\u003e\u003ca class=\"ds-nav\" href=\"#\"\u003e\u003csvg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003e\u003crect width=\"7\" height=\"9\" x=\"3\" y=\"3\" rx=\"1\"/\u003e\u003crect width=\"7\" height=\"5\" x=\"14\" y=\"3\" rx=\"1\"/\u003e\u003crect width=\"7\" height=\"9\" x=\"14\" y=\"12\" rx=\"1\"/\u003e\u003crect width=\"7\" height=\"5\" x=\"3\" y=\"16\" rx=\"1\"/\u003e\u003c/svg\u003eDaftar Stok\u003c/a\u003e\u003ca class=\"ds-nav\" data-active=\"true\" href=\"#\"\u003e\u003csvg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003e\u003crect width=\"7\" height=\"9\" x=\"3\" y=\"3\" rx=\"1\"/\u003e\u003crect width=\"7\" height=\"5\" x=\"14\" y=\"3\" rx=\"1\"/\u003e\u003crect width=\"7\" height=\"9\" x=\"14\" y=\"12\" rx=\"1\"/\u003e\u003crect width=\"7\" height=\"5\" x=\"3\" y=\"16\" rx=\"1\"/\u003e\u003c/svg\u003eCommand Center\u003c/a\u003e\u003c/nav\u003e",
+      "html": "<nav style=\"display:flex;flex-direction:column;gap:4px;width:240px;\"><a class=\"ds-nav\" href=\"#\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect width=\"7\" height=\"9\" x=\"3\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"5\" x=\"14\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"9\" x=\"14\" y=\"12\" rx=\"1\"/><rect width=\"7\" height=\"5\" x=\"3\" y=\"16\" rx=\"1\"/></svg>Daftar Stok</a><a class=\"ds-nav\" data-active=\"true\" href=\"#\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect width=\"7\" height=\"9\" x=\"3\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"5\" x=\"14\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"9\" x=\"14\" y=\"12\" rx=\"1\"/><rect width=\"7\" height=\"5\" x=\"3\" y=\"16\" rx=\"1\"/></svg>Command Center</a></nav>",
       "css": ".ds-nav { display:flex; align-items:center; gap:12px; border-radius:8px; padding:10px 12px; font-family:inherit; font-size:14px; font-weight:500; color:#64748B; text-decoration:none; transition:background-color .2s, color .2s; } .ds-nav svg { width:20px; height:20px; flex-shrink:0; } .ds-nav:hover { background:#F8FAFC; color:#0F172A; } .ds-nav[data-active=\"true\"] { background:#EFF6FF; color:#2563EB; } .ds-nav[data-active=\"true\"] svg { stroke-width:2; }"
     }
   ],
   "narrative": {
     "northStar": "The Ledger Room",
-    "overview": "Feryshop\u0027s dashboard is designed to feel like a calm, well-run back office where every number sits in its place — quiet, orderly, and always traceable. Admins live in this interface for hours across a shift, so the system trades spectacle for stillness: an airy slate canvas (#F8FAFC on light, #0F172A on dark) carries pure-white surfaces (light) or deep slate surfaces (#1E293B on dark), a single restrained blue accent carries interaction, and status is spoken in muted, soft-tinted chips rather than loud fills. The aesthetic philosophy in the project\u0027s own design brief is a \u0027Human-Made Modern B2B SaaS\u0027 look: breathable, premium, and calm, explicitly built to reduce eye strain for staff who stare at tables and dashboards all day. Dark mode uses tonal layering — dark surfaces with subtle inner glow borders — instead of the light two-layer white-on-slate system. Depth is a whisper at rest and only appears when it earns attention; monospace numeric values reinforce the audit-first discipline.",
+    "overview": "Feryshop's dashboard is designed to feel like a calm, well-run back office where every number sits in its place — quiet, orderly, and always traceable. Admins live in this interface for hours across a shift, so the system trades spectacle for stillness: an airy slate canvas (#F8FAFC on light, #0F172A on dark) carries pure-white surfaces (light) or deep slate surfaces (#1E293B on dark), a single restrained blue accent carries interaction, and status is spoken in muted, soft-tinted chips rather than loud fills. The aesthetic philosophy in the project's own design brief is a \"Human-Made Modern B2B SaaS\" look: breathable, premium, and calm, explicitly built to reduce eye strain for staff who stare at tables and dashboards all day. Dark mode uses tonal layering — dark surfaces with subtle borders — instead of the light two-layer white-on-slate system. Density is comfortable, never cramped. Cards breathe with p-6/p-8 padding, tables leave generous cell spacing, and grids gap at 16–24px. Depth is a whisper at rest — white cards sit on hairline slate borders with a barely-there shadow — and elevation only appears when it earns attention: a card rises on hover, and modals or slide-over drawers lift hard above the page. Typography leans on the system UI sans stack with tight-tracked bold display headings and 14px body copy; sensitive values (prices, account codes, OTPs) are set in monospace so columns line up and codes scan — a visual nod to the product's audit-first discipline.",
     "keyCharacteristics": [
       "Single calm blue accent (blue-600) on a slate-50 / white two-layer canvas (light) or deep slate-900 / slate-800 tonal layering (dark); no neon, fluorescent, or cyan tones, ever.",
       "Soft but never pill-shaped corners: 10px controls, 12px cards, 16px imagery; rounded-full reserved for avatars, dots, and circular icon buttons.",
       "Muted status system: 50-level tinted backgrounds with 600-level text and hairline rings; dark mode uses deeper tinted backgrounds.",
-      "Layered elevation: flat at rest, gentle rise on hover, hard shadow-2xl lift for overlays. Dark mode uses subtle inner glow instead of drop shadow.",
+      "Layered elevation: flat at rest, gentle rise on hover, hard shadow-2xl lift for overlays. Dark mode uses subtle ambient glow instead of shadow on dark surfaces.",
       "Comfortable, breathable density with generous whitespace throughout.",
       "Thin-line lucide icons (strokeWidth 1.5) at 20px in navigation; duotone Phosphor icons for dashboard stats.",
       "Monospace for numeric and sensitive values, reinforcing the ledger/audit identity."
@@ -585,7 +694,7 @@
       },
       {
         "name": "The Hairline Rest Rule",
-        "body": "Surfaces are flat at rest — white card, hairline border, whisper of shadow. Depth appears only as a response to state: hover rise, or hard overlay elevation.",
+        "body": "Surfaces are flat at rest — white card, hairline border, whisper of shadow on light mode; dark surface, subtle inner glow, whisper of ambient on dark mode. Depth appears only as a response to state: hover rise, or hard overlay elevation.",
         "section": "elevation"
       }
     ],
@@ -601,12 +710,12 @@
       "Do use the dark mode tokens (dark-canvas, dark-surface, dark-ink, etc.) when building dark mode surfaces — never reuse light mode tokens for dark backgrounds."
     ],
     "donts": [
-      "Don\u0027t use neon, fluorescent, or cyan tones anywhere — the Calm Blue Rule is absolute.",
-      "Don\u0027t use rounded-full on standard buttons, cards, or inputs.",
-      "Don\u0027t leave main cards resting on heavy shadow-md/shadow-lg; flat hairline + whisper is the resting state.",
-      "Don\u0027t cramp tables or compress cell padding to fit more data.",
-      "Don\u0027t introduce new blue families for emphasis — borrow Violet or Indigo for module-level accent instead.",
-      "Don\u0027t reuse light mode surface colors (#FFFFFF, #F8FAFC) for dark mode backgrounds — the dark palette is a separate token set."
+      "Don't use neon, fluorescent, or cyan tones anywhere — the Calm Blue Rule is absolute.",
+      "Don't use rounded-full on standard buttons, cards, or inputs.",
+      "Don't leave main cards resting on heavy shadow-md/shadow-lg; flat hairline + whisper is the resting state.",
+      "Don't cramp tables or compress cell padding to fit more data.",
+      "Don't introduce new blue families for emphasis — borrow Violet or Indigo for module-level accent instead.",
+      "Don't reuse light mode surface colors (#FFFFFF, #F8FAFC) for dark mode backgrounds — the dark palette is a separate token set."
     ]
   }
 }

@@ -462,14 +462,14 @@ export function GameCategoryManager({
                         <div className="flex items-center justify-center gap-2">
                           <button
                             onClick={() => handleEditClick(cat)}
-                            className="rounded-[10px] p-1.5 text-blue-500 transition-colors hover:bg-blue-50 hover:text-blue-700"
+                            className="tap-large rounded-[10px] text-blue-500 transition-colors hover:bg-blue-50 hover:text-blue-700"
                             title="Edit"
                           >
                             <Edit2 className="h-3.5 w-3.5" />
                           </button>
                           <button
                             onClick={() => handleDelete(cat.id)}
-                            className="text-faint-foreground rounded-[10px] p-1.5 transition-colors hover:bg-rose-50 hover:text-rose-600"
+                            className="text-faint-foreground tap-large rounded-[10px] transition-colors hover:bg-rose-50 hover:text-rose-600"
                             title="Hapus"
                             disabled={isPending}
                           >

@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Search, Filter, Plus, ChevronDown, Download, X, Loader2 } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
 import { getInventory, addInventoryItem, getGames } from "@/app/actions/inventory";
 import { InventoryRowActions } from "@/components/inventory/InventoryRowActions";
+import { Pagination } from "@/components/ui/Pagination";
+import { useFocusTrap } from "@/lib/hooks/useFocusTrap";
 import type { Database } from "@/types/database.types";
 
 type InventoryItem = Database["public"]["Tables"]["inventory"]["Row"] & {
@@ -21,7 +23,58 @@ export default function InventoryPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [activeCategory, setActiveCategory] = useState("Semua");
+  const [activeStatus, setActiveStatus] = useState("Semua Status");
+  const [searchQuery, setSearchQuery] = useState("");
   const [isExporting, setIsExporting] = useState(false);
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+  const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const categoryButtonRef = useRef<HTMLButtonElement>(null);
+  const categoryMenuRef = useRef<HTMLDivElement>(null);
+  const statusButtonRef = useRef<HTMLButtonElement>(null);
+  const statusMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isCategoryDropdownOpen && !isStatusDropdownOpen) return;
+
+    const handlePointerDown = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node;
+      const categoryInside =
+        categoryButtonRef.current?.contains(target) ||
+        categoryMenuRef.current?.contains(target);
+      const statusInside =
+        statusButtonRef.current?.contains(target) || statusMenuRef.current?.contains(target);
+
+      if (isCategoryDropdownOpen && !categoryInside) {
+        setIsCategoryDropdownOpen(false);
+      }
+      if (isStatusDropdownOpen && !statusInside) {
+        setIsStatusDropdownOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      if (isCategoryDropdownOpen) {
+        setIsCategoryDropdownOpen(false);
+        categoryButtonRef.current?.focus();
+      }
+      if (isStatusDropdownOpen) {
+        setIsStatusDropdownOpen(false);
+        statusButtonRef.current?.focus();
+      }
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isCategoryDropdownOpen, isStatusDropdownOpen]);
 
   const closeAddStock = () => {
     if (isAddStockClosing) return;
@@ -36,6 +89,8 @@ export default function InventoryPage() {
     setError("");
     setIsAddStockOpen(true);
   };
+
+  const addStockRef = useFocusTrap<HTMLDivElement>(isAddStockOpen || isAddStockClosing, null, closeAddStock);
 
   const loadInventory = async () => {
     try {
@@ -69,6 +124,11 @@ export default function InventoryPage() {
     loadInventory();
     loadGames();
   }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCurrentPage(1);
+  }, [activeCategory, activeStatus, searchQuery, inventory.length]);
 
   const handleAddStock = async (formData: FormData) => {
     try {
@@ -126,10 +186,34 @@ export default function InventoryPage() {
     }
   };
 
-  const filteredInventory =
-    activeCategory === "Semua"
+  const filteredInventory = useMemo(() => {
+    return activeCategory === "Semua"
       ? inventory
       : inventory.filter((item) => item.games?.name === activeCategory);
+  }, [inventory, activeCategory]);
+
+  const displayedInventory = useMemo(() => {
+    const searchQueryLower = searchQuery.trim().toLowerCase();
+    return filteredInventory.filter((item) => {
+      if (activeStatus !== "Semua Status" && item.status !== activeStatus) return false;
+      if (!searchQueryLower) return true;
+      const haystack = [
+        item.public_id,
+        item.title_reference,
+        item.games?.name,
+        item.account_specs,
+      ]
+        .filter((v): v is string => Boolean(v))
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(searchQueryLower);
+    });
+  }, [filteredInventory, activeStatus, searchQuery]);
+
+  const totalPages = Math.max(1, Math.ceil(displayedInventory.length / itemsPerPage));
+  const safePage = Math.min(currentPage, totalPages);
+  const pageStart = (safePage - 1) * itemsPerPage;
+  const pageItems = displayedInventory.slice(pageStart, pageStart + itemsPerPage);
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 pb-8">
@@ -172,22 +256,86 @@ export default function InventoryPage() {
           </div>
           <input
             type="text"
-            className="border-border bg-muted text-foreground block w-full rounded-lg border py-2 pr-3 pl-10 placeholder-slate-400 transition-all outline-none focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="border-border bg-muted text-foreground block w-full rounded-lg border py-2 pr-3 pl-10 placeholder-placeholder transition-all outline-none focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             placeholder="Cari ID stok, kategori, atau nama akun..."
           />
         </div>
         <div className="flex w-full items-center gap-3 sm:w-auto">
-          <button className="border-border bg-card text-foreground hover:bg-muted inline-flex w-full min-w-[140px] items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm font-medium sm:w-auto">
-            <div className="flex items-center gap-2">
-              <Filter className="text-faint-foreground h-4 w-4" />
-              <span>{activeCategory}</span>
-            </div>
-            <ChevronDown className="text-faint-foreground h-4 w-4" />
-          </button>
-          <button className="border-border bg-card text-foreground hover:bg-muted inline-flex w-full min-w-[140px] items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm font-medium sm:w-auto">
-            <span>Semua Status</span>
-            <ChevronDown className="text-faint-foreground h-4 w-4" />
-          </button>
+          <div className="relative w-full sm:w-auto">
+            <button
+              ref={categoryButtonRef}
+              onClick={() => setIsCategoryDropdownOpen((o) => !o)}
+              aria-expanded={isCategoryDropdownOpen}
+              aria-haspopup="menu"
+              className="border-border bg-card text-foreground hover:bg-muted inline-flex w-full min-w-35 items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm font-medium sm:w-auto"
+            >
+              <div className="flex items-center gap-2">
+                <Filter className="text-faint-foreground h-4 w-4" />
+                <span>{activeCategory}</span>
+              </div>
+              <ChevronDown className="text-faint-foreground h-4 w-4" />
+            </button>
+            {isCategoryDropdownOpen && (
+              <div
+                ref={categoryMenuRef}
+                role="menu"
+                className="border-border bg-card absolute right-0 z-30 mt-1 w-48 rounded-lg border py-1 shadow-lg"
+              >
+                {["Semua", ...games.map((g) => g.name)].map((name) => (
+                  <button
+                    key={name}
+                    role="menuitem"
+                    onClick={() => {
+                      setActiveCategory(name);
+                      setIsCategoryDropdownOpen(false);
+                    }}
+                    className={`hover:bg-muted block w-full px-4 py-2 text-left text-sm ${
+                      activeCategory === name ? "text-blue-600 font-semibold" : "text-foreground"
+                    }`}
+                  >
+                    {name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="relative w-full sm:w-auto">
+            <button
+              ref={statusButtonRef}
+              onClick={() => setIsStatusDropdownOpen((o) => !o)}
+              aria-expanded={isStatusDropdownOpen}
+              aria-haspopup="menu"
+              className="border-border bg-card text-foreground hover:bg-muted inline-flex w-full min-w-35 items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm font-medium sm:w-auto"
+            >
+              <span>{activeStatus}</span>
+              <ChevronDown className="text-faint-foreground h-4 w-4" />
+            </button>
+            {isStatusDropdownOpen && (
+              <div
+                ref={statusMenuRef}
+                role="menu"
+                className="border-border bg-card absolute right-0 z-30 mt-1 w-48 rounded-lg border py-1 shadow-lg"
+              >
+                {["Semua Status", "UNPOSTED", "AVAILABLE", "SOLD"].map((status) => (
+                  <button
+                    key={status}
+                    role="menuitem"
+                    onClick={() => {
+                      setActiveStatus(status);
+                      setIsStatusDropdownOpen(false);
+                    }}
+                    className={`hover:bg-muted block w-full px-4 py-2 text-left text-sm ${
+                      activeStatus === status ? "text-blue-600 font-semibold" : "text-foreground"
+                    }`}
+                  >
+                    {status}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -287,23 +435,34 @@ export default function InventoryPage() {
                     Tidak ada stok untuk kategori ini.
                   </td>
                 </tr>
+              ) : displayedInventory.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="text-muted-foreground px-6 py-8 text-center text-sm">
+                    Tidak ada stok yang cocok dengan pencarian atau filter.
+                  </td>
+                </tr>
               ) : (
-                filteredInventory.map((item) => {
+                pageItems.map((item) => {
                   let badgeClass = "bg-muted text-muted-foreground border-border";
                   const statusStr = item.status || "UNPOSTED";
 
                   if (statusStr === "AVAILABLE") {
-                    badgeClass = "bg-blue-50 text-blue-600 border-blue-100";
-                  } else if (statusStr === "SOLD") {
                     badgeClass = "bg-emerald-50 text-emerald-600 border-emerald-100";
+                  } else if (statusStr === "SOLD") {
+                    badgeClass = "bg-blue-50 text-blue-600 border-blue-100";
                   } else if (statusStr === "UNPOSTED") {
-                    badgeClass = "bg-orange-50 text-orange-600 border-orange-100";
+                    badgeClass = "bg-muted text-muted-foreground border-border";
                   }
 
                   return (
                     <tr key={item.id} className="group hover:bg-muted/50 transition-colors">
                       <td className="text-foreground px-6 py-4 text-sm font-semibold whitespace-nowrap">
-                        {item.public_id || item.title_reference || "-"}
+                        <span
+                          className="block max-w-36 truncate"
+                          title={item.public_id || item.title_reference || "-"}
+                        >
+                          {item.public_id || item.title_reference || "-"}
+                        </span>
                       </td>
                       <td className="text-muted-foreground px-6 py-4 text-sm font-medium whitespace-nowrap">
                         <span className="bg-muted text-muted-foreground rounded-md px-2.5 py-1 text-[11px] font-semibold">
@@ -311,19 +470,17 @@ export default function InventoryPage() {
                         </span>
                       </td>
                       <td className="text-foreground px-6 py-4 text-sm">
-                        <span className="block max-w-[250px] truncate font-medium">
+                        <span className="block max-w-62.5 truncate font-medium" title={item.title_reference || "-"}>
                           {item.title_reference || "-"}
                         </span>
                       </td>
-                      <td className="text-muted-foreground px-6 py-4 text-right text-sm font-medium whitespace-nowrap">
+                      <td className="text-muted-foreground px-6 py-4 font-mono text-right text-sm font-medium tabular-nums whitespace-nowrap">
                         {formatRupiah(Number(item.capital_price))}
                       </td>
                       <td className="px-6 py-4 text-right text-sm whitespace-nowrap">
-                        <div className="flex flex-col items-end">
-                          <span className="text-foreground font-bold">
-                            {formatRupiah(Number(item.asking_price))}
-                          </span>
-                        </div>
+                        <span className="text-foreground font-mono text-sm font-bold tabular-nums">
+                          {formatRupiah(Number(item.asking_price))}
+                        </span>
                       </td>
                       <td className="px-6 py-4 text-center whitespace-nowrap">
                         <span
@@ -343,30 +500,28 @@ export default function InventoryPage() {
           </table>
         </div>
 
-        {/* Pagination Mockup */}
-        <div className="border-border-soft bg-card flex items-center justify-between border-t px-6 py-4">
-          <div className="text-muted-foreground text-sm">
-            Menampilkan{" "}
-            <span className="text-foreground font-semibold">
-              {filteredInventory.length > 0 ? 1 : 0}
-            </span>{" "}
-            - <span className="text-foreground font-semibold">{filteredInventory.length}</span> dari{" "}
-            <span className="text-foreground font-semibold">{filteredInventory.length}</span> stok
-          </div>
-          <div className="flex gap-1">
-            <button className="border-border text-faint-foreground cursor-not-allowed rounded-md border px-3 py-1 text-sm">
-              Sebelumnya
-            </button>
-            <button className="border-border text-foreground hover:bg-muted rounded-md border px-3 py-1 text-sm font-medium">
-              Selanjutnya
-            </button>
-          </div>
-        </div>
+        {/* Pagination */}
+        <Pagination
+          currentPage={safePage}
+          totalItems={displayedInventory.length}
+          itemsPerPage={itemsPerPage}
+          onPageChange={(page) => setCurrentPage(page)}
+          onPageSizeChange={(size) => {
+            setItemsPerPage(size);
+            setCurrentPage(1);
+          }}
+          itemLabel="stok"
+        />
       </div>
 
       {/* Tambah Stok Modal (Slide-over Drawer) */}
       {(isAddStockOpen || isAddStockClosing) && (
         <div
+          ref={addStockRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="add-stock-drawer-title"
+          tabIndex={-1}
           onClick={closeAddStock}
           className={`fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm ${
             isAddStockClosing ? "fs-overlay-out" : "fs-overlay-in"
@@ -380,14 +535,17 @@ export default function InventoryPage() {
           >
             <div className="border-border-soft bg-muted flex items-center justify-between border-b px-6 py-5">
               <div>
-                <h2 className="text-foreground text-lg font-bold">Tambah Stok Baru</h2>
+                <h2 id="add-stock-drawer-title" className="text-foreground text-lg font-bold">
+                  Tambah Stok Baru
+                </h2>
                 <p className="text-muted-foreground mt-1 text-xs">
                   Isi form data stok akun game baru.
                 </p>
               </div>
               <button
                 onClick={closeAddStock}
-                className="bg-card text-faint-foreground hover:text-muted-foreground rounded-full p-2 shadow-sm transition-colors"
+                aria-label="Tutup form Tambah Stok Baru"
+                className="bg-card text-faint-foreground hover:text-muted-foreground tap-large rounded-full shadow-sm transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>

@@ -436,7 +436,7 @@ export function GameManager({
                       <td className="px-5 py-3.5 text-center">
                         <button
                           onClick={() => handleEditClick(game)}
-                          className="rounded-[10px] p-1.5 text-violet-500 transition-colors hover:bg-violet-50 hover:text-violet-700"
+                          className="tap-large rounded-[10px] text-violet-500 transition-colors hover:bg-violet-50 hover:text-violet-700"
                           title="Edit"
                         >
                           <Edit2 className="h-3.5 w-3.5" />

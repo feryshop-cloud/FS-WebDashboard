@@ -204,7 +204,7 @@ export function StockPurchaseForm({ accounts }: { accounts: Account[] }) {
                     required
                     name="current_price"
                     type="number"
-                    className="border-input w-full rounded-[10px] border py-2.5 pr-4 pl-12 font-mono text-sm font-bold text-blue-600 transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                    className="border-input w-full rounded-[10px] border py-2.5 pr-4 pl-12 font-mono text-sm font-bold text-purple-600 transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
                     placeholder="0"
                   />
                 </div>

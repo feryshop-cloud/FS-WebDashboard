@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { X, Loader2 } from "lucide-react";
 import { updateInventoryItem } from "@/app/actions/inventory";
+import { useFocusTrap } from "@/lib/hooks/useFocusTrap";
 
 type InventoryItem = {
   id: string;
@@ -35,8 +36,6 @@ export function EditInventoryModal({
   const [error, setError] = useState("");
   const [isClosing, setIsClosing] = useState(false);
 
-  if (!isOpen) return null;
-
   const handleClose = () => {
     if (isClosing || isSubmitting) return;
     setIsClosing(true);
@@ -45,6 +44,10 @@ export function EditInventoryModal({
       onClose();
     }, 200);
   };
+
+  const modalRef = useFocusTrap<HTMLDivElement>(isOpen, null, handleClose);
+
+  if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -74,6 +77,11 @@ export function EditInventoryModal({
 
   return (
     <div
+      ref={modalRef}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="edit-stock-drawer-title"
+      tabIndex={-1}
       className={`fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm ${
         isClosing ? "fs-overlay-out" : "fs-overlay-in"
       }`}
@@ -87,7 +95,9 @@ export function EditInventoryModal({
       >
         <div className="border-border-soft bg-muted flex items-center justify-between border-b px-6 py-5">
           <div>
-            <h2 className="text-foreground text-lg font-bold">Edit Data Stok</h2>
+            <h2 id="edit-stock-drawer-title" className="text-foreground text-lg font-bold">
+              Edit Data Stok
+            </h2>
             <p className="text-muted-foreground mt-1 text-xs">
               Ubah rincian informasi stok akun game.
             </p>
@@ -95,7 +105,8 @@ export function EditInventoryModal({
           <button
             onClick={handleClose}
             disabled={isSubmitting}
-            className="bg-card text-faint-foreground hover:text-muted-foreground rounded-full p-2 shadow-sm transition-colors disabled:opacity-50"
+            aria-label="Tutup form Edit Data Stok"
+            className="bg-card text-faint-foreground hover:text-muted-foreground tap-large rounded-full shadow-sm transition-colors disabled:opacity-50"
           >
             <X className="h-5 w-5" />
           </button>

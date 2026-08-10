@@ -146,7 +146,7 @@ export default function LoginPage() {
                   type="email"
                   autoComplete="email"
                   required
-                  className="border-border bg-card text-foreground block w-full rounded-xl border py-3 pr-4 pl-11 text-sm placeholder-slate-400 transition-colors focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                  className="border-border bg-card text-foreground block w-full rounded-xl border py-3 pr-4 pl-11 text-sm placeholder-placeholder transition-colors focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                   placeholder="admin@ferryshop.com"
                 />
               </div>
@@ -170,7 +170,7 @@ export default function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   required
-                  className="border-border bg-card text-foreground block w-full rounded-xl border py-3 pr-11 pl-11 text-sm placeholder-slate-400 transition-colors focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                  className="border-border bg-card text-foreground block w-full rounded-xl border py-3 pr-11 pl-11 text-sm placeholder-placeholder transition-colors focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                   placeholder="••••••••"
                 />
                 <button

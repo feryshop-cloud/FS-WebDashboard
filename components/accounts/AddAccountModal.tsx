@@ -64,7 +64,7 @@ export function AddAccountModal({ isOpen, onClose }: AddAccountModalProps) {
           <button
             onClick={onClose}
             disabled={isPending}
-            className="hover:bg-card/10 rounded-[10px] p-1.5 text-white/80 transition-colors hover:text-white disabled:opacity-50"
+            className="hover:bg-card/10 tap-large rounded-[10px] text-white/80 transition-colors hover:text-white disabled:opacity-50"
           >
             <X className="h-5 w-5" />
           </button>

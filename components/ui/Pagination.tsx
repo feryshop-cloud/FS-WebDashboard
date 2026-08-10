@@ -44,7 +44,7 @@ export const Pagination: React.FC<PaginationProps> = ({
             <select
               value={itemsPerPage}
               onChange={(e) => onPageSizeChange(Number(e.target.value))}
-              className="border-border bg-card text-foreground rounded-md border px-2 py-1.5 text-xs focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+              className="border-border bg-card text-foreground tap-large rounded-md border text-xs focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
             >
               {options.map((size) => (
                 <option key={size} value={size}>
@@ -60,7 +60,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           type="button"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage <= 1}
-          className="border-border bg-card text-foreground hover:bg-muted hover:text-foreground inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 text-sm font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+          className="border-border bg-card text-foreground hover:bg-muted hover:text-foreground tap-large inline-flex items-center gap-1 rounded-lg border text-sm font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
         >
           <ChevronLeft className="h-4 w-4" />
           <span>Sebelumnya</span>
@@ -74,7 +74,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           type="button"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage >= totalPages}
-          className="border-border bg-card text-foreground hover:bg-muted hover:text-foreground inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 text-sm font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+          className="border-border bg-card text-foreground hover:bg-muted hover:text-foreground tap-large inline-flex items-center gap-1 rounded-lg border text-sm font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
         >
           <span>Selanjutnya</span>
           <ChevronRight className="h-4 w-4" />

@@ -21,6 +21,7 @@ import { getErrorMessage } from "@/lib/error";
 import { getLedgers, addManualLedger, updateLedger, deleteLedger } from "@/app/actions/ledger";
 import { getAccounts } from "@/app/actions/accounts";
 import { Pagination } from "@/components/ui/Pagination";
+import { useFocusTrap } from "@/lib/hooks/useFocusTrap";
 import { LedgerWithRelations } from "@/types/database";
 import type { Database } from "@/types/database.types";
 
@@ -116,6 +117,9 @@ export default function LedgerPage() {
       setEditingLedger(null);
     }, 200);
   };
+
+  const addManualRef = useFocusTrap<HTMLDivElement>(isAddManualOpen || isAddManualClosing, null, closeAddManual);
+  const editRef = useFocusTrap<HTMLDivElement>(!!editingLedger, null, closeEdit);
 
   const handleAddManual = async (formData: FormData) => {
     try {
@@ -253,7 +257,7 @@ export default function LedgerPage() {
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="border-border bg-muted/70 text-foreground focus:bg-card block w-full rounded-xl border py-2 pr-3 pl-10 placeholder-slate-400 transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 sm:text-sm"
+            className="border-border bg-muted/70 text-foreground focus:bg-card block w-full rounded-xl border py-2 pr-3 pl-10 placeholder-placeholder transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 sm:text-sm"
             placeholder="Cari referensi, catatan, atau ID..."
           />
         </div>
@@ -366,10 +370,13 @@ export default function LedgerPage() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex max-w-[280px] flex-col">
-                          <span className="text-foreground truncate font-semibold">
+                          <span className="text-foreground truncate font-semibold" title={tx.ref_id ? `Ref: ${tx.ref_id}` : "-"}>
                             {tx.ref_id ? `Ref: ${tx.ref_id}` : "-"}
                           </span>
-                          <span className="text-muted-foreground mt-0.5 truncate text-xs">
+                          <span
+                            className="text-muted-foreground mt-0.5 truncate text-xs"
+                            title={tx.notes || "-"}
+                          >
                             {tx.notes || "-"}
                           </span>
                         </div>
@@ -393,6 +400,7 @@ export default function LedgerPage() {
                             onClick={() => handleDelete(tx)}
                             disabled={isDeletingId === tx.id}
                             className="rounded-[10px] p-1.5 text-rose-600 transition-colors hover:bg-rose-50 hover:text-rose-700 disabled:opacity-50"
+                            aria-label="Hapus Entri Kas"
                             title="Hapus Entri Kas"
                           >
                             {isDeletingId === tx.id ? (
@@ -425,6 +433,11 @@ export default function LedgerPage() {
       {/* Add Manual Ledger Modal */}
       {(isAddManualOpen || isAddManualClosing) && (
         <div
+          ref={addManualRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="add-ledger-title"
+          tabIndex={-1}
           className={`fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm ${
             isAddManualClosing ? "fs-overlay-out" : "fs-overlay-in"
           }`}
@@ -438,14 +451,17 @@ export default function LedgerPage() {
           >
             <div className="border-border-soft bg-muted/50 flex items-center justify-between border-b px-6 py-5">
               <div>
-                <h2 className="text-foreground text-base font-bold">Catat Kas Manual</h2>
+                <h2 id="add-ledger-title" className="text-foreground text-base font-bold">
+                  Catat Kas Manual
+                </h2>
                 <p className="text-muted-foreground mt-0.5 text-xs">
                   Tambah entri uang masuk, keluar, atau pengeluaran operasional.
                 </p>
               </div>
               <button
                 onClick={closeAddManual}
-                className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-lg p-1.5"
+                aria-label="Tutup form Catat Kas Manual"
+                className="text-faint-foreground hover:bg-muted hover:text-muted-foreground tap-large rounded-lg"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -547,6 +563,11 @@ export default function LedgerPage() {
       {/* Edit Ledger Modal */}
       {editingLedger && (
         <div
+          ref={editRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="edit-ledger-title"
+          tabIndex={-1}
           className={`fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm ${
             isEditClosing ? "fs-overlay-out" : "fs-overlay-in"
           }`}
@@ -560,14 +581,17 @@ export default function LedgerPage() {
           >
             <div className="border-border-soft bg-muted/50 flex items-center justify-between border-b px-6 py-5">
               <div>
-                <h2 className="text-foreground text-base font-bold">Edit Catatan Transaksi</h2>
+                <h2 id="edit-ledger-title" className="text-foreground text-base font-bold">
+                  Edit Catatan Transaksi
+                </h2>
                 <p className="text-muted-foreground mt-0.5 text-xs">
                   Ubah deskripsi atau catatan entri kas ini.
                 </p>
               </div>
               <button
                 onClick={closeEdit}
-                className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-lg p-1.5"
+                aria-label="Tutup form Edit Catatan Transaksi"
+                className="text-faint-foreground hover:bg-muted hover:text-muted-foreground tap-large rounded-lg"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -583,7 +607,10 @@ export default function LedgerPage() {
                   <label className="text-muted-foreground mb-1 block text-xs font-medium">
                     ID Transaksi
                   </label>
-                  <p className="border-border bg-muted text-foreground truncate rounded-lg border p-2 font-mono text-xs font-semibold">
+                  <p
+                    className="border-border bg-muted text-foreground truncate rounded-lg border p-2 font-mono text-xs font-semibold"
+                    title={editingLedger.id}
+                  >
                     {editingLedger.id}
                   </p>
                 </div>

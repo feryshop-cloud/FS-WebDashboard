@@ -74,7 +74,15 @@ export async function getPurchases(): Promise<{
       .from("stocks")
       .select(
         `
-        *,
+        id,
+        sku,
+        name,
+        category,
+        seller_info,
+        capital_price,
+        purchase_payment_status,
+        purchase_date,
+        created_at,
         accounts (name)
       `,
       )

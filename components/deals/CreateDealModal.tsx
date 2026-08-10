@@ -95,7 +95,7 @@ export function CreateDealModal({ isOpen, onClose }: CreateDealModalProps) {
           <button
             onClick={onClose}
             disabled={isPending}
-            className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-[10px] p-1.5 transition-colors disabled:opacity-50"
+            className="text-faint-foreground hover:bg-muted hover:text-muted-foreground tap-large rounded-[10px] transition-colors disabled:opacity-50"
           >
             <X className="h-5 w-5" />
           </button>

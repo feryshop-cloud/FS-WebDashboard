@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { Search, Filter, Plus, ChevronDown, X, Loader2, Download, Trash2 } from "lucide-react";
 import { formatRupiah, formatDate } from "@/lib/utils";
 import { getErrorMessage } from "@/lib/error";
 import { getPurchases, purchaseStock, getGames, deletePurchase } from "@/actions/purchases";
 import { getAccounts } from "@/app/actions/accounts";
+import { useFocusTrap } from "@/lib/hooks/useFocusTrap";
 
 import { PurchaseWithRelations } from "@/types/database";
 
@@ -25,6 +26,9 @@ export default function PurchasesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL"); // ALL, LUNAS, PENDING
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
+  const [pageNumber, setPageNumber] = useState(1);
+  const filterButtonRef = useRef<HTMLButtonElement>(null);
+  const filterMenuRef = useRef<HTMLDivElement>(null);
 
   // Form State
   const [selectedStatus, setSelectedStatus] = useState<"LUNAS" | "PENDING">("LUNAS");
@@ -37,6 +41,8 @@ export default function PurchasesPage() {
       setIsAddOpen(false);
     }, 200);
   };
+
+  const addDrawerRef = useFocusTrap<HTMLDivElement>(isAddOpen || isAddClosing, null, closeAdd);
 
   const openAdd = () => {
     setError("");
@@ -128,17 +134,92 @@ export default function PurchasesPage() {
   };
 
   // Filter & Search Logic
-  const filteredPurchases = purchases.filter((purchase) => {
-    const matchesSearch =
-      purchase.sku?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      purchase.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      purchase.seller_info?.toLowerCase().includes(searchQuery.toLowerCase());
+  const query = searchQuery.trim().toLowerCase();
+  const filteredPurchases = useMemo(() => {
+    return purchases.filter((purchase) => {
+      const matchesSearch =
+        query === "" ||
+        purchase.sku?.toLowerCase().includes(query) ||
+        purchase.name?.toLowerCase().includes(query) ||
+        purchase.seller_info?.toLowerCase().includes(query);
 
-    const matchesStatus =
-      statusFilter === "ALL" || purchase.purchase_payment_status === statusFilter;
+      const matchesStatus =
+        statusFilter === "ALL" || purchase.purchase_payment_status === statusFilter;
 
-    return matchesSearch && matchesStatus;
-  });
+      return matchesSearch && matchesStatus;
+    });
+  }, [purchases, query, statusFilter]);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPageNumber(1);
+  }, [query, statusFilter]);
+
+  // Pagination
+  const PAGE_SIZE = 10;
+  const totalPages = Math.max(1, Math.ceil(filteredPurchases.length / PAGE_SIZE));
+  const safePage = Math.min(pageNumber, totalPages);
+  const pageStart = (safePage - 1) * PAGE_SIZE;
+  const pageItems = filteredPurchases.slice(pageStart, pageStart + PAGE_SIZE);
+
+  // Dropdown dismiss: outside click or Escape
+  useEffect(() => {
+    if (!isFilterDropdownOpen) return;
+    const handlePointerDown = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node;
+      if (
+        filterButtonRef.current &&
+        filterMenuRef.current &&
+        !filterButtonRef.current.contains(target) &&
+        !filterMenuRef.current.contains(target)
+      ) {
+        setIsFilterDropdownOpen(false);
+      }
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsFilterDropdownOpen(false);
+        filterButtonRef.current?.focus();
+      }
+    };
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isFilterDropdownOpen]);
+
+  const handleExportData = () => {
+    const rows = filteredPurchases.map((p) => {
+      const isLunas = p.purchase_payment_status === "LUNAS";
+      return [
+        p.sku || "",
+        p.name || "",
+        p.category || "",
+        p.seller_info || "",
+        formatRupiah(p.capital_price ?? 0),
+        p.accounts?.name || "",
+        isLunas ? "Lunas" : "Pending",
+      ];
+    });
+    const header = ["SKU", "Nama Item", "Kategori", "Supplier", "Harga Modal", "Metode Pembayaran", "Status"];
+    const csv = [header, ...rows]
+      .map((row) => row.map((cell) => `"${String(cell).replaceAll('"', '""')}"`).join(","))
+      .join("\n");
+    const blob = new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `pembelian-stok-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   const handleDeletePurchase = async (id: string, name?: string | null) => {
     if (!window.confirm(`Apakah Anda yakin ingin menghapus data pembelian stok "${name || ""}"?`)) {
@@ -167,13 +248,16 @@ export default function PurchasesPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="border-border bg-card text-foreground hover:bg-muted hover:text-foreground inline-flex items-center justify-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium shadow-sm transition-colors">
+          <button
+            onClick={handleExportData}
+            className="border-border bg-card text-foreground hover:bg-muted hover:text-foreground inline-flex items-center justify-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium shadow-sm transition-colors"
+          >
             <Download className="h-4 w-4" />
             Export Data
           </button>
           <button
             onClick={openAdd}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700 active:scale-[0.97]"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-transparent bg-purple-600 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-purple-200 transition-all hover:bg-purple-700 active:scale-[0.97]"
           >
             <Plus className="h-4 w-4" />
             Catat Pembelian Baru
@@ -191,13 +275,18 @@ export default function PurchasesPage() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="border-border bg-muted text-foreground block w-full rounded-lg border py-2 pr-3 pl-10 placeholder-slate-400 transition-all outline-none focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            aria-label="Cari ID pembelian, item, atau supplier"
+            className="border-border bg-muted text-foreground block w-full rounded-lg border py-2 pr-3 pl-10 placeholder-placeholder transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 sm:text-sm"
             placeholder="Cari ID pembelian, item, atau supplier..."
           />
         </div>
         <div className="relative flex w-full items-center gap-3 sm:w-auto">
           <button
+            ref={filterButtonRef}
             onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
+            aria-haspopup="listbox"
+            aria-expanded={isFilterDropdownOpen}
+            aria-controls="status-filter-listbox"
             className="border-border bg-card text-foreground hover:bg-muted inline-flex w-full min-w-[160px] items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm font-medium sm:w-auto"
           >
             <span className="flex items-center gap-2">
@@ -214,31 +303,43 @@ export default function PurchasesPage() {
           </button>
 
           {isFilterDropdownOpen && (
-            <div className="fs-drop-in border-border-soft bg-card absolute top-full right-0 z-10 mt-2 w-48 rounded-xl border py-1 shadow-lg">
+            <div
+              id="status-filter-listbox"
+              ref={filterMenuRef}
+              role="listbox"
+              aria-label="Filter status pembayaran"
+              className="fs-drop-in border-border-soft bg-card absolute top-full right-0 z-10 mt-2 w-48 rounded-xl border py-1 shadow-lg"
+            >
               <button
+                role="option"
+                aria-selected={statusFilter === "ALL"}
                 onClick={() => {
                   setStatusFilter("ALL");
                   setIsFilterDropdownOpen(false);
                 }}
-                className="text-foreground hover:bg-muted w-full px-4 py-2 text-left text-sm font-medium"
+                className={`w-full px-4 py-2 text-left text-sm font-medium ${statusFilter === "ALL" ? "bg-muted text-foreground" : "text-foreground hover:bg-muted"}`}
               >
                 Semua Status
               </button>
               <button
+                role="option"
+                aria-selected={statusFilter === "LUNAS"}
                 onClick={() => {
                   setStatusFilter("LUNAS");
                   setIsFilterDropdownOpen(false);
                 }}
-                className="text-foreground hover:bg-muted w-full px-4 py-2 text-left text-sm font-medium"
+                className={`w-full px-4 py-2 text-left text-sm font-medium ${statusFilter === "LUNAS" ? "bg-muted text-foreground" : "text-foreground hover:bg-muted"}`}
               >
                 Lunas
               </button>
               <button
+                role="option"
+                aria-selected={statusFilter === "PENDING"}
                 onClick={() => {
                   setStatusFilter("PENDING");
                   setIsFilterDropdownOpen(false);
                 }}
-                className="text-foreground hover:bg-muted w-full px-4 py-2 text-left text-sm font-medium"
+                className={`w-full px-4 py-2 text-left text-sm font-medium ${statusFilter === "PENDING" ? "bg-muted text-foreground" : "text-foreground hover:bg-muted"}`}
               >
                 Pending
               </button>
@@ -301,21 +402,41 @@ export default function PurchasesPage() {
               {isLoading ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-12 text-center">
-                    <Loader2 className="mx-auto h-8 w-8 animate-spin text-blue-600" />
+                    <Loader2 className="mx-auto h-8 w-8 animate-spin text-purple-600" />
                   </td>
                 </tr>
-              ) : filteredPurchases.length === 0 ? (
+              ) : !isLoading && purchases.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="text-muted-foreground px-6 py-8 text-center text-sm">
                     Belum ada data pembelian stok.
                   </td>
                 </tr>
+              ) : filteredPurchases.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-8 text-center">
+                    <div className="flex flex-col items-center gap-3">
+                      <p className="text-muted-foreground text-sm">
+                        Tidak ada hasil yang cocok dengan filter.
+                      </p>
+                      <button
+                        onClick={() => {
+                          setSearchQuery("");
+                          setStatusFilter("ALL");
+                        }}
+                        className="text-foreground hover:bg-muted inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                        Reset filter
+                      </button>
+                    </div>
+                  </td>
+                </tr>
               ) : (
-                filteredPurchases.map((purchase) => {
+                pageItems.map((purchase) => {
                   const isLunas = purchase.purchase_payment_status === "LUNAS";
                   const statusBadgeClass = isLunas
-                    ? "bg-emerald-50 text-emerald-600 border-emerald-100"
-                    : "bg-orange-50 text-orange-600 border-orange-100";
+                    ? "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200/50"
+                    : "bg-amber-50 text-amber-600 ring-1 ring-amber-200/50";
 
                   return (
                     <tr key={purchase.id} className="group hover:bg-muted/50 transition-colors">
@@ -331,7 +452,10 @@ export default function PurchasesPage() {
                       </td>
                       <td className="text-foreground px-6 py-4 text-sm">
                         <div className="flex flex-col">
-                          <span className="text-foreground block max-w-[240px] truncate font-semibold">
+                          <span
+                            className="text-foreground block max-w-[240px] truncate font-semibold"
+                            title={purchase.name ?? undefined}
+                          >
                             {purchase.name}
                           </span>
                           <span className="text-faint-foreground mt-0.5 text-[10px]">
@@ -350,7 +474,7 @@ export default function PurchasesPage() {
                       </td>
                       <td className="px-6 py-4 text-center whitespace-nowrap">
                         <span
-                          className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${statusBadgeClass}`}
+                          className={`inline-flex items-center rounded-[10px] px-2.5 py-1 text-xs font-medium ring-1 ${statusBadgeClass}`}
                         >
                           {isLunas ? "Lunas" : "Pending"}
                         </span>
@@ -358,8 +482,9 @@ export default function PurchasesPage() {
                       <td className="px-6 py-4 text-center text-sm font-medium whitespace-nowrap">
                         <button
                           onClick={() => handleDeletePurchase(purchase.id, purchase.name)}
+                          aria-label={`Hapus pembelian ${purchase.name || purchase.sku || ""}`}
                           title="Hapus Pembelian"
-                          className="rounded-md p-1.5 text-rose-600 transition-colors hover:bg-rose-50 hover:text-rose-700"
+                          className="tap-large rounded-md text-rose-600 transition-colors hover:bg-rose-50 hover:text-rose-700"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -377,26 +502,45 @@ export default function PurchasesPage() {
           <div className="text-muted-foreground text-sm">
             Menampilkan{" "}
             <span className="text-foreground font-semibold">
-              {filteredPurchases.length > 0 ? 1 : 0}
+              {filteredPurchases.length === 0 ? 0 : pageStart + 1}
             </span>{" "}
-            - <span className="text-foreground font-semibold">{filteredPurchases.length}</span> dari{" "}
+            - <span className="text-foreground font-semibold">{pageStart + pageItems.length}</span>{" "}
+            dari{" "}
             <span className="text-foreground font-semibold">{filteredPurchases.length}</span>{" "}
             pembelian
           </div>
-          <div className="flex gap-1">
-            <button className="border-border text-faint-foreground cursor-not-allowed rounded-md border px-3 py-1 text-sm">
-              Sebelummnya
-            </button>
-            <button className="border-border text-foreground hover:bg-muted rounded-md border px-3 py-1 text-sm font-medium">
-              Selanjutnya
-            </button>
-          </div>
+          {filteredPurchases.length > 0 && (
+            <nav aria-label="Navigasi halaman" className="flex gap-1">
+              <button
+                onClick={() => setPageNumber((p) => Math.max(1, p - 1))}
+                disabled={safePage <= 1}
+                className="border-border text-foreground hover:bg-muted rounded-md border px-3 py-1 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Sebelumnya
+              </button>
+              <span className="text-faint-foreground flex items-center px-2 text-sm font-medium">
+                {safePage} / {totalPages}
+              </span>
+              <button
+                onClick={() => setPageNumber((p) => Math.min(totalPages, p + 1))}
+                disabled={safePage >= totalPages}
+                className="border-border text-foreground hover:bg-muted rounded-md border px-3 py-1 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Selanjutnya
+              </button>
+            </nav>
+          )}
         </div>
       </div>
 
       {/* Buat Pembelian Baru Modal (Slide-over Drawer) */}
       {(isAddOpen || isAddClosing) && (
         <div
+          ref={addDrawerRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="add-purchase-title"
+          tabIndex={-1}
           onClick={closeAdd}
           className={`fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm ${
             isAddClosing ? "fs-overlay-out" : "fs-overlay-in"
@@ -410,14 +554,17 @@ export default function PurchasesPage() {
           >
             <div className="border-border-soft bg-muted flex items-center justify-between border-b px-6 py-5">
               <div>
-                <h2 className="text-foreground text-lg font-bold">Catat Pembelian Baru</h2>
+                <h2 id="add-purchase-title" className="text-foreground text-lg font-bold">
+                  Catat Pembelian Baru
+                </h2>
                 <p className="text-muted-foreground mt-1 text-xs">
                   Isi form transaksi pembelian akun dari penjual.
                 </p>
               </div>
               <button
                 onClick={closeAdd}
-                className="bg-card text-faint-foreground hover:text-muted-foreground rounded-full p-2 shadow-sm transition-colors"
+                aria-label="Tutup form Catat Pembelian Baru"
+                className="bg-card text-faint-foreground hover:text-muted-foreground tap-large rounded-full shadow-sm transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -441,7 +588,7 @@ export default function PurchasesPage() {
                   <select
                     name="category"
                     required
-                    className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
                   >
                     <option value="">-- Pilih Game --</option>
                     {games.map((game) => (
@@ -460,7 +607,7 @@ export default function PurchasesPage() {
                     name="name"
                     required
                     type="text"
-                    className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
                     placeholder="Mis. MLBB Mythic Glory 120 Skins"
                   />
                 </div>
@@ -473,7 +620,7 @@ export default function PurchasesPage() {
                     <input
                       name="username"
                       type="text"
-                      className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
                       placeholder="Username/email"
                     />
                   </div>
@@ -484,7 +631,7 @@ export default function PurchasesPage() {
                     <input
                       name="password"
                       type="text"
-                      className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
                       placeholder="Password"
                     />
                   </div>
@@ -497,7 +644,7 @@ export default function PurchasesPage() {
                   <textarea
                     name="account_details"
                     rows={2}
-                    className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
                     placeholder="Masukkan spesifikasi akun (heros, skins, winrate, dll)..."
                   />
                 </div>
@@ -512,7 +659,7 @@ export default function PurchasesPage() {
                       required
                       type="number"
                       min="1"
-                      className="border-border w-full rounded-lg border px-3 py-2 text-sm font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      className="border-border w-full rounded-lg border px-3 py-2 text-sm font-semibold focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
                       placeholder="Rp 0"
                     />
                   </div>
@@ -525,7 +672,7 @@ export default function PurchasesPage() {
                       required
                       type="number"
                       min="1"
-                      className="border-border w-full rounded-lg border px-3 py-2 text-sm font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      className="border-border w-full rounded-lg border px-3 py-2 text-sm font-semibold focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
                       placeholder="Rp 0"
                     />
                   </div>
@@ -539,7 +686,7 @@ export default function PurchasesPage() {
                     <input
                       name="seller_info"
                       type="text"
-                      className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
                       placeholder="Nama seller/supplier"
                     />
                   </div>
@@ -552,7 +699,7 @@ export default function PurchasesPage() {
                       required
                       value={selectedStatus}
                       onChange={(e) => setSelectedStatus(e.target.value as "LUNAS" | "PENDING")}
-                      className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
                     >
                       <option value="LUNAS">Lunas</option>
                       <option value="PENDING">Pending</option>
@@ -561,14 +708,14 @@ export default function PurchasesPage() {
                 </div>
 
                 {selectedStatus === "LUNAS" && (
-                  <div className="fs-drop-in rounded-xl border border-blue-100 bg-blue-50/50 p-4">
+                  <div className="fs-drop-in rounded-xl border border-purple-100 bg-purple-50/50 p-4">
                     <label className="text-foreground mb-1 block text-xs font-semibold">
                       Sumber Rekening / Metode Pembayaran
                     </label>
                     <select
                       name="payment_account_id"
                       required
-                      className="border-border bg-card w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      className="border-border bg-card w-full rounded-lg border px-3 py-2 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
                     >
                       <option value="">-- Pilih Rekening Pembayaran --</option>
                       {accounts
@@ -589,7 +736,7 @@ export default function PurchasesPage() {
                   <textarea
                     name="internal_notes"
                     rows={2}
-                    className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
                     placeholder="Catatan tambahan untuk internal..."
                   />
                 </div>
@@ -599,7 +746,7 @@ export default function PurchasesPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-blue-700 disabled:opacity-50"
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm shadow-purple-200 transition-colors hover:bg-purple-700 disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <>

@@ -188,6 +188,7 @@ The dark mode palette inverts the light neutral ramp while preserving the same a
 - **Title** (600, 16–18px): Card and section headers inside panels.
 - **Body** (400, 14px / `text-sm`, 1.5 line-height): Default interface text; tables use 13px (`text-[13px]`) to fit more rows without losing legibility.
 - **Label** (500, 12px / `text-xs`, 0.05em tracking, uppercase): Sidebar group titles, card stat labels, table column headers. Small, wide-tracked, and quiet.
+- **Micro** (500–700, 10–11px / `text-[10px]`/`text-[11px]`): Dense-table metadata and status chips. 10px for secondary metadata under a row's primary label; 11px for status/type chips inside crowded tables. Never for primary content, controls, or prose — reserved for the compact-caption legibility of high-density ledger views.
 - **Mono** (400–700, 14px): Numeric and sensitive values; align columns and make codes scannable.
 
 ### Named Rules

@@ -85,9 +85,9 @@ export function AddPaymentModal({
             </div>
           )}
 
-          <div className="flex items-center justify-between rounded-lg border border-blue-100 bg-blue-50/50 p-4">
+          <div className="flex items-center justify-between rounded-lg border border-purple-100 bg-purple-50/50 p-4">
             <span className="text-muted-foreground text-sm font-medium">Remaining Balance:</span>
-            <span className="font-mono text-lg font-bold text-blue-700">
+            <span className="font-mono text-lg font-bold text-purple-700">
               {formatRupiah(remainingBalance)}
             </span>
           </div>
@@ -103,7 +103,7 @@ export function AddPaymentModal({
                 type="number"
                 min="1"
                 max={remainingBalance}
-                className="border-input placeholder:text-faint-foreground w-full rounded-lg border px-4 py-2.5 font-mono text-sm transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                className="border-input placeholder:text-faint-foreground w-full rounded-lg border px-4 py-2.5 font-mono text-sm transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
                 placeholder="0"
               />
             </div>
@@ -115,7 +115,7 @@ export function AddPaymentModal({
               <select
                 required
                 name="account_id"
-                className="border-input bg-card w-full rounded-lg border px-4 py-2.5 text-sm transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                className="border-input bg-card w-full rounded-lg border px-4 py-2.5 text-sm transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
               >
                 <option value="">-- Choose Account --</option>
                 {accounts.map((acc) => (
@@ -131,7 +131,7 @@ export function AddPaymentModal({
               <input
                 name="notes"
                 type="text"
-                className="border-input placeholder:text-faint-foreground w-full rounded-lg border px-4 py-2.5 text-sm transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                className="border-input placeholder:text-faint-foreground w-full rounded-lg border px-4 py-2.5 text-sm transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
                 placeholder="e.g. TF BCA a.n. Budi"
               />
             </div>
@@ -151,7 +151,7 @@ export function AddPaymentModal({
             type="submit"
             form="add-payment-form"
             disabled={isPending}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-blue-200 transition-all hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-purple-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-purple-200 transition-all hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-70"
           >
             {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
             {isPending ? "Processing..." : "Submit Payment"}

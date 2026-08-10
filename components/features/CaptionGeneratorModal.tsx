@@ -59,7 +59,7 @@ export function CaptionGeneratorModal({
           <h2 className="text-foreground text-lg font-semibold">Buat Caption</h2>
           <button
             onClick={handleClose}
-            className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-[10px] p-1.5 transition-colors"
+            className="text-faint-foreground hover:bg-muted hover:text-muted-foreground tap-large rounded-[10px] transition-colors"
           >
             <X className="h-5 w-5" />
           </button>

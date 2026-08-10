@@ -170,10 +170,10 @@ export function LedgerTable({ entries }: LedgerTableProps) {
                         className="flex flex-row items-center justify-end gap-1.5"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <button className="border-border text-muted-foreground hover:bg-muted hover:text-foreground flex h-8 w-8 items-center justify-center rounded-md border transition-colors">
+                        <button className="border-border text-muted-foreground hover:bg-muted hover:text-foreground tap-large flex h-8 w-8 items-center justify-center rounded-md border transition-colors">
                           <Edit2 className="h-4 w-4" />
                         </button>
-                        <button className="border-border text-muted-foreground flex h-8 w-8 items-center justify-center rounded-md border transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600">
+                        <button className="border-border text-muted-foreground tap-large flex h-8 w-8 items-center justify-center rounded-md border transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600">
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </div>

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { MoreHorizontal, Edit2, Trash2, Loader2, AlertTriangle } from "lucide-react";
 import { deleteInventoryItem } from "@/app/actions/inventory";
 import { EditInventoryModal } from "./EditInventoryModal";
+import { useFocusTrap } from "@/lib/hooks/useFocusTrap";
 
 type InventoryItem = {
   id: string;
@@ -31,6 +32,12 @@ export function InventoryRowActions({ item, games, onRefresh }: InventoryRowActi
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
 
+  const deleteDialogRef = useFocusTrap<HTMLDivElement>(
+    isDeleteOpen,
+    null,
+    () => !isDeleting && setIsDeleteOpen(false),
+  );
+
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
@@ -53,7 +60,10 @@ export function InventoryRowActions({ item, games, onRefresh }: InventoryRowActi
     <div className="relative inline-block text-left" onClick={(e) => e.stopPropagation()}>
       <button
         onClick={() => setIsOpenMenu(!isOpenMenu)}
-        className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-md p-1.5 focus:outline-none"
+        aria-expanded={isOpenMenu}
+        aria-haspopup="menu"
+        aria-label="Aksi stok"
+        className="text-faint-foreground hover:bg-muted hover:text-muted-foreground tap-large rounded-md focus:outline-none"
       >
         <MoreHorizontal className="h-5 w-5" />
       </button>
@@ -98,21 +108,33 @@ export function InventoryRowActions({ item, games, onRefresh }: InventoryRowActi
 
       {/* Delete Confirmation Modal */}
       {isDeleteOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+        <div
+          ref={deleteDialogRef}
+          role="alertdialog"
+          aria-modal="true"
+          aria-labelledby="delete-stock-title"
+          aria-describedby="delete-stock-desc"
+          tabIndex={-1}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+        >
           <div className="border-border bg-card w-full max-w-sm rounded-xl border p-6 shadow-xl">
             <div className="mb-4 flex items-center gap-3 text-rose-600">
               <div className="rounded-full bg-rose-50 p-2">
                 <AlertTriangle className="h-6 w-6" />
               </div>
-              <h3 className="text-foreground text-lg font-bold">Hapus Stok?</h3>
+              <h3 id="delete-stock-title" className="text-foreground text-lg font-bold">
+                Hapus Stok?
+              </h3>
             </div>
-            <p className="text-muted-foreground mb-4 text-sm">
+            <p id="delete-stock-desc" className="text-muted-foreground mb-4 text-sm">
               Apakah Anda yakin ingin menghapus stok{" "}
-              <span className="text-foreground font-semibold">{item.title_reference || "ini"}</span>
+              <span className="text-foreground font-semibold">
+                {item.title_reference || "ini"}
+              </span>
               ? Tindakan ini tidak dapat dibatalkan.
             </p>
             {deleteError && (
-              <div className="mb-4 rounded-lg bg-rose-50 p-3 text-xs text-rose-600">
+              <div role="alert" className="mb-4 rounded-lg bg-rose-50 p-3 text-xs text-rose-600">
                 {deleteError}
               </div>
             )}
@@ -127,10 +149,10 @@ export function InventoryRowActions({ item, games, onRefresh }: InventoryRowActi
               <button
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className="flex items-center gap-1.5 rounded-lg bg-rose-600 px-4 py-2 text-xs font-semibold text-white hover:bg-rose-700 disabled:opacity-50"
+                className="tap-large flex items-center gap-1.5 rounded-lg bg-rose-600 text-xs font-semibold text-white hover:bg-rose-700 disabled:opacity-50"
               >
                 {isDeleting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                Hapus
+                {isDeleting ? "Menghapus..." : "Hapus"}
               </button>
             </div>
           </div>
