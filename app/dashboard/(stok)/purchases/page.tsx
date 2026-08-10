@@ -4,19 +4,11 @@ import React from "react";
 import { Search, Filter, Plus, ChevronDown, X, Loader2, Download, Trash2 } from "lucide-react";
 import { formatRupiah, formatDate } from "@/lib/utils";
 import { usePurchases } from "@/lib/hooks/features/usePurchases";
+import { Pagination } from "@/components/ui/Pagination";
 
 export default function PurchasesPage() {
   const {
-    data: {
-      purchases,
-      games,
-      accounts,
-      filteredPurchases,
-      pageItems,
-      totalPages,
-      safePage,
-      pageStart,
-    },
+    data: { purchases, games, accounts, filteredPurchases, pageItems, safePage, itemsPerPage },
     isLoading,
     isSubmitting,
     error,
@@ -39,6 +31,7 @@ export default function PurchasesPage() {
       setStatusFilter,
       setIsFilterDropdownOpen,
       setPageNumber,
+      setItemsPerPage,
       setSelectedStatus,
     },
   } = usePurchases();
@@ -303,39 +296,17 @@ export default function PurchasesPage() {
           </table>
         </div>
 
-        {/* Pagination Info */}
-        <div className="border-border-soft bg-card flex items-center justify-between border-t px-6 py-4">
-          <div className="text-muted-foreground text-sm">
-            Menampilkan{" "}
-            <span className="text-foreground font-semibold">
-              {filteredPurchases.length === 0 ? 0 : pageStart + 1}
-            </span>{" "}
-            - <span className="text-foreground font-semibold">{pageStart + pageItems.length}</span>{" "}
-            dari <span className="text-foreground font-semibold">{filteredPurchases.length}</span>{" "}
-            pembelian
-          </div>
-          {filteredPurchases.length > 0 && (
-            <nav aria-label="Navigasi halaman" className="flex gap-1">
-              <button
-                onClick={() => setPageNumber((p) => Math.max(1, p - 1))}
-                disabled={safePage <= 1}
-                className="border-border text-foreground hover:bg-muted rounded-md border px-3 py-1 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Sebelumnya
-              </button>
-              <span className="text-faint-foreground flex items-center px-2 text-sm font-medium">
-                {safePage} / {totalPages}
-              </span>
-              <button
-                onClick={() => setPageNumber((p) => Math.min(totalPages, p + 1))}
-                disabled={safePage >= totalPages}
-                className="border-border text-foreground hover:bg-muted rounded-md border px-3 py-1 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Selanjutnya
-              </button>
-            </nav>
-          )}
-        </div>
+        <Pagination
+          currentPage={safePage}
+          totalItems={filteredPurchases.length}
+          itemsPerPage={itemsPerPage}
+          onPageChange={(page) => setPageNumber(page)}
+          onPageSizeChange={(size) => {
+            setItemsPerPage(size);
+            setPageNumber(1);
+          }}
+          itemLabel="pembelian"
+        />
       </div>
 
       {/* Buat Pembelian Baru Modal (Slide-over Drawer) */}

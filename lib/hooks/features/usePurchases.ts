@@ -24,6 +24,7 @@ export function usePurchases() {
   const [statusFilter, setStatusFilter] = useState("ALL"); // ALL, LUNAS, PENDING
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [selectedStatus, setSelectedStatus] = useState<"LUNAS" | "PENDING">("LUNAS");
 
   const filterButtonRef = useRef<HTMLButtonElement>(null);
@@ -168,11 +169,10 @@ export function usePurchases() {
     setPageNumber(1);
   }, [query, statusFilter]);
 
-  const PAGE_SIZE = 10;
-  const totalPages = Math.max(1, Math.ceil(filteredPurchases.length / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(filteredPurchases.length / itemsPerPage));
   const safePage = Math.min(pageNumber, totalPages);
-  const pageStart = (safePage - 1) * PAGE_SIZE;
-  const pageItems = filteredPurchases.slice(pageStart, pageStart + PAGE_SIZE);
+  const pageStart = (safePage - 1) * itemsPerPage;
+  const pageItems = filteredPurchases.slice(pageStart, pageStart + itemsPerPage);
 
   useEffect(() => {
     if (!isFilterDropdownOpen) return;
@@ -265,7 +265,7 @@ export function usePurchases() {
       totalPages,
       safePage,
       pageStart,
-      pageSize: PAGE_SIZE,
+      itemsPerPage,
     },
     isLoading,
     isSubmitting,
@@ -277,6 +277,7 @@ export function usePurchases() {
       statusFilter,
       isFilterDropdownOpen,
       pageNumber,
+      itemsPerPage,
       selectedStatus,
     },
     refs: {
@@ -294,6 +295,7 @@ export function usePurchases() {
       setStatusFilter,
       setIsFilterDropdownOpen,
       setPageNumber,
+      setItemsPerPage,
       setSelectedStatus,
       loadData,
     },
