@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import useSWR from "swr";
 import { getErrorMessage } from "@/lib/error";
 import { getTradeInDeals, createTukarTambah } from "@/app/actions/trade-in";
@@ -24,6 +24,10 @@ export function useTradeIn() {
   const [priceOut, setPriceOut] = useState(0);
   const [ttValue, setTtValue] = useState(0);
   const [paymentAmount, setPaymentAmount] = useState(0);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const {
     data: deals = [],
@@ -93,12 +97,50 @@ export function useTradeIn() {
 
   const selisih = ttValue - priceOut;
 
+  const filteredDeals = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return deals;
+
+    return deals.filter((tt) => {
+      const dealNumber = tt.deal_number?.toLowerCase() || "";
+      const customerName =
+        (tt.customers as { name?: string | null } | null)?.name?.toLowerCase() || "";
+      const stockOutName = tt.deal_items?.[0]?.stocks?.name?.toLowerCase() || "";
+      const tradeInItemsDesc = (tt.trade_in_items || [])
+        .map((item) => String((item as { description?: string }).description || "").toLowerCase())
+        .join(" ");
+
+      return (
+        dealNumber.includes(query) ||
+        customerName.includes(query) ||
+        stockOutName.includes(query) ||
+        tradeInItemsDesc.includes(query)
+      );
+    });
+  }, [deals, searchQuery]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredDeals.length / itemsPerPage));
+  const safePage = Math.min(currentPage, totalPages);
+  const pageStart = (safePage - 1) * itemsPerPage;
+  const pageItems = filteredDeals.slice(pageStart, pageStart + itemsPerPage);
+
   return {
     data: {
       deals,
       stocks,
       accounts,
       selisih,
+      filteredDeals,
+      pageItems,
+      totalPages,
+      safePage,
+      pageStart,
+      itemsPerPage,
     },
     isLoading,
     isSubmitting,
@@ -109,6 +151,9 @@ export function useTradeIn() {
       priceOut,
       ttValue,
       paymentAmount,
+      currentPage,
+      itemsPerPage,
+      searchQuery,
     },
     actions: {
       openAddTT,
@@ -117,6 +162,9 @@ export function useTradeIn() {
       setPriceOut,
       setTtValue,
       setPaymentAmount,
+      setCurrentPage,
+      setItemsPerPage,
+      setSearchQuery,
       loadData,
     },
   };

@@ -6,8 +6,6 @@ import {
   Filter,
   FileText,
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
   X,
   Loader2,
   ShoppingBag,
@@ -17,10 +15,11 @@ import {
 import { formatRupiah, formatDate } from "@/lib/utils";
 import { useTopupOrders } from "@/lib/hooks/features/useTopupOrders";
 import { BuyStatus, PaymentStatus } from "@/types/status";
+import { Pagination } from "@/components/ui/Pagination";
 
 export default function TopupOrdersPage() {
   const {
-    data: { orders, pagination, selectedOrder, startFrom, endTo },
+    data: { orders, pagination, selectedOrder },
     isLoading,
     isSaving,
     modalError,
@@ -278,54 +277,14 @@ export default function TopupOrdersPage() {
           </table>
         </div>
 
-        {/* Pagination */}
-        <div className="border-border-soft bg-card flex flex-col items-center justify-between gap-3 border-t px-6 py-4 sm:flex-row">
-          <div className="flex flex-col items-center gap-3 sm:flex-row">
-            <div className="text-muted-foreground text-sm">
-              Menampilkan <span className="text-foreground font-semibold">{startFrom}</span> -{" "}
-              <span className="text-foreground font-semibold">{endTo}</span> dari{" "}
-              <span className="text-foreground font-semibold">{pagination.total}</span> pesanan
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-muted-foreground text-xs whitespace-nowrap">
-                Tampil per hal:
-              </span>
-              <select
-                value={pagination.pageSize}
-                onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-                disabled={isLoading}
-                className="border-border bg-card text-foreground rounded-md border px-2 py-1.5 text-xs focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none disabled:opacity-50"
-              >
-                {[10, 20, 50, 100].map((size) => (
-                  <option key={size} value={size}>
-                    {size}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => handlePageChange(pagination.page - 1)}
-              disabled={pagination.page <= 1}
-              className="border-border text-muted-foreground hover:bg-muted inline-flex items-center gap-1 rounded-md border px-3 py-1.5 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              Sebelumnya
-            </button>
-            <span className="text-foreground px-3 text-sm font-medium">
-              Hal {pagination.page} / {pagination.totalPages}
-            </span>
-            <button
-              onClick={() => handlePageChange(pagination.page + 1)}
-              disabled={pagination.page >= pagination.totalPages}
-              className="border-border text-muted-foreground hover:bg-muted inline-flex items-center gap-1 rounded-md border px-3 py-1.5 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              Selanjutnya
-              <ChevronRight className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
+        <Pagination
+          currentPage={pagination.page}
+          totalItems={pagination.total}
+          itemsPerPage={pagination.pageSize}
+          onPageChange={(page) => handlePageChange(page)}
+          onPageSizeChange={(size) => handlePageSizeChange(size)}
+          itemLabel="pesanan"
+        />
       </div>
 
       {/* Processing Modal (Slide-over) */}

@@ -52,6 +52,9 @@ export function usePromoCodes() {
   const [editing, setEditing] = useState<number | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   const {
     data: promos = [],
     isLoading,
@@ -156,10 +159,20 @@ export function usePromoCodes() {
     return promos.filter((p) => p.code.toLowerCase().includes(search.toLowerCase()));
   }, [promos, search]);
 
+  const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
+  const safePage = Math.min(currentPage, totalPages);
+  const pageStart = (safePage - 1) * itemsPerPage;
+  const pageItems = filtered.slice(pageStart, pageStart + itemsPerPage);
+
   return {
     data: {
       promos,
       filtered,
+      pageItems,
+      totalPages,
+      safePage,
+      pageStart,
+      itemsPerPage,
     },
     isLoading,
     isSubmitting,
@@ -170,6 +183,8 @@ export function usePromoCodes() {
       isAddClosing,
       editing,
       form,
+      currentPage,
+      itemsPerPage,
     },
     helpers: {
       toDateTimeLocal,
@@ -182,6 +197,8 @@ export function usePromoCodes() {
       closeModal,
       handleSave,
       handleDelete,
+      setCurrentPage,
+      setItemsPerPage,
       loadData,
     },
   };

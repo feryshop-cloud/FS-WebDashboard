@@ -4,10 +4,11 @@ import React from "react";
 import { Search, Plus, Filter, AlertTriangle, X, Loader2, Trash2, Eye } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { useProblemCases } from "@/lib/hooks/features/useProblemCases";
+import { Pagination } from "@/components/ui/Pagination";
 
 export default function ProblemCasesPage() {
   const {
-    data: { deals, stocks, filteredCases },
+    data: { deals, stocks, filteredCases, pageItems, safePage, itemsPerPage },
     isLoading,
     isSubmitting,
     isDeletingId,
@@ -39,6 +40,8 @@ export default function ProblemCasesPage() {
       handleAddCase,
       handleUpdateCase,
       handleDeleteCase,
+      setCurrentPage,
+      setItemsPerPage,
     },
   } = useProblemCases();
 
@@ -138,7 +141,7 @@ export default function ProblemCasesPage() {
                   </td>
                 </tr>
               ) : (
-                filteredCases.map((c) => {
+                pageItems.map((c) => {
                   let badgeClass = "bg-muted text-muted-foreground border-border";
                   if (c.status === "OPEN") badgeClass = "bg-rose-50 text-rose-600 border-rose-100";
                   if (c.status === "IN_PROGRESS")
@@ -219,6 +222,17 @@ export default function ProblemCasesPage() {
             </tbody>
           </table>
         </div>
+        <Pagination
+          currentPage={safePage}
+          totalItems={filteredCases.length}
+          itemsPerPage={itemsPerPage}
+          onPageChange={(page) => setCurrentPage(page)}
+          onPageSizeChange={(size) => {
+            setItemsPerPage(size);
+            setCurrentPage(1);
+          }}
+          itemLabel="kasus"
+        />
       </div>
 
       {/* Buat Case Baru Modal */}

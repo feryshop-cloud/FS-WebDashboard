@@ -4,15 +4,26 @@ import React from "react";
 import { Plus, Search, Trash2, Edit, X, Save, Loader2, Tag } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
 import { usePromoCodes, type PromoCodeRow } from "@/lib/hooks/features/usePromoCodes";
+import { Pagination } from "@/components/ui/Pagination";
 
 export default function PromoCodesPage() {
   const {
-    data: { filtered },
+    data: { filtered, pageItems, safePage, itemsPerPage },
     isLoading,
     isSubmitting,
     error,
     uiState: { search, isAddOpen, isAddClosing, editing, form },
-    actions: { setSearch, setField, openAdd, openEdit, closeModal, handleSave, handleDelete },
+    actions: {
+      setSearch,
+      setField,
+      openAdd,
+      openEdit,
+      closeModal,
+      handleSave,
+      handleDelete,
+      setCurrentPage,
+      setItemsPerPage,
+    },
   } = usePromoCodes();
 
   const discountLabel = (p: PromoCodeRow) =>
@@ -82,7 +93,7 @@ export default function PromoCodesPage() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((p) => {
+              {pageItems.map((p) => {
                 const quota = p.quota ?? 0;
                 const used = p.used_count ?? 0;
                 const full = quota > 0 && used >= quota;
@@ -143,6 +154,20 @@ export default function PromoCodesPage() {
             </tbody>
           </table>
         </div>
+      )}
+
+      {filtered.length > 0 && (
+        <Pagination
+          currentPage={safePage}
+          totalItems={filtered.length}
+          itemsPerPage={itemsPerPage}
+          onPageChange={(page) => setCurrentPage(page)}
+          onPageSizeChange={(size) => {
+            setItemsPerPage(size);
+            setCurrentPage(1);
+          }}
+          itemLabel="promo"
+        />
       )}
 
       {/* Create / Edit Modal */}

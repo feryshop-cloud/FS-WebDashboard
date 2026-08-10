@@ -13,15 +13,26 @@ import {
 } from "lucide-react";
 import { formatRupiah, formatDate } from "@/lib/utils";
 import { useTradeIn } from "@/lib/hooks/features/useTradeIn";
+import { Pagination } from "@/components/ui/Pagination";
 
 export default function TradeInPage() {
   const {
-    data: { deals, stocks, accounts, selisih },
+    data: { deals, stocks, accounts, selisih, filteredDeals, pageItems, safePage, itemsPerPage },
     isLoading,
     isSubmitting,
     error,
-    uiState: { isAddTTOpen, isAddTTClosing, priceOut, ttValue, paymentAmount },
-    actions: { openAddTT, closeAddTT, handleAddTT, setPriceOut, setTtValue, setPaymentAmount },
+    uiState: { isAddTTOpen, isAddTTClosing, priceOut, ttValue, paymentAmount, searchQuery },
+    actions: {
+      openAddTT,
+      closeAddTT,
+      handleAddTT,
+      setPriceOut,
+      setTtValue,
+      setPaymentAmount,
+      setCurrentPage,
+      setItemsPerPage,
+      setSearchQuery,
+    },
   } = useTradeIn();
 
   return (
@@ -59,6 +70,11 @@ export default function TradeInPage() {
           </div>
           <input
             type="text"
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setCurrentPage(1);
+            }}
             className="border-border bg-muted text-foreground placeholder-placeholder block w-full rounded-lg border py-2 pr-3 pl-10 transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 sm:text-sm"
             placeholder="Cari ID transaksi, nama customer..."
           />
@@ -79,12 +95,14 @@ export default function TradeInPage() {
           <div className="border-border-soft bg-card flex justify-center rounded-xl border p-12 shadow-sm">
             <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
           </div>
-        ) : deals.length === 0 ? (
+        ) : filteredDeals.length === 0 ? (
           <div className="border-border-soft bg-card text-muted-foreground rounded-xl border p-12 text-center text-sm shadow-sm">
-            Belum ada transaksi Tukar Tambah.
+            {deals.length === 0
+              ? "Belum ada transaksi Tukar Tambah."
+              : "Tidak ada transaksi Tukar Tambah yang cocok dengan pencarian."}
           </div>
         ) : (
-          deals.map((tt) => {
+          pageItems.map((tt) => {
             let badgeClass = "bg-muted text-muted-foreground border-border";
             if ((tt.status as string) === "Selesai" || (tt.status as string) === "Lunas")
               badgeClass = "bg-emerald-50 text-emerald-600 border-emerald-100";
@@ -200,13 +218,17 @@ export default function TradeInPage() {
         )}
       </div>
 
-      {deals.length > 0 && (
-        <div className="mt-4 flex justify-center">
-          <button className="border-border bg-card text-muted-foreground hover:bg-muted rounded-lg border px-4 py-2 text-sm font-medium shadow-sm transition-colors">
-            Muat Lebih Banyak
-          </button>
-        </div>
-      )}
+      <Pagination
+        currentPage={safePage}
+        totalItems={filteredDeals.length}
+        itemsPerPage={itemsPerPage}
+        onPageChange={(page) => setCurrentPage(page)}
+        onPageSizeChange={(size) => {
+          setItemsPerPage(size);
+          setCurrentPage(1);
+        }}
+        itemLabel="transaksi"
+      />
 
       {/* Buat TT Baru Modal */}
       {(isAddTTOpen || isAddTTClosing) && (

@@ -44,6 +44,9 @@ export function useProblemCases() {
 
   const [editStatus, setEditStatus] = useState("");
   const [editChronology, setEditChronology] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   const [editIssueType, setEditIssueType] = useState("");
 
   const {
@@ -164,7 +167,7 @@ export function useProblemCases() {
     const termLower = searchTerm.trim().toLowerCase();
     return cases.filter((c) => {
       const matchesSearch =
-        !termLower ||
+        termLower === "" ||
         String(c.case_number || "")
           .toLowerCase()
           .includes(termLower) ||
@@ -184,6 +187,11 @@ export function useProblemCases() {
     });
   }, [cases, searchTerm, statusFilter]);
 
+  const totalPages = Math.max(1, Math.ceil(filteredCases.length / itemsPerPage));
+  const safePage = Math.min(currentPage, totalPages);
+  const pageStart = (safePage - 1) * itemsPerPage;
+  const pageItems = filteredCases.slice(pageStart, pageStart + itemsPerPage);
+
   const getStatusBadge = (status: string) => {
     if (status === "OPEN") return "bg-rose-50 text-rose-600 border-rose-100";
     if (status === "IN_PROGRESS") return "bg-amber-50 text-amber-600 border-amber-100";
@@ -197,6 +205,11 @@ export function useProblemCases() {
       deals,
       stocks,
       filteredCases,
+      pageItems,
+      totalPages,
+      safePage,
+      pageStart,
+      itemsPerPage,
     },
     isLoading,
     isSubmitting,
@@ -213,6 +226,8 @@ export function useProblemCases() {
       editStatus,
       editChronology,
       editIssueType,
+      currentPage,
+      itemsPerPage,
     },
     helpers: {
       PROBLEM_CASE_STATUS_LABEL,
@@ -232,6 +247,8 @@ export function useProblemCases() {
       handleAddCase,
       handleUpdateCase,
       handleDeleteCase,
+      setCurrentPage,
+      setItemsPerPage,
       loadData,
     },
   };

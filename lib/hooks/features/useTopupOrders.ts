@@ -47,14 +47,14 @@ export function useTopupOrders() {
 
   const [appliedFilters, setAppliedFilters] = useState<TopupOrdersFilters>({
     page: 1,
-    pageSize: 20,
+    pageSize: 10,
     search: "",
     paymentStatus: "",
     buyStatus: "",
   });
 
   const {
-    data: resultData = { data: [], total: 0, page: 1, pageSize: 20, totalPages: 1 },
+    data: resultData = { data: [], total: 0, page: 1, pageSize: 10, totalPages: 1 },
     isLoading,
     mutate,
   } = useSWR<TopupOrdersResult>(["topup-orders", appliedFilters], async () => {
