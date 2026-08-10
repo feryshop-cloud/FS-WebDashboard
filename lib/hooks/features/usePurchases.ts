@@ -7,6 +7,7 @@ import { getErrorMessage } from "@/lib/error";
 import { getPurchases, purchaseStock, getGames, deletePurchase } from "@/actions/purchases";
 import { getAccounts } from "@/app/actions/accounts";
 import { useFocusTrap } from "@/lib/hooks/useFocusTrap";
+import { useDebouncedValue } from "@/lib/hooks/useDebouncedValue";
 import { PurchaseWithRelations } from "@/types/database";
 
 export type Purchase = PurchaseWithRelations;
@@ -19,6 +20,7 @@ export function usePurchases() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebouncedValue(searchQuery, 300);
   const [statusFilter, setStatusFilter] = useState("ALL"); // ALL, LUNAS, PENDING
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);
@@ -145,7 +147,7 @@ export function usePurchases() {
     }
   };
 
-  const query = searchQuery.trim().toLowerCase();
+  const query = debouncedSearchQuery.trim().toLowerCase();
   const filteredPurchases = useMemo(() => {
     return purchases.filter((purchase) => {
       const matchesSearch =

@@ -1,4 +1,4 @@
-import { useState, useCallback, useTransition } from "react";
+import { useState, useCallback, useTransition, useEffect, useRef } from "react";
 import useSWR from "swr";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getTopupProducts } from "@/app/actions/topup-products";
@@ -20,6 +20,13 @@ export function useTopupProducts() {
   const searchParams = useSearchParams();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [, startTransition] = useTransition();
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    };
+  }, []);
 
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
   const itemsPerPage = parseInt(searchParams.get("limit") || "10", 10);
@@ -62,15 +69,32 @@ export function useTopupProducts() {
     [mutate],
   );
 
+  const pushWithParams = (params: URLSearchParams) => {
+    params.set("page", "1");
+    router.push(`/dashboard/topup-products?${params.toString()}`);
+  };
+
   const handleFilterChange = (key: string, value: string) => {
+    if (key === "search") {
+      if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+      searchTimerRef.current = setTimeout(() => {
+        const params = new URLSearchParams(searchParams.toString());
+        if (value) {
+          params.set("search", value);
+        } else {
+          params.delete("search");
+        }
+        pushWithParams(params);
+      }, 300);
+      return;
+    }
     const params = new URLSearchParams(searchParams.toString());
     if (value) {
       params.set(key, value);
     } else {
       params.delete(key);
     }
-    params.set("page", "1");
-    router.push(`/dashboard/topup-products?${params.toString()}`);
+    pushWithParams(params);
   };
 
   const handleResetFilters = () => {

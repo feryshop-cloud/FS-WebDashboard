@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import useSWR from "swr";
 import { getInventory, addInventoryItem, getGames } from "@/app/actions/inventory";
 import { useFocusTrap } from "@/lib/hooks/useFocusTrap";
+import { useDebouncedValue } from "@/lib/hooks/useDebouncedValue";
 import type { Database } from "@/types/database.types";
 
 export type InventoryItem = Database["public"]["Tables"]["inventory"]["Row"] & {
@@ -20,6 +21,7 @@ export function useInventory() {
   const [activeCategory, setActiveCategory] = useState("Semua");
   const [activeStatus, setActiveStatus] = useState("Semua Status");
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebouncedValue(searchQuery, 300);
   const [isExporting, setIsExporting] = useState(false);
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
@@ -122,7 +124,7 @@ export function useInventory() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentPage(1);
-  }, [activeCategory, activeStatus, searchQuery, inventory.length]);
+  }, [activeCategory, activeStatus, debouncedSearchQuery, inventory.length]);
 
   const handleAddStock = async (formData: FormData) => {
     try {
@@ -186,7 +188,7 @@ export function useInventory() {
   }, [inventory, activeCategory]);
 
   const displayedInventory = useMemo(() => {
-    const searchQueryLower = searchQuery.trim().toLowerCase();
+    const searchQueryLower = debouncedSearchQuery.trim().toLowerCase();
     return filteredInventory.filter((item) => {
       if (activeStatus !== "Semua Status" && item.status !== activeStatus) return false;
       if (!searchQueryLower) return true;
@@ -196,7 +198,7 @@ export function useInventory() {
         .toLowerCase();
       return haystack.includes(searchQueryLower);
     });
-  }, [filteredInventory, activeStatus, searchQuery]);
+  }, [filteredInventory, activeStatus, debouncedSearchQuery]);
 
   const totalPages = Math.max(1, Math.ceil(displayedInventory.length / itemsPerPage));
   const safePage = Math.min(currentPage, totalPages);
