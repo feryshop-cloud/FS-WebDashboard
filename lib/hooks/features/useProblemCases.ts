@@ -168,10 +168,10 @@ export function useProblemCases() {
     return cases.filter((c) => {
       const matchesSearch =
         !termLower ||
-        c.case_code?.toLowerCase().includes(termLower) ||
-        c.title?.toLowerCase().includes(termLower) ||
-        c.reporter_name?.toLowerCase().includes(termLower) ||
-        c.chronology?.toLowerCase().includes(termLower);
+        String(c.case_number || "").toLowerCase().includes(termLower) ||
+        String(c.title || "").toLowerCase().includes(termLower) ||
+        String(c.chronology || "").toLowerCase().includes(termLower) ||
+        String(c.issue_type || "").toLowerCase().includes(termLower);
 
       const matchesStatus = statusFilter === "ALL" || c.status === statusFilter;
 

@@ -1,7 +1,7 @@
 import { getDealById } from "@/actions/deals";
 import { getAccounts } from "@/actions/accounts";
 import { DealDetailHeader } from "./DealDetailHeader";
-import { StatusBadge } from "@/components/ui/StatusBadge";
+import { DealStatusBadge } from "@/components/ui/StatusBadge";
 import { PaymentWithRelations, DealStatus } from "@/types/database";
 import { formatRupiah, formatDate } from "@/lib/utils";
 
@@ -52,7 +52,7 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
               <div>
                 <p className="text-muted-foreground text-sm font-medium">Status</p>
                 <div className="mt-1">
-                  <StatusBadge status={deal.status} />
+                  <DealStatusBadge status={deal.status} />
                 </div>
               </div>
               <div>

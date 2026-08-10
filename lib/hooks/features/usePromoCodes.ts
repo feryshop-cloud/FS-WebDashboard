@@ -112,7 +112,7 @@ export function usePromoCodes() {
       min_order: String(p.min_order ?? 0),
       max_discount: String(p.max_discount ?? 0),
       quota: String(p.quota ?? 0),
-      is_active: p.is_active,
+      is_active: p.is_active === true,
       start_date: toDateTimeLocal(p.start_date),
       end_date: toDateTimeLocal(p.end_date),
     });
@@ -125,19 +125,21 @@ export function usePromoCodes() {
     setIsSubmitting(true);
 
     try {
-      const payload = {
-        code: form.code.trim().toUpperCase(),
-        discount_type: form.discount_type as "percent" | "fixed",
-        discount_value: parseFloat(form.discount_value) || 0,
-        min_order: parseFloat(form.min_order) || 0,
-        max_discount: parseFloat(form.max_discount) || 0,
-        quota: parseInt(form.quota, 10) || 0,
-        is_active: form.is_active,
-        start_date: form.start_date ? new Date(form.start_date).toISOString() : null,
-        end_date: form.end_date ? new Date(form.end_date).toISOString() : null,
-      };
+      const payload = new FormData();
+      payload.set("code", form.code.trim().toUpperCase());
+      payload.set("discount_type", form.discount_type);
+      payload.set("discount_value", parseFloat(form.discount_value) ? String(form.discount_value) : "0");
+      payload.set("min_order", parseFloat(form.min_order) ? String(form.min_order) : "0");
+      payload.set("max_discount", parseFloat(form.max_discount) ? String(form.max_discount) : "0");
+      payload.set("quota", parseInt(form.quota, 10) ? String(form.quota) : "0");
+      payload.set("is_active", form.is_active ? "on" : "off");
+      if (form.start_date) payload.set("start_date", new Date(form.start_date).toISOString());
+      if (form.end_date) payload.set("end_date", new Date(form.end_date).toISOString());
 
-      if (!payload.code || payload.discount_value <= 0) {
+      const code = form.code.trim().toUpperCase();
+      const discountValue = parseFloat(form.discount_value) || 0;
+
+      if (!code || discountValue <= 0) {
         throw new Error("Kode promo dan nilai diskon wajib diisi dengan benar.");
       }
 
