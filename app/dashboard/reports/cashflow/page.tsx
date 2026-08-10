@@ -1,15 +1,7 @@
 "use client";
 
 import React from "react";
-import {
-  Download,
-  ChevronDown,
-  ArrowUpRight,
-  ArrowDownRight,
-  Wallet,
-  Loader2,
-  Search,
-} from "lucide-react";
+import { Download, ChevronDown, ArrowUpRight, ArrowDownRight, Wallet, Search } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
 import { useCashflowReport } from "@/lib/hooks/features/useCashflowReport";
 
@@ -148,7 +140,7 @@ export default function CashflowPage() {
           <div>
             <h3 className="text-3xl font-black tracking-tight text-emerald-600">
               {isLoading ? (
-                <Loader2 className="text-faint-foreground h-6 w-6 animate-spin" />
+                <span className="bg-muted inline-block h-8 w-36 animate-pulse rounded"></span>
               ) : (
                 formatRupiah(cashIn)
               )}
@@ -168,7 +160,7 @@ export default function CashflowPage() {
           <div>
             <h3 className="text-3xl font-black tracking-tight text-rose-600">
               {isLoading ? (
-                <Loader2 className="text-faint-foreground h-6 w-6 animate-spin" />
+                <span className="bg-muted inline-block h-8 w-36 animate-pulse rounded"></span>
               ) : (
                 formatRupiah(cashOut)
               )}
@@ -190,7 +182,7 @@ export default function CashflowPage() {
               className={`text-3xl font-black tracking-tight ${netCashflow >= 0 ? "text-foreground" : "text-rose-600"}`}
             >
               {isLoading ? (
-                <Loader2 className="text-faint-foreground h-6 w-6 animate-spin" />
+                <span className="bg-muted inline-block h-8 w-36 animate-pulse rounded"></span>
               ) : (
                 formatRupiah(netCashflow)
               )}
@@ -208,8 +200,20 @@ export default function CashflowPage() {
           </div>
           <div className="space-y-6 p-6">
             {isLoading ? (
-              <div className="flex justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+              <div className="space-y-6">
+                {[1, 2].map((group) => (
+                  <div key={group} className="space-y-3">
+                    <div className="bg-muted h-4 w-32 animate-pulse rounded"></div>
+                    <div className="space-y-2 pl-3">
+                      {[1, 2].map((i) => (
+                        <div key={i} className="flex justify-between py-1">
+                          <div className="bg-muted h-4 w-24 animate-pulse rounded"></div>
+                          <div className="bg-muted h-4 w-16 animate-pulse rounded"></div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : (
               <>
