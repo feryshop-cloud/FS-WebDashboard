@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
+import useSWR from "swr";
 import {
   getTopupOrders,
   updateTopupOrder,
@@ -36,9 +37,6 @@ export function getBuyBadgeClass(status: string) {
 }
 
 export function useTopupOrders() {
-  const [orders, setOrders] = useState<OrderRow[]>([]);
-  const [pagination, setPagination] = useState({ total: 0, page: 1, pageSize: 20, totalPages: 1 });
-  const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [paymentStatus, setPaymentStatus] = useState("");
   const [buyStatus, setBuyStatus] = useState("");
@@ -47,48 +45,32 @@ export function useTopupOrders() {
   const [modalError, setModalError] = useState("");
   const [modalSuccess, setModalSuccess] = useState("");
 
-  const loadOrders = useCallback(async (filters: TopupOrdersFilters = {}) => {
-    try {
-      setIsLoading(true);
-      const result: TopupOrdersResult = await getTopupOrders(filters);
-      setOrders(result.data);
-      setPagination({
-        total: result.total,
-        page: result.page,
-        pageSize: result.pageSize,
-        totalPages: result.totalPages,
-      });
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const [appliedFilters, setAppliedFilters] = useState<TopupOrdersFilters>({
+    page: 1,
+    pageSize: 20,
+    search: "",
+    paymentStatus: "",
+    buyStatus: "",
+  });
 
-  useEffect(() => {
-    let active = true;
-    getTopupOrders({ page: 1, pageSize: 20 })
-      .then((result: TopupOrdersResult) => {
-        if (!active) return;
-        setOrders(result.data);
-        setPagination({
-          total: result.total,
-          page: result.page,
-          pageSize: result.pageSize,
-          totalPages: result.totalPages,
-        });
-      })
-      .catch((err) => console.error(err))
-      .finally(() => {
-        if (active) setIsLoading(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
+  const {
+    data: resultData = { data: [], total: 0, page: 1, pageSize: 20, totalPages: 1 },
+    isLoading,
+    mutate,
+  } = useSWR<TopupOrdersResult>(["topup-orders", appliedFilters], async () => {
+    return await getTopupOrders(appliedFilters);
+  });
+
+  const orders = resultData.data || [];
+  const pagination = {
+    total: resultData.total || 0,
+    page: resultData.page || 1,
+    pageSize: resultData.pageSize || 20,
+    totalPages: resultData.totalPages || 1,
+  };
 
   const handleApplyFilters = () => {
-    loadOrders({
+    setAppliedFilters({
       search: searchQuery,
       paymentStatus,
       buyStatus,
@@ -101,29 +83,30 @@ export function useTopupOrders() {
     setSearchQuery("");
     setPaymentStatus("");
     setBuyStatus("");
-    loadOrders({ page: 1, pageSize: pagination.pageSize });
-  };
-
-  const handlePageChange = (nextPage: number) => {
-    if (nextPage < 1 || nextPage > pagination.totalPages) return;
-    loadOrders({
-      search: searchQuery,
-      paymentStatus,
-      buyStatus,
-      page: nextPage,
+    setAppliedFilters({
+      search: "",
+      paymentStatus: "",
+      buyStatus: "",
+      page: 1,
       pageSize: pagination.pageSize,
     });
   };
 
+  const handlePageChange = (nextPage: number) => {
+    if (nextPage < 1 || nextPage > pagination.totalPages) return;
+    setAppliedFilters((prev) => ({
+      ...prev,
+      page: nextPage,
+    }));
+  };
+
   const handlePageSizeChange = (size: number) => {
     if (size === pagination.pageSize) return;
-    loadOrders({
-      search: searchQuery,
-      paymentStatus,
-      buyStatus,
+    setAppliedFilters((prev) => ({
+      ...prev,
       page: 1,
       pageSize: size,
-    });
+    }));
   };
 
   const handleExportCSV = () => {
@@ -201,13 +184,7 @@ export function useTopupOrders() {
     if (result.success) {
       setModalSuccess("Pesanan berhasil diperbarui.");
       setSelectedOrder(null);
-      loadOrders({
-        search: searchQuery,
-        paymentStatus,
-        buyStatus,
-        page: pagination.page,
-        pageSize: pagination.pageSize,
-      });
+      mutate();
     } else {
       setModalError(result.error || "Gagal memperbarui pesanan.");
     }
@@ -255,7 +232,7 @@ export function useTopupOrders() {
       handleExportCSV,
       handleOpenOrder,
       handleSaveOrder,
-      loadOrders,
+      loadOrders: () => mutate(),
     },
   };
 }

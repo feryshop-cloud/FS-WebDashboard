@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import useSWR from "swr";
 import { getErrorMessage } from "@/lib/error";
 import { getTradeInDeals, createTukarTambah } from "@/app/actions/trade-in";
 import { getInventory } from "@/app/actions/inventory";
@@ -17,10 +18,6 @@ export type Account = Database["public"]["Tables"]["accounts"]["Row"];
 export function useTradeIn() {
   const [isAddTTOpen, setIsAddTTOpen] = useState(false);
   const [isAddTTClosing, setIsAddTTClosing] = useState(false);
-  const [deals, setDeals] = useState<Deal[]>([]);
-  const [stocks, setStocks] = useState<InventoryItem[]>([]);
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -28,41 +25,43 @@ export function useTradeIn() {
   const [ttValue, setTtValue] = useState(0);
   const [paymentAmount, setPaymentAmount] = useState(0);
 
-  const loadData = async () => {
-    try {
-      setIsLoading(true);
-      const [dealsData, stocksResult, accountsData] = await Promise.all([
-        getTradeInDeals(),
-        getInventory(),
-        getAccounts(),
-      ]);
-      setDeals((dealsData as unknown as TradeInWithRelations[]) || []);
-      setStocks((stocksResult.data || []).filter((s) => s.status === "AVAILABLE"));
-      setAccounts(accountsData || []);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const {
+    data: deals = [],
+    isLoading: dealsLoading,
+    mutate: mutateDeals,
+  } = useSWR<Deal[]>("trade-in-deals", async () => {
+    const result = await getTradeInDeals();
+    return (result as unknown as TradeInWithRelations[]) || [];
+  });
 
-  useEffect(() => {
-    let active = true;
-    Promise.all([getTradeInDeals(), getInventory(), getAccounts()])
-      .then(([dealsData, stocksResult, accountsData]) => {
-        if (!active) return;
-        setDeals((dealsData as unknown as TradeInWithRelations[]) || []);
-        setStocks((stocksResult.data || []).filter((s) => s.status === "AVAILABLE"));
-        setAccounts(accountsData || []);
-      })
-      .catch((err) => console.error(err))
-      .finally(() => {
-        if (active) setIsLoading(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
+  const {
+    data: stocks = [],
+    isLoading: stocksLoading,
+    mutate: mutateStocks,
+  } = useSWR<InventoryItem[]>("inventory-available", async () => {
+    const result = await getInventory();
+    if (result.error) throw new Error(result.error);
+    return ((result.data || []) as unknown as InventoryItem[]).filter(
+      (s) => s.status === "AVAILABLE",
+    );
+  });
+
+  const {
+    data: accounts = [],
+    isLoading: accountsLoading,
+    mutate: mutateAccounts,
+  } = useSWR<Account[]>("accounts", async () => {
+    const result = await getAccounts();
+    return result || [];
+  });
+
+  const isLoading = dealsLoading || stocksLoading || accountsLoading;
+
+  const loadData = () => {
+    mutateDeals();
+    mutateStocks();
+    mutateAccounts();
+  };
 
   const closeAddTT = () => {
     if (isAddTTClosing || isSubmitting) return;
@@ -83,7 +82,7 @@ export function useTradeIn() {
       setIsSubmitting(true);
       setError("");
       await createTukarTambah(formData);
-      await loadData();
+      loadData();
       closeAddTT();
     } catch (err: unknown) {
       setError(getErrorMessage(err));
