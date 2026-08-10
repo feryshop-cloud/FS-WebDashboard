@@ -1,9 +1,9 @@
-import { createClient } from "../../../../../lib/supabase/server";
+import { createClient } from "../../../../../../lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { InventoryTable } from "../../../../../components/features/InventoryTable";
-import type { InventoryItemWithGame } from "../../../../../types/database";
+import { InventoryTable } from "../../../../../../components/features/InventoryTable";
+import type { InventoryItemWithGame } from "../../../../../../types/database";
 
 export const dynamic = "force-dynamic";
 

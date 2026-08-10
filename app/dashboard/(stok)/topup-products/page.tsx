@@ -112,7 +112,7 @@ function TopupProductsContent() {
   ];
 
   return (
-    <div className="mx-auto flex max-w-7xl flex-col gap-6 pb-8">
+    <>
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
@@ -248,7 +248,7 @@ function TopupProductsContent() {
         onClose={() => setIsAddModalOpen(false)}
         onSuccess={() => loadProducts()}
       />
-    </div>
+    </>
   );
 }
 

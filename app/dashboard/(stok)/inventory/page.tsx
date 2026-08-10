@@ -144,7 +144,7 @@ export default function InventoryPage() {
   ];
 
   return (
-    <div className="mx-auto flex max-w-7xl flex-col gap-6 pb-8">
+    <>
       <PageHeader
         title="Manajemen Stok"
         subtitle="Kelola seluruh stok akun game, harga modal, dan status ketersediaan."
@@ -195,33 +195,6 @@ export default function InventoryPage() {
             ariaLabel="Filter status stok"
           />
         </div>
-      </div>
-
-      {/* Category Filter Bar */}
-      <div className="flex flex-wrap gap-2">
-        <button
-          onClick={() => setActiveCategory("Semua")}
-          className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
-            activeCategory === "Semua"
-              ? "border-blue-600 bg-blue-600 text-white"
-              : "border-border bg-card text-muted-foreground hover:bg-muted"
-          }`}
-        >
-          Semua
-        </button>
-        {games.map((game) => (
-          <button
-            key={game.id}
-            onClick={() => setActiveCategory(game.name)}
-            className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
-              activeCategory === game.name
-                ? "border-blue-600 bg-blue-600 text-white"
-                : "border-border bg-card text-muted-foreground hover:bg-muted"
-            }`}
-          >
-            {game.name}
-          </button>
-        ))}
       </div>
 
       <DataTable
@@ -362,7 +335,7 @@ export default function InventoryPage() {
           </form>
         </SlideOverDrawer>
       )}
-    </div>
+    </>
   );
 }
 

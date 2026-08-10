@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from "react";
+import useSWR from "swr";
 import { getInventory, addInventoryItem, getGames } from "@/app/actions/inventory";
 import { useFocusTrap } from "@/lib/hooks/useFocusTrap";
 import type { Database } from "@/types/database.types";
@@ -14,9 +15,6 @@ export type Game = { id: string; name: string; slug: string };
 export function useInventory() {
   const [isAddStockOpen, setIsAddStockOpen] = useState(false);
   const [isAddStockClosing, setIsAddStockClosing] = useState(false);
-  const [inventory, setInventory] = useState<InventoryItem[]>([]);
-  const [games, setGames] = useState<Game[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [activeCategory, setActiveCategory] = useState("Semua");
@@ -32,6 +30,34 @@ export function useInventory() {
   const categoryMenuRef = useRef<HTMLDivElement>(null);
   const statusButtonRef = useRef<HTMLButtonElement>(null);
   const statusMenuRef = useRef<HTMLDivElement>(null);
+
+  const inventoryKey = "inventory";
+  const {
+    data: inventory = [],
+    isLoading: inventoryLoading,
+    mutate: mutateInventory,
+  } = useSWR<InventoryItem[]>(inventoryKey, async () => {
+    const result = await getInventory();
+    if (result.error) throw new Error(result.error);
+    return (result.data as unknown as InventoryItem[]) || [];
+  });
+
+  const gamesKey = "inventory-games";
+  const {
+    data: games = [],
+    isLoading: gamesLoading,
+    mutate: mutateGames,
+  } = useSWR<Game[]>(gamesKey, async () => {
+    const result = await getGames();
+    if (result.error) throw new Error(result.error);
+    return (result.data as Game[]) || [];
+  });
+
+  const isLoading = inventoryLoading || gamesLoading;
+  const loadInventory = () => {
+    mutateInventory();
+    mutateGames();
+  };
 
   useEffect(() => {
     if (!isCategoryDropdownOpen && !isStatusDropdownOpen) return;
@@ -92,43 +118,6 @@ export function useInventory() {
     null,
     closeAddStock,
   );
-
-  const loadInventory = async () => {
-    try {
-      setIsLoading(true);
-      const result = await getInventory();
-      if (result.error) {
-        console.error("Error loading inventory:", result.error);
-      } else {
-        setInventory(result.data || []);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    let active = true;
-    Promise.all([getInventory(), getGames()])
-      .then(([invResult, gamesResult]) => {
-        if (!active) return;
-        if (!invResult.error && invResult.data) {
-          setInventory(invResult.data as unknown as InventoryItem[]);
-        }
-        if (!gamesResult.error && gamesResult.data) {
-          setGames(gamesResult.data);
-        }
-      })
-      .catch((err) => console.error(err))
-      .finally(() => {
-        if (active) setIsLoading(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect

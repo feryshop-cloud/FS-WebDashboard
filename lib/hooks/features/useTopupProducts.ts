@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, useTransition } from "react";
+import { useState, useCallback, useTransition } from "react";
+import useSWR from "swr";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getTopupProducts } from "@/app/actions/topup-products";
 
@@ -17,11 +18,7 @@ export type TopupProduct = {
 export function useTopupProducts() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [products, setProducts] = useState<TopupProduct[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [totalCount, setTotalCount] = useState(0);
   const [, startTransition] = useTransition();
 
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
@@ -32,77 +29,38 @@ export function useTopupProducts() {
   const isActiveFilter = searchParams.get("isActive") || "";
   const isGangguanFilter = searchParams.get("isGangguan") || "";
 
+  const queryKey = {
+    page: currentPage,
+    limit: itemsPerPage,
+    search: searchQuery,
+    sortBy,
+    sortOrder,
+    isActive: isActiveFilter,
+    isGangguan: isGangguanFilter,
+  };
+
+  const { data, isLoading, error, mutate } = useSWR<{
+    products: TopupProduct[];
+    totalCount: number;
+  }>(["topup-products", queryKey], async () => {
+    const res = await getTopupProducts(queryKey);
+    if (res.error) throw new Error(res.error);
+    return { products: (res.data as TopupProduct[]) || [], totalCount: res.totalCount || 0 };
+  });
+
+  const products = data?.products ?? [];
+  const totalCount = data?.totalCount ?? 0;
+  const errorMessage = error instanceof Error ? error.message : "";
+
   const loadProducts = useCallback(
-    async (
-      filters: {
-        page?: number;
-        search?: string;
-        sortBy?: string;
-        sortOrder?: string;
-        isActive?: string;
-        isGangguan?: string;
-      } = {},
-    ) => {
-      try {
-        setIsLoading(true);
-        setError("");
-        const res = await getTopupProducts({
-          page: filters.page ?? currentPage,
-          limit: itemsPerPage,
-          search: filters.search ?? searchQuery,
-          sortBy: filters.sortBy ?? sortBy,
-          sortOrder: (filters.sortOrder ?? sortOrder) as "asc" | "desc",
-          isActive: filters.isActive ?? isActiveFilter,
-          isGangguan: filters.isGangguan ?? isGangguanFilter,
-        });
-
-        if (res.error) {
-          setError(res.error);
-        } else {
-          setProducts((res.data as TopupProduct[]) || []);
-          setTotalCount(res.totalCount || 0);
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Gagal mengambil data produk");
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [currentPage, searchQuery, sortBy, sortOrder, isActiveFilter, isGangguanFilter, itemsPerPage],
-  );
-
-  useEffect(() => {
-    let active = true;
-    getTopupProducts({
-      page: currentPage,
-      limit: itemsPerPage,
-      search: searchQuery,
-      sortBy,
-      sortOrder,
-      isActive: isActiveFilter,
-      isGangguan: isGangguanFilter,
-    })
-      .then((res) => {
-        if (!active) return;
-        if (res.error) {
-          setError(res.error);
-        } else {
-          setProducts((res.data as TopupProduct[]) || []);
-          setTotalCount(res.totalCount || 0);
-        }
-      })
-      .catch((err) => {
-        if (!active) return;
-        setError(err instanceof Error ? err.message : "Gagal mengambil data produk");
-      })
-      .finally(() => {
-        if (active) setIsLoading(false);
+    (filters: Parameters<typeof getTopupProducts>[0] = {}) => {
+      startTransition(() => {
+        mutate();
+        void filters;
       });
-
-    return () => {
-      active = false;
-    };
-  }, [currentPage, searchQuery, sortBy, sortOrder, isActiveFilter, isGangguanFilter, itemsPerPage]);
+    },
+    [mutate],
+  );
 
   const handleFilterChange = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -155,7 +113,7 @@ export function useTopupProducts() {
       itemsPerPage,
     },
     isLoading,
-    error,
+    error: errorMessage,
     uiState: {
       isAddModalOpen,
       searchQuery,

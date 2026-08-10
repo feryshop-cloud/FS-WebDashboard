@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useRef } from "react";
+import useSWR from "swr";
 import { formatRupiah } from "@/lib/utils";
 import { getErrorMessage } from "@/lib/error";
 import { getPurchases, purchaseStock, getGames, deletePurchase } from "@/actions/purchases";
@@ -15,10 +16,6 @@ export type Account = { id: string; name: string; is_active: boolean; balance: n
 export function usePurchases() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isAddClosing, setIsAddClosing] = useState(false);
-  const [purchases, setPurchases] = useState<Purchase[]>([]);
-  const [games, setGames] = useState<Game[]>([]);
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -46,41 +43,46 @@ export function usePurchases() {
     setIsAddOpen(true);
   };
 
-  const loadData = async () => {
-    try {
-      setIsLoading(true);
-      const [purchasesRes, gamesRes, accountsData] = await Promise.all([
-        getPurchases(),
-        getGames(),
-        getAccounts(),
-      ]);
-      setPurchases(purchasesRes.data || []);
-      setGames(gamesRes.data || []);
-      setAccounts((accountsData as unknown as Account[]) || []);
-    } catch (err) {
-      console.error("Error loading purchases data:", err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const purchasesKey = "purchases";
+  const {
+    data: purchases = [],
+    isLoading: purchasesLoading,
+    mutate: mutatePurchases,
+  } = useSWR<Purchase[]>(purchasesKey, async () => {
+    const res = await getPurchases();
+    if (res.error) throw new Error(res.error);
+    return (res.data as Purchase[]) || [];
+  });
 
-  useEffect(() => {
-    let active = true;
-    Promise.all([getPurchases(), getGames(), getAccounts()])
-      .then(([purchasesRes, gamesRes, accountsData]) => {
-        if (!active) return;
-        setPurchases(purchasesRes.data || []);
-        setGames(gamesRes.data || []);
-        setAccounts((accountsData as unknown as Account[]) || []);
-      })
-      .catch((err) => console.error(err))
-      .finally(() => {
-        if (active) setIsLoading(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
+  const gamesKey = "purchases-games";
+  const {
+    data: games = [],
+    isLoading: gamesLoading,
+    mutate: mutateGames,
+  } = useSWR<Game[]>(gamesKey, async () => {
+    const res = await getGames();
+    if (res.error) throw new Error(res.error);
+    return (res.data as Game[]) || [];
+  });
+
+  const accountsKey = "accounts";
+  const {
+    data: accounts = [],
+    isLoading: accountsLoading,
+    mutate: mutateAccounts,
+  } = useSWR<Account[]>(accountsKey, async () => {
+    const res = await getAccounts();
+    if ((res as unknown as { error?: string }).error)
+      throw new Error((res as unknown as { error?: string }).error);
+    return (res as unknown as Account[]) || [];
+  });
+
+  const isLoading = purchasesLoading || gamesLoading || accountsLoading;
+  const loadData = () => {
+    mutatePurchases();
+    mutateGames();
+    mutateAccounts();
+  };
 
   const handleAddPurchase = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
