@@ -38,7 +38,6 @@ const CLEANUP_TABLES = [
   "inventory",
   "accounts",
   "games",
-  "worker_heartbeat",
 ] as const;
 
 async function deleteAll(table: string) {

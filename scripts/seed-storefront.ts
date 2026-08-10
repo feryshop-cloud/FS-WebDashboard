@@ -90,7 +90,7 @@ const seedPaymentMethods = [
     fee: 0,
     fee_percent: 0.7,
     type: "qris",
-    status: "active",
+    status: "ACTIVE",
     group: "QRIS & E-Wallet",
   },
 ];
@@ -100,9 +100,9 @@ async function main() {
   for (const game of seedGames) {
     const { error } = await supabase.from("games").upsert(
       {
-        title: game.title,
+        name: game.title,
         slug: game.slug,
-        image: game.image,
+        image_url: game.image,
         banner: game.banner,
         logo: game.logo,
         developers: game.developers,
@@ -118,20 +118,26 @@ async function main() {
   console.log("Seeding storefront products...");
   for (const [slug, products] of Object.entries(seedProducts)) {
     for (const p of products) {
-      const { error } = await supabase.from("products").upsert(
-        {
-          id: p.id,
-          game_slug: slug,
-          title: p.title,
-          selling_price: p.selling_price,
-          selling_price_gold: p.selling_price_gold,
-          selling_price_platinum: p.selling_price_platinum,
-          promo_price: p.promo_price,
-          is_active: p.is_active,
-          sort_order: 1,
-        },
-        { onConflict: "id" },
-      );
+      const { error: delError } = await supabase
+        .from("products")
+        .delete()
+        .eq("sku", p.id);
+      if (delError) {
+        console.error("Error removing old product:", delError);
+        continue;
+      }
+
+      const { error } = await supabase.from("products").insert({
+        sku: p.id,
+        game_slug: slug,
+        title: p.title,
+        selling_price: p.selling_price,
+        selling_price_gold: p.selling_price_gold,
+        selling_price_platinum: p.selling_price_platinum,
+        promo_price: p.promo_price,
+        is_active: p.is_active,
+        sort_order: 1,
+      });
       if (error) console.error("Error seeding product:", error);
     }
   }
