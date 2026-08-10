@@ -452,7 +452,7 @@ export default function ProblemCasesPage() {
                   </label>
                   <select
                     value={editStatus}
-                    onChange={(e) => setEditStatus(e.target.value)}
+                    onChange={(e) => setEditStatus(e.target.value as Parameters<typeof setEditStatus>[0])}
                     className="border-border text-foreground w-full rounded-lg border px-3 py-2 text-sm font-semibold focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                   >
                     <option value="OPEN">Open (Baru)</option>

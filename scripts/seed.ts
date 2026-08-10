@@ -196,7 +196,7 @@ async function main() {
         post_price: 2000000,
         current_price: 2000000,
         status: "AVAILABLE",
-        purchase_payment_status: "LUNAS",
+        purchase_payment_status: "PENDING",
         images: [
           "https://picsum.photos/seed/val1/800/600",
           "https://picsum.photos/seed/val2/800/600",
@@ -247,7 +247,7 @@ async function main() {
         post_price: 1000000,
         current_price: 1000000,
         status: "AVAILABLE",
-        purchase_payment_status: "LUNAS",
+        purchase_payment_status: "PENDING",
         images: [
           "https://picsum.photos/seed/ff1/800/600",
           "https://picsum.photos/seed/ff2/800/600",

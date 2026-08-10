@@ -23,7 +23,7 @@ import { useFerryMail } from "@/lib/hooks/features/useFerryMail";
 
 export default function FerryMailPage() {
   const {
-    data: { filteredEmails, accounts, isLoadingAccounts },
+    data: { filteredEmails, pageItems, totalFiltered, totalPages, currentPage, accounts, isLoadingAccounts },
     uiState: {
       selectedEmail,
       searchQuery,
@@ -41,6 +41,7 @@ export default function FerryMailPage() {
       setSearchQuery,
       setActiveTab,
       setSelectedAccountId,
+      setCurrentPage,
       handleCopy,
       toggleCheck,
       toggleStar,
@@ -182,8 +183,33 @@ export default function FerryMailPage() {
               </button>
             </div>
 
-            {/* Right Side: Account picker + Search */}
+            {/* Right Side: Pager + Account picker + Search */}
             <div className="ml-auto flex items-center gap-2 pb-2">
+              {/* Compact pager */}
+              {totalPages > 1 && (
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                    disabled={currentPage === 1}
+                    className="text-muted-foreground hover:bg-muted disabled:opacity-30 rounded p-1 transition-colors"
+                    aria-label="Halaman sebelumnya"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
+                  </button>
+                  <span className="text-muted-foreground min-w-[48px] text-center text-xs font-semibold tabular-nums">
+                    {currentPage} / {totalPages}
+                  </span>
+                  <button
+                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                    disabled={currentPage === totalPages}
+                    className="text-muted-foreground hover:bg-muted disabled:opacity-30 rounded p-1 transition-colors"
+                    aria-label="Halaman berikutnya"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
+                  </button>
+                  <span className="text-faint-foreground text-xs tabular-nums">({totalFiltered})</span>
+                </div>
+              )}
               <div className="relative">
                 <Mail className="text-faint-foreground absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2" />
                 <select
@@ -228,7 +254,7 @@ export default function FerryMailPage() {
                 </span>
               </div>
             ) : (
-              filteredEmails.map((email) => (
+              pageItems.map((email) => (
                 <div
                   key={email.id}
                   onClick={() => setSelectedEmail(email)}

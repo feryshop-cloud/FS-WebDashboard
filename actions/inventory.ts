@@ -102,6 +102,7 @@ export async function addInventoryItem(formData: FormData) {
     image_urls: image_urls,
     status: "UNPOSTED",
     added_by: user.id,
+    public_id: null as any,
   });
 
   if (error) {

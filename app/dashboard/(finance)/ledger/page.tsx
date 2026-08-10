@@ -5,11 +5,14 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   ArrowRightLeft,
+  ArrowLeft,
   PenTool,
   Loader2,
   Plus,
   FileText,
   Trash2,
+  BadgeDollarSign,
+  ShoppingCart,
 } from "lucide-react";
 import { formatRupiah, formatDate } from "@/lib/utils";
 import { Pagination } from "@/components/ui/Pagination";
@@ -17,10 +20,11 @@ import { DataTable, type DataTableColumn } from "@/components/ui/DataTable";
 import { StatusBadge, type BadgeTone } from "@/components/ui/StatusBadge";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SearchInput } from "@/components/ui/SearchInput";
-import { FilterSelect } from "@/components/ui/FilterSelect";
+import { FilterDropdown, type FilterDropdownOption } from "@/components/ui/FilterDropdown";
 import { SlideOverDrawer } from "@/components/ui/SlideOverDrawer";
 import { IconButton } from "@/components/ui/IconButton";
 import { useLedger, type LedgerRecord } from "@/lib/hooks/features/useLedger";
+import { LEDGER_TYPE_LABELS, ledgerTypeLabel } from "@/lib/ledger";
 
 function LedgerPageContent() {
   const {
@@ -56,6 +60,14 @@ function LedgerPageContent() {
     },
   } = useLedger();
 
+  const typeOptions: FilterDropdownOption[] = [
+    { value: "ALL", label: "Semua Tipe Kas" },
+    ...Object.entries(LEDGER_TYPE_LABELS).map(([value, label]) => ({
+      value,
+      label,
+    })),
+  ];
+
   const columns: DataTableColumn<LedgerRecord>[] = [
     {
       key: "date",
@@ -79,7 +91,7 @@ function LedgerPageContent() {
       header: "Tipe Transaksi",
       render: (tx) => (
         <StatusBadge
-          label={tx.transaction_type}
+          label={ledgerTypeLabel(tx.transaction_type)}
           tone={txTypeTone(tx.transaction_type)}
           icon={txTypeIcon(tx.transaction_type)}
         />
@@ -180,16 +192,12 @@ function LedgerPageContent() {
           onChange={setSearchTerm}
           placeholder="Cari referensi, catatan, atau ID..."
         />
-        <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto">
-          <FilterSelect
+        <div className="flex w-full items-center gap-3 sm:w-auto">
+          <FilterDropdown
             value={typeFilter}
-            onChange={setTypeFilter}
+            onSelect={setTypeFilter}
             ariaLabel="Filter tipe kas"
-            options={[
-              { value: "ALL", label: "Semua Tipe Kas" },
-              { value: "IN", label: "Uang Masuk (IN)" },
-              { value: "OUT", label: "Uang Keluar (OUT)" },
-            ]}
+            options={typeOptions}
           />
         </div>
       </div>
@@ -260,10 +268,10 @@ function LedgerPageContent() {
                   required
                   className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                 >
-                  <option value="PAYMENT_IN">Uang Masuk (PAYMENT_IN)</option>
-                  <option value="PAYMENT_OUT">Uang Keluar (PAYMENT_OUT)</option>
-                  <option value="REFUND">Refund (REFUND)</option>
-                  <option value="ADJUSTMENT">Penyesuaian (ADJUSTMENT)</option>
+                  <option value="PAYMENT_IN">{ledgerTypeLabel("PAYMENT_IN")}</option>
+                  <option value="PAYMENT_OUT">{ledgerTypeLabel("PAYMENT_OUT")}</option>
+                  <option value="REFUND">{ledgerTypeLabel("REFUND")}</option>
+                  <option value="ADJUSTMENT">{ledgerTypeLabel("ADJUSTMENT")}</option>
                 </select>
               </div>
               <div>
@@ -354,7 +362,8 @@ function LedgerPageContent() {
                   Tipe Transaksi & Nominal
                 </label>
                 <p className="text-foreground text-sm font-bold">
-                  {editingLedger.transaction_type} ({formatRupiah(Number(editingLedger.amount))})
+                  {ledgerTypeLabel(editingLedger.transaction_type)} (
+                  {formatRupiah(Number(editingLedger.amount))})
                 </p>
               </div>
               <div>
@@ -403,11 +412,12 @@ function LedgerPageContent() {
 
 function txTypeTone(type: string): BadgeTone {
   switch (type) {
-    case "Pembayaran Masuk":
+    case "PAYMENT_IN":
+    case "TRANSFER_IN":
       return "emerald";
-    case "Mutasi Masuk":
-      return "blue";
-    case "Mutasi Keluar":
+    case "PAYMENT_OUT":
+    case "TRANSFER_OUT":
+    case "STOCK_PURCHASE":
       return "rose";
     default:
       return "amber";
@@ -415,9 +425,12 @@ function txTypeTone(type: string): BadgeTone {
 }
 
 function txTypeIcon(type: string) {
-  if (type === "Pembayaran Masuk") return ArrowUpRight;
-  if (type === "Mutasi Masuk") return ArrowRightLeft;
-  if (type === "Mutasi Keluar") return ArrowDownRight;
+  if (type === "PAYMENT_IN") return ArrowUpRight;
+  if (type === "PAYMENT_OUT") return ArrowDownRight;
+  if (type === "REFUND") return ArrowLeft;
+  if (type === "CASHBACK") return BadgeDollarSign;
+  if (type === "TRANSFER_IN" || type === "TRANSFER_OUT") return ArrowRightLeft;
+  if (type === "STOCK_PURCHASE") return ShoppingCart;
   return PenTool;
 }
 

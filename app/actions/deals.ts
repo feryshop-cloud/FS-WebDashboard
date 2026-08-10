@@ -135,13 +135,19 @@ export async function deleteDeal(id: string) {
       throw new Error("Sesi tidak valid. Silakan login kembali.");
     }
 
-    // 1. Delete deal items first
+    // 1. Delete trade-in items if any
+    const { error: tradeInErr } = await supabase.from("trade_in_items").delete().eq("deal_id", id);
+    if (tradeInErr) {
+      logger.error("Error deleting trade in items", { error: tradeInErr });
+    }
+
+    // 2. Delete deal items first
     const { error: itemsErr } = await supabase.from("deal_items").delete().eq("deal_id", id);
     if (itemsErr) {
       logger.error("Error deleting deal items", { error: itemsErr });
     }
 
-    // 2. Delete deal
+    // 3. Delete deal
     const { error } = await supabase.from("deals").delete().eq("id", id);
     if (error) {
       logger.error("Error deleting deal", { error });
@@ -152,6 +158,7 @@ export async function deleteDeal(id: string) {
     revalidatePath("/dashboard/inventory");
     revalidatePath("/dashboard/accounts");
     revalidatePath("/dashboard/ledger");
+    revalidatePath("/dashboard/trade-in");
   });
 }
 

@@ -25,12 +25,16 @@ async function main() {
     let customerId = customers?.[0]?.id || null;
     if (!customerId) {
       console.log("No customer found. Creating a dummy customer...");
-      const { data: newCust, error: custErr } = await supabase.from("customers").insert({
-        name: "Joko Susilo",
-        phone: "081234567890",
-        email: "joko@gmail.com",
-        notes: "Dummy Customer"
-      }).select("id").single();
+      const { data: newCust, error: custErr } = await supabase
+        .from("customers")
+        .insert({
+          name: "Joko Susilo",
+          phone: "081234567890",
+          email: "joko@gmail.com",
+          notes: "Dummy Customer",
+        })
+        .select("id")
+        .single();
       if (custErr) throw custErr;
       customerId = newCust.id;
     }
@@ -70,16 +74,17 @@ async function main() {
           post_price: 250000 + (idx % 100) * 1000,
           current_price: 240000 + (idx % 100) * 1000,
           status: "AVAILABLE",
+          purchase_payment_status: idx % 5 === 0 ? "PENDING" : "LUNAS",
           purchase_date: new Date().toISOString(),
           seller_info: "Feryshop Supplier Team",
           notes: "Generated automatically",
-          managed_by: userId
+          managed_by: userId,
         });
       }
       const { data: inserted, error } = await supabase.from("stocks").insert(batch).select("id");
       if (error) throw error;
       if (inserted) {
-        inserted.forEach(s => stockIds.push(s.id));
+        inserted.forEach((s) => stockIds.push(s.id));
       }
       console.log(`  Seeded stocks ${i + batch.length}/${totalRecords}`);
     }
@@ -101,13 +106,16 @@ async function main() {
           sku: `SKU-ML-${idx}`,
           is_active: true,
           is_gangguan: false,
-          sort_order: idx
+          sort_order: idx,
         });
       }
-      const { data: insertedProducts, error } = await supabase.from("products").insert(batch).select("id");
+      const { data: insertedProducts, error } = await supabase
+        .from("products")
+        .insert(batch)
+        .select("id");
       if (error) throw error;
       if (insertedProducts) {
-        insertedProducts.forEach(p => productIds.push(p.id));
+        insertedProducts.forEach((p) => productIds.push(p.id));
       }
       console.log(`  Seeded products ${i + batch.length}/${totalRecords}`);
     }
@@ -130,7 +138,7 @@ async function main() {
             status: type === "Penjualan" ? "PAID" : "DRAFT",
             due_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
             notes: `Auto seeded ${type} deal #${idx}`,
-            handled_by: userId
+            handled_by: userId,
           });
         }
         const { data: newDeals, error } = await supabase.from("deals").insert(batch).select("id");
@@ -143,7 +151,7 @@ async function main() {
             return {
               deal_id: deal.id,
               stock_id: stockId,
-              price: 300000 + (dIdx % 100) * 2000
+              price: 300000 + (dIdx % 100) * 2000,
             };
           });
           const { error: diErr } = await supabase.from("deal_items").insert(dealItemsBatch);
@@ -155,7 +163,7 @@ async function main() {
           const tradeInBatch = newDeals.map((deal, dIdx) => ({
             deal_id: deal.id,
             description: `Akun ML Level ${50 + dIdx}`,
-            estimated_value: 150000 + (dIdx % 10) * 5000
+            estimated_value: 150000 + (dIdx % 10) * 5000,
           }));
           const { error: tiErr } = await supabase.from("trade_in_items").insert(tradeInBatch);
           if (tiErr) throw tiErr;
@@ -189,7 +197,7 @@ async function main() {
           buy_status: "SUCCESS",
           serial_number: `SN-ML-${idx}-99823`,
           whatsapp: "089876543210",
-          email: `player${idx}@gmail.com`
+          email: `player${idx}@gmail.com`,
         });
       }
       const { error } = await supabase.from("orders").insert(batch);
@@ -209,7 +217,7 @@ async function main() {
           status: "OPEN", // Correct ENUM value ('OPEN', 'IN_PROGRESS', 'WAITING_CUSTOMER', 'WAITING_THIRD_PARTY', 'RESOLVED', 'CANNOT_RESOLVE', 'PERMANENT', 'REFUND', 'CANCEL')
           chronology: `Customer komplain akun dinonaktifkan pada transaksi #${idx}`,
           resolution: "",
-          handled_by: userId
+          handled_by: userId,
         });
       }
       const { error } = await supabase.from("problem_cases").insert(batch);
@@ -233,7 +241,7 @@ async function main() {
           used_count: 0,
           is_active: true,
           start_date: new Date().toISOString(),
-          end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+          end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
         });
       }
       const { error } = await supabase.from("promo_codes").insert(batch);

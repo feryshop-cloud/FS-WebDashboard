@@ -36,7 +36,7 @@ export async function createProblemCase(formData: FormData) {
     const supabase = await createClient();
 
     const issue_type = formData.get("issue_type")?.toString();
-    const status = formData.get("status")?.toString() || "OPEN";
+    const status = (formData.get("status")?.toString() || "OPEN") as ProblemCaseInsert["status"];
     const chronology = formData.get("chronology")?.toString();
     const related_type = formData.get("related_type")?.toString();
     const related_id = formData.get("related_id")?.toString();
@@ -107,9 +107,11 @@ export async function deleteProblemCase(id: string) {
   });
 }
 
+type ProblemCaseUpdate = Database["public"]["Tables"]["problem_cases"]["Update"];
+
 export async function updateProblemCase(
   id: string,
-  data: { status?: string; chronology?: string; issue_type?: string },
+  data: { status?: ProblemCaseUpdate["status"]; chronology?: string; issue_type?: string },
 ) {
   return runAction("updateProblemCase", async () => {
     const supabase = await createClient();

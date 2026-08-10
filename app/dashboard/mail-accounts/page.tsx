@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Plus, Search, Trash2, Edit, X, Save, Loader2, Mail } from "lucide-react";
+import { Plus, Search, Trash2, Edit, X, Save, Loader2, Mail, AlertCircle } from "lucide-react";
 import { useEmailAccounts } from "@/lib/hooks/features/useEmailAccounts";
 import { Pagination } from "@/components/ui/Pagination";
 
@@ -26,80 +26,86 @@ export default function EmailAccountsPage() {
   } = useEmailAccounts();
 
   return (
-    <>
+    <div className="flex flex-col gap-6">
       {/* Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h1 className="text-foreground text-2xl font-bold tracking-tight">Kelola Akun Email</h1>
-          <p className="text-muted-foreground mt-0.5 text-sm">
+          <p className="text-muted-foreground mt-1 text-sm">
             Alamat email yang menjadi penerima kode OTP di kotak masuk FerryMail.
           </p>
         </div>
         <button
           onClick={openAdd}
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 active:scale-[0.97] sm:w-auto"
+          className="inline-flex items-center justify-center gap-2 rounded-xl border border-transparent bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700 active:scale-[0.97] sm:w-auto"
         >
           <Plus className="h-4 w-4" />
           Tambah Akun Email
         </button>
       </div>
 
+      {/* Error Banner */}
       {error && (
-        <div className="border-border-soft border-l-4 border-l-rose-500 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-          {error}
+        <div className="flex items-start gap-3 rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
       {/* Search */}
-      <div className="relative max-w-md">
-        <Search className="text-faint-foreground absolute top-2.5 left-3 h-4 w-4" />
+      <div className="relative max-w-sm">
+        <Search className="text-faint-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Cari email atau nama akun..."
-          className="border-border bg-card w-full rounded-lg border py-2 pr-4 pl-9 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          className="border-border bg-card w-full rounded-xl border py-2.5 pr-4 pl-9 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
         />
       </div>
 
       {/* Table */}
       {isLoading ? (
-        <div className="flex items-center justify-center py-12">
+        <div className="flex items-center justify-center py-16">
           <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-card border-border-soft text-muted-foreground flex flex-col items-center gap-2 rounded-xl border py-12 text-sm">
-          <Mail className="h-6 w-6 opacity-40" />
-          {accounts.length === 0
-            ? "Belum ada akun email. Tambahkan alamat penerima OTP untuk mulai menerima email."
-            : "Tidak ada akun yang cocok dengan pencarian."}
+        <div className="bg-card border-border-soft text-muted-foreground flex flex-col items-center gap-3 rounded-2xl border py-16 text-sm">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-blue-100 bg-blue-50 text-blue-500">
+            <Mail className="h-5 w-5" />
+          </div>
+          <p className="max-w-xs text-center">
+            {accounts.length === 0
+              ? "Belum ada akun email. Tambahkan alamat penerima OTP untuk mulai menerima email."
+              : "Tidak ada akun yang cocok dengan pencarian."}
+          </p>
         </div>
       ) : (
-        <div className="border-border-soft bg-card overflow-x-auto rounded-xl border shadow-sm">
-          <table className="w-full min-w-180 text-left text-sm">
-            <thead className="border-border-soft bg-muted/50 text-faint-foreground border-b text-xs font-bold uppercase">
+        <div className="border-border-soft bg-card overflow-x-auto rounded-2xl border shadow-sm">
+          <table className="w-full min-w-[560px] text-left text-sm">
+            <thead className="border-border-soft bg-muted/50 text-faint-foreground border-b text-xs font-bold uppercase tracking-wide">
               <tr>
-                <th className="px-5 py-3">Akun</th>
-                <th className="px-4 py-3">Sync Terakhir</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3 text-right">Aksi</th>
+                <th className="px-5 py-3.5">Akun</th>
+                <th className="px-5 py-3.5">Sync Terakhir</th>
+                <th className="px-5 py-3.5">Status</th>
+                <th className="px-5 py-3.5 text-right">Aksi</th>
               </tr>
             </thead>
             <tbody>
               {pageItems.map((acc) => (
                 <tr
                   key={acc.id}
-                  className="border-border-soft hover:bg-muted/30 border-b last:border-0"
+                  className="border-border-soft hover:bg-muted/30 border-b transition-colors last:border-0"
                 >
-                  <td className="px-5 py-3">
-                    <div className="text-foreground font-semibold">
+                  <td className="px-5 py-4">
+                    <div className="text-foreground font-semibold leading-snug">
                       {acc.display_name || acc.email}
                     </div>
                     {acc.display_name && (
-                      <div className="text-muted-foreground font-mono text-xs">{acc.email}</div>
+                      <div className="text-muted-foreground mt-0.5 font-mono text-xs">{acc.email}</div>
                     )}
                   </td>
-                  <td className="text-muted-foreground px-4 py-3 text-xs">
+                  <td className="text-muted-foreground px-5 py-4 text-xs">
                     {acc.last_synced_at
                       ? new Date(acc.last_synced_at).toLocaleString("id-ID", {
                           day: "numeric",
@@ -110,9 +116,9 @@ export default function EmailAccountsPage() {
                         })
                       : "Belum pernah"}
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-5 py-4">
                     <span
-                      className={`inline-block rounded px-2 py-0.5 text-[10px] font-bold ${
+                      className={`inline-block rounded-md px-2.5 py-1 text-xs font-bold tracking-wide ${
                         acc.is_active
                           ? "bg-emerald-100 text-emerald-700"
                           : "bg-muted text-muted-foreground"
@@ -121,11 +127,11 @@ export default function EmailAccountsPage() {
                       {acc.is_active ? "AKTIF" : "NONAKTIF"}
                     </span>
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="flex justify-end gap-1">
+                  <td className="px-5 py-4">
+                    <div className="flex justify-end gap-1.5">
                       <button
                         onClick={() => openEdit(acc)}
-                        className="rounded p-1.5 text-emerald-600 transition-colors hover:bg-emerald-50"
+                        className="rounded-lg p-1.5 text-emerald-600 transition-colors hover:bg-emerald-50"
                         title="Edit"
                       >
                         <Edit className="h-4 w-4" />
@@ -133,7 +139,7 @@ export default function EmailAccountsPage() {
                       <button
                         onClick={() => handleDelete(acc)}
                         disabled={isSubmitting}
-                        className="rounded p-1.5 text-rose-600 transition-colors hover:bg-rose-50 disabled:opacity-50"
+                        className="rounded-lg p-1.5 text-rose-500 transition-colors hover:bg-rose-50 disabled:opacity-40"
                         title="Hapus"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -147,6 +153,7 @@ export default function EmailAccountsPage() {
         </div>
       )}
 
+      {/* Pagination */}
       {filtered.length > 0 && (
         <Pagination
           currentPage={safePage}
@@ -161,7 +168,7 @@ export default function EmailAccountsPage() {
         />
       )}
 
-      {/* Create / Edit Modal */}
+      {/* Create / Edit Drawer */}
       {(isAddOpen || isAddClosing) && (
         <div
           className={`fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm ${
@@ -175,6 +182,7 @@ export default function EmailAccountsPage() {
               isAddClosing ? "fs-drawer-out" : "fs-drawer-in"
             }`}
           >
+            {/* Drawer Header */}
             <div className="border-border-soft flex items-center justify-between border-b px-6 py-5">
               <div>
                 <h2 className="text-foreground text-base font-bold">
@@ -188,22 +196,26 @@ export default function EmailAccountsPage() {
               </div>
               <button
                 onClick={closeModal}
-                className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-lg p-1.5"
+                className="text-faint-foreground hover:bg-muted hover:text-muted-foreground rounded-lg p-1.5 transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
+            {/* Drawer Body */}
             <form onSubmit={handleSave} className="fs-rise-in flex flex-1 flex-col overflow-hidden">
-              <div className="flex-1 space-y-4 overflow-y-auto p-6">
+              <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-6 py-5">
+                {/* Inline error inside drawer */}
                 {error && (
-                  <div className="fs-drop-in rounded-lg border border-rose-100 bg-rose-50 p-3 text-xs font-medium text-rose-700">
-                    {error}
+                  <div className="flex items-start gap-2.5 rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-xs font-medium text-rose-700">
+                    <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                    <span>{error}</span>
                   </div>
                 )}
 
-                <div>
-                  <label className="text-foreground mb-1 block text-xs font-semibold">
+                {/* Alamat Email */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-foreground text-xs font-semibold">
                     Alamat Email <span className="text-rose-500">*</span>
                   </label>
                   <input
@@ -212,12 +224,13 @@ export default function EmailAccountsPage() {
                     onChange={(e) => setField("email", e.target.value)}
                     required
                     placeholder="otp@ferryshop.com"
-                    className="border-border w-full rounded-lg border px-3 py-2 font-mono text-sm outline-none focus:border-blue-500"
+                    className="border-border w-full rounded-xl border px-3 py-2.5 font-mono text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                   />
                 </div>
 
-                <div>
-                  <label className="text-foreground mb-1 block text-xs font-semibold">
+                {/* Nama Tampilan */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-foreground text-xs font-semibold">
                     Nama Tampilan
                   </label>
                   <input
@@ -225,29 +238,32 @@ export default function EmailAccountsPage() {
                     value={form.display_name}
                     onChange={(e) => setField("display_name", e.target.value)}
                     placeholder="Contoh: Kotak Masuk OTP Utama"
-                    className="border-border w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-blue-500"
+                    className="border-border w-full rounded-xl border px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                   />
                 </div>
 
-                <div className="flex items-end pt-1">
-                  <label className="flex items-center gap-2 text-sm font-semibold">
-                    <input
-                      type="checkbox"
-                      checked={form.is_active}
-                      onChange={(e) => setField("is_active", e.target.checked)}
-                      className="h-4 w-4"
-                    />
-                    Akun Aktif (ikut disinkronkan)
-                  </label>
-                </div>
+                {/* Toggle Aktif */}
+                <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-border bg-muted/40 px-4 py-3 text-sm font-semibold transition-colors hover:bg-muted/70">
+                  <input
+                    type="checkbox"
+                    checked={form.is_active}
+                    onChange={(e) => setField("is_active", e.target.checked)}
+                    className="h-4 w-4 rounded accent-blue-600"
+                  />
+                  <div>
+                    <div className="text-foreground text-xs font-semibold">Akun Aktif</div>
+                    <div className="text-muted-foreground text-xs font-normal">Ikut disinkronkan saat FerryMail berjalan</div>
+                  </div>
+                </label>
               </div>
 
-              <div className="border-border-soft bg-card border-t p-6">
-                <div className="flex w-full flex-col gap-2">
+              {/* Drawer Footer */}
+              <div className="border-border-soft bg-card border-t px-6 py-4">
+                <div className="flex items-center gap-3">
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+                    className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
                   >
                     {isSubmitting ? (
                       <>
@@ -265,7 +281,7 @@ export default function EmailAccountsPage() {
                     type="button"
                     onClick={closeModal}
                     disabled={isSubmitting}
-                    className="text-muted-foreground hover:bg-muted inline-flex w-full items-center justify-center rounded-lg px-4 py-2 text-xs font-semibold disabled:opacity-50"
+                    className="text-muted-foreground hover:bg-muted rounded-xl px-4 py-2.5 text-xs font-semibold transition-colors disabled:opacity-50"
                   >
                     Batal
                   </button>
@@ -275,6 +291,6 @@ export default function EmailAccountsPage() {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

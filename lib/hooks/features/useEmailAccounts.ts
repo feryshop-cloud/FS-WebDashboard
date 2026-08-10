@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import useSWR from "swr";
 import { getErrorMessage } from "@/lib/error";
+import { useDebouncedValue } from "@/lib/hooks/useDebouncedValue";
 import {
   getEmailAccounts,
   createEmailAccount,
@@ -25,6 +26,7 @@ export const emptyEmailAccountForm: EmailAccountForm = {
 
 export function useEmailAccounts() {
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebouncedValue(search, 300);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -35,6 +37,10 @@ export function useEmailAccounts() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch]);
 
   const {
     data: accounts = [],
@@ -121,12 +127,11 @@ export function useEmailAccounts() {
   };
 
   const filtered = useMemo(() => {
-    const q = search.toLowerCase();
+    const q = debouncedSearch.toLowerCase();
     return accounts.filter(
-      (a) =>
-        a.email.toLowerCase().includes(q) || (a.display_name || "").toLowerCase().includes(q),
+      (a) => a.email.toLowerCase().includes(q) || (a.display_name || "").toLowerCase().includes(q),
     );
-  }, [accounts, search]);
+  }, [accounts, debouncedSearch]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
   const safePage = Math.min(currentPage, totalPages);

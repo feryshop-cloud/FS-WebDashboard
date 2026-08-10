@@ -20,13 +20,33 @@ export function useAccounts() {
   const [isAddAccountClosing, setIsAddAccountClosing] = useState(false);
   const [isMutasiOpen, setIsMutasiOpen] = useState(false);
   const [isMutasiClosing, setIsMutasiClosing] = useState(false);
+  const [isAdjustOpen, setIsAdjustOpen] = useState(false);
+  const [isAdjustClosing, setIsAdjustClosing] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
   const [isEditAccountClosing, setIsEditAccountClosing] = useState(false);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const fetchRole = async () => {
+      const { createClient } = await import("@/lib/supabase/client");
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data } = await supabase
+          .from("users")
+          .select("roles(name)")
+          .eq("id", user.id)
+          .maybeSingle();
+        setCurrentUserRole((data?.roles as { name?: string } | null)?.name || null);
+      }
+    };
+    fetchRole();
+  }, []);
 
   const {
     data: accounts = [],
@@ -148,6 +168,75 @@ export function useAccounts() {
     }
   };
 
+  const {
+    data: adjustments = [],
+    mutate: mutateAdjustments,
+  } = useSWR<any[]>("balance-adjustments", async () => {
+    const { getBalanceAdjustments } = await import("@/app/actions/accounts");
+    return (await getBalanceAdjustments()) || [];
+  });
+
+  const closeAdjust = () => {
+    if (isAdjustClosing || isSubmitting) return;
+    setIsAdjustClosing(true);
+    setTimeout(() => {
+      setIsAdjustClosing(false);
+      setIsAdjustOpen(false);
+    }, 200);
+  };
+
+  const openAdjust = () => {
+    setError("");
+    if (isAdjustClosing) return;
+    setIsAdjustOpen(true);
+  };
+
+  const handleRequestAdjustment = async (formData: FormData) => {
+    try {
+      setIsSubmitting(true);
+      setError("");
+      const { requestBalanceAdjustment } = await import("@/app/actions/accounts");
+      await requestBalanceAdjustment(formData);
+      loadAccounts();
+      mutateAdjustments();
+      closeAdjust();
+    } catch (err: unknown) {
+      setError(getErrorMessage(err));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleApproveAdjustment = async (id: string) => {
+    try {
+      setIsSubmitting(true);
+      setError("");
+      const { approveBalanceAdjustment } = await import("@/app/actions/accounts");
+      await approveBalanceAdjustment(id);
+      loadAccounts();
+      mutateAdjustments();
+    } catch (err: unknown) {
+      setError(getErrorMessage(err));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleRejectAdjustment = async (id: string) => {
+    try {
+      setIsSubmitting(true);
+      setError("");
+      const { rejectBalanceAdjustment } = await import("@/app/actions/accounts");
+      await rejectBalanceAdjustment(id);
+      loadAccounts();
+      mutateAdjustments();
+    } catch (err: unknown) {
+      setError(getErrorMessage(err));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const totalBalance = accounts.reduce((sum, acc) => sum + Number(acc.balance), 0);
 
   const getIcon = (type: string) => {
@@ -167,6 +256,7 @@ export function useAccounts() {
     data: {
       accounts,
       totalBalance,
+      adjustments,
     },
     isLoading,
     isSubmitting,
@@ -177,9 +267,12 @@ export function useAccounts() {
       isAddAccountClosing,
       isMutasiOpen,
       isMutasiClosing,
+      isAdjustOpen,
+      isAdjustClosing,
       editingAccount,
       isEditAccountClosing,
       openMenuId,
+      currentUserRole,
     },
     refs: {
       menuRef,
@@ -193,6 +286,8 @@ export function useAccounts() {
       closeAddAccount,
       openMutasi,
       closeMutasi,
+      openAdjust,
+      closeAdjust,
       setEditingAccount,
       closeEditAccount,
       setOpenMenuId,
@@ -200,6 +295,9 @@ export function useAccounts() {
       handleUpdateAccount,
       handleDeleteAccount,
       handleMutasi,
+      handleRequestAdjustment,
+      handleApproveAdjustment,
+      handleRejectAdjustment,
       loadAccounts,
     },
   };

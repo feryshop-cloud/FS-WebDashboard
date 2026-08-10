@@ -84,29 +84,26 @@ export default function TopupOrdersPage() {
       </div>
 
       {/* Action Bar */}
-      <div className="border-border-soft bg-card flex flex-col gap-4 rounded-xl border p-4 shadow-sm lg:flex-row lg:items-center">
-        <div className="relative w-full lg:w-96">
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <Search className="text-faint-foreground h-4 w-4" />
-          </div>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleApplyFilters();
-            }}
-            className="border-border bg-muted text-foreground placeholder-placeholder block w-full rounded-lg border py-2 pr-3 pl-10 transition-all outline-none focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-            placeholder="Cari order ID, nickname, atau ID game..."
-          />
-        </div>
+      <div className="border-border bg-card flex flex-col gap-4 rounded-xl border p-4 shadow-sm">
         <div className="flex flex-wrap items-center gap-3">
-          <div className="border-border bg-card flex items-center gap-2 rounded-lg border px-3 py-2">
-            <Filter className="text-faint-foreground h-4 w-4" />
+          {/* Search */}
+          <div className="relative min-w-50 flex-1">
+            <Search className="text-faint-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="border-border bg-muted w-full rounded-lg border py-2 pr-4 pl-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+              placeholder="Cari order ID, nickname, atau ID game..."
+            />
+          </div>
+
+          {/* Status Pembayaran Filter */}
+          <div className="relative min-w-48">
             <select
               value={paymentStatus}
               onChange={(e) => setPaymentStatus(e.target.value)}
-              className="text-foreground bg-transparent text-sm font-medium outline-none"
+              className="border-border bg-muted text-foreground w-full appearance-none rounded-lg border py-2 pr-8 pl-3 text-sm font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
             >
               <option value="">Semua Status Pembayaran</option>
               {VALID_PAYMENT_STATUSES.map((s) => (
@@ -115,14 +112,15 @@ export default function TopupOrdersPage() {
                 </option>
               ))}
             </select>
-            <ChevronDown className="text-faint-foreground h-4 w-4" />
+            <ChevronDown className="text-faint-foreground pointer-events-none absolute top-1/2 right-2 h-4 w-4 -translate-y-1/2" />
           </div>
-          <div className="border-border bg-card flex items-center gap-2 rounded-lg border px-3 py-2">
-            <Filter className="text-faint-foreground h-4 w-4" />
+
+          {/* Status Pengiriman Filter */}
+          <div className="relative min-w-48">
             <select
               value={buyStatus}
               onChange={(e) => setBuyStatus(e.target.value)}
-              className="text-foreground bg-transparent text-sm font-medium outline-none"
+              className="border-border bg-muted text-foreground w-full appearance-none rounded-lg border py-2 pr-8 pl-3 text-sm font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
             >
               <option value="">Semua Status Pengiriman</option>
               {VALID_BUY_STATUSES.map((s) => (
@@ -131,20 +129,18 @@ export default function TopupOrdersPage() {
                 </option>
               ))}
             </select>
-            <ChevronDown className="text-faint-foreground h-4 w-4" />
+            <ChevronDown className="text-faint-foreground pointer-events-none absolute top-1/2 right-2 h-4 w-4 -translate-y-1/2" />
           </div>
-          <button
-            onClick={handleApplyFilters}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700"
-          >
-            Terapkan
-          </button>
-          <button
-            onClick={handleResetFilters}
-            className="border-border bg-card text-foreground hover:bg-muted inline-flex items-center justify-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium shadow-sm transition-colors"
-          >
-            Reset
-          </button>
+
+          {(searchQuery || paymentStatus || buyStatus) && (
+            <button
+              onClick={handleResetFilters}
+              className="border-border bg-muted text-foreground hover:bg-muted inline-flex items-center gap-1 rounded-lg border px-3 py-2 text-sm font-medium transition-colors"
+            >
+              <X className="h-3 w-3" />
+              Reset
+            </button>
+          )}
         </div>
       </div>
 
@@ -246,15 +242,18 @@ export default function TopupOrdersPage() {
                       <span
                         className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${getPaymentBadgeClass(order.payment_status)}`}
                       >
-                        {PaymentStatusLabel[order.payment_status as PaymentStatus] ||
-                          order.payment_status}
+                        {order.payment_status.toUpperCase() === "COMPLETED"
+                          ? "Lunas"
+                          : PaymentStatusLabel[order.payment_status.toLowerCase() as PaymentStatus] ||
+                            order.payment_status}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-center whitespace-nowrap">
                       <span
                         className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${getBuyBadgeClass(order.buy_status)}`}
                       >
-                        {BuyStatusLabel[order.buy_status as BuyStatus] || order.buy_status}
+                        {BuyStatusLabel[order.buy_status.toLowerCase() as BuyStatus] ||
+                          order.buy_status}
                       </span>
                     </td>
                     <td className="text-muted-foreground px-6 py-4 text-right text-sm whitespace-nowrap">
@@ -263,11 +262,23 @@ export default function TopupOrdersPage() {
                     <td className="px-6 py-4 text-center text-sm font-medium whitespace-nowrap">
                       <button
                         onClick={() => handleOpenOrder(order)}
-                        disabled={LOCKED_BUY_STATUSES.includes(order.buy_status)}
-                        className="inline-flex items-center gap-1 rounded-md border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs font-semibold text-blue-600 transition-colors hover:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-40"
+                        className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-semibold transition-colors active:scale-[0.97] ${
+                          LOCKED_BUY_STATUSES.includes(order.buy_status.toLowerCase())
+                            ? "border border-muted bg-muted text-muted-foreground hover:bg-muted/80"
+                            : "border border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100"
+                        }`}
                       >
-                        <CheckCircle2 className="h-3.5 w-3.5" />
-                        {LOCKED_BUY_STATUSES.includes(order.buy_status) ? "Selesai" : "Proses"}
+                        {LOCKED_BUY_STATUSES.includes(order.buy_status.toLowerCase()) ? (
+                          <>
+                            <FileText className="h-3.5 w-3.5" />
+                            Detail
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle2 className="h-3.5 w-3.5" />
+                            Proses
+                          </>
+                        )}
                       </button>
                     </td>
                   </tr>
@@ -427,8 +438,10 @@ export default function TopupOrdersPage() {
                       <span
                         className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${getPaymentBadgeClass(selectedOrder.payment_status)}`}
                       >
-                        {PaymentStatusLabel[selectedOrder.payment_status as PaymentStatus] ||
-                          selectedOrder.payment_status}
+                        {selectedOrder.payment_status.toUpperCase() === "COMPLETED"
+                          ? "Lunas"
+                          : PaymentStatusLabel[selectedOrder.payment_status.toLowerCase() as PaymentStatus] ||
+                            selectedOrder.payment_status}
                       </span>
                     </dd>
                   </div>
@@ -442,7 +455,7 @@ export default function TopupOrdersPage() {
                   )}
                 </dl>
               </div>
-
+ 
               {/* Fulfillment form */}
               <div className="space-y-4">
                 <div>
@@ -456,7 +469,7 @@ export default function TopupOrdersPage() {
                       setSelectedOrder({ ...selectedOrder, serial_number: e.target.value })
                     }
                     placeholder="Masukkan SN atau bukti pengiriman..."
-                    disabled={LOCKED_BUY_STATUSES.includes(selectedOrder.buy_status)}
+                    disabled={LOCKED_BUY_STATUSES.includes(selectedOrder.buy_status.toLowerCase())}
                     className="border-border disabled:bg-muted disabled:text-faint-foreground w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed"
                   />
                 </div>
@@ -465,11 +478,11 @@ export default function TopupOrdersPage() {
                     Ubah Status Pesanan
                   </label>
                   <select
-                    value={selectedOrder.buy_status}
+                    value={selectedOrder.buy_status.toLowerCase()}
                     onChange={(e) =>
                       setSelectedOrder({ ...selectedOrder, buy_status: e.target.value })
                     }
-                    disabled={LOCKED_BUY_STATUSES.includes(selectedOrder.buy_status)}
+                    disabled={LOCKED_BUY_STATUSES.includes(selectedOrder.buy_status.toLowerCase())}
                     className="border-border disabled:bg-muted disabled:text-faint-foreground w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed"
                   >
                     {VALID_BUY_STATUSES.map((s) => (
@@ -482,18 +495,17 @@ export default function TopupOrdersPage() {
               </div>
             </div>
 
-            <div className="border-border-soft bg-card border-t p-6">
-              <button
-                onClick={handleSaveOrder}
-                disabled={
-                  isSaving ||
-                  (selectedOrder && LOCKED_BUY_STATUSES.includes(selectedOrder.buy_status))
-                }
-                className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {isSaving ? "Menyimpan..." : "Simpan Perubahan"}
-              </button>
-            </div>
+            {selectedOrder && !LOCKED_BUY_STATUSES.includes(selectedOrder.buy_status.toLowerCase()) && (
+              <div className="border-border-soft bg-card border-t p-6">
+                <button
+                  onClick={handleSaveOrder}
+                  disabled={isSaving}
+                  className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {isSaving ? "Menyimpan..." : "Simpan Perubahan"}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

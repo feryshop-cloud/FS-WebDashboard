@@ -28,6 +28,11 @@ export function useTradeIn() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+
+  const [deleteTarget, setDeleteTarget] = useState<Deal | null>(null);
+  const [deleteError, setDeleteError] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const {
     data: deals = [],
@@ -99,9 +104,18 @@ export function useTradeIn() {
 
   const filteredDeals = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
-    if (!query) return deals;
 
     return deals.filter((tt) => {
+      if (statusFilter) {
+        const dealStatus = (tt.status as string) || "";
+        if (statusFilter === "BOOKED" && dealStatus !== "BOOKED") return false;
+        if (statusFilter === "PAID" && dealStatus !== "PAID") return false;
+        if (statusFilter === "COMPLETED" && dealStatus !== "COMPLETED") return false;
+        if (statusFilter === "CANCELLED" && !dealStatus.toUpperCase().includes("CANCEL")) return false;
+      }
+
+      if (!query) return true;
+
       const dealNumber = tt.deal_number?.toLowerCase() || "";
       const customerName =
         (tt.customers as { name?: string | null } | null)?.name?.toLowerCase() || "";
@@ -117,12 +131,111 @@ export function useTradeIn() {
         tradeInItemsDesc.includes(query)
       );
     });
-  }, [deals, searchQuery]);
+  }, [deals, searchQuery, statusFilter]);
+
+  const handleExportCSV = () => {
+    if (deals.length === 0) return;
+
+    const headers = [
+      "ID Transaksi",
+      "Customer",
+      "Aset Masuk (Aset Customer)",
+      "Nilai Aset Masuk",
+      "Stok Keluar (Feryshop)",
+      "Nilai Stok Keluar",
+      "Status",
+      "Tanggal",
+    ];
+
+    const rows = deals.map((tt) => {
+      const inItemsDesc = (tt.trade_in_items || [])
+        .map((item) => String((item as { description?: string }).description || ""))
+        .join(" & ");
+      const inItemsValue = (tt.trade_in_items || [])
+        .reduce((sum: number, item) => sum + Number((item as { estimated_value?: number }).estimated_value || 0), 0);
+      const stockOutName = tt.deal_items?.[0]?.stocks?.name || "N/A";
+
+      return [
+        tt.deal_number,
+        (tt.customers as { name?: string | null } | null)?.name || "-",
+        inItemsDesc || "-",
+        inItemsValue,
+        stockOutName,
+        Number(tt.total_deal_price || 0),
+        tt.status || "-",
+        new Date(tt.created_at as string).toLocaleString("id-ID"),
+      ];
+    });
+
+    const csvContent =
+      "\uFEFF" +
+      [headers.join(","), ...rows.map((e) => e.map((val) => `"${val}"`).join(","))].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `tukar-tambah-deals_${new Date().toISOString().split("T")[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleDeleteDeal = async (id: string) => {
+    try {
+      setIsDeleting(true);
+      setDeleteError("");
+      const { deleteDeal } = await import("@/app/actions/deals");
+      await deleteDeal(id);
+      loadData();
+      setDeleteTarget(null);
+    } catch (err: unknown) {
+      setDeleteError(getErrorMessage(err));
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const [editTarget, setEditTarget] = useState<Deal | null>(null);
+
+  const openEditTT = (tt: Deal) => {
+    setEditTarget(tt);
+    setPriceOut(Number(tt.total_deal_price || 0));
+    const inValue = Number(
+      (tt.trade_in_items?.[0] as { estimated_value?: number } | undefined)?.estimated_value || 0
+    );
+    setTtValue(inValue);
+    setPaymentAmount(Math.abs(Number(tt.total_deal_price || 0) - inValue));
+    setError("");
+  };
+
+  const closeEditTT = () => {
+    setEditTarget(null);
+    setPriceOut(0);
+    setTtValue(0);
+    setPaymentAmount(0);
+    setError("");
+  };
+
+  const handleUpdateTT = async (formData: FormData) => {
+    try {
+      if (!editTarget) return;
+      setIsSubmitting(true);
+      setError("");
+      const { updateTukarTambah } = await import("@/app/actions/trade-in");
+      await updateTukarTambah(editTarget.id, formData);
+      loadData();
+      closeEditTT();
+    } catch (err: unknown) {
+      setError(getErrorMessage(err));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentPage(1);
-  }, [searchQuery]);
+  }, [searchQuery, statusFilter]);
 
   const totalPages = Math.max(1, Math.ceil(filteredDeals.length / itemsPerPage));
   const safePage = Math.min(currentPage, totalPages);
@@ -141,6 +254,10 @@ export function useTradeIn() {
       safePage,
       pageStart,
       itemsPerPage,
+      deleteTarget,
+      deleteError,
+      isDeleting,
+      editTarget,
     },
     isLoading,
     isSubmitting,
@@ -154,6 +271,7 @@ export function useTradeIn() {
       currentPage,
       itemsPerPage,
       searchQuery,
+      statusFilter,
     },
     actions: {
       openAddTT,
@@ -165,6 +283,13 @@ export function useTradeIn() {
       setCurrentPage,
       setItemsPerPage,
       setSearchQuery,
+      setStatusFilter,
+      handleExportCSV,
+      setDeleteTarget,
+      handleDeleteDeal,
+      openEditTT,
+      closeEditTT,
+      handleUpdateTT,
       loadData,
     },
   };

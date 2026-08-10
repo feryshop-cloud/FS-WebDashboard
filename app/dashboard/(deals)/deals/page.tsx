@@ -25,7 +25,15 @@ export default function DealsPage() {
     isDeleting,
     error,
     deleteError,
-    uiState: { isAddDealOpen, isAddDealClosing, itemsPerPage, deleteTarget },
+    uiState: {
+      isAddDealOpen,
+      isAddDealClosing,
+      itemsPerPage,
+      deleteTarget,
+      searchQuery,
+      statusFilter,
+      dateFilter,
+    },
     actions: {
       openAddDeal,
       closeAddDeal,
@@ -35,6 +43,9 @@ export default function DealsPage() {
       setDeleteTarget,
       setCurrentPage,
       setItemsPerPage,
+      setSearchQuery,
+      setStatusFilter,
+      setDateFilter,
     },
   } = useDeals();
 
@@ -81,22 +92,60 @@ export default function DealsPage() {
           </div>
           <input
             type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="border-border bg-muted text-foreground placeholder-placeholder block w-full rounded-lg border py-2 pr-3 pl-10 transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 sm:text-sm"
             placeholder="Cari nomor deal, customer, atau stok..."
           />
         </div>
         <div className="flex w-full items-center gap-3 sm:w-auto">
-          <button className="border-border bg-card text-foreground hover:bg-muted inline-flex w-full min-w-35 items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm font-medium sm:w-auto">
-            <div className="flex items-center gap-2">
-              <Filter className="text-faint-foreground h-4 w-4" />
-              <span>Semua Status</span>
-            </div>
-            <ChevronDown className="text-faint-foreground h-4 w-4" />
-          </button>
-          <button className="border-border bg-card text-foreground hover:bg-muted inline-flex w-full min-w-35 items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm font-medium sm:w-auto">
-            <span>Pilih Tanggal</span>
-            <ChevronDown className="text-faint-foreground h-4 w-4" />
-          </button>
+          <div className="relative w-full sm:w-auto">
+            <Filter className="text-faint-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+            <select
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="border-border bg-card text-foreground hover:bg-muted block w-full min-w-35 cursor-pointer appearance-none rounded-lg border py-2 pr-8 pl-9 text-sm font-medium transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 sm:w-auto"
+            >
+              <option value="ALL">Semua Status</option>
+              <option value="DRAFT">Draft</option>
+              <option value="PAID">Paid (Lunas)</option>
+              <option value="BOOKED">Booked (Booking)</option>
+              <option value="LIMITED_ACCESS">Akses Terbatas</option>
+              <option value="CANCELLED_BY_BUYER">Cancelled by Buyer</option>
+              <option value="CANCELLED_BY_SELLER">Cancelled by Seller</option>
+              <option value="COMPLETED">Completed (Selesai)</option>
+              <option value="PROBLEM">Problem</option>
+            </select>
+            <ChevronDown className="text-faint-foreground pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
+          </div>
+          <div className="relative w-full sm:w-auto">
+            <input
+              type="date"
+              value={dateFilter}
+              onChange={(e) => {
+                setDateFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="border-border bg-card text-foreground hover:bg-muted block w-full min-w-35 cursor-pointer rounded-lg border py-2 pr-8 pl-3 text-sm font-medium transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 sm:w-auto"
+            />
+            {dateFilter ? (
+              <button
+                onClick={() => {
+                  setDateFilter("");
+                  setCurrentPage(1);
+                }}
+                className="text-faint-foreground hover:text-foreground absolute top-1/2 right-2.5 -translate-y-1/2"
+                title="Hapus filter tanggal"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            ) : (
+              <ChevronDown className="text-faint-foreground pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
+            )}
+          </div>
         </div>
       </div>
 
@@ -177,18 +226,37 @@ export default function DealsPage() {
                 </tr>
               ) : (
                 pageItems.map((deal) => {
+                  const getStatusLabel = (status: string) => {
+                    const labels: Record<string, string> = {
+                      DRAFT: "Draft",
+                      PAID: "Paid (Lunas)",
+                      BOOKED: "Booked (Booking)",
+                      LIMITED_ACCESS: "Akses Terbatas",
+                      CANCELLED_BY_BUYER: "Cancelled by Buyer",
+                      CANCELLED_BY_SELLER: "Cancelled by Seller",
+                      COMPLETED: "Completed (Selesai)",
+                      PROBLEM: "Problem",
+                    };
+                    return labels[status] || status;
+                  };
+
                   let badgeClass = "bg-muted text-muted-foreground border-border";
+                  const statusStr = (deal.status as string) || "";
                   if (
-                    (deal.status as string) === "Lunas" ||
-                    (deal.status as string) === "Selesai"
+                    statusStr === "Lunas" ||
+                    statusStr === "Selesai" ||
+                    statusStr === "PAID" ||
+                    statusStr === "COMPLETED"
                   ) {
                     badgeClass = "bg-emerald-50 text-emerald-600 border-emerald-100";
                   } else if (
-                    (deal.status as string) === "Booking" ||
-                    (deal.status as string) === "Akses Terbatas"
+                    statusStr === "Booking" ||
+                    statusStr === "Akses Terbatas" ||
+                    statusStr === "BOOKED" ||
+                    statusStr === "LIMITED_ACCESS"
                   ) {
                     badgeClass = "bg-orange-50 text-orange-600 border-orange-100";
-                  } else if ((deal.status as string)?.includes("Cancel")) {
+                  } else if (statusStr.includes("Cancel") || statusStr.includes("CANCELLED")) {
                     badgeClass = "bg-rose-50 text-rose-600 border-rose-100";
                   }
 
@@ -231,7 +299,7 @@ export default function DealsPage() {
                         <span
                           className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${badgeClass}`}
                         >
-                          {deal.status}
+                          {getStatusLabel(deal.status)}
                         </span>
                       </td>
                       <td className="text-muted-foreground px-6 py-4 text-right text-sm whitespace-nowrap">

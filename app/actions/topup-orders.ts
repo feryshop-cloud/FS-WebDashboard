@@ -36,15 +36,19 @@ export async function getTopupOrders(filters: TopupOrdersFilters = {}): Promise<
 
     if (search.trim()) {
       const term = `%${search.trim()}%`;
-      query = query.or(`order_id.ilike.${term},nickname.ilike.${term},id_games.ilike.${term}`);
+      query = query.or(`order_id.ilike.${term},nickname.ilike.${term},id_games.ilike.${term},product_title.ilike.${term}`);
     }
 
     if (paymentStatus) {
-      query = query.eq("payment_status", paymentStatus);
+      let dbPaymentStatus = paymentStatus.toUpperCase();
+      if (dbPaymentStatus === "PAID") {
+        dbPaymentStatus = "COMPLETED";
+      }
+      query = query.eq("payment_status", dbPaymentStatus);
     }
 
     if (buyStatus) {
-      query = query.eq("buy_status", buyStatus);
+      query = query.eq("buy_status", buyStatus.toUpperCase());
     }
 
     const { data, error, count } = await query
@@ -100,7 +104,7 @@ export async function updateTopupOrder(
       };
 
       if (payload.buy_status !== undefined) {
-        updatePayload.buy_status = payload.buy_status;
+        updatePayload.buy_status = payload.buy_status.toUpperCase();
       }
       if (payload.serial_number !== undefined) {
         updatePayload.serial_number = payload.serial_number;

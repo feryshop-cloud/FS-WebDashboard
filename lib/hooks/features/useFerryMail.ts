@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useEffect, useRef } from "react";
+import { useState, useTransition, useEffect, useRef, useMemo } from "react";
 import useSWR from "swr";
 import { getErrorMessage } from "@/lib/error";
 import {
@@ -11,6 +11,7 @@ import {
   type IncomingEmailRow,
 } from "@/app/actions/incoming-emails";
 import { getEmailAccounts, type EmailAccountRow } from "@/app/actions/email-accounts";
+import { useDebouncedValue } from "@/lib/hooks/useDebouncedValue";
 
 export interface Email {
   id: string;
@@ -107,7 +108,20 @@ function formatListTime(iso: string): string {
     return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
   }
   if (dayDiff === 1) return "Kemarin";
-  const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "Mei",
+    "Jun",
+    "Jul",
+    "Agu",
+    "Sep",
+    "Okt",
+    "Nov",
+    "Des",
+  ];
   return `${d.getDate()} ${months[d.getMonth()]}`;
 }
 
@@ -149,11 +163,14 @@ function rowToEmail(row: IncomingEmailRow): Email {
 export function useFerryMail() {
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebouncedValue(searchQuery, 300);
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState("utama");
   const [selectedAccountId, setSelectedAccountId] = useState<string>("all");
   const [isDeleting, setIsDeleting] = useState(false);
   const [openMenu, setOpenMenu] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 50;
   const menuRef = useRef<HTMLDivElement>(null);
   const [, startTransition] = useTransition();
 
@@ -167,13 +184,13 @@ export function useFerryMail() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const {
-    data: accounts = [],
-    isLoading: isLoadingAccounts,
-  } = useSWR<EmailAccountRow[]>("email-accounts-active", async () => {
-    const all = (await getEmailAccounts()) || [];
-    return all.filter((a) => a.is_active);
-  });
+  const { data: accounts = [], isLoading: isLoadingAccounts } = useSWR<EmailAccountRow[]>(
+    "email-accounts-active",
+    async () => {
+      const all = (await getEmailAccounts()) || [];
+      return all.filter((a) => a.is_active);
+    },
+  );
 
   const {
     data: rows = [],
@@ -209,10 +226,10 @@ export function useFerryMail() {
     });
   }, [isLoading, rows]);
 
-  const filteredEmails = emails.filter((email) => {
+  const filteredEmails = useMemo(() => emails.filter((email) => {
     const matchesSearch =
-      email.sender.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      email.subject.toLowerCase().includes(searchQuery.toLowerCase());
+      email.sender.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+      email.subject.toLowerCase().includes(debouncedSearch.toLowerCase());
     if (!matchesSearch) return false;
 
     if (activeTab === "arsip") {
@@ -224,7 +241,14 @@ export function useFerryMail() {
       return email.isStarred;
     }
     return true;
-  });
+  }), [emails, debouncedSearch, activeTab]);
+
+  // Reset halaman saat filter berubah
+  useEffect(() => { setCurrentPage(1); }, [debouncedSearch, activeTab, selectedAccountId]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredEmails.length / ITEMS_PER_PAGE));
+  const safePage = Math.min(currentPage, totalPages);
+  const pageItems = filteredEmails.slice((safePage - 1) * ITEMS_PER_PAGE, safePage * ITEMS_PER_PAGE);
 
   const handleCopy = () => {
     if (!selectedEmail) return;
@@ -351,6 +375,10 @@ export function useFerryMail() {
     data: {
       emails,
       filteredEmails,
+      pageItems,
+      totalFiltered: filteredEmails.length,
+      totalPages,
+      currentPage: safePage,
       isLoading,
       isLoadingAccounts,
       accounts,
@@ -374,6 +402,7 @@ export function useFerryMail() {
       setSearchQuery,
       setActiveTab,
       setSelectedAccountId,
+      setCurrentPage,
       handleCopy,
       toggleCheck,
       toggleStar,

@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import useSWR from "swr";
 import { getErrorMessage } from "@/lib/error";
+import type { Database } from "@/types/database.types";
 import {
   getProblemCases,
   createProblemCase,
@@ -42,7 +43,8 @@ export function useProblemCases() {
   const [error, setError] = useState("");
   const [relatedType, setRelatedType] = useState("NONE");
 
-  const [editStatus, setEditStatus] = useState("");
+  type StatusEnum = Database["public"]["Tables"]["problem_cases"]["Update"]["status"];
+  const [editStatus, setEditStatus] = useState<StatusEnum>(undefined);
   const [editChronology, setEditChronology] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -101,7 +103,7 @@ export function useProblemCases() {
     if (isDetailClosing) return;
     setError("");
     setSelectedCase(c);
-    setEditStatus((c.status as string) || "OPEN");
+    setEditStatus(((c.status as string) || "OPEN") as StatusEnum);
     setEditChronology((c.chronology as string) || "");
     setEditIssueType((c.issue_type as string) || "");
   };

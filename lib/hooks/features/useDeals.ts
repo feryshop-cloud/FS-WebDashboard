@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useSWR from "swr";
 import { getErrorMessage } from "@/lib/error";
 import { getDeals, createPenjualan, deleteDeal } from "@/app/actions/deals";
 import { getInventory } from "@/app/actions/inventory";
 import { getAccounts } from "@/app/actions/accounts";
+import { useDebouncedValue } from "@/lib/hooks/useDebouncedValue";
 import type { Database } from "@/types/database.types";
 import { DealWithRelations } from "@/types/database";
 
@@ -23,6 +24,14 @@ export function useDeals() {
   const [isExporting, setIsExporting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [dateFilter, setDateFilter] = useState("");
+  const debouncedSearch = useDebouncedValue(searchQuery, 300);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch]);
   const [deleteTarget, setDeleteTarget] = useState<Deal | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
@@ -138,14 +147,38 @@ export function useDeals() {
     }
   };
 
-  const totalPages = Math.max(1, Math.ceil(deals.length / itemsPerPage));
+  const filteredDeals = deals.filter((deal) => {
+    if (statusFilter !== "ALL" && deal.status !== statusFilter) {
+      return false;
+    }
+    if (dateFilter) {
+      const dealDate = new Date(deal.created_at).toISOString().split("T")[0];
+      if (dealDate !== dateFilter) {
+        return false;
+      }
+    }
+    if (debouncedSearch) {
+      const q = debouncedSearch.toLowerCase();
+      const matchNumber = deal.deal_number?.toLowerCase().includes(q);
+      const matchCustomer = deal.customers?.name?.toLowerCase().includes(q);
+      const matchStock = deal.deal_items?.some((item) =>
+        item.stocks?.name?.toLowerCase().includes(q),
+      );
+      if (!matchNumber && !matchCustomer && !matchStock) {
+        return false;
+      }
+    }
+    return true;
+  });
+
+  const totalPages = Math.max(1, Math.ceil(filteredDeals.length / itemsPerPage));
   const safePage = Math.min(currentPage, totalPages);
   const pageStart = (safePage - 1) * itemsPerPage;
-  const pageItems = deals.slice(pageStart, pageStart + itemsPerPage);
+  const pageItems = filteredDeals.slice(pageStart, pageStart + itemsPerPage);
 
   return {
     data: {
-      deals,
+      deals: filteredDeals,
       stocks,
       accounts,
       pageItems,
@@ -165,6 +198,9 @@ export function useDeals() {
       currentPage,
       itemsPerPage,
       deleteTarget,
+      searchQuery,
+      statusFilter,
+      dateFilter,
     },
     actions: {
       openAddDeal,
@@ -175,6 +211,9 @@ export function useDeals() {
       setDeleteTarget,
       setCurrentPage,
       setItemsPerPage,
+      setSearchQuery,
+      setStatusFilter,
+      setDateFilter,
       loadData,
     },
   };

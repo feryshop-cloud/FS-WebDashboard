@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useSWR from "swr";
+import { useDebouncedValue } from "@/lib/hooks/useDebouncedValue";
 import {
   getTopupOrders,
   updateTopupOrder,
@@ -23,16 +24,18 @@ export type OrderRow = Database["public"]["Tables"]["orders"]["Row"];
 export const LOCKED_BUY_STATUSES: readonly string[] = [BuyStatus.SUCCESS, BuyStatus.FAILED];
 
 export function getPaymentBadgeClass(status: string) {
-  if (status === PaymentStatus.PAID) return "bg-emerald-50 text-emerald-600 border-emerald-100";
-  if (status === PaymentStatus.EXPIRED) return "bg-rose-50 text-rose-600 border-rose-100";
-  if (status === PaymentStatus.FAILED) return "bg-rose-50 text-rose-600 border-rose-100";
+  const s = (status || "").toLowerCase();
+  if (s === "completed" || s === "paid") return "bg-emerald-50 text-emerald-600 border-emerald-100";
+  if (s === "expired") return "bg-rose-50 text-rose-600 border-rose-100";
+  if (s === "failed") return "bg-rose-50 text-rose-600 border-rose-100";
   return "bg-orange-50 text-orange-600 border-orange-100";
 }
 
 export function getBuyBadgeClass(status: string) {
-  if (status === BuyStatus.SUCCESS) return "bg-emerald-50 text-emerald-600 border-emerald-100";
-  if (status === BuyStatus.PROCESSING) return "bg-orange-50 text-orange-600 border-orange-100";
-  if (status === BuyStatus.FAILED) return "bg-rose-50 text-rose-600 border-rose-100";
+  const s = (status || "").toLowerCase();
+  if (s === "success") return "bg-emerald-50 text-emerald-600 border-emerald-100";
+  if (s === "processing") return "bg-orange-50 text-orange-600 border-orange-100";
+  if (s === "failed") return "bg-rose-50 text-rose-600 border-rose-100";
   return "bg-muted text-muted-foreground border-border";
 }
 
@@ -52,6 +55,18 @@ export function useTopupOrders() {
     paymentStatus: "",
     buyStatus: "",
   });
+
+  const debouncedSearch = useDebouncedValue(searchQuery, 300);
+
+  useEffect(() => {
+    setAppliedFilters((prev) => ({
+      ...prev,
+      search: debouncedSearch,
+      paymentStatus,
+      buyStatus,
+      page: 1,
+    }));
+  }, [debouncedSearch, paymentStatus, buyStatus]);
 
   const {
     data: resultData = { data: [], total: 0, page: 1, pageSize: 10, totalPages: 1 },

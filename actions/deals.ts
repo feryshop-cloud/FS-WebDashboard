@@ -114,7 +114,7 @@ function mapRowToDealWithRelations(row: DealQueryRow): DealWithRelations {
           id: row.users.id,
           full_name: row.users.full_name,
           role_id: row.users.role_id,
-          is_active: row.users.status === "Aktif",
+          is_active: row.users.status === "ACTIVE" || (row.users.status as string) === "Aktif",
           created_at: row.users.created_at || "",
           updated_at: row.users.updated_at || "",
         }

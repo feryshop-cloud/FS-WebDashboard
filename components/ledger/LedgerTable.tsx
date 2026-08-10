@@ -4,6 +4,7 @@ import { useState, Fragment } from "react";
 import { LedgerWithRelations } from "@/types/database";
 import { Edit2, Trash2, Wallet } from "lucide-react";
 import { formatRupiah, formatDate } from "@/lib/utils";
+import { ledgerTypeLabel } from "@/lib/ledger";
 import Image from "next/image";
 
 interface LedgerTableProps {
@@ -12,29 +13,6 @@ interface LedgerTableProps {
 
 export function LedgerTable({ entries }: LedgerTableProps) {
   const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
-
-  const formatTxType = (type: string) => {
-    switch (type) {
-      case "PAYMENT_IN":
-        return "Pembayaran Masuk";
-      case "PAYMENT_OUT":
-        return "Pembayaran Keluar";
-      case "REFUND":
-        return "Refund";
-      case "CASHBACK":
-        return "Cashback TT";
-      case "TRANSFER_IN":
-        return "Mutasi Masuk";
-      case "TRANSFER_OUT":
-        return "Mutasi Keluar";
-      case "STOCK_PURCHASE":
-        return "Pembelian Stok";
-      case "ADJUSTMENT":
-        return "Penyesuaian";
-      default:
-        return type;
-    }
-  };
 
   const getAccountIcon = (
     account: { image_url?: string | null; name?: string | null } | null | undefined,
@@ -146,9 +124,9 @@ export function LedgerTable({ entries }: LedgerTableProps) {
                         className={`inline-flex truncate rounded-md px-2 py-0.5 text-[11px] font-medium ${
                           isPositive ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"
                         }`}
-                        title={formatTxType(entry.transaction_type)}
+                        title={ledgerTypeLabel(entry.transaction_type)}
                       >
-                        {formatTxType(entry.transaction_type)}
+                        {ledgerTypeLabel(entry.transaction_type)}
                       </span>
                     </td>
                     <td className="truncate px-3 py-2">

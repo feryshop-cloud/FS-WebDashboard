@@ -1,7 +1,8 @@
-import { useState, useCallback, useTransition, useEffect, useRef } from "react";
+import { useState, useCallback, useTransition, useEffect } from "react";
 import useSWR from "swr";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getTopupProducts } from "@/app/actions/topup-products";
+import { useDebouncedValue } from "@/lib/hooks/useDebouncedValue";
 
 export type TopupProduct = {
   id: string;
@@ -20,17 +21,27 @@ export function useTopupProducts() {
   const searchParams = useSearchParams();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [, startTransition] = useTransition();
-  const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
-    };
-  }, []);
-
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
   const itemsPerPage = parseInt(searchParams.get("limit") || "10", 10);
   const searchQuery = searchParams.get("search") || "";
+  const [localSearch, setLocalSearch] = useState(searchQuery);
+  const debouncedSearch = useDebouncedValue(localSearch, 300);
+
+  useEffect(() => {
+    setLocalSearch(searchQuery);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    if (debouncedSearch !== searchQuery) {
+      const params = new URLSearchParams(searchParams.toString());
+      if (debouncedSearch) {
+        params.set("search", debouncedSearch);
+      } else {
+        params.delete("search");
+      }
+      pushWithParams(params);
+    }
+  }, [debouncedSearch]);
   const sortBy = searchParams.get("sortBy") || "game_slug";
   const sortOrder = (searchParams.get("sortOrder") || "asc") as "asc" | "desc";
   const isActiveFilter = searchParams.get("isActive") || "";
@@ -76,16 +87,7 @@ export function useTopupProducts() {
 
   const handleFilterChange = (key: string, value: string) => {
     if (key === "search") {
-      if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
-      searchTimerRef.current = setTimeout(() => {
-        const params = new URLSearchParams(searchParams.toString());
-        if (value) {
-          params.set("search", value);
-        } else {
-          params.delete("search");
-        }
-        pushWithParams(params);
-      }, 300);
+      setLocalSearch(value);
       return;
     }
     const params = new URLSearchParams(searchParams.toString());
@@ -140,7 +142,7 @@ export function useTopupProducts() {
     error: errorMessage,
     uiState: {
       isAddModalOpen,
-      searchQuery,
+      searchQuery: localSearch,
       sortBy,
       sortOrder,
       isActiveFilter,

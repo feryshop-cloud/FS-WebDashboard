@@ -270,6 +270,7 @@ export async function addGame(name: string, slug: string, logo?: string, instruc
       logo: logo || null,
       instructions: finalInstructions as Json,
       is_active: true,
+      code: null as any,
     })
     .select()
     .single();

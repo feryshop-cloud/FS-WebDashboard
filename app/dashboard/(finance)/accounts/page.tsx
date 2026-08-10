@@ -11,13 +11,17 @@ import {
   Loader2,
   Pencil,
   Trash2,
+  Sliders,
+  CheckCircle2,
+  XCircle,
+  Clock,
 } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
 import { useAccounts } from "@/lib/hooks/features/useAccounts";
 
 export default function AccountsPage() {
   const {
-    data: { accounts, totalBalance },
+    data: { accounts, totalBalance, adjustments },
     isLoading,
     isSubmitting,
     isDeletingId,
@@ -27,9 +31,12 @@ export default function AccountsPage() {
       isAddAccountClosing,
       isMutasiOpen,
       isMutasiClosing,
+      isAdjustOpen,
+      isAdjustClosing,
       editingAccount,
       isEditAccountClosing,
       openMenuId,
+      currentUserRole,
     },
     refs: { menuRef },
     helpers: { getIcon, getColor },
@@ -38,6 +45,8 @@ export default function AccountsPage() {
       closeAddAccount,
       openMutasi,
       closeMutasi,
+      openAdjust,
+      closeAdjust,
       setEditingAccount,
       closeEditAccount,
       setOpenMenuId,
@@ -45,6 +54,9 @@ export default function AccountsPage() {
       handleUpdateAccount,
       handleDeleteAccount,
       handleMutasi,
+      handleRequestAdjustment,
+      handleApproveAdjustment,
+      handleRejectAdjustment,
     },
   } = useAccounts();
 
@@ -65,6 +77,13 @@ export default function AccountsPage() {
           >
             <ArrowRightLeft className="h-4 w-4" />
             Mutasi Saldo
+          </button>
+          <button
+            onClick={openAdjust}
+            className="border-border bg-card text-foreground hover:bg-muted hover:text-foreground inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold shadow-sm transition-all active:scale-[0.97]"
+          >
+            <Sliders className="h-4 w-4" />
+            Koreksi Saldo
           </button>
           <button
             onClick={openAddAccount}
@@ -558,6 +577,188 @@ export default function AccountsPage() {
                     </>
                   ) : (
                     <span>Proses Mutasi</span>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* OWNER: Approval Panel */}
+      {currentUserRole === "OWNER" && adjustments.filter((a) => a.status === "PENDING").length > 0 && (
+        <div className="border-border-soft bg-card rounded-2xl border p-6 shadow-sm">
+          <div className="mb-4 flex items-center gap-2">
+            <Clock className="h-4 w-4 text-amber-500" />
+            <h2 className="text-foreground text-sm font-bold">Permintaan Koreksi Saldo Menunggu Persetujuan</h2>
+            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-700">
+              {adjustments.filter((a) => a.status === "PENDING").length}
+            </span>
+          </div>
+          <div className="flex flex-col gap-3">
+            {adjustments
+              .filter((a) => a.status === "PENDING")
+              .map((adj) => (
+                <div
+                  key={adj.id}
+                  className="border-border-soft bg-muted/40 flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-foreground text-sm font-semibold">
+                        {adj.accounts?.name ?? "—"}
+                      </span>
+                      <span
+                        className={`rounded px-2 py-0.5 text-xs font-bold ${
+                          adj.amount >= 0
+                            ? "bg-emerald-100 text-emerald-700"
+                            : "bg-rose-100 text-rose-700"
+                        }`}
+                      >
+                        {adj.amount >= 0 ? "+" : ""}
+                        {formatRupiah(adj.amount)}
+                      </span>
+                    </div>
+                    <p className="text-muted-foreground text-xs">{adj.notes}</p>
+                    <p className="text-faint-foreground text-xs">
+                      Diajukan oleh: {adj.requested?.full_name ?? "—"}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <button
+                      disabled={isSubmitting}
+                      onClick={() => handleApproveAdjustment(adj.id)}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
+                    >
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      Setujui
+                    </button>
+                    <button
+                      disabled={isSubmitting}
+                      onClick={() => handleRejectAdjustment(adj.id)}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-rose-700 disabled:opacity-50"
+                    >
+                      <XCircle className="h-3.5 w-3.5" />
+                      Tolak
+                    </button>
+                  </div>
+                </div>
+              ))}
+          </div>
+          {error && (
+            <p className="mt-3 text-xs text-rose-600">{error}</p>
+          )}
+        </div>
+      )}
+
+      {/* Adjustment Request Drawer */}
+      {isAdjustOpen && (
+        <div
+          className={`fixed inset-0 z-50 flex items-end justify-center sm:items-center ${
+            isAdjustClosing ? "animate-fadeOut" : "animate-fadeIn"
+          }`}
+        >
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={closeAdjust}
+          />
+          <div
+            className={`relative z-10 w-full max-w-md rounded-t-2xl sm:rounded-2xl bg-card shadow-2xl ${
+              isAdjustClosing ? "animate-slideDown" : "animate-slideUp"
+            }`}
+          >
+            {/* Header */}
+            <div className="border-border-soft flex items-center justify-between border-b p-6">
+              <div>
+                <h2 className="text-foreground text-base font-bold">Ajukan Koreksi Saldo</h2>
+                <p className="text-muted-foreground mt-0.5 text-xs">
+                  {currentUserRole === "OWNER"
+                    ? "Koreksi akan langsung diterapkan."
+                    : "Pengajuan akan diverifikasi oleh Owner."}
+                </p>
+              </div>
+              <button
+                onClick={closeAdjust}
+                className="text-muted-foreground hover:bg-muted rounded-lg p-2"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Form */}
+            <form action={handleRequestAdjustment} className="flex flex-col gap-5 p-6">
+              {/* Rekening */}
+              <div>
+                <label className="text-foreground mb-1 block text-xs font-semibold">
+                  Rekening <span className="text-rose-500">*</span>
+                </label>
+                <select
+                  name="account_id"
+                  required
+                  className="border-border text-foreground w-full rounded-lg border px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                >
+                  <option value="">Pilih rekening...</option>
+                  {accounts.map((acc) => (
+                    <option key={acc.id} value={acc.id}>
+                      {acc.name} — {formatRupiah(Number(acc.balance))}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Nominal */}
+              <div>
+                <label className="text-foreground mb-1 block text-xs font-semibold">
+                  Nominal Koreksi <span className="text-rose-500">*</span>
+                </label>
+                <p className="text-muted-foreground mb-1.5 text-xs">
+                  Gunakan nilai positif untuk menambah, negatif untuk mengurangi saldo.
+                </p>
+                <input
+                  type="number"
+                  name="amount"
+                  required
+                  placeholder="cth: 50000 atau -25000"
+                  className="border-border text-foreground w-full rounded-lg border px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                />
+              </div>
+
+              {/* Alasan */}
+              <div>
+                <label className="text-foreground mb-1 block text-xs font-semibold">
+                  Alasan / Catatan <span className="text-rose-500">*</span>
+                </label>
+                <textarea
+                  name="notes"
+                  required
+                  rows={3}
+                  placeholder="Jelaskan alasan koreksi saldo ini..."
+                  className="border-border text-foreground w-full resize-none rounded-lg border px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                />
+              </div>
+
+              {error && <p className="text-xs text-rose-600">{error}</p>}
+
+              <div className="border-border-soft flex justify-end gap-3 border-t pt-4">
+                <button
+                  type="button"
+                  onClick={closeAdjust}
+                  className="text-muted-foreground hover:bg-muted rounded-lg px-4 py-2 text-xs font-semibold"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="inline-flex items-center gap-2 rounded-lg bg-amber-600 px-4 py-2 text-xs font-semibold text-white hover:bg-amber-700 disabled:opacity-50"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      <span>Memproses...</span>
+                    </>
+                  ) : (
+                    <span>Ajukan Koreksi</span>
                   )}
                 </button>
               </div>
