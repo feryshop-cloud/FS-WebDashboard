@@ -19,7 +19,7 @@ interface DataTableProps<T> {
   error?: string | null;
   emptyMessage?: string;
   emptyContent?: ReactNode;
-  loadingColor?: "blue" | "purple";
+  loadingColor?: "blue";
   footer?: ReactNode;
   onRowClick?: (row: T) => void;
 }
@@ -32,7 +32,6 @@ const ALIGN_CLASS: Record<string, string> = {
 
 const LOADING_CLASS: Record<string, string> = {
   blue: "text-blue-600",
-  purple: "text-purple-600",
 };
 
 export function DataTable<T>({

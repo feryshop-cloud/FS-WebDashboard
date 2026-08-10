@@ -11,7 +11,7 @@ export function DealsHeaderActions() {
     <>
       <button
         onClick={() => setIsModalOpen(true)}
-        className="flex items-center gap-2 rounded-[10px] bg-purple-600 px-5 py-2.5 font-semibold text-white shadow-sm shadow-purple-200 transition-all hover:bg-purple-700 active:scale-95"
+        className="flex items-center gap-2 rounded-[10px] bg-blue-600 px-5 py-2.5 font-semibold text-white shadow-sm shadow-blue-200 transition-all hover:bg-blue-700 active:scale-95"
       >
         <Plus className="h-5 w-5" />
         Buat Transaksi Baru

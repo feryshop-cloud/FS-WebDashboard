@@ -63,7 +63,7 @@ export default function PurchasesPage() {
           </button>
           <button
             onClick={openAdd}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-transparent bg-purple-600 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-purple-200 transition-all hover:bg-purple-700 active:scale-[0.97]"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-blue-200 transition-all hover:bg-blue-700 active:scale-[0.97]"
           >
             <Plus className="h-4 w-4" />
             Catat Pembelian Baru
@@ -82,7 +82,7 @@ export default function PurchasesPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             aria-label="Cari ID pembelian, item, atau supplier"
-            className="border-border bg-muted text-foreground placeholder-placeholder block w-full rounded-lg border py-2 pr-3 pl-10 transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 sm:text-sm"
+            className="border-border bg-muted text-foreground placeholder-placeholder block w-full rounded-lg border py-2 pr-3 pl-10 transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 sm:text-sm"
             placeholder="Cari ID pembelian, item, atau supplier..."
           />
         </div>
@@ -208,7 +208,7 @@ export default function PurchasesPage() {
               {isLoading ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-12 text-center">
-                    <Loader2 className="mx-auto h-8 w-8 animate-spin text-purple-600" />
+                    <Loader2 className="mx-auto h-8 w-8 animate-spin text-blue-600" />
                   </td>
                 </tr>
               ) : !isLoading && purchases.length === 0 ? (
@@ -393,7 +393,7 @@ export default function PurchasesPage() {
                   <select
                     name="category"
                     required
-                    className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                   >
                     <option value="">-- Pilih Game --</option>
                     {games.map((game) => (
@@ -412,7 +412,7 @@ export default function PurchasesPage() {
                     name="name"
                     required
                     type="text"
-                    className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                     placeholder="Mis. MLBB Mythic Glory 120 Skins"
                   />
                 </div>
@@ -425,7 +425,7 @@ export default function PurchasesPage() {
                     <input
                       name="username"
                       type="text"
-                      className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
+                      className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                       placeholder="Username/email"
                     />
                   </div>
@@ -436,7 +436,7 @@ export default function PurchasesPage() {
                     <input
                       name="password"
                       type="text"
-                      className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
+                      className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                       placeholder="Password"
                     />
                   </div>
@@ -449,7 +449,7 @@ export default function PurchasesPage() {
                   <textarea
                     name="account_details"
                     rows={2}
-                    className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                     placeholder="Masukkan spesifikasi akun (heros, skins, winrate, dll)..."
                   />
                 </div>
@@ -464,7 +464,7 @@ export default function PurchasesPage() {
                       required
                       type="number"
                       min="1"
-                      className="border-border w-full rounded-lg border px-3 py-2 text-sm font-semibold focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
+                      className="border-border w-full rounded-lg border px-3 py-2 text-sm font-semibold focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                       placeholder="Rp 0"
                     />
                   </div>
@@ -477,7 +477,7 @@ export default function PurchasesPage() {
                       required
                       type="number"
                       min="1"
-                      className="border-border w-full rounded-lg border px-3 py-2 text-sm font-semibold focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
+                      className="border-border w-full rounded-lg border px-3 py-2 text-sm font-semibold focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                       placeholder="Rp 0"
                     />
                   </div>
@@ -491,7 +491,7 @@ export default function PurchasesPage() {
                     <input
                       name="seller_info"
                       type="text"
-                      className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
+                      className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                       placeholder="Nama seller/supplier"
                     />
                   </div>
@@ -504,7 +504,7 @@ export default function PurchasesPage() {
                       required
                       value={selectedStatus}
                       onChange={(e) => setSelectedStatus(e.target.value as "LUNAS" | "PENDING")}
-                      className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
+                      className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                     >
                       <option value="LUNAS">Lunas</option>
                       <option value="PENDING">Pending</option>
@@ -513,14 +513,14 @@ export default function PurchasesPage() {
                 </div>
 
                 {selectedStatus === "LUNAS" && (
-                  <div className="fs-drop-in rounded-xl border border-purple-100 bg-purple-50/50 p-4">
+                  <div className="fs-drop-in rounded-xl border border-blue-100 bg-blue-50/50 p-4">
                     <label className="text-foreground mb-1 block text-xs font-semibold">
                       Sumber Rekening / Metode Pembayaran
                     </label>
                     <select
                       name="payment_account_id"
                       required
-                      className="border-border bg-card w-full rounded-lg border px-3 py-2 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
+                      className="border-border bg-card w-full rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                     >
                       <option value="">-- Pilih Rekening Pembayaran --</option>
                       {accounts
@@ -541,7 +541,7 @@ export default function PurchasesPage() {
                   <textarea
                     name="internal_notes"
                     rows={2}
-                    className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                     placeholder="Catatan tambahan untuk internal..."
                   />
                 </div>
@@ -551,7 +551,7 @@ export default function PurchasesPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm shadow-purple-200 transition-colors hover:bg-purple-700 disabled:opacity-50"
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm shadow-blue-200 transition-colors hover:bg-blue-700 disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <>

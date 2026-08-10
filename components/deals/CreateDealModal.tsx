@@ -122,7 +122,7 @@ export function CreateDealModal({ isOpen, onClose }: CreateDealModalProps) {
                 <select
                   required
                   name="stock_id"
-                  className="border-input bg-card w-full rounded-[10px] border px-4 py-2.5 text-sm transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                  className="border-input bg-card w-full rounded-[10px] border px-4 py-2.5 text-sm transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                   defaultValue=""
                 >
                   <option value="" disabled>
@@ -145,7 +145,7 @@ export function CreateDealModal({ isOpen, onClose }: CreateDealModalProps) {
                 required
                 name="customer_name"
                 type="text"
-                className="border-input placeholder:text-faint-foreground w-full rounded-[10px] border px-4 py-2.5 text-sm transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                className="border-input placeholder:text-faint-foreground w-full rounded-[10px] border px-4 py-2.5 text-sm transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g. Budi Santoso"
               />
             </div>
@@ -157,7 +157,7 @@ export function CreateDealModal({ isOpen, onClose }: CreateDealModalProps) {
               <input
                 name="customer_contact"
                 type="text"
-                className="border-input placeholder:text-faint-foreground w-full rounded-[10px] border px-4 py-2.5 text-sm transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                className="border-input placeholder:text-faint-foreground w-full rounded-[10px] border px-4 py-2.5 text-sm transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g. 08123456789 / @budi_ig"
               />
             </div>
@@ -175,7 +175,7 @@ export function CreateDealModal({ isOpen, onClose }: CreateDealModalProps) {
                   name="deal_price"
                   type="number"
                   min="1"
-                  className="border-input w-full rounded-[10px] border py-2.5 pr-4 pl-12 font-mono text-sm transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                  className="border-input w-full rounded-[10px] border py-2.5 pr-4 pl-12 font-mono text-sm transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                   placeholder="0"
                 />
               </div>
@@ -199,7 +199,7 @@ export function CreateDealModal({ isOpen, onClose }: CreateDealModalProps) {
             type="submit"
             form="create-deal-form"
             disabled={isPending}
-            className="flex items-center gap-2 rounded-[10px] bg-purple-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm shadow-purple-200 transition-all hover:bg-purple-700 active:bg-purple-800 disabled:cursor-not-allowed disabled:opacity-70"
+            className="flex items-center gap-2 rounded-[10px] bg-blue-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm shadow-blue-200 transition-all hover:bg-blue-700 active:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-70"
           >
             {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
             {isPending ? "Menyimpan..." : "Buat Transaksi"}

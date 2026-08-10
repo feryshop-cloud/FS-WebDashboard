@@ -140,8 +140,14 @@ The palette is a restrained cool-neutral system: one blue accent, a slate neutra
 
 ### Secondary
 
-- **Violet** (#9333EA): A deliberate secondary accent owned by the deal/trade-in/purchase modules — purple primary buttons on deal creation, purchases, and trade-in flows, plus the "Akses Terbatas" status tint. Distinct from Calm Blue so module context reads instantly.
-- **Indigo** (#4F46E5): Used only for the transfer-funds flow (bank-to-bank mutations), separating it from regular payments.
+There is no secondary *interaction* accent. Calm Blue is the only hue used for buttons, focus rings, active states, and progress fills — every action across every module shares the same accent so the system reads as monochrome. Violet and the other status hues below are reserved exclusively for chips and status tints, never for primary actions.
+
+### Status Hues (chip-only)
+
+These hues exist solely for chips, badges, and status tints — they are never used for buttons, focus rings, or module accents.
+
+- **Violet** (#9333EA): The "Akses Terbatas" / limited-access status chip only.
+- **Indigo** (#4F46E5): Reserved for bank-to-bank mutation chips in the ledger (transfer-funds flows).
 
 ### Neutral
 
@@ -173,7 +179,7 @@ The dark mode palette inverts the light neutral ramp while preserving the same a
 
 ### Named Rules
 
-**The Calm Blue Rule.** Calm Blue is the one primary accent, used for primary actions and active states only. No neon, fluorescent, or cyan tones appear anywhere in the system. When a module needs emphasis, it borrows Violet or Indigo — never a new blue family.
+**The Calm Blue Rule.** Calm Blue is the one and only accent, used for primary actions and active states across every module. No neon, fluorescent, or cyan tones appear anywhere. No module gets its own button or focus hue — module context is carried by label, icon, and section framing, never by a change in accent color. All other hues in the system belong to status chips only.
 
 ## Typography
 
@@ -213,7 +219,7 @@ The project's design docs specify a custom soft-shadow scale (`--shadow-soft-mai
 - **Card Hover** (`0 4px 6px -1px rgba(0,0,0,0.10)`, `shadow-md`): Interactive cards when hovered on light mode. On dark mode, a brighter inner glow (`inset 0 1px 0 rgba(255,255,255,0.08)`) plus a subtle outer glow.
 - **Overlay** (`0 25px 50px -12px rgba(0,0,0,0.25)`, `shadow-2xl`): Modals, drawers, and dropdown menus. Same on both modes.
 - **Soft Ambient** (docs): `0 4px 20px -4px rgba(15,23,42,0.04)` for main cards and `0 8px 30px -6px rgba(15,23,42,0.08)` for hover — the intended premium alternative to default shadows. On dark mode, these become `0 4px 20px -4px rgba(0,0,0,0.12)` and `0 8px 30px -6px rgba(0,0,0,0.18)`.
-- **Button Glow** (docs): `0 2px 10px -3px rgba(37,99,235,0.20)` — a faint blue halo on primary buttons; implementations tint it per accent (`shadow-blue-200`, `shadow-purple-200`, etc.). On dark mode, the glow uses `rgba(37,99,235,0.30)` for better visibility.
+- **Button Glow** (docs): `0 2px 10px -3px rgba(37,99,235,0.20)` — a faint blue halo on primary buttons, always tinted Calm Blue (`shadow-blue-200`). On dark mode, the glow uses `rgba(37,99,235,0.30)` for better visibility.
 
 ### Named Rules
 
@@ -228,10 +234,9 @@ A soft-corner system. The radius scale is normalized around 10px: controls, badg
 ### Buttons
 
 - **Shape:** Soft 10px corners, comfortable height (`py-2.5`, roughly 42px), full-width or inline.
-- **Primary:** Calm Blue fill, white `font-semibold` 14px text, 10–24px padding, faint blue glow shadow; hover deepens to `#1D4ED8`, active to `#1E40AF`, disabled at 70% opacity.
-- **Module Primary:** Same anatomy with the module's accent — Violet for deals/purchases/trade-in, Indigo for fund transfers, Emerald for completion actions, Red for destructive confirmation.
+- **Primary:** Calm Blue fill, white `font-semibold` 14px text, 10–24px padding, faint blue glow shadow; hover deepens to `#1D4ED8`, active to `#1E40AF`, disabled at 70% opacity. Identical anatomy and hue for every module — there is no per-module button color.
 - **Secondary / Ghost:** White fill, slate hairline border, ink text, `hover:bg-slate-50`; used for exports, filters, and cancel actions. Quiet by default.
-- **Focus:** `focus-visible` rings on the Calm Blue accent (or the button's own accent).
+- **Focus:** `focus-visible` rings always on the Calm Blue accent.
 
 ### Chips / Status Badges
 
@@ -248,7 +253,7 @@ A soft-corner system. The radius scale is normalized around 10px: controls, badg
 ### Inputs / Fields
 
 - **Style:** White fill, `slate-300`/`gray-300` border, 10px corners, `px-4 py-2.5`, 14px text.
-- **Focus:** Calm Blue border with a 2px blue ring (`focus:ring-2 focus:ring-blue-500`); module forms may focus in their accent.
+- **Focus:** Calm Blue border with a 2px blue ring (`focus:ring-2 focus:ring-blue-500`), across every module.
 - **Sensitive fields:** Monospace for prices, codes, and account numbers.
 - **Disabled / Error:** Muted background with reduced opacity; error states use rose tints (`bg-rose-50`, `text-rose-600`, `ring-rose-200`).
 
@@ -283,5 +288,6 @@ A soft-corner system. The radius scale is normalized around 10px: controls, badg
 - **Don't** use `rounded-full` on standard buttons, cards, or inputs.
 - **Don't** leave main cards resting on heavy `shadow-md`/`shadow-lg`; flat hairline + whisper is the resting state.
 - **Don't** cramp tables or compress cell padding to fit more data.
-- **Don't** introduce new blue families for emphasis — borrow Violet or Indigo for module-level accent instead.
+- **Don't** introduce new blue families for emphasis — Calm Blue is the single accent across every module; never swap module buttons to a different hue.
+- **Don't** use status hues (Violet, Indigo, Emerald, Amber, Red, Orange) on buttons, focus rings, or navigation — they are chip-only.
 - **Don't** reuse light mode surface colors (`#FFFFFF`, `#F8FAFC`) for dark mode backgrounds — the dark palette is a separate token set.

@@ -7,12 +7,11 @@ interface SearchInputProps {
   placeholder?: string;
   ariaLabel?: string;
   className?: string;
-  accent?: "blue" | "purple" | "slate";
+  accent?: "blue" | "slate";
 }
 
 const ACCENT_FOCUS: Record<string, string> = {
   blue: "focus:border-blue-500 focus:ring-blue-500/20",
-  purple: "focus:border-purple-500 focus:ring-purple-500/20",
   slate: "focus:border-blue-500 focus:ring-blue-500/20",
 };
 

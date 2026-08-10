@@ -56,11 +56,11 @@ export function StockPurchaseForm({ accounts }: { accounts: Account[] }) {
 
   return (
     <div className="border-border bg-card overflow-hidden rounded-[10px] border shadow-sm">
-      <div className="flex items-center gap-3 bg-purple-600 px-6 py-6 text-white">
-        <ShoppingCart className="h-6 w-6 text-purple-100" />
+      <div className="flex items-center gap-3 bg-blue-600 px-6 py-6 text-white">
+        <ShoppingCart className="h-6 w-6 text-blue-100" />
         <div>
           <h2 className="text-xl font-bold">New Stock Purchase Invoice</h2>
-          <p className="mt-0.5 text-sm text-purple-100">
+          <p className="mt-0.5 text-sm text-blue-100">
             Enter details of the stock acquired from the seller.
           </p>
         </div>
@@ -96,7 +96,7 @@ export function StockPurchaseForm({ accounts }: { accounts: Account[] }) {
                   required
                   name="category"
                   type="text"
-                  className="border-input placeholder:text-faint-foreground w-full rounded-[10px] border px-4 py-2.5 text-sm transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                  className="border-input placeholder:text-faint-foreground w-full rounded-[10px] border px-4 py-2.5 text-sm transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                   placeholder="e.g. Mobile Legends"
                 />
               </div>
@@ -108,7 +108,7 @@ export function StockPurchaseForm({ accounts }: { accounts: Account[] }) {
                   required
                   name="name"
                   type="text"
-                  className="border-input placeholder:text-faint-foreground w-full rounded-[10px] border px-4 py-2.5 text-sm transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                  className="border-input placeholder:text-faint-foreground w-full rounded-[10px] border px-4 py-2.5 text-sm transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                   placeholder="e.g. Akun Sultan GG"
                 />
               </div>
@@ -126,7 +126,7 @@ export function StockPurchaseForm({ accounts }: { accounts: Account[] }) {
                 <input
                   name="username"
                   type="text"
-                  className="border-input placeholder:text-faint-foreground w-full rounded-[10px] border px-4 py-2.5 text-sm transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                  className="border-input placeholder:text-faint-foreground w-full rounded-[10px] border px-4 py-2.5 text-sm transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                   placeholder="Login ID"
                 />
               </div>
@@ -135,7 +135,7 @@ export function StockPurchaseForm({ accounts }: { accounts: Account[] }) {
                 <input
                   name="password"
                   type="text"
-                  className="border-input placeholder:text-faint-foreground w-full rounded-[10px] border px-4 py-2.5 text-sm transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                  className="border-input placeholder:text-faint-foreground w-full rounded-[10px] border px-4 py-2.5 text-sm transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                   placeholder="Password"
                 />
               </div>
@@ -145,7 +145,7 @@ export function StockPurchaseForm({ accounts }: { accounts: Account[] }) {
               <input
                 name="account_details"
                 type="text"
-                className="border-input placeholder:text-faint-foreground w-full rounded-[10px] border px-4 py-2.5 text-sm transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                className="border-input placeholder:text-faint-foreground w-full rounded-[10px] border px-4 py-2.5 text-sm transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g. Login via Moonton / Google"
               />
             </div>
@@ -169,7 +169,7 @@ export function StockPurchaseForm({ accounts }: { accounts: Account[] }) {
                     required
                     name="capital_price"
                     type="number"
-                    className="border-input text-foreground w-full rounded-[10px] border py-2.5 pr-4 pl-12 font-mono text-sm font-bold transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                    className="border-input text-foreground w-full rounded-[10px] border py-2.5 pr-4 pl-12 font-mono text-sm font-bold transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                     placeholder="0"
                   />
                 </div>
@@ -187,7 +187,7 @@ export function StockPurchaseForm({ accounts }: { accounts: Account[] }) {
                     required
                     name="post_price"
                     type="number"
-                    className="border-input w-full rounded-[10px] border py-2.5 pr-4 pl-12 font-mono text-sm transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                    className="border-input w-full rounded-[10px] border py-2.5 pr-4 pl-12 font-mono text-sm transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                     placeholder="0"
                   />
                 </div>
@@ -204,7 +204,7 @@ export function StockPurchaseForm({ accounts }: { accounts: Account[] }) {
                     required
                     name="current_price"
                     type="number"
-                    className="border-input w-full rounded-[10px] border py-2.5 pr-4 pl-12 font-mono text-sm font-bold text-purple-600 transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                    className="border-input w-full rounded-[10px] border py-2.5 pr-4 pl-12 font-mono text-sm font-bold text-blue-600 transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                     placeholder="0"
                   />
                 </div>
@@ -267,7 +267,7 @@ export function StockPurchaseForm({ accounts }: { accounts: Account[] }) {
                   <select
                     required
                     name="payment_account_id"
-                    className="border-input bg-card text-foreground w-full rounded-[10px] border px-4 py-3 text-sm font-medium transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                    className="border-input bg-card text-foreground w-full rounded-[10px] border px-4 py-3 text-sm font-medium transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">-- Choose Account to Deduct --</option>
                     {accounts.map((acc) => (
@@ -292,7 +292,7 @@ export function StockPurchaseForm({ accounts }: { accounts: Account[] }) {
                 <input
                   name="seller_info"
                   type="text"
-                  className="border-input placeholder:text-faint-foreground w-full rounded-[10px] border px-4 py-2.5 text-sm transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                  className="border-input placeholder:text-faint-foreground w-full rounded-[10px] border px-4 py-2.5 text-sm transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                   placeholder="e.g. Nama Seller / WA / Grup FB"
                 />
               </div>
@@ -301,7 +301,7 @@ export function StockPurchaseForm({ accounts }: { accounts: Account[] }) {
                 <input
                   name="internal_notes"
                   type="text"
-                  className="border-input placeholder:text-faint-foreground w-full rounded-[10px] border px-4 py-2.5 text-sm transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                  className="border-input placeholder:text-faint-foreground w-full rounded-[10px] border px-4 py-2.5 text-sm transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                   placeholder="e.g. Butuh change email 7 hari"
                 />
               </div>
@@ -312,7 +312,7 @@ export function StockPurchaseForm({ accounts }: { accounts: Account[] }) {
             <button
               type="submit"
               disabled={isPending}
-              className="flex items-center gap-2 rounded-[10px] bg-purple-600 px-8 py-3.5 text-sm font-bold text-white shadow-sm shadow-purple-200 transition-all hover:bg-purple-700 active:bg-purple-800 disabled:cursor-not-allowed disabled:opacity-70"
+              className="flex items-center gap-2 rounded-[10px] bg-blue-600 px-8 py-3.5 text-sm font-bold text-white shadow-sm shadow-blue-200 transition-all hover:bg-blue-700 active:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-70"
             >
               {isPending && <Loader2 className="h-5 w-5 animate-spin" />}
               {isPending ? "Processing Secure Transaction..." : "Complete Purchase"}

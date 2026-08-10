@@ -43,7 +43,7 @@ export default function TradeInPage() {
           </button>
           <button
             onClick={openAddTT}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-transparent bg-purple-600 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-purple-200 transition-all hover:bg-purple-700 active:scale-[0.97]"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-blue-200 transition-all hover:bg-blue-700 active:scale-[0.97]"
           >
             <Plus className="h-4 w-4" />
             Buat Transaksi TT
@@ -59,7 +59,7 @@ export default function TradeInPage() {
           </div>
           <input
             type="text"
-            className="border-border bg-muted text-foreground placeholder-placeholder block w-full rounded-lg border py-2 pr-3 pl-10 transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 sm:text-sm"
+            className="border-border bg-muted text-foreground placeholder-placeholder block w-full rounded-lg border py-2 pr-3 pl-10 transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 sm:text-sm"
             placeholder="Cari ID transaksi, nama customer..."
           />
         </div>
@@ -77,7 +77,7 @@ export default function TradeInPage() {
       <div className="grid grid-cols-1 gap-4">
         {isLoading ? (
           <div className="border-border-soft bg-card flex justify-center rounded-xl border p-12 shadow-sm">
-            <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
           </div>
         ) : deals.length === 0 ? (
           <div className="border-border-soft bg-card text-muted-foreground rounded-xl border p-12 text-center text-sm shadow-sm">
@@ -102,14 +102,14 @@ export default function TradeInPage() {
                 className="group border-border-soft bg-card relative overflow-hidden rounded-xl border shadow-sm transition-shadow hover:shadow-md"
               >
                 <div className="absolute top-4 right-4">
-                  <button className="tap-large rounded-md text-purple-600 transition-colors hover:bg-purple-50 hover:text-purple-700">
+                  <button className="tap-large rounded-md text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-700">
                     <MoreHorizontal className="h-5 w-5" />
                   </button>
                 </div>
 
                 {/* Card Header */}
                 <div className="border-border-soft/50 bg-muted/30 flex items-center gap-4 border-b px-6 py-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full border border-purple-100 bg-purple-50 text-purple-600">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full border border-blue-100 bg-blue-50 text-blue-600">
                     <ArrowRightLeft className="h-5 w-5" />
                   </div>
                   <div>
@@ -167,7 +167,7 @@ export default function TradeInPage() {
                     <h3 className="text-faint-foreground text-[10px] font-bold tracking-wider uppercase">
                       Stok Feryshop (Keluar)
                     </h3>
-                    <div className="flex items-center justify-between rounded-lg border border-purple-100 bg-purple-50/50 p-2.5">
+                    <div className="flex items-center justify-between rounded-lg border border-blue-100 bg-blue-50/50 p-2.5">
                       <span
                         className="text-foreground mr-2 truncate text-xs font-semibold"
                         title={stockOutName}
@@ -189,7 +189,7 @@ export default function TradeInPage() {
                       {formatRupiah(Number(tt.total_deal_price))}
                     </span>
 
-                    <button className="mt-4 w-full rounded-md bg-purple-50 px-3 py-1.5 text-center text-xs font-semibold text-purple-600 transition-colors hover:bg-purple-100 hover:text-purple-700 sm:w-auto">
+                    <button className="mt-4 w-full rounded-md bg-blue-50 px-3 py-1.5 text-center text-xs font-semibold text-blue-600 transition-colors hover:bg-blue-100 hover:text-blue-700 sm:w-auto">
                       Lihat Detail
                     </button>
                   </div>
@@ -257,7 +257,7 @@ export default function TradeInPage() {
                       name="customer_name"
                       required
                       type="text"
-                      className="border-border w-full rounded-lg border px-3 py-2 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
+                      className="border-border w-full rounded-lg border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                       placeholder="Mis. Budi Santoso"
                     />
                   </div>
@@ -268,7 +268,7 @@ export default function TradeInPage() {
                     <input
                       name="customer_phone"
                       type="text"
-                      className="border-border w-full rounded-lg border px-3 py-2 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
+                      className="border-border w-full rounded-lg border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                       placeholder="Mis. 08123456789"
                     />
                   </div>
@@ -288,7 +288,7 @@ export default function TradeInPage() {
                     <select
                       name="stock_out_id"
                       required
-                      className="border-border w-full rounded-lg border px-3 py-2 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
+                      className="border-border w-full rounded-lg border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                     >
                       <option value="">-- Pilih Stok Tersedia --</option>
                       {stocks.map((stock) => (
@@ -313,7 +313,7 @@ export default function TradeInPage() {
                         setPriceOut(val);
                         setPaymentAmount(Math.abs(val - ttValue));
                       }}
-                      className="border-border w-full rounded-lg border px-3 py-2 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
+                      className="border-border w-full rounded-lg border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                       placeholder="Rp 0"
                     />
                   </div>
@@ -334,7 +334,7 @@ export default function TradeInPage() {
                       name="tt_desc"
                       required
                       type="text"
-                      className="border-border w-full rounded-lg border px-3 py-2 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
+                      className="border-border w-full rounded-lg border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                       placeholder="Mis. Akun MLBB Mythic"
                     />
                   </div>
@@ -353,7 +353,7 @@ export default function TradeInPage() {
                         setTtValue(val);
                         setPaymentAmount(Math.abs(priceOut - val));
                       }}
-                      className="border-border w-full rounded-lg border px-3 py-2 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
+                      className="border-border w-full rounded-lg border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                       placeholder="Rp 0"
                     />
                   </div>
@@ -402,7 +402,7 @@ export default function TradeInPage() {
                           min="0"
                           value={paymentAmount || ""}
                           onChange={(e) => setPaymentAmount(Number(e.target.value))}
-                          className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
+                          className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                           placeholder="Rp 0"
                         />
                       </div>
@@ -413,7 +413,7 @@ export default function TradeInPage() {
                         <select
                           name="account_id"
                           required={paymentAmount > 0}
-                          className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
+                          className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                         >
                           <option value="">-- Rekening (Wajib jika ada tunai) --</option>
                           {accounts
@@ -433,7 +433,7 @@ export default function TradeInPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full rounded-lg bg-purple-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm shadow-purple-200 transition-colors hover:bg-purple-700 disabled:opacity-50"
+                  className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm shadow-blue-200 transition-colors hover:bg-blue-700 disabled:opacity-50"
                 >
                   {isSubmitting ? "Memproses..." : "Proses Tukar Tambah"}
                 </button>

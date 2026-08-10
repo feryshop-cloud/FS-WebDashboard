@@ -65,7 +65,7 @@ export default function DealsPage() {
           </button>
           <button
             onClick={openAddDeal}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-transparent bg-purple-600 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-purple-200 transition-all hover:bg-purple-700 active:scale-[0.97]"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-blue-200 transition-all hover:bg-blue-700 active:scale-[0.97]"
           >
             <Plus className="h-4 w-4" />
             Buat Deal Baru
@@ -81,7 +81,7 @@ export default function DealsPage() {
           </div>
           <input
             type="text"
-            className="border-border bg-muted text-foreground placeholder-placeholder block w-full rounded-lg border py-2 pr-3 pl-10 transition-all outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 sm:text-sm"
+            className="border-border bg-muted text-foreground placeholder-placeholder block w-full rounded-lg border py-2 pr-3 pl-10 transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 sm:text-sm"
             placeholder="Cari nomor deal, customer, atau stok..."
           />
         </div>
@@ -160,7 +160,7 @@ export default function DealsPage() {
               {isLoading ? (
                 <tr>
                   <td colSpan={8} className="px-6 py-12 text-center">
-                    <Loader2 className="mx-auto h-8 w-8 animate-spin text-purple-600" />
+                    <Loader2 className="mx-auto h-8 w-8 animate-spin text-blue-600" />
                   </td>
                 </tr>
               ) : deals.length === 0 ? (
@@ -320,7 +320,7 @@ export default function DealsPage() {
                   <select
                     name="stock_id"
                     required
-                    className="border-border w-full rounded-lg border px-3 py-2 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                   >
                     <option value="">-- Pilih Stok Tersedia --</option>
                     {stocks.map((stock) => (
@@ -338,7 +338,7 @@ export default function DealsPage() {
                     name="customer_name"
                     required
                     type="text"
-                    className="border-border w-full rounded-lg border px-3 py-2 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                     placeholder="Mis. Budi Santoso"
                   />
                 </div>
@@ -349,7 +349,7 @@ export default function DealsPage() {
                   <input
                     name="customer_phone"
                     type="text"
-                    className="border-border w-full rounded-lg border px-3 py-2 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                     placeholder="Mis. 08123456789"
                   />
                 </div>
@@ -362,7 +362,7 @@ export default function DealsPage() {
                     required
                     type="number"
                     min="1"
-                    className="border-border w-full rounded-lg border px-3 py-2 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
+                    className="border-border w-full rounded-lg border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                     placeholder="Rp 0"
                   />
                 </div>
@@ -378,7 +378,7 @@ export default function DealsPage() {
                         name="payment_amount"
                         type="number"
                         min="0"
-                        className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
+                        className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                         placeholder="Rp 0"
                         defaultValue={0}
                       />
@@ -389,7 +389,7 @@ export default function DealsPage() {
                       </label>
                       <select
                         name="account_id"
-                        className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none"
+                        className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                       >
                         <option value="">-- Pilih Rekening (Kosongkan jika 0) --</option>
                         {accounts
@@ -408,7 +408,7 @@ export default function DealsPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full rounded-lg bg-purple-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm shadow-purple-200 transition-colors hover:bg-purple-700 disabled:opacity-50"
+                  className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm shadow-blue-200 transition-colors hover:bg-blue-700 disabled:opacity-50"
                 >
                   {isSubmitting ? "Memproses..." : "Proses Transaksi"}
                 </button>

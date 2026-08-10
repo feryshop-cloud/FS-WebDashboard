@@ -180,13 +180,13 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
                   <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
                     Payment Progress
                   </span>
-                  <span className="text-sm font-bold text-purple-600">
+                  <span className="text-sm font-bold text-blue-600">
                     {deal.payment_percentage.toFixed(0)}%
                   </span>
                 </div>
                 <div className="bg-muted h-2.5 w-full overflow-hidden rounded-[10px]">
                   <div
-                    className={`h-full rounded-[10px] transition-all duration-1000 ease-out ${deal.payment_percentage >= 100 ? "bg-emerald-500" : "bg-purple-600"}`}
+                    className={`h-full rounded-[10px] transition-all duration-1000 ease-out ${deal.payment_percentage >= 100 ? "bg-emerald-500" : "bg-blue-600"}`}
                     style={{ width: `${Math.min(deal.payment_percentage, 100)}%` }}
                   ></div>
                 </div>
