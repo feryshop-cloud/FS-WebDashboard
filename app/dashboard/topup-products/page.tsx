@@ -12,10 +12,11 @@ import {
   ArrowUpDown,
 } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
-import { useTopupProducts } from "@/lib/hooks/features/useTopupProducts";
+import { useTopupProducts, TopupProduct } from "@/lib/hooks/features/useTopupProducts";
 import { AddTopupProductModal } from "@/components/topup/TopupProductModals";
 import { TopupProductRowActions } from "@/components/topup/TopupProductRowActions";
 import { Pagination } from "@/components/ui/Pagination";
+import { DataTable, type DataTableColumn } from "@/components/ui/DataTable";
 
 function TopupProductsContent() {
   const {
@@ -50,8 +51,68 @@ function TopupProductsContent() {
     { value: "is_gangguan", label: "Status Gangguan" },
   ];
 
+  const columns: DataTableColumn<TopupProduct>[] = [
+    {
+      key: "title",
+      header: "Nama Produk",
+      render: (p) => <span className="text-foreground font-medium">{p.title}</span>,
+    },
+    {
+      key: "game",
+      header: "Game",
+      render: (p) => (
+        <span className="inline-flex items-center rounded-full border border-blue-100 bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700">
+          {p.brand || "-"}
+        </span>
+      ),
+    },
+    {
+      key: "sku",
+      header: "SKU",
+      className: "text-muted-foreground font-mono text-xs",
+      render: (p) => p.sku || "-",
+    },
+    {
+      key: "selling_price",
+      header: "Harga Jual",
+      className: "text-foreground font-semibold",
+      render: (p) => formatRupiah(p.selling_price),
+    },
+    {
+      key: "cost_price",
+      header: "Harga Modal",
+      className: "text-muted-foreground",
+      render: (p) => formatRupiah(p.cost_price || 0),
+    },
+    {
+      key: "status",
+      header: "Status",
+      align: "center",
+      render: (p) =>
+        p.is_gangguan ? (
+          <span className="inline-flex items-center rounded-md border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
+            Gangguan
+          </span>
+        ) : p.is_active ? (
+          <span className="inline-flex items-center rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
+            Aktif
+          </span>
+        ) : (
+          <span className="border-border bg-muted text-muted-foreground inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium">
+            Nonaktif
+          </span>
+        ),
+    },
+    {
+      key: "actions",
+      header: "Aksi",
+      align: "center",
+      render: (p) => <TopupProductRowActions product={p} onRefresh={() => loadProducts()} />,
+    },
+  ];
+
   return (
-    <div className="space-y-6 p-8">
+    <div className="mx-auto flex max-w-7xl flex-col gap-6 pb-8">
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
@@ -158,91 +219,28 @@ function TopupProductsContent() {
       </div>
 
       {/* Content / Table */}
-      <div className="border-border bg-card overflow-hidden rounded-xl border shadow-sm">
-        {error && (
-          <div className="border-b border-red-100 bg-red-50 p-4 text-sm text-red-700">{error}</div>
-        )}
-
-        {isLoading ? (
-          <div className="text-faint-foreground flex items-center justify-center py-16">
-            <Loader2 className="mr-2 h-6 w-6 animate-spin" />
-            <span>Memuat katalog produk Top-Up...</span>
-          </div>
-        ) : products.length === 0 ? (
-          <div className="px-4 py-16 text-center">
-            <ShoppingBag className="text-faint-foreground mx-auto mb-3 h-12 w-12" />
-            <h3 className="text-foreground text-base font-semibold">Tidak ada produk ditemukan</h3>
-            <p className="text-muted-foreground mt-1 text-sm">
-              Data master belum diisi atau filter yang dipilih tidak cocok.
-            </p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="text-muted-foreground w-full text-left text-sm">
-              <thead className="border-border bg-muted text-muted-foreground border-b text-xs font-semibold tracking-wider uppercase">
-                <tr>
-                  <th className="px-6 py-3.5">Nama Produk</th>
-                  <th className="px-6 py-3.5">Game</th>
-                  <th className="px-6 py-3.5">SKU</th>
-                  <th className="px-6 py-3.5">Harga Jual</th>
-                  <th className="px-6 py-3.5">Harga Modal</th>
-                  <th className="px-6 py-3.5 text-center">Status</th>
-                  <th className="px-6 py-3.5 text-center">Aksi</th>
-                </tr>
-              </thead>
-              <tbody className="divide-border divide-y">
-                {products.map((p) => (
-                  <tr key={p.id} className="hover:bg-muted/50 transition-colors">
-                    <td className="text-foreground px-6 py-4 font-medium">{p.title}</td>
-                    <td className="px-6 py-4">
-                      <span className="inline-flex items-center rounded-full border border-blue-100 bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700">
-                        {p.brand || "-"}
-                      </span>
-                    </td>
-                    <td className="text-muted-foreground px-6 py-4 font-mono text-xs">
-                      {p.sku || "-"}
-                    </td>
-                    <td className="text-foreground px-6 py-4 font-semibold">
-                      {formatRupiah(p.selling_price)}
-                    </td>
-                    <td className="text-muted-foreground px-6 py-4">
-                      {formatRupiah(p.cost_price || 0)}
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      {p.is_gangguan ? (
-                        <span className="inline-flex items-center rounded-md border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
-                          Gangguan
-                        </span>
-                      ) : p.is_active ? (
-                        <span className="inline-flex items-center rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
-                          Aktif
-                        </span>
-                      ) : (
-                        <span className="border-border bg-muted text-muted-foreground inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium">
-                          Nonaktif
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <TopupProductRowActions product={p} onRefresh={() => loadProducts()} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-        {!isLoading && products.length > 0 && (
-          <Pagination
-            currentPage={currentPage}
-            totalItems={totalCount || products.length}
-            itemsPerPage={itemsPerPage}
-            onPageChange={(page) => handleFilterChange("page", String(page))}
-            onPageSizeChange={handlePageSizeChange}
-            itemLabel="produk"
-          />
-        )}
-      </div>
+      <DataTable
+        columns={columns}
+        rows={products}
+        rowKey={(p) => p.id}
+        isLoading={isLoading}
+        error={error}
+        emptyMessage="Tidak ada produk ditemukan"
+        emptyContent="Data master belum diisi atau filter yang dipilih tidak cocok."
+        footer={
+          !isLoading &&
+          products.length > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalItems={totalCount || products.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={(page) => handleFilterChange("page", String(page))}
+              onPageSizeChange={handlePageSizeChange}
+              itemLabel="produk"
+            />
+          )
+        }
+      />
 
       {/* Add Product Modal */}
       <AddTopupProductModal
