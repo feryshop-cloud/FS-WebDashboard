@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import useSWR from "swr";
 import { getErrorMessage } from "@/lib/error";
 import {
   getAccounts,
@@ -22,41 +23,22 @@ export function useAccounts() {
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
   const [isEditAccountClosing, setIsEditAccountClosing] = useState(false);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
-
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const loadAccounts = async () => {
-    try {
-      setIsLoading(true);
-      const data = await getAccounts();
-      setAccounts(data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
+  const {
+    data: accounts = [],
+    isLoading,
+    mutate,
+  } = useSWR<Account[]>("accounts", async () => {
+    return (await getAccounts()) || [];
+  });
+
+  const loadAccounts = () => {
+    mutate();
   };
-
-  useEffect(() => {
-    let isMounted = true;
-    getAccounts()
-      .then((data) => {
-        if (isMounted) setAccounts(data);
-      })
-      .catch((err) => console.error(err))
-      .finally(() => {
-        if (isMounted) setIsLoading(false);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {

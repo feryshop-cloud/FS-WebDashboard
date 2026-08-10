@@ -1,7 +1,8 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
+import useSWR from "swr";
 import { formatDate } from "@/lib/utils";
 import { getErrorMessage } from "@/lib/error";
 import { getLedgers, addManualLedger, updateLedger, deleteLedger } from "@/app/actions/ledger";
@@ -17,13 +18,9 @@ export function useLedger() {
   const searchParams = useSearchParams();
   const accountId = searchParams.get("accountId") || undefined;
 
-  const [ledgers, setLedgers] = useState<LedgerRecord[]>([]);
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("ALL");
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const [editingLedger, setEditingLedger] = useState<LedgerRecord | null>(null);
@@ -34,37 +31,31 @@ export function useLedger() {
   const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
   const [error, setError] = useState("");
 
+  const {
+    data: ledgerResult = { data: [], totalCount: 0 },
+    isLoading: ledgerLoading,
+    mutate: mutateLedger,
+  } = useSWR(["ledger", currentPage, itemsPerPage, accountId], async () => {
+    return await getLedgers(currentPage, itemsPerPage, accountId);
+  });
+
+  const {
+    data: accounts = [],
+    isLoading: accountsLoading,
+    mutate: mutateAccounts,
+  } = useSWR<Account[]>("accounts", async () => {
+    return (await getAccounts()) || [];
+  });
+
+  const rawLedgers = ledgerResult.data;
+  const ledgers = useMemo(() => (rawLedgers as LedgerRecord[]) || [], [rawLedgers]);
+  const totalCount = ledgerResult.totalCount || 0;
+  const isLoading = ledgerLoading || accountsLoading;
+
   const loadLedgerData = () => {
-    setIsLoading(true);
-    Promise.all([getLedgers(currentPage, itemsPerPage, accountId), getAccounts()])
-      .then(([ledgerRes, accountsData]) => {
-        setLedgers((ledgerRes.data as LedgerRecord[]) || []);
-        setTotalCount(ledgerRes.totalCount || 0);
-        setAccounts(accountsData || []);
-      })
-      .catch((err) => console.error(err))
-      .finally(() => setIsLoading(false));
+    mutateLedger();
+    mutateAccounts();
   };
-
-  useEffect(() => {
-    let isMounted = true;
-    Promise.all([getLedgers(currentPage, itemsPerPage, accountId), getAccounts()])
-      .then(([ledgerRes, accountsData]) => {
-        if (isMounted) {
-          setLedgers((ledgerRes.data as LedgerRecord[]) || []);
-          setTotalCount(ledgerRes.totalCount || 0);
-          setAccounts(accountsData || []);
-        }
-      })
-      .catch((err) => console.error(err))
-      .finally(() => {
-        if (isMounted) setIsLoading(false);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [currentPage, accountId, itemsPerPage]);
 
   const handlePageSizeChange = (size: number) => {
     if (size === itemsPerPage) return;
