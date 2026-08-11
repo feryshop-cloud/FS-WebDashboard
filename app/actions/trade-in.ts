@@ -332,12 +332,14 @@ export async function updateTukarTambah(id: string, formData: FormData) {
     // Fetch existing deal data to check for differences
     const { data: existingDeal, error: dealFetchErr } = await supabase
       .from("deals")
-      .select(`
+      .select(
+        `
         *,
         deal_items (stock_id),
         trade_in_items (id),
         payments (id)
-      `)
+      `,
+      )
       .eq("id", id)
       .single();
 
@@ -406,17 +408,25 @@ export async function updateTukarTambah(id: string, formData: FormData) {
 
     // Restore old stock status if it changed
     if (oldStockId && oldStockId !== stock_out_id) {
-      await supabase.from("stocks").update({ status: "AVAILABLE", sold_date: null, booking_date: null }).eq("id", oldStockId);
+      await supabase
+        .from("stocks")
+        .update({ status: "AVAILABLE", sold_date: null, booking_date: null })
+        .eq("id", oldStockId);
     }
 
     // Update new stock status
-    await supabase.from("stocks").update({
-      status: initialStockStatus,
-      sold_date: initialStockStatus === "SOLD" ? new Date().toISOString() : null,
-      booking_date: (["BOOKED", "LIMITED_ACCESS", "SOLD"] as StockStatus[]).includes(initialStockStatus)
-        ? new Date().toISOString()
-        : null,
-    }).eq("id", stock_out_id);
+    await supabase
+      .from("stocks")
+      .update({
+        status: initialStockStatus,
+        sold_date: initialStockStatus === "SOLD" ? new Date().toISOString() : null,
+        booking_date: (["BOOKED", "LIMITED_ACCESS", "SOLD"] as StockStatus[]).includes(
+          initialStockStatus,
+        )
+          ? new Date().toISOString()
+          : null,
+      })
+      .eq("id", stock_out_id);
 
     // 4. Update Trade-in Items
     const { error: ttUpdateErr } = await supabase
@@ -445,17 +455,15 @@ export async function updateTukarTambah(id: string, formData: FormData) {
         if (paymentErr) throw paymentErr;
       } else {
         // Insert Payment
-        const { error: payErr } = await supabase
-          .from("payments")
-          .insert({
-            deal_id: id,
-            account_id: account_id,
-            amount: payment_amount,
-            payment_type: "OUT",
-            status: "COMPLETED",
-            notes: `Tukar Tambah (Ubah) - Kembalian Tunai (${tt_desc})`,
-            handled_by: user.id,
-          });
+        const { error: payErr } = await supabase.from("payments").insert({
+          deal_id: id,
+          account_id: account_id,
+          amount: payment_amount,
+          payment_type: "OUT",
+          status: "COMPLETED",
+          notes: `Tukar Tambah (Ubah) - Kembalian Tunai (${tt_desc})`,
+          handled_by: user.id,
+        });
         if (payErr) throw payErr;
 
         // Insert Finance Ledger
@@ -478,4 +486,3 @@ export async function updateTukarTambah(id: string, formData: FormData) {
     revalidatePath("/dashboard/ledger");
   });
 }
-

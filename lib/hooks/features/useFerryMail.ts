@@ -78,29 +78,38 @@ export function useFerryMail() {
     });
   }, [isLoading, rows]);
 
-  const filteredEmails = useMemo(() => emails.filter((email) => {
-    const matchesSearch =
-      email.sender.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-      email.subject.toLowerCase().includes(debouncedSearch.toLowerCase());
-    if (!matchesSearch) return false;
+  const filteredEmails = useMemo(
+    () =>
+      emails.filter((email) => {
+        const matchesSearch =
+          email.sender.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+          email.subject.toLowerCase().includes(debouncedSearch.toLowerCase());
+        if (!matchesSearch) return false;
 
-    if (activeTab === "arsip") {
-      return email.isArchived;
-    }
-    if (email.isArchived) return false;
+        if (activeTab === "arsip") {
+          return email.isArchived;
+        }
+        if (email.isArchived) return false;
 
-    if (activeTab === "favorit") {
-      return email.isStarred;
-    }
-    return true;
-  }), [emails, debouncedSearch, activeTab]);
+        if (activeTab === "favorit") {
+          return email.isStarred;
+        }
+        return true;
+      }),
+    [emails, debouncedSearch, activeTab],
+  );
 
   // Reset halaman saat filter berubah
-  useEffect(() => { setCurrentPage(1); }, [debouncedSearch, activeTab, selectedAccountId]);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch, activeTab, selectedAccountId]);
 
   const totalPages = Math.max(1, Math.ceil(filteredEmails.length / ITEMS_PER_PAGE));
   const safePage = Math.min(currentPage, totalPages);
-  const pageItems = filteredEmails.slice((safePage - 1) * ITEMS_PER_PAGE, safePage * ITEMS_PER_PAGE);
+  const pageItems = filteredEmails.slice(
+    (safePage - 1) * ITEMS_PER_PAGE,
+    safePage * ITEMS_PER_PAGE,
+  );
 
   const toggleCheck = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();

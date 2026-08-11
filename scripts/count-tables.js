@@ -11,7 +11,15 @@ if (!supabaseUrl || !supabaseServiceKey) {
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 async function main() {
-  const tables = ["stocks", "products", "deals", "trade_in_items", "orders", "problem_cases", "promo_codes"];
+  const tables = [
+    "stocks",
+    "products",
+    "deals",
+    "trade_in_items",
+    "orders",
+    "problem_cases",
+    "promo_codes",
+  ];
   for (const table of tables) {
     const { count, error } = await supabase.from(table).select("*", { count: "exact", head: true });
     if (error) {

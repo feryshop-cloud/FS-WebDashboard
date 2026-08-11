@@ -244,8 +244,9 @@ export default function TopupOrdersPage() {
                       >
                         {order.payment_status.toUpperCase() === "COMPLETED"
                           ? "Lunas"
-                          : PaymentStatusLabel[order.payment_status.toLowerCase() as PaymentStatus] ||
-                            order.payment_status}
+                          : PaymentStatusLabel[
+                              order.payment_status.toLowerCase() as PaymentStatus
+                            ] || order.payment_status}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-center whitespace-nowrap">
@@ -264,7 +265,7 @@ export default function TopupOrdersPage() {
                         onClick={() => handleOpenOrder(order)}
                         className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-semibold transition-colors active:scale-[0.97] ${
                           LOCKED_BUY_STATUSES.includes(order.buy_status.toLowerCase())
-                            ? "border border-muted bg-muted text-muted-foreground hover:bg-muted/80"
+                            ? "border-muted bg-muted text-muted-foreground hover:bg-muted/80 border"
                             : "border border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100"
                         }`}
                       >
@@ -440,8 +441,9 @@ export default function TopupOrdersPage() {
                       >
                         {selectedOrder.payment_status.toUpperCase() === "COMPLETED"
                           ? "Lunas"
-                          : PaymentStatusLabel[selectedOrder.payment_status.toLowerCase() as PaymentStatus] ||
-                            selectedOrder.payment_status}
+                          : PaymentStatusLabel[
+                              selectedOrder.payment_status.toLowerCase() as PaymentStatus
+                            ] || selectedOrder.payment_status}
                       </span>
                     </dd>
                   </div>
@@ -455,7 +457,7 @@ export default function TopupOrdersPage() {
                   )}
                 </dl>
               </div>
- 
+
               {/* Fulfillment form */}
               <div className="space-y-4">
                 <div>
@@ -495,17 +497,18 @@ export default function TopupOrdersPage() {
               </div>
             </div>
 
-            {selectedOrder && !LOCKED_BUY_STATUSES.includes(selectedOrder.buy_status.toLowerCase()) && (
-              <div className="border-border-soft bg-card border-t p-6">
-                <button
-                  onClick={handleSaveOrder}
-                  disabled={isSaving}
-                  className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {isSaving ? "Menyimpan..." : "Simpan Perubahan"}
-                </button>
-              </div>
-            )}
+            {selectedOrder &&
+              !LOCKED_BUY_STATUSES.includes(selectedOrder.buy_status.toLowerCase()) && (
+                <div className="border-border-soft bg-card border-t p-6">
+                  <button
+                    onClick={handleSaveOrder}
+                    disabled={isSaving}
+                    className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {isSaving ? "Menyimpan..." : "Simpan Perubahan"}
+                  </button>
+                </div>
+              )}
           </div>
         </div>
       )}

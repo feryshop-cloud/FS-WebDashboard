@@ -151,12 +151,14 @@ export async function getBalanceAdjustments() {
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("balance_adjustments")
-      .select(`
+      .select(
+        `
         *,
         accounts (name),
         requested:users!requested_by (full_name),
         approved:users!approved_by (full_name)
-      `)
+      `,
+      )
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -176,7 +178,9 @@ export async function requestBalanceAdjustment(formData: FormData) {
     const amount = parseFloat(amountStr);
 
     if (!account_id || isNaN(amount) || amount === 0 || !notes) {
-      throw new Error("Data penyesuaian tidak valid. Nominal tidak boleh 0 dan alasan wajib diisi.");
+      throw new Error(
+        "Data penyesuaian tidak valid. Nominal tidak boleh 0 dan alasan wajib diisi.",
+      );
     }
 
     const supabase = await createClient();
@@ -230,13 +234,10 @@ export async function requestBalanceAdjustment(formData: FormData) {
         .select("balance")
         .eq("id", account_id)
         .single();
-      
+
       if (accData) {
         const newBalance = Number(accData.balance) + amount;
-        await supabase
-          .from("accounts")
-          .update({ balance: newBalance })
-          .eq("id", account_id);
+        await supabase.from("accounts").update({ balance: newBalance }).eq("id", account_id);
       }
     } else {
       // Create PENDING request for regular admin
@@ -307,13 +308,10 @@ export async function approveBalanceAdjustment(id: string) {
       .select("balance")
       .eq("id", adj.account_id)
       .single();
-    
+
     if (accData) {
       const newBalance = Number(accData.balance) + Number(adj.amount);
-      await supabase
-        .from("accounts")
-        .update({ balance: newBalance })
-        .eq("id", adj.account_id);
+      await supabase.from("accounts").update({ balance: newBalance }).eq("id", adj.account_id);
     }
 
     // 3. Update adjustment status to APPROVED

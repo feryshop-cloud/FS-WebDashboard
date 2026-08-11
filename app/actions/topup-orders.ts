@@ -36,7 +36,9 @@ export async function getTopupOrders(filters: TopupOrdersFilters = {}): Promise<
 
     if (search.trim()) {
       const term = `%${search.trim()}%`;
-      query = query.or(`order_id.ilike.${term},nickname.ilike.${term},id_games.ilike.${term},product_title.ilike.${term}`);
+      query = query.or(
+        `order_id.ilike.${term},nickname.ilike.${term},id_games.ilike.${term},product_title.ilike.${term}`,
+      );
     }
 
     if (paymentStatus) {

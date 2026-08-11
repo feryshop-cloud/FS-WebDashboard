@@ -5,10 +5,7 @@ import { Download, TrendingUp, TrendingDown, Activity } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FilterDropdown, type FilterDropdownOption } from "@/components/ui/FilterDropdown";
-import {
-  useProfitLossReport,
-  getMonthOptions,
-} from "@/lib/hooks/features/useProfitLossReport";
+import { useProfitLossReport, getMonthOptions } from "@/lib/hooks/features/useProfitLossReport";
 
 export default function ProfitLossPage() {
   const {

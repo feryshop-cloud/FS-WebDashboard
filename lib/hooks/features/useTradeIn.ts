@@ -111,7 +111,8 @@ export function useTradeIn() {
         if (statusFilter === "BOOKED" && dealStatus !== "BOOKED") return false;
         if (statusFilter === "PAID" && dealStatus !== "PAID") return false;
         if (statusFilter === "COMPLETED" && dealStatus !== "COMPLETED") return false;
-        if (statusFilter === "CANCELLED" && !dealStatus.toUpperCase().includes("CANCEL")) return false;
+        if (statusFilter === "CANCELLED" && !dealStatus.toUpperCase().includes("CANCEL"))
+          return false;
       }
 
       if (!query) return true;
@@ -151,8 +152,11 @@ export function useTradeIn() {
       const inItemsDesc = (tt.trade_in_items || [])
         .map((item) => String((item as { description?: string }).description || ""))
         .join(" & ");
-      const inItemsValue = (tt.trade_in_items || [])
-        .reduce((sum: number, item) => sum + Number((item as { estimated_value?: number }).estimated_value || 0), 0);
+      const inItemsValue = (tt.trade_in_items || []).reduce(
+        (sum: number, item) =>
+          sum + Number((item as { estimated_value?: number }).estimated_value || 0),
+        0,
+      );
       const stockOutName = tt.deal_items?.[0]?.stocks?.name || "N/A";
 
       return [
@@ -175,7 +179,10 @@ export function useTradeIn() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.setAttribute("href", url);
-    link.setAttribute("download", `tukar-tambah-deals_${new Date().toISOString().split("T")[0]}.csv`);
+    link.setAttribute(
+      "download",
+      `tukar-tambah-deals_${new Date().toISOString().split("T")[0]}.csv`,
+    );
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -202,7 +209,7 @@ export function useTradeIn() {
     setEditTarget(tt);
     setPriceOut(Number(tt.total_deal_price || 0));
     const inValue = Number(
-      (tt.trade_in_items?.[0] as { estimated_value?: number } | undefined)?.estimated_value || 0
+      (tt.trade_in_items?.[0] as { estimated_value?: number } | undefined)?.estimated_value || 0,
     );
     setTtValue(inValue);
     setPaymentAmount(Math.abs(Number(tt.total_deal_price || 0) - inValue));

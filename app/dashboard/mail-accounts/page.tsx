@@ -83,7 +83,7 @@ export default function EmailAccountsPage() {
       ) : (
         <div className="border-border-soft bg-card overflow-x-auto rounded-2xl border shadow-sm">
           <table className="w-full min-w-140 text-left text-sm">
-            <thead className="border-border-soft bg-muted/50 text-faint-foreground border-b text-xs font-bold uppercase tracking-wide">
+            <thead className="border-border-soft bg-muted/50 text-faint-foreground border-b text-xs font-bold tracking-wide uppercase">
               <tr>
                 <th className="px-5 py-3.5">Akun</th>
                 <th className="px-5 py-3.5">Sync Terakhir</th>
@@ -98,11 +98,13 @@ export default function EmailAccountsPage() {
                   className="border-border-soft hover:bg-muted/30 border-b transition-colors last:border-0"
                 >
                   <td className="px-5 py-4">
-                    <div className="text-foreground font-semibold leading-snug">
+                    <div className="text-foreground leading-snug font-semibold">
                       {acc.display_name || acc.email}
                     </div>
                     {acc.display_name && (
-                      <div className="text-muted-foreground mt-0.5 font-mono text-xs">{acc.email}</div>
+                      <div className="text-muted-foreground mt-0.5 font-mono text-xs">
+                        {acc.email}
+                      </div>
                     )}
                   </td>
                   <td className="text-muted-foreground px-5 py-4 text-xs">
@@ -230,9 +232,7 @@ export default function EmailAccountsPage() {
 
                 {/* Nama Tampilan */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-foreground text-xs font-semibold">
-                    Nama Tampilan
-                  </label>
+                  <label className="text-foreground text-xs font-semibold">Nama Tampilan</label>
                   <input
                     type="text"
                     value={form.display_name}
@@ -243,7 +243,7 @@ export default function EmailAccountsPage() {
                 </div>
 
                 {/* Toggle Aktif */}
-                <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-border bg-muted/40 px-4 py-3 text-sm font-semibold transition-colors hover:bg-muted/70">
+                <label className="border-border bg-muted/40 hover:bg-muted/70 flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 text-sm font-semibold transition-colors">
                   <input
                     type="checkbox"
                     checked={form.is_active}
@@ -252,7 +252,9 @@ export default function EmailAccountsPage() {
                   />
                   <div>
                     <div className="text-foreground text-xs font-semibold">Akun Aktif</div>
-                    <div className="text-muted-foreground text-xs font-normal">Ikut disinkronkan saat FerryMail berjalan</div>
+                    <div className="text-muted-foreground text-xs font-normal">
+                      Ikut disinkronkan saat FerryMail berjalan
+                    </div>
                   </div>
                 </label>
               </div>

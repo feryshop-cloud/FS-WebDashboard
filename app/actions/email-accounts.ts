@@ -32,7 +32,9 @@ export async function getEmailAccounts() {
 
 export async function createEmailAccount(formData: FormData) {
   return runAction("createEmailAccount", async () => {
-    const email = String(formData.get("email") || "").trim().toLowerCase();
+    const email = String(formData.get("email") || "")
+      .trim()
+      .toLowerCase();
     const displayName = String(formData.get("display_name") || "").trim() || null;
     const isActive = formData.get("is_active") === "on";
 
@@ -64,7 +66,9 @@ export async function updateEmailAccount(id: string, formData: FormData) {
   return runAction("updateEmailAccount", async () => {
     if (!id) throw new Error("ID akun wajib diisi.");
 
-    const email = String(formData.get("email") || "").trim().toLowerCase();
+    const email = String(formData.get("email") || "")
+      .trim()
+      .toLowerCase();
     const displayName = String(formData.get("display_name") || "").trim() || null;
     const isActive = formData.get("is_active") === "on";
 
@@ -73,11 +77,14 @@ export async function updateEmailAccount(id: string, formData: FormData) {
     }
 
     const supabase = await createClient();
-    const { error } = await supabase.from("email_accounts").update({
-      email,
-      display_name: displayName,
-      is_active: isActive,
-    }).eq("id", id);
+    const { error } = await supabase
+      .from("email_accounts")
+      .update({
+        email,
+        display_name: displayName,
+        is_active: isActive,
+      })
+      .eq("id", id);
 
     if (error) {
       logger.error("Error updating email account", { error });

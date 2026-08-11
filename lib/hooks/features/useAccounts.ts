@@ -35,7 +35,9 @@ export function useAccounts() {
     const fetchRole = async () => {
       const { createClient } = await import("@/lib/supabase/client");
       const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (user) {
         const { data } = await supabase
           .from("users")
@@ -168,13 +170,13 @@ export function useAccounts() {
     }
   };
 
-  const {
-    data: adjustments = [],
-    mutate: mutateAdjustments,
-  } = useSWR<any[]>("balance-adjustments", async () => {
-    const { getBalanceAdjustments } = await import("@/app/actions/accounts");
-    return (await getBalanceAdjustments()) || [];
-  });
+  const { data: adjustments = [], mutate: mutateAdjustments } = useSWR<any[]>(
+    "balance-adjustments",
+    async () => {
+      const { getBalanceAdjustments } = await import("@/app/actions/accounts");
+      return (await getBalanceAdjustments()) || [];
+    },
+  );
 
   const closeAdjust = () => {
     if (isAdjustClosing || isSubmitting) return;

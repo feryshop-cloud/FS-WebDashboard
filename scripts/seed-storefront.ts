@@ -118,10 +118,7 @@ async function main() {
   console.log("Seeding storefront products...");
   for (const [slug, products] of Object.entries(seedProducts)) {
     for (const p of products) {
-      const { error: delError } = await supabase
-        .from("products")
-        .delete()
-        .eq("sku", p.id);
+      const { error: delError } = await supabase.from("products").delete().eq("sku", p.id);
       if (delError) {
         console.error("Error removing old product:", delError);
         continue;

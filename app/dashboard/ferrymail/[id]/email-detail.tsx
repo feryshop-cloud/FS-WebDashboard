@@ -82,7 +82,7 @@ export function EmailDetail({ email }: { email: IncomingEmailRow }) {
             <button
               onClick={handleDelete}
               disabled={isDeleting}
-              className="text-rose-600 hover:bg-rose-50 rounded-lg p-1.5 transition-colors disabled:opacity-50"
+              className="rounded-lg p-1.5 text-rose-600 transition-colors hover:bg-rose-50 disabled:opacity-50"
               title="Hapus email"
             >
               <Trash2 className={`h-4 w-4 ${isDeleting ? "animate-pulse" : ""}`} />

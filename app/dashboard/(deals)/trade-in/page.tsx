@@ -38,7 +38,15 @@ export default function TradeInPage() {
     isLoading,
     isSubmitting,
     error,
-    uiState: { isAddTTOpen, isAddTTClosing, priceOut, ttValue, paymentAmount, searchQuery, statusFilter },
+    uiState: {
+      isAddTTOpen,
+      isAddTTClosing,
+      priceOut,
+      ttValue,
+      paymentAmount,
+      searchQuery,
+      statusFilter,
+    },
     actions: {
       openAddTT,
       closeAddTT,
@@ -177,18 +185,15 @@ export default function TradeInPage() {
 
                   {openMenuId === tt.id && (
                     <>
-                      <div
-                        className="fixed inset-0 z-10"
-                        onClick={() => setOpenMenuId(null)}
-                      />
-                      <div className="absolute right-0 mt-1 w-40 rounded-lg border border-border bg-card p-1 shadow-lg z-20">
+                      <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
+                      <div className="border-border bg-card absolute right-0 z-20 mt-1 w-40 rounded-lg border p-1 shadow-lg">
                         <button
                           type="button"
                           onClick={() => {
                             openEditTT(tt);
                             setOpenMenuId(null);
                           }}
-                          className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-xs font-semibold text-foreground hover:bg-muted"
+                          className="text-foreground hover:bg-muted flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-xs font-semibold"
                         >
                           <FileText className="h-3.5 w-3.5" />
                           Edit Skema
@@ -295,7 +300,7 @@ export default function TradeInPage() {
 
                     <Link
                       href={`/dashboard/deals/${tt.id}`}
-                      className="mt-4 w-full rounded-md bg-blue-50 px-3 py-1.5 text-center text-xs font-semibold text-blue-600 transition-colors hover:bg-blue-100 hover:text-blue-700 sm:w-auto inline-block"
+                      className="mt-4 inline-block w-full rounded-md bg-blue-50 px-3 py-1.5 text-center text-xs font-semibold text-blue-600 transition-colors hover:bg-blue-100 hover:text-blue-700 sm:w-auto"
                     >
                       Lihat Detail
                     </Link>
@@ -557,12 +562,12 @@ export default function TradeInPage() {
       {/* Edit Transaksi TT Modal */}
       {editTarget && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm fs-overlay-in"
+          className="fs-overlay-in fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm"
           onClick={closeEditTT}
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-card flex h-full w-full max-w-md flex-col shadow-2xl fs-drawer-in"
+            className="bg-card fs-drawer-in flex h-full w-full max-w-md flex-col shadow-2xl"
           >
             <div className="border-border-soft bg-muted flex items-center justify-between border-b px-6 py-5">
               <div>
@@ -578,7 +583,10 @@ export default function TradeInPage() {
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <form action={handleUpdateTT} className="fs-rise-in flex flex-1 flex-col overflow-hidden">
+            <form
+              action={handleUpdateTT}
+              className="fs-rise-in flex flex-1 flex-col overflow-hidden"
+            >
               <div className="flex-1 space-y-6 overflow-y-auto p-6">
                 {error && (
                   <div className="fs-drop-in rounded-lg border border-rose-100 bg-rose-50 p-3 text-sm text-rose-600">
@@ -599,7 +607,9 @@ export default function TradeInPage() {
                       name="customer_name"
                       required
                       type="text"
-                      defaultValue={(editTarget.customers as { name?: string | null } | null)?.name || ""}
+                      defaultValue={
+                        (editTarget.customers as { name?: string | null } | null)?.name || ""
+                      }
                       className="border-border w-full rounded-lg border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                       placeholder="Mis. Budi Santoso"
                     />
@@ -611,7 +621,9 @@ export default function TradeInPage() {
                     <input
                       name="customer_phone"
                       type="text"
-                      defaultValue={(editTarget.customers as { phone?: string | null } | null)?.phone || ""}
+                      defaultValue={
+                        (editTarget.customers as { phone?: string | null } | null)?.phone || ""
+                      }
                       className="border-border w-full rounded-lg border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                       placeholder="Mis. 08123456789"
                     />
@@ -632,16 +644,24 @@ export default function TradeInPage() {
                     <select
                       name="stock_out_id"
                       required
-                      defaultValue={(editTarget.deal_items?.[0] as { stock_id?: string } | undefined)?.stock_id || ""}
+                      defaultValue={
+                        (editTarget.deal_items?.[0] as { stock_id?: string } | undefined)
+                          ?.stock_id || ""
+                      }
                       className="border-border w-full rounded-lg border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                     >
                       <option value="">-- Pilih Stok Tersedia --</option>
                       {(() => {
-                        const dealItem = editTarget.deal_items?.[0] as { stock_id?: string; stocks?: { name?: string } | null } | undefined;
+                        const dealItem = editTarget.deal_items?.[0] as
+                          { stock_id?: string; stocks?: { name?: string } | null } | undefined;
                         const editStock = dealItem?.stocks;
                         const editStockId = dealItem?.stock_id;
                         const allStocks = [...stocks];
-                        if (editStock && editStockId && !allStocks.some((s) => s.id === editStockId)) {
+                        if (
+                          editStock &&
+                          editStockId &&
+                          !allStocks.some((s) => s.id === editStockId)
+                        ) {
                           allStocks.unshift({
                             id: editStockId,
                             title_reference: editStock.name || "Stok Saat Ini (Selesai/Terjual)",
@@ -691,7 +711,10 @@ export default function TradeInPage() {
                       name="tt_desc"
                       required
                       type="text"
-                      defaultValue={(editTarget.trade_in_items?.[0] as { description?: string } | undefined)?.description || ""}
+                      defaultValue={
+                        (editTarget.trade_in_items?.[0] as { description?: string } | undefined)
+                          ?.description || ""
+                      }
                       className="border-border w-full rounded-lg border px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                       placeholder="Mis. Akun MLBB Mythic"
                     />
@@ -804,27 +827,24 @@ export default function TradeInPage() {
       {/* Hapus TT Konfirmasi Modal */}
       {deleteTarget && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm fs-overlay-in"
+          className="fs-overlay-in fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
           onClick={() => setDeleteTarget(null)}
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-card w-full max-w-md rounded-xl p-6 shadow-2xl fs-rise-in border border-border"
+            className="bg-card fs-rise-in border-border w-full max-w-md rounded-xl border p-6 shadow-2xl"
           >
-            <div className="flex items-center gap-3 text-rose-600 mb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-rose-50 border border-rose-100">
+            <div className="mb-4 flex items-center gap-3 text-rose-600">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-rose-100 bg-rose-50">
                 <AlertTriangle className="h-5 w-5" />
               </div>
-              <h3 className="text-foreground text-lg font-bold">
-                Hapus Transaksi Tukar Tambah
-              </h3>
+              <h3 className="text-foreground text-lg font-bold">Hapus Transaksi Tukar Tambah</h3>
             </div>
             <p className="text-muted-foreground mb-4 text-sm leading-relaxed">
               Apakah Anda yakin ingin menghapus transaksi Tukar Tambah{" "}
-              <strong className="text-foreground font-semibold">
-                {deleteTarget.deal_number}
-              </strong>
-              ? Aset masuk dan deal item yang terkait juga akan dihapus. Tindakan ini tidak dapat dibatalkan.
+              <strong className="text-foreground font-semibold">{deleteTarget.deal_number}</strong>?
+              Aset masuk dan deal item yang terkait juga akan dihapus. Tindakan ini tidak dapat
+              dibatalkan.
             </p>
             {deleteError && (
               <div className="mb-4 rounded-lg border border-rose-100 bg-rose-50 p-3 text-sm text-rose-600">
