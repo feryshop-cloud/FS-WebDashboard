@@ -307,7 +307,7 @@ export function UserManagementTab({
                   </div>
 
                   {createdUser.generatedPassword && (
-                    <div className="w-full max-w-xs rounded-xl border border-emerald-200 bg-emerald-50/60 p-4 text-left">
+                    <div className="border-border bg-muted w-full max-w-xs rounded-xl border p-4 text-left">
                       <p className="text-muted-foreground text-xs font-semibold">
                         Password otomatis (simpan & bagikan ke pengguna):
                       </p>
