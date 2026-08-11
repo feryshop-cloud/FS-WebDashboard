@@ -29,10 +29,20 @@ export async function getAuditLogs(filters: AuditLogFilters = {}): Promise<Audit
       .from("audit_logs")
       .select(
         `
-          *,
+          id,
+          user_id,
+          role_name,
+          action,
+          module,
+          description,
+          old_data,
+          new_data,
+          related_id,
+          ip_address,
+          created_at,
           public_users (full_name)
         `,
-        { count: "exact" },
+        { count: "estimated" },
       )
       .order("created_at", { ascending: false })
       .range(from, to);
