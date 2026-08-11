@@ -26,6 +26,39 @@ export interface ProfitLossReportData {
   expenseItems?: Array<{ name: string; amount: number }>;
 }
 
+const INDONESIAN_MONTHS = [
+  "Januari",
+  "Februari",
+  "Maret",
+  "April",
+  "Mei",
+  "Juni",
+  "Juli",
+  "Agustus",
+  "September",
+  "Oktober",
+  "November",
+  "Desember",
+];
+
+export interface MonthOption {
+  value: string;
+  label: string;
+}
+
+export function getMonthOptions(count = 12): MonthOption[] {
+  const now = new Date();
+  const options: MonthOption[] = [];
+  for (let i = 0; i < count; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    options.push({
+      value: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`,
+      label: `${INDONESIAN_MONTHS[d.getMonth()]} ${d.getFullYear()}`,
+    });
+  }
+  return options;
+}
+
 const getDateRange = (filter: string) => {
   const now = new Date();
   if (filter === "TODAY") {
@@ -41,9 +74,20 @@ const getDateRange = (filter: string) => {
     const start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
     return { startDate: start, endDate: undefined };
   }
+  if (filter === "LAST_MONTH") {
+    const start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const end = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+    return { startDate: start.toISOString(), endDate: end.toISOString() };
+  }
   if (filter === "THIS_YEAR") {
     const start = new Date(now.getFullYear(), 0, 1).toISOString();
     return { startDate: start, endDate: undefined };
+  }
+  if (/^\d{4}-\d{2}$/.test(filter)) {
+    const [year, month] = filter.split("-").map(Number);
+    const start = new Date(year, month - 1, 1);
+    const end = new Date(year, month, 0, 23, 59, 59, 999);
+    return { startDate: start.toISOString(), endDate: end.toISOString() };
   }
   return { startDate: undefined, endDate: undefined };
 };
@@ -51,7 +95,7 @@ const getDateRange = (filter: string) => {
 export function useProfitLossReport() {
   const [reportData, setReportData] = useState<ProfitLossReportData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [periodFilter, setPeriodFilter] = useState("ALL");
+  const [periodFilter, setPeriodFilter] = useState("THIS_MONTH");
   const [, startTransition] = useTransition();
 
   const loadData = (filter: string) => {

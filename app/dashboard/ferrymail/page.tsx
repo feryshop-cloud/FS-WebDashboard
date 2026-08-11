@@ -1,17 +1,15 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import {
   Search,
-  Copy,
-  Check,
   Shield,
   Inbox,
   Square,
   CheckSquare,
   RefreshCw,
   MoreVertical,
-  ArrowLeft,
   Star,
   Mail,
   MailOpen,
@@ -22,46 +20,39 @@ import {
 import { useFerryMail } from "@/lib/hooks/features/useFerryMail";
 
 export default function FerryMailPage() {
+  const router = useRouter();
   const {
     data: { filteredEmails, pageItems, totalFiltered, totalPages, currentPage, accounts, isLoadingAccounts },
     uiState: {
-      selectedEmail,
       searchQuery,
-      copied,
       activeTab,
       allFilteredChecked,
       selectedAccountId,
       isDeleting,
       checkedCount,
       openMenu,
+      allCheckedArchived,
     },
     refs: { menuRef },
     actions: {
-      setSelectedEmail,
       setSearchQuery,
       setActiveTab,
       setSelectedAccountId,
       setCurrentPage,
-      handleCopy,
       toggleCheck,
       toggleStar,
       toggleAllChecks,
       reloadInbox,
-      handleDeleteEmail,
       handleBulkDelete,
       markAsRead,
       setOpenMenu,
-      archiveEmail,
-      restoreEmail,
-      bulkArchive,
+      bulkToggleArchive,
     },
   } = useFerryMail();
 
   return (
     <div className="border-border bg-card -mx-8 -my-8 flex h-[calc(100vh-4rem)] flex-col overflow-hidden border-t font-sans select-none">
-      {!selectedEmail ? (
-        // INBOX LIST VIEW
-        <div className="bg-card flex flex-1 flex-col overflow-hidden">
+      <div className="bg-card flex flex-1 flex-col overflow-hidden">
           {/* Unified Header Bar */}
           <div className="border-border flex min-h-12 shrink-0 items-center border-b px-4 pt-2">
             {/* Actions */}
@@ -85,11 +76,19 @@ export default function FerryMailPage() {
               {checkedCount > 0 && (
                 <>
                   <button
-                    onClick={bulkArchive}
+                    onClick={bulkToggleArchive}
                     className="hover:bg-muted text-foreground rounded p-1 transition-colors"
-                    title={`Arsipkan ${checkedCount} email`}
+                    title={
+                      allCheckedArchived
+                        ? `Keluarkan ${checkedCount} email dari arsip`
+                        : `Arsipkan ${checkedCount} email`
+                    }
                   >
-                    <Archive className="h-4 w-4" />
+                    {allCheckedArchived ? (
+                      <ArchiveRestore className="h-4 w-4" />
+                    ) : (
+                      <Archive className="h-4 w-4" />
+                    )}
                   </button>
                   <button
                     onClick={handleBulkDelete}
@@ -124,11 +123,20 @@ export default function FerryMailPage() {
                       Tandai sudah dibaca
                     </button>
                     <button
-                      onClick={bulkArchive}
+                      onClick={bulkToggleArchive}
                       className="text-foreground hover:bg-muted flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium transition-colors"
                     >
-                      <Archive className="h-3.5 w-3.5 text-amber-600" />
-                      Arsipkan
+                      {allCheckedArchived ? (
+                        <>
+                          <ArchiveRestore className="h-3.5 w-3.5 text-amber-600" />
+                          Keluarkan dari arsip
+                        </>
+                      ) : (
+                        <>
+                          <Archive className="h-3.5 w-3.5 text-amber-600" />
+                          Arsipkan
+                        </>
+                      )}
                     </button>
                   </div>
                 )}
@@ -257,7 +265,7 @@ export default function FerryMailPage() {
               pageItems.map((email) => (
                 <div
                   key={email.id}
-                  onClick={() => setSelectedEmail(email)}
+                  onClick={() => router.push(`/dashboard/ferrymail/${email.id}`)}
                   className={`border-border flex cursor-pointer items-center border-b px-4 py-2 transition-colors hover:bg-slate-50 ${
                     email.isChecked ? "bg-blue-50/20" : ""
                   }`}
@@ -326,106 +334,6 @@ export default function FerryMailPage() {
             )}
           </div>
         </div>
-      ) : (
-        // EMAIL DETAIL VIEW
-        <div className="bg-card flex flex-1 flex-col overflow-hidden">
-          {/* Header Bar */}
-          <div className="border-border flex shrink-0 items-center gap-2 border-b px-4 py-3">
-            <button
-              onClick={() => setSelectedEmail(null)}
-              className="text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg p-1.5 transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </button>
-            <div className="ml-auto flex items-center gap-1">
-              {selectedEmail.isArchived ? (
-                <button
-                  onClick={() => restoreEmail(selectedEmail)}
-                  className="hover:bg-muted text-foreground rounded-lg p-1.5 transition-colors"
-                  title="Pulihkan dari arsip"
-                >
-                  <ArchiveRestore className="h-4 w-4" />
-                </button>
-              ) : (
-                <button
-                  onClick={() => archiveEmail(selectedEmail)}
-                  className="hover:bg-muted text-foreground rounded-lg p-1.5 transition-colors"
-                  title="Arsipkan email"
-                >
-                  <Archive className="h-4 w-4" />
-                </button>
-              )}
-              <button
-                onClick={() => handleDeleteEmail(selectedEmail)}
-                disabled={isDeleting}
-                className="text-rose-600 hover:bg-rose-50 rounded-lg p-1.5 transition-colors disabled:opacity-50"
-                title="Hapus email"
-              >
-                <Trash2 className={`h-4 w-4 ${isDeleting ? "animate-pulse" : ""}`} />
-              </button>
-            </div>
-          </div>
-
-          {/* Email Body */}
-          <div className="flex-1 overflow-y-auto p-8">
-            <div className="mx-auto max-w-2xl space-y-6">
-              {/* Subject */}
-              <h2 className="text-foreground text-xl font-bold tracking-tight">
-                {selectedEmail.subject}
-              </h2>
-
-              {/* Sender Details */}
-              <div className="flex items-center gap-3">
-                <div
-                  className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white ${selectedEmail.avatarBg}`}
-                >
-                  {selectedEmail.avatarText}
-                </div>
-                <div>
-                  <div className="text-foreground text-sm font-bold">{selectedEmail.sender}</div>
-                  <div className="text-muted-foreground text-xs font-medium">
-                    &lt;{selectedEmail.senderEmail}&gt;
-                  </div>
-                </div>
-                <div className="text-muted-foreground ml-auto text-xs font-semibold">
-                  {selectedEmail.date}
-                </div>
-              </div>
-
-              <hr className="border-border" />
-
-              {/* OTP Card */}
-              {selectedEmail.otp && (
-                <div className="border-border-soft bg-muted/30 flex items-center justify-between rounded-xl border p-4 shadow-sm">
-                  <div>
-                    <div className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
-                      One-Time Password (OTP)
-                    </div>
-                    <div className="text-foreground tracking-wides mt-1 font-mono text-2xl font-black">
-                      {selectedEmail.otp}
-                    </div>
-                  </div>
-                  <button
-                    onClick={handleCopy}
-                    className={`inline-flex h-10 w-10 items-center justify-center rounded-lg border shadow-sm transition-all active:scale-95 ${
-                      copied
-                        ? "border-emerald-200 bg-emerald-50 text-emerald-600"
-                        : "border-border bg-card text-foreground hover:bg-muted"
-                    }`}
-                  >
-                    {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                  </button>
-                </div>
-              )}
-
-              {/* Message Body */}
-              <div className="text-foreground text-sm leading-relaxed font-semibold whitespace-pre-line">
-                {selectedEmail.body}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+      </div>
   );
 }

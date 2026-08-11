@@ -82,7 +82,7 @@ export default function EmailAccountsPage() {
         </div>
       ) : (
         <div className="border-border-soft bg-card overflow-x-auto rounded-2xl border shadow-sm">
-          <table className="w-full min-w-[560px] text-left text-sm">
+          <table className="w-full min-w-140 text-left text-sm">
             <thead className="border-border-soft bg-muted/50 text-faint-foreground border-b text-xs font-bold uppercase tracking-wide">
               <tr>
                 <th className="px-5 py-3.5">Akun</th>

@@ -74,6 +74,24 @@ export async function deleteIncomingEmails(ids: string[]) {
   });
 }
 
+export async function getIncomingEmailById(id: string) {
+  return runAction("getIncomingEmailById", async () => {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("incoming_emails")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (error) {
+      logger.error("Error fetching incoming email by id", { error, id });
+      return null;
+    }
+
+    return (data || null) as IncomingEmailRow | null;
+  });
+}
+
 export async function getIncomingEmails(accountId?: string) {
   return runAction("getIncomingEmails", async () => {
     const supabase = await createClient();

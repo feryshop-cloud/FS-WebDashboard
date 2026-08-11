@@ -1,9 +1,14 @@
 "use client";
 
 import React from "react";
-import { Calendar, Download, TrendingUp, TrendingDown, Activity } from "lucide-react";
+import { Download, TrendingUp, TrendingDown, Activity } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
-import { useProfitLossReport } from "@/lib/hooks/features/useProfitLossReport";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { FilterDropdown, type FilterDropdownOption } from "@/components/ui/FilterDropdown";
+import {
+  useProfitLossReport,
+  getMonthOptions,
+} from "@/lib/hooks/features/useProfitLossReport";
 
 export default function ProfitLossPage() {
   const {
@@ -12,6 +17,14 @@ export default function ProfitLossPage() {
     uiState: { periodFilter },
     actions: { setPeriodFilter },
   } = useProfitLossReport();
+
+  const monthOptions = getMonthOptions(12);
+  const periodOptions: FilterDropdownOption[] = [
+    { value: "THIS_MONTH", label: "Bulan Ini" },
+    { value: "LAST_MONTH", label: "Bulan Lalu" },
+    { value: "THIS_YEAR", label: "Tahun Ini" },
+    ...monthOptions,
+  ];
 
   if (isLoading) {
     return (
@@ -68,33 +81,30 @@ export default function ProfitLossPage() {
 
   return (
     <>
-      {/* Header */}
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <div>
-          <h1 className="text-foreground text-2xl font-bold tracking-tight">
-            Laba Rugi (Profit & Loss)
-          </h1>
-          <p className="text-muted-foreground mt-0.5 text-sm">
-            Analisis pendapatan, beban pokok penjualan, dan laba bersih bisnis.
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="border-border bg-card text-foreground relative inline-flex items-center rounded-lg border px-3 py-2 text-sm font-medium shadow-sm sm:w-auto">
-            <Calendar className="text-faint-foreground mr-2 h-4 w-4" />
-            <select
-              value={periodFilter}
-              onChange={(e) => setPeriodFilter(e.target.value)}
-              className="text-foreground cursor-pointer bg-transparent pr-4 font-medium outline-none"
-            >
-              <option value="THIS_MONTH">Bulan Ini</option>
-              <option value="LAST_MONTH">Bulan Lalu</option>
-              <option value="THIS_YEAR">Tahun Ini</option>
-            </select>
-          </div>
-          <button className="border-border bg-card text-foreground hover:bg-muted hover:text-foreground inline-flex items-center justify-center gap-2 rounded-lg border px-4 py-2 text-sm font-semibold shadow-sm transition-colors">
+      <PageHeader
+        title="Laba Rugi (Profit & Loss)"
+        subtitle="Analisis pendapatan, beban pokok penjualan, dan laba bersih bisnis."
+        actions={
+          <button className="border-border bg-card text-foreground hover:bg-muted hover:text-foreground inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold shadow-sm transition-all">
             <Download className="h-4 w-4" />
             Eksport Laporan
           </button>
+        }
+      />
+
+      {/* Action Bar */}
+      <div className="border-border-soft bg-card flex flex-col items-center justify-between gap-4 rounded-xl border p-4 shadow-sm sm:flex-row">
+        <p className="text-muted-foreground text-sm font-medium">
+          Menampilkan laporan laba rugi periode terpilih.
+        </p>
+        <div className="flex w-full items-center gap-3 sm:w-auto">
+          <FilterDropdown
+            value={periodFilter}
+            onSelect={setPeriodFilter}
+            ariaLabel="Filter periode laporan"
+            options={periodOptions}
+            menuClassName="max-h-80 overflow-y-auto"
+          />
         </div>
       </div>
 
