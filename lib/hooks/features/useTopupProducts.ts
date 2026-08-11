@@ -26,6 +26,10 @@ export function useTopupProducts() {
   const searchQuery = searchParams.get("search") || "";
   const [localSearch, setLocalSearch] = useState(searchQuery);
   const debouncedSearch = useDebouncedValue(localSearch, 300);
+  const pushWithParams = (params: URLSearchParams) => {
+    params.set("page", "1");
+    router.push(`/dashboard/topup-products?${params.toString()}`);
+  };
 
   useEffect(() => {
     setLocalSearch(searchQuery);
@@ -79,11 +83,6 @@ export function useTopupProducts() {
     },
     [mutate],
   );
-
-  const pushWithParams = (params: URLSearchParams) => {
-    params.set("page", "1");
-    router.push(`/dashboard/topup-products?${params.toString()}`);
-  };
 
   const handleFilterChange = (key: string, value: string) => {
     if (key === "search") {

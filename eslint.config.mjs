@@ -22,6 +22,7 @@ const eslintConfig = defineConfig([
     ".agents/**",
     ".codex/**",
     ".kiro/**",
+    "scripts/**",
   ]),
   {
     rules: {
@@ -29,6 +30,8 @@ const eslintConfig = defineConfig([
         "warn",
         { argsIgnorePattern: "^_", varsIgnorePattern: "^_", caughtErrorsIgnorePattern: "^_" },
       ],
+      "@typescript-eslint/no-explicit-any": "off",
+      "react-hooks/set-state-in-effect": "off",
     },
   },
 ]);

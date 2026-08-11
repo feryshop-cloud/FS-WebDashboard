@@ -1,54 +1,54 @@
 # PRD: Core Features & Modules
 
-## 1. Authentication Module
-- **Login Page:** A clean, minimal login screen centered on the page using the soft mesh background defined in `3_design.md`. 
-  - *Fields:* Email, Password.
-  - *Feedback:* Use toast notifications for invalid credentials.
-- **Session Management:** Securely handle Supabase sessions. Protect all `/dashboard` routes using Next.js Middleware to redirect unauthenticated users back to `/login`.
+## 1. Authentication & RBAC Module
+* **Login Page**: Layar masuk minimalis dengan validasi kredensial dan notifikasi toast.
+* **Role-Based Access Control**: Pembagian akses dinamis berdasarkan role (`OWNER` vs `ADMIN`).
+* **Session Management**: Session ditangani secara aman via Next.js Middleware untuk memproteksi rute `/dashboard/*`.
 
-## 2. Dashboard / Overview Module
-The main landing page after login. The UI MUST conditionally render based on the user's role (`SUPER_ADMIN` vs `ADMIN`).
+## 2. Command Center Dashboard Module
+Landing page utama yang menampilkan visualisasi data berdasarkan kewenangan role pengguna:
+* **Super Admin / Owner View**:
+  - Kartu Metrik Utama: Omzet Penjualan, Profit Bersih, Total Piutang Aktif, dan Total Modal Stok yang beredar.
+  - Donut Chart Inventori: Visualisasi status stok secara proporsional riil (Tersedia, Booking, Akses Terbatas, Terjual, On Hold, Bermasalah, Cancel).
+  - Grafik Tren Keuangan: Dual AreaChart (`recharts`) yang memetakan statistik Pendapatan (Revenue) vs Laba Bersih (Profit) selama 30 hari terakhir.
+  - Panel Recent Transactions: Kartu interaktif yang menyajikan 7 transaksi terakhir di ledger dengan link cerdas ke detail entitas terkait.
+* **Admin / Warehouse View**:
+  - Membatasi akses sehingga tidak menampilkan metrik keuangan apa pun. Hanya menyajikan metrik operasional (Tugas Pending, Stok Tersedia, dan Stok Terjual).
 
-### A. Super Admin View (Financial Focus)
-- **Top Metric Cards:** - Total Revenue (from `SOLD` items).
-  - Total Net Profit (Sold Price - Capital Price).
-  - Active Capital (Sum of `capital_price` for `UNPOSTED` and `AVAILABLE` items).
-- **Activity Chart:** A minimal line or bar chart (using `recharts` or Shadcn charts) showing sales revenue over the last 30 days.
+## 3. Inventory & Stock Management Module
+* **Data Table Stok**: Dilengkapi pencarian kode referensi/nama akun, filter kategori game, filter status stok, dan paginasi terintegrasi.
+* **Ingestion Stok (Slide-out Sheet)**: Input kategori game, upload screenshot spek, kode referensi internal, spesifikasi akun (JSONB/Text), harga modal, harga posting, dan catatan internal.
+* **Row-Level Actions**:
+  - Detail/Edit stok.
+  - Generate Caption (menyalin caption promosi siap pakai).
+  - Mark as Sold (mengalihkan status stok ke SOLD dengan input nominal terjual riil).
+  - Kelola Problem (melaporkan kendala akun).
 
-### B. Admin View (Operational Focus)
-- **Top Metric Cards:**
-  - Tasks Pending: Count of `UNPOSTED` accounts.
-  - Active Stock: Count of `AVAILABLE` accounts.
-  - Completed: Count of `SOLD` accounts this week.
-- *Strict Rule:* The Admin view MUST NOT render any financial metrics, profit margins, or capital data.
+## 4. Deals & Split Payments Module
+* **Manajemen Deal**: Mendukung transaksi penjualan standar maupun tukar tambah.
+* **Split Payments**: Satu deal mendukung beberapa pembayaran cicilan (DP -> Cicilan -> Pelunasan). Menghitung secara otomatis sisa pembayaran (piutang) dan persentase pembayaran.
+* **Invoice/Nota**: Menghasilkan nota resmi yang dapat diunduh dalam format PDF/Excel.
+* **Refund/Cancellation Flow**: Membatalkan deal dengan pengembalian dana penuh atau pemotongan dana hangus sesuai kebijakan.
 
-## 3. Inventory Management Module (The Core)
-A comprehensive Data Table page to manage all game accounts.
-- **Data Table Features:** - Search by internal reference code.
-  - Filter by Game (ML, FF, etc.).
-  - Filter by Status (Unposted, Available, Sold).
-  - Pagination.
-- **Add New Item (Slide-out / Sheet or Dialog):**
-  - Select Game Category.
-  - Upload Screenshot (Client-side preview -> Uploads to Supabase Storage -> Returns URL).
-  - Input fields: Internal Reference, Account Specs (Textarea), Capital Price, Asking Price.
-- **Item Action Menu (Row level):**
-  - View Details / Edit.
-  - Generate Caption (Opens Caption Module).
-  - Mark as Sold (Opens a modal to input the final `sold_price`).
-  - Delete (Super Admin only).
+## 5. Trade-In (Tukar Tambah) Module
+* **Alur Barter**: Mendukung penukaran satu atau lebih akun milik customer dengan akun stok Feryshop.
+* **Penilaian Aset**: Nilai taksiran akun customer dicatat sebagai aset masuk baru, dan selisihnya diselesaikan dengan tambahan uang masuk (pemasukan) atau cashback (pengeluaran).
 
-## 4. Auto-Caption Generator Module
-This is a critical workflow feature for the staff to accelerate marketing.
-- **Trigger:** Clicking "Generate Caption" on an `UNPOSTED` or `AVAILABLE` inventory item.
-- **UI:** A modal or slide-over sheet containing a formatted text block.
-- **Logic:** The system takes the `account_specs`, `asking_price`, and Game Category, and formats it into a social-media-ready template (with appropriate emojis).
-- **Action:** A prominent "Copy to Clipboard" button. Once copied, the system should prompt the user: "Update status to AVAILABLE?" to automatically change the status from `UNPOSTED`.
+## 6. Cashbook & Ledger Management Module
+* **Accounts/Metode Pembayaran**: Pengelolaan dompet digital, rekening bank, dan channel reseller.
+* **Buku Kas/Ledger**: Pencatatan mutasi kas secara riil, baik transaksi otomatis (penjualan, pembelian stok, refund) maupun transaksi manual (pengeluaran operasional, transfer antar-rekening, admin fee).
 
-## 5. Game Category Management (Settings)
-- A simple settings page restricted to `SUPER_ADMIN`.
-- Allows adding new games (e.g., adding "PUBG Mobile") to populate the dropdown menus in the Inventory forms.
+## 7. Ticketing Problem Cases Module
+* Layanan pelaporan dispute pasca-transaksi untuk akun yang bermasalah.
+* Menyimpan kronologi tindakan penyelesaian, biaya perbaikan, opsi refund, dan update status akhir.
 
-## 6. Reports & Export (Super Admin Only)
-- A dedicated page or a button on the Dashboard to export data.
-- **Functionality:** Export filtered inventory or sales data into a `.csv` or `.xlsx` format for external accounting purposes.
+## 8. FerryMail Module (Surel Integrasi)
+* Halaman kotak masuk surel (inbox) yang menampilkan email masuk untuk mempermudah admin/staff dalam mengecek kode verifikasi (OTP) dari game tanpa perlu membuka webmail eksternal.
+
+## 9. Reports & Export Module
+* **Laporan Finansial**: Laporan Laba Rugi (Profit & Loss) dan Laporan Arus Kas (Cashflow).
+* **Fitur Paginasi & Filter**: Filter tanggal, filter akun bank, dan pagination tabel laporan.
+* **Export Data**: Mendukung ekspor instan seluruh data laporan ke format CSV dan Excel (`/api/export/*`).
+
+## 10. Audit Log Module
+* Log rekam jejak aktivitas staf bersifat read-only untuk memantau aktivitas sensitif (login, perubahan role, ekspor laporan, pembuatan deal, penyesuaian saldo rekening).

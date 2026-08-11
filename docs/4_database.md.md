@@ -1,59 +1,56 @@
 # PRD: Database Schema & Supabase Architecture
 
 ## 1. Database Philosophy
-This system uses Supabase (PostgreSQL) as the primary data store. The database design must strictly adhere to relational principles, ensuring data integrity through foreign keys and constraints.
+Sistem ini menggunakan Supabase (PostgreSQL) sebagai penyimpanan data utama. Struktur relasional dioptimalkan untuk integritas data yang ketat (Strict ERP Pattern) menggunakan foreign keys, checks, dan constraints. Data keuangan dilacak secara double-entry dan audit trail merekam seluruh aktivitas penting secara immutable.
 
-## 2. Authentication & Role Management (RBAC)
-We rely on Supabase Auth for authentication. However, to manage internal roles (Super Admin vs. Admin), we will create a dedicated `profiles` or `users_roles` table that links to the Supabase `auth.users` table via a trigger.
+## 2. Authentication & Role-Based Access Control (RBAC)
+Kami menggunakan Supabase Auth terintegrasi dengan tabel manajemen hak akses kustom untuk memisahkan wewenang admin operasional (`ADMIN`) dan pemilik bisnis (`OWNER`).
 
-### Enum: `user_role`
-- `SUPER_ADMIN`: Full access, including financial data.
-- `ADMIN`: Operational access only.
+### Skema Tabel RBAC:
+* **`roles`**: Menyimpan nama role kustom (misal: `OWNER`, `ADMIN`, `FINANCE`).
+* **`users`**: Menghubungkan metadata admin (nama lengkap, role, status aktif) ke `auth.users` Supabase.
+* **`permissions`**: Izin aksi granular per modul.
+* **`role_permissions`**: Mapping relasi perizinan antara `roles` dan `permissions`.
 
-### Table: `profiles`
-- `id` (uuid, Primary Key, References `auth.users(id)`)
-- `full_name` (text, not null)
-- `role` (enum `user_role`, default: 'ADMIN')
-- `created_at` (timestamp, default: now())
+---
 
-## 3. Core Tables
+## 3. Tabel Utama & Relasi
 
-### Table: `games` (Lookup Table)
-Stores the categories of games being managed (e.g., Mobile Legends, Free Fire).
-- `id` (uuid, Primary Key, default: uuid_generate_v4())
-- `name` (text, not null, unique) - e.g., "Mobile Legends"
-- `slug` (text, not null, unique) - e.g., "mobile-legends"
-- `created_at` (timestamp, default: now())
+### A. Modul Inventori / Game
+* **`categories`**: Menyimpan kategori game (contoh: "Mobile Legends", "Free Fire").
+* **`stocks`**: Menyimpan data akun game (menggantikan draft `inventory`).
+  - Kolom kunci: `id`, `category_id`, `name`, `account_details`, `username`, `password`, `capital_price` (modal), `post_price`, `current_price`, `status`, `seller_info`, `admin_id`.
+  - Status enum: `AVAILABLE` (Tersedia), `BOOKED` (Booking), `RESTRICTED` (Akses Terbatas), `SOLD` (Terjual), `ON_HOLD`, `PROBLEM_PENDING`, `PROBLEM_PERMANENT`, `CANCELLED`.
+* **`stock_histories`**: Log mutasi perubahan status stok untuk audit riwayat kepemilikan.
 
-### Enum: `inventory_status`
-- `UNPOSTED`: Freshly inputted, caption not yet generated/posted to socials.
-- `AVAILABLE`: Posted and waiting for buyers.
-- `SOLD`: Transaction completed.
+### B. Modul Transaksi & Tukar Tambah
+* **`customers`**: Menyimpan profil pelanggan (nama, nomor telepon WhatsApp).
+* **`deals`**: Mencatat transaksi penjualan utama.
+  - Tipe deal: `Penjualan`, `Tukar Tambah`.
+  - Status deal: `DRAFT`, `BOOKING`, `RESTRICTED`, `LUNAS`, `CANCELLED_BY_CUSTOMER`, `CANCELLED_BY_SHOP`, `REFUND_PARTIAL`, `REFUND_FULL`, `PROBLEM`, `DONE`.
+* **`deal_items`**: Menghubungkan deal dengan item stok yang terjual.
+* **`trade_in_items`**: Menampung data akun dari customer yang masuk sebagai aset barter dalam transaksi tukar tambah.
 
-### Table: `inventory` (The Core Entity)
-Stores the actual game accounts.
-- `id` (uuid, Primary Key, default: uuid_generate_v4())
-- `game_id` (uuid, Foreign Key references `games(id)`, not null)
-- `added_by` (uuid, Foreign Key references `profiles(id)`)
-- `title_reference` (text) - Internal name/code for the account (e.g., "ML-Mythic-001")
-- `account_specs` (jsonb or text) - Details like rank, skins, win rate, etc.
-- `screenshot_url` (text) - Path to the image in Supabase Storage.
-- `capital_price` (integer, not null) - The cost to buy the account (Modal).
-- `asking_price` (integer, not null) - The initial selling price offered to buyers.
-- `sold_price` (integer, nullable) - The final agreed price when sold.
-- `status` (enum `inventory_status`, default: 'UNPOSTED')
-- `sold_at` (timestamp, nullable)
-- `created_at` (timestamp, default: now())
-- `updated_at` (timestamp, default: now())
+### C. Modul Keuangan & Ledger
+* **`accounts`**: Menyimpan akun/metode pembayaran resmi (kas, bank, e-wallet).
+* **`payments`**: Mencatat cicilan/pembayaran dari customer yang terikat ke suatu deal.
+* **`finance_ledger`**: Buku kas umum untuk setiap mutasi uang keluar/masuk.
+  - Tipe transaksi: `PAYMENT_IN`, `PAYMENT_OUT`, `STOCK_PURCHASE`, `REFUND`, `CASHBACK`, `TRANSFER_IN`, `TRANSFER_OUT`, `ADJUSTMENT`.
+* **`balance_adjustments`**: Request penyesuaian saldo manual oleh staf yang membutuhkan approval Owner.
+
+### D. Modul Operasional & Lainnya
+* **`problem_cases`**: Tiket penanganan jika akun bermasalah pasca penjualan atau tukar tambah.
+* **`email_accounts` & `incoming_emails`**: Integrasi FerryMail untuk menarik dan membaca OTP/pesan masuk ke akun email game.
+* **`audit_logs`**: Log tidak dapat diubah (immutable) yang mencatat log masuk, view data sensitif, ekspor, dan mutasi data oleh admin.
+* **`topup_products` & `orders`**: Integrasi sinkronisasi produk/pesanan top-up.
+
+---
 
 ## 4. Supabase Storage (Buckets)
-- **Bucket Name:** `account-screenshots`
-- **Access:** Public read access (for rendering in the dashboard). Upload access restricted to authenticated users (Super Admin & Admin).
+* **Bucket `account-screenshots`**: Menyimpan screenshot spek akun game. Bersifat public-read untuk render UI di dashboard, tetapi upload dibatasi bagi admin terautentikasi.
 
-## 5. Row Level Security (RLS) Rules (Guidelines for AI)
-The AI must ensure that RLS policies are considered in the SQL migration scripts:
-- All tables must have RLS enabled.
-- `profiles`: Users can read all profiles but only Super Admins can update roles.
-- `games`: All authenticated users can read. Only Super Admins can insert/update/delete.
-- `inventory`: All authenticated users can read, insert, and update. Deletion is restricted to Super Admins.
-- Financial data isolation: On the frontend/server actions, `capital_price` and `sold_price` must be stripped from API payloads if the requesting user's role is `ADMIN`, ensuring they cannot calculate profit margins.
+## 5. Row Level Security (RLS) & Column-Level Security
+* Semua tabel wajib mengaktifkan RLS.
+* Penggunaan `SUPABASE_SERVICE_ROLE_KEY` pada frontend/workspace Next.js dinonaktifkan sepenuhnya demi alasan keamanan.
+* Operasi read/write dilakukan melalui anon-key dengan validasi session RLS atau fungsi PostgreSQL RPC bertanda `SECURITY DEFINER` (misal: `process_payment`, `process_stock_purchase`, dan `process_account_transfer`).
+* Akses data sensitif keuangan seperti modal (`capital_price`) dan profit pada tingkat server action dibatasi hanya bagi admin dengan role `OWNER`/`SUPER_ADMIN`.
