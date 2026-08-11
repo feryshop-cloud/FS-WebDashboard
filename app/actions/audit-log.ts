@@ -25,7 +25,7 @@ export async function getAuditLogs(filters: AuditLogFilters = {}): Promise<Audit
     const from = (page - 1) * pageSize;
     const to = from + pageSize - 1;
 
-    const { data, error, count } = await supabase
+    const { data, error } = await supabase
       .from("audit_logs")
       .select(
         `
@@ -42,7 +42,6 @@ export async function getAuditLogs(filters: AuditLogFilters = {}): Promise<Audit
           created_at,
           public_users (full_name)
         `,
-        { count: "estimated" },
       )
       .order("created_at", { ascending: false })
       .range(from, to);
@@ -52,12 +51,15 @@ export async function getAuditLogs(filters: AuditLogFilters = {}): Promise<Audit
       return { data: [], total: 0, page, pageSize, totalPages: 1 };
     }
 
+    const fetchedData = (data as unknown as AuditLog[]) || [];
+    const totalEstimate = fetchedData.length < pageSize ? from + fetchedData.length : from + pageSize + 100;
+
     return {
-      data: (data as unknown as AuditLog[]) || [],
-      total: count || 0,
+      data: fetchedData,
+      total: totalEstimate,
       page,
       pageSize,
-      totalPages: Math.max(1, Math.ceil((count || 0) / pageSize)),
+      totalPages: Math.max(1, Math.ceil(totalEstimate / pageSize)),
     };
   });
 }
