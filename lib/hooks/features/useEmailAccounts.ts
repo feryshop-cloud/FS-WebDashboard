@@ -15,14 +15,20 @@ import {
 export type EmailAccountForm = {
   email: string;
   display_name: string;
+  access_pin: string;
   is_active: boolean;
 };
 
 export const emptyEmailAccountForm: EmailAccountForm = {
   email: "",
   display_name: "",
+  access_pin: "123456",
   is_active: true,
 };
+
+export function generateRandomPin(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
 
 export function useEmailAccounts() {
   const [search, setSearch] = useState("");
@@ -69,7 +75,10 @@ export function useEmailAccounts() {
   const openAdd = () => {
     setError("");
     setEditing(null);
-    setForm(emptyEmailAccountForm);
+    setForm({
+      ...emptyEmailAccountForm,
+      access_pin: generateRandomPin(),
+    });
     setIsAddOpen(true);
   };
 
@@ -79,6 +88,7 @@ export function useEmailAccounts() {
     setForm({
       email: acc.email,
       display_name: acc.display_name || "",
+      access_pin: (acc as unknown as { access_pin?: string }).access_pin || "123456",
       is_active: acc.is_active,
     });
     setIsAddOpen(true);
@@ -97,6 +107,7 @@ export function useEmailAccounts() {
       const payload = new FormData();
       payload.set("email", form.email.trim());
       payload.set("display_name", form.display_name.trim());
+      payload.set("access_pin", form.access_pin.trim() || "123456");
       payload.set("is_active", form.is_active ? "on" : "off");
 
       if (editing) {
@@ -118,35 +129,43 @@ export function useEmailAccounts() {
     if (!confirm(`Hapus akun email "${acc.email}"? Email yang masuk juga akan ikut terhapus.`)) {
       return;
     }
+
     try {
       await deleteEmailAccount(acc.id);
       loadData();
     } catch (err) {
-      alert(getErrorMessage(err));
+      setError(getErrorMessage(err));
     }
   };
 
   const filtered = useMemo(() => {
-    const q = debouncedSearch.toLowerCase();
-    return accounts.filter(
-      (a) => a.email.toLowerCase().includes(q) || (a.display_name || "").toLowerCase().includes(q),
-    );
+    const q = debouncedSearch.trim().toLowerCase();
+    if (!q) return accounts;
+
+    return accounts.filter((acc) => {
+      const e = acc.email.toLowerCase();
+      const d = (acc.display_name || "").toLowerCase();
+      const p = ((acc as unknown as { access_pin?: string }).access_pin || "").toLowerCase();
+      return e.includes(q) || d.includes(q) || p.includes(q);
+    });
   }, [accounts, debouncedSearch]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
+  const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
   const safePage = Math.min(currentPage, totalPages);
-  const pageStart = (safePage - 1) * itemsPerPage;
-  const pageItems = filtered.slice(pageStart, pageStart + itemsPerPage);
+
+  const pageItems = useMemo(() => {
+    const start = (safePage - 1) * itemsPerPage;
+    return filtered.slice(start, start + itemsPerPage);
+  }, [filtered, safePage, itemsPerPage]);
 
   return {
     data: {
       accounts,
       filtered,
       pageItems,
-      totalPages,
       safePage,
-      pageStart,
       itemsPerPage,
+      totalPages,
     },
     isLoading,
     isSubmitting,
@@ -157,8 +176,6 @@ export function useEmailAccounts() {
       isAddClosing,
       editing,
       form,
-      currentPage,
-      itemsPerPage,
     },
     actions: {
       setSearch,
@@ -170,7 +187,7 @@ export function useEmailAccounts() {
       handleDelete,
       setCurrentPage,
       setItemsPerPage,
-      loadData,
+      generateNewPin: () => setField("access_pin", generateRandomPin()),
     },
   };
 }

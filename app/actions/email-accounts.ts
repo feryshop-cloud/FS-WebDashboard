@@ -36,6 +36,7 @@ export async function createEmailAccount(formData: FormData) {
       .trim()
       .toLowerCase();
     const displayName = String(formData.get("display_name") || "").trim() || null;
+    const accessPin = String(formData.get("access_pin") || "").trim() || "123456";
     const isActive = formData.get("is_active") === "on";
 
     if (!email) {
@@ -46,6 +47,7 @@ export async function createEmailAccount(formData: FormData) {
     const { error } = await supabase.from("email_accounts").insert({
       email,
       display_name: displayName,
+      access_pin: accessPin,
       is_active: isActive,
     });
 
@@ -70,6 +72,7 @@ export async function updateEmailAccount(id: string, formData: FormData) {
       .trim()
       .toLowerCase();
     const displayName = String(formData.get("display_name") || "").trim() || null;
+    const accessPin = String(formData.get("access_pin") || "").trim() || "123456";
     const isActive = formData.get("is_active") === "on";
 
     if (!email) {
@@ -82,6 +85,7 @@ export async function updateEmailAccount(id: string, formData: FormData) {
       .update({
         email,
         display_name: displayName,
+        access_pin: accessPin,
         is_active: isActive,
       })
       .eq("id", id);
