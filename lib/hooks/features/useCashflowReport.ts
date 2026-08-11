@@ -27,6 +27,8 @@ export function useCashflowReport() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isMonthDropdownOpen, setIsMonthDropdownOpen] = useState(false);
   const [isYearDropdownOpen, setIsYearDropdownOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [, startTransition] = useTransition();
 
   const loadData = () => {
@@ -74,6 +76,10 @@ export function useCashflowReport() {
     };
   }, []);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedMonth, selectedYear, searchQuery]);
+
   // Filter entries for the selected month and year
   const monthlyEntries = entries.filter((entry) => {
     const d = new Date(entry.created_at);
@@ -90,6 +96,15 @@ export function useCashflowReport() {
 
     return matchesSearch;
   });
+
+  const totalItems = filteredEntries.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
+  const safePage = Math.min(currentPage, totalPages);
+
+  const paginatedEntries = filteredEntries.slice(
+    (safePage - 1) * itemsPerPage,
+    safePage * itemsPerPage,
+  );
 
   // Aggregation
   let cashIn = 0;
@@ -220,6 +235,7 @@ export function useCashflowReport() {
       entries,
       monthlyEntries,
       filteredEntries,
+      paginatedEntries,
       cashIn,
       cashOut,
       netCashflow,
@@ -234,6 +250,8 @@ export function useCashflowReport() {
       searchQuery,
       isMonthDropdownOpen,
       isYearDropdownOpen,
+      currentPage: safePage,
+      itemsPerPage,
     },
     actions: {
       setSelectedMonth,
@@ -241,6 +259,11 @@ export function useCashflowReport() {
       setSearchQuery,
       setIsMonthDropdownOpen,
       setIsYearDropdownOpen,
+      setCurrentPage,
+      handlePageSizeChange: (size: number) => {
+        setItemsPerPage(size);
+        setCurrentPage(1);
+      },
       loadData: () => startTransition(() => loadData()),
       handleExportCSV,
     },

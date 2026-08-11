@@ -56,7 +56,6 @@ export default function TopupOrdersPage() {
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h1 className="text-foreground flex items-center gap-2 text-2xl font-bold tracking-tight">
-            <ShoppingBag className="h-7 w-7 text-blue-600" />
             Top-Up Orders
           </h1>
           <p className="text-muted-foreground mt-0.5 text-sm">

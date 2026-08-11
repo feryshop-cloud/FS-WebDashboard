@@ -70,9 +70,9 @@ const navGroups: { title: string; items: NavItem[] }[] = [
     ],
   },
   {
-    title: "FerryMail",
+    title: "Mail",
     items: [
-      { label: "Inbox", icon: Mail, href: "/dashboard/ferrymail" },
+      { label: "Inbox", icon: Mail, href: "/dashboard/mail-list" },
       { label: "Kelola Akun", icon: Settings, href: "/dashboard/mail-accounts" },
     ],
   },

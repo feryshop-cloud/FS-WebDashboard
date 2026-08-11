@@ -10,7 +10,7 @@ export type EmailAccountRow = Database["public"]["Tables"]["email_accounts"]["Ro
 
 function revalidate() {
   revalidatePath("/dashboard/mail-accounts", "page");
-  revalidatePath("/dashboard/ferrymail", "page");
+  revalidatePath("/dashboard/mail-list", "page");
 }
 
 export async function getEmailAccounts() {

@@ -3,6 +3,7 @@
 import React from "react";
 import { Download, ChevronDown, ArrowUpRight, ArrowDownRight, Wallet, Search } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
+import { Pagination } from "@/components/ui/Pagination";
 import { useCashflowReport } from "@/lib/hooks/features/useCashflowReport";
 
 const MONTHS = [
@@ -24,16 +25,26 @@ const YEARS = [2025, 2026, 2027];
 
 export default function CashflowPage() {
   const {
-    data: { filteredEntries, cashIn, cashOut, netCashflow, inflows, outflows },
+    data: { paginatedEntries, filteredEntries, cashIn, cashOut, netCashflow, inflows, outflows },
     isLoading,
     error,
-    uiState: { selectedMonth, selectedYear, searchQuery, isMonthDropdownOpen, isYearDropdownOpen },
+    uiState: {
+      selectedMonth,
+      selectedYear,
+      searchQuery,
+      isMonthDropdownOpen,
+      isYearDropdownOpen,
+      currentPage,
+      itemsPerPage,
+    },
     actions: {
       setSelectedMonth,
       setSelectedYear,
       setSearchQuery,
       setIsMonthDropdownOpen,
       setIsYearDropdownOpen,
+      setCurrentPage,
+      handlePageSizeChange,
       handleExportCSV,
     },
   } = useCashflowReport();
@@ -366,7 +377,7 @@ export default function CashflowPage() {
                     </td>
                   </tr>
                 ) : (
-                  filteredEntries.map((entry) => {
+                  paginatedEntries.map((entry) => {
                     const isPositive = Number(entry.amount) > 0;
 
                     let badgeColor = "bg-muted text-foreground border-border";
@@ -444,6 +455,17 @@ export default function CashflowPage() {
               </tbody>
             </table>
           </div>
+
+          {!isLoading && filteredEntries.length > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalItems={filteredEntries.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={handlePageSizeChange}
+              itemLabel="transaksi"
+            />
+          )}
         </div>
       </div>
     </>

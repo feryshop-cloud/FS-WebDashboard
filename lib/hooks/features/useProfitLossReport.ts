@@ -141,6 +141,54 @@ export function useProfitLossReport() {
         .reduce((acc: number, curr: ProfitLossBreakdownItem) => acc + curr.amount, 0)
     : 0;
 
+  const handleExportCSV = () => {
+    if (!reportData) return;
+
+    const rows: string[][] = [
+      ["LAPORAN LABA RUGI (PROFIT & LOSS)"],
+      [`Periode: ${periodFilter}`],
+      [`Tanggal Ekspor: ${new Date().toLocaleString("id-ID")}`],
+      [""],
+      ["RINGKASAN", "JUMLAH (IDR)"],
+      ["Total Pendapatan (Omzet)", String(reportData.revenue ?? 0)],
+      ["Beban Pokok Penjualan (HPP)", String(reportData.cogs ?? 0)],
+      ["Total Laba Kotor", String(grossProfit)],
+      ["Total Beban Operasional", String(totalExpenses)],
+      ["Laba Bersih (Net Profit)", String(reportData.netProfit ?? 0)],
+      [""],
+      ["RINCIAN PENDAPATAN & BEBAN"],
+      ["Kategori", "Keterangan", "Jumlah (IDR)"],
+    ];
+
+    (reportData.breakdown?.income || []).forEach((item) => {
+      rows.push(["Pendapatan", item.label, String(item.amount)]);
+    });
+
+    rows.push(["HPP", "Beban Pokok Penjualan HPP", String(reportData.cogs ?? 0)]);
+
+    (reportData.breakdown?.expenses || []).forEach((item) => {
+      rows.push(["Beban Operasional", item.label, String(item.amount)]);
+    });
+
+    const csvContent =
+      "\uFEFF" +
+      rows
+        .map((row) => row.map((val) => `"${(val || "").replace(/"/g, '""')}"`).join(","))
+        .join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `laporan-laba-rugi-${periodFilter}-${new Date().toISOString().slice(0, 10)}.csv`,
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return {
     data: {
       reportData,
@@ -154,6 +202,7 @@ export function useProfitLossReport() {
     actions: {
       setPeriodFilter,
       reload: () => startTransition(() => loadData(periodFilter)),
+      handleExportCSV,
     },
   };
 }

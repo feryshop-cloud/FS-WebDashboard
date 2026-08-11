@@ -221,7 +221,7 @@ export default function FerryMailPage() {
                     />
                   </svg>
                 </button>
-                <span className="text-muted-foreground min-w-[48px] text-center text-xs font-semibold tabular-nums">
+                <span className="text-muted-foreground min-w-12 text-center text-xs font-semibold tabular-nums">
                   {currentPage} / {totalPages}
                 </span>
                 <button
@@ -293,7 +293,7 @@ export default function FerryMailPage() {
             pageItems.map((email) => (
               <div
                 key={email.id}
-                onClick={() => router.push(`/dashboard/ferrymail/${email.id}`)}
+                onClick={() => router.push(`/dashboard/mail-list/${email.id}`)}
                 className={`border-border flex cursor-pointer items-center border-b px-4 py-2 transition-colors hover:bg-slate-50 ${
                   email.isChecked ? "bg-blue-50/20" : ""
                 }`}

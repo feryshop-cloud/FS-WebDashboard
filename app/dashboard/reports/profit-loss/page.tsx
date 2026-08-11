@@ -12,7 +12,7 @@ export default function ProfitLossPage() {
     data: { reportData, grossProfit, totalExpenses },
     isLoading,
     uiState: { periodFilter },
-    actions: { setPeriodFilter },
+    actions: { setPeriodFilter, handleExportCSV },
   } = useProfitLossReport();
 
   const monthOptions = getMonthOptions(12);
@@ -82,9 +82,12 @@ export default function ProfitLossPage() {
         title="Laba Rugi (Profit & Loss)"
         subtitle="Analisis pendapatan, beban pokok penjualan, dan laba bersih bisnis."
         actions={
-          <button className="border-border bg-card text-foreground hover:bg-muted hover:text-foreground inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold shadow-sm transition-all">
+          <button
+            onClick={handleExportCSV}
+            className="border-border bg-card text-foreground hover:bg-muted hover:text-foreground inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold shadow-sm transition-all"
+          >
             <Download className="h-4 w-4" />
-            Eksport Laporan
+            Ekspor Laporan
           </button>
         }
       />

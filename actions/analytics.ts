@@ -139,3 +139,62 @@ export async function getRecentLedger(
     return { data: [], error: getErrorMessage(error) };
   }
 }
+
+export async function getRevenueProfitTrend(days = 30): Promise<{
+  data: Array<{ date: string; label: string; revenue: number; profit: number }>;
+  error: string | null;
+}> {
+  try {
+    const supabase = await createClient();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+    startDate.setHours(0, 0, 0, 0);
+
+    const { data: entries, error } = await supabase
+      .from("finance_ledger")
+      .select("amount, transaction_type, created_at")
+      .gte("created_at", startDate.toISOString())
+      .order("created_at", { ascending: true });
+
+    if (error) throw error;
+
+    const map = new Map<string, { revenue: number; expense: number }>();
+
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      map.set(key, { revenue: 0, expense: 0 });
+    }
+
+    (entries || []).forEach((entry) => {
+      const dateKey = new Date(entry.created_at).toISOString().slice(0, 10);
+      const amt = Number(entry.amount || 0);
+      const current = map.get(dateKey) || { revenue: 0, expense: 0 };
+
+      if (amt > 0) {
+        current.revenue += amt;
+      } else if (amt < 0) {
+        current.expense += Math.abs(amt);
+      }
+      map.set(dateKey, current);
+    });
+
+    const result = Array.from(map.entries()).map(([dateStr, val]) => {
+      const d = new Date(dateStr);
+      const label = d.toLocaleDateString("id-ID", { day: "numeric", month: "short" });
+      const profit = val.revenue - val.expense;
+      return {
+        date: dateStr,
+        label,
+        revenue: val.revenue,
+        profit: profit,
+      };
+    });
+
+    return { data: result, error: null };
+  } catch (error: unknown) {
+    logger.error("Error fetching revenue profit trend", { error });
+    return { data: [], error: getErrorMessage(error) };
+  }
+}

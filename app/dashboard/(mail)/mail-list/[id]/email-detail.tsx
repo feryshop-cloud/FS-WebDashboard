@@ -42,7 +42,7 @@ export function EmailDetail({ email }: { email: IncomingEmailRow }) {
     try {
       setIsDeleting(true);
       await deleteIncomingEmails([email.id]);
-      router.push("/dashboard/ferrymail");
+      router.push("/dashboard/mail-list");
     } catch (err) {
       alert(getErrorMessage(err));
       setIsDeleting(false);
@@ -55,7 +55,7 @@ export function EmailDetail({ email }: { email: IncomingEmailRow }) {
         {/* Header Bar */}
         <div className="border-border flex shrink-0 items-center gap-2 border-b px-4 py-3">
           <Link
-            href="/dashboard/ferrymail"
+            href="/dashboard/mail-list"
             className="text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg p-1.5 transition-colors"
             aria-label="Kembali ke kotak masuk"
           >
