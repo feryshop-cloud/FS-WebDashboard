@@ -39,7 +39,8 @@ export async function getAuditLogs(filters: AuditLogFilters = {}): Promise<Audit
           new_data,
           related_id,
           ip_address,
-          created_at
+          created_at,
+          public_users (full_name)
         `,
       )
       .order("created_at", { ascending: false })
