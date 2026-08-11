@@ -44,7 +44,8 @@ export async function createEmailAccount(formData: FormData) {
     }
 
     const supabase = await createClient();
-    const { error } = await supabase.from("email_accounts").insert({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase.from("email_accounts") as any).insert({
       email,
       display_name: displayName,
       access_pin: accessPin,
@@ -80,8 +81,8 @@ export async function updateEmailAccount(id: string, formData: FormData) {
     }
 
     const supabase = await createClient();
-    const { error } = await supabase
-      .from("email_accounts")
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase.from("email_accounts") as any)
       .update({
         email,
         display_name: displayName,

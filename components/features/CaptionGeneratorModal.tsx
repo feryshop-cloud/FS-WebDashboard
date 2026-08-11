@@ -8,12 +8,12 @@ import { TemplateItem } from "@/lib/hooks/features/useTemplates";
 
 interface InventoryCaptionItem {
   id: string;
-  public_id: string | null;
-  title_reference: string | null;
-  account_specs: string;
+  public_id?: string | null;
+  title_reference?: string | null;
+  account_specs?: string | null;
   asking_price: number;
   status: string;
-  games: { name: string } | null;
+  games?: { name: string } | null;
 }
 
 export function CaptionGeneratorModal({
@@ -37,7 +37,11 @@ export function CaptionGeneratorModal({
 
   // Filter templates to Social Media / Marketing type
   const socialTemplates = templates.filter(
-    (t) => t.type.toLowerCase().includes("social") || t.type.toLowerCase().includes("media") || t.type === "Marketing" || true
+    (t) =>
+      t.type.toLowerCase().includes("social") ||
+      t.type.toLowerCase().includes("media") ||
+      t.type === "Marketing" ||
+      true,
   );
 
   useEffect(() => {
@@ -86,7 +90,7 @@ export function CaptionGeneratorModal({
 
     const variables: Record<string, string> = {
       game_name: gameName,
-      account_specs: item.account_specs,
+      account_specs: item.account_specs || "",
       asking_price: priceFormatted,
       ref_code: refCode,
       public_id: item.public_id || refCode,
@@ -103,11 +107,12 @@ export function CaptionGeneratorModal({
   };
 
   const activeTemplate = socialTemplates[activeTemplateIdx] || socialTemplates[0];
-  const finalCaptionText = activeTemplate && selectedItem
-    ? interpolateCaption(activeTemplate.content, selectedItem)
-    : selectedItem
-    ? `[${selectedItem.games?.name || "Game"}] Account Available!\nRef: ${selectedItem.title_reference || selectedItem.public_id}\n\nSpesifikasi:\n${selectedItem.account_specs}\n\nHarga: ${formatCurrency(selectedItem.asking_price)}\n\nMinat? Hubungi Admin SEKARANG!`
-    : "Pilih akun inventori terlebih dahulu.";
+  const finalCaptionText =
+    activeTemplate && selectedItem
+      ? interpolateCaption(activeTemplate.content, selectedItem)
+      : selectedItem
+        ? `[${selectedItem.games?.name || "Game"}] Account Available!\nRef: ${selectedItem.title_reference || selectedItem.public_id}\n\nSpesifikasi:\n${selectedItem.account_specs}\n\nHarga: ${formatCurrency(selectedItem.asking_price)}\n\nMinat? Hubungi Admin SEKARANG!`
+        : "Pilih akun inventori terlebih dahulu.";
 
   const handleCopy = async () => {
     try {
@@ -126,7 +131,7 @@ export function CaptionGeneratorModal({
       await updateItemStatus(selectedItem.id, "AVAILABLE");
       // Update local state status
       setInventoryList((prev) =>
-        prev.map((i) => (i.id === selectedItem.id ? { ...i, status: "AVAILABLE" } : i))
+        prev.map((i) => (i.id === selectedItem.id ? { ...i, status: "AVAILABLE" } : i)),
       );
     } catch (err) {
       console.error("Failed to update status", err);
@@ -165,11 +170,11 @@ export function CaptionGeneratorModal({
         <div className="flex-1 space-y-5 overflow-y-auto p-6">
           {/* Inventory Item Selector */}
           <div className="space-y-1.5">
-            <label className="text-foreground block text-xs font-semibold uppercase tracking-wider">
+            <label className="text-foreground block text-xs font-semibold tracking-wider uppercase">
               Pilih Akun Game Inventori
             </label>
             {isLoadingInventory ? (
-              <div className="flex items-center gap-2 rounded-xl border border-border bg-muted/50 px-3 py-2.5 text-xs text-muted-foreground">
+              <div className="border-border bg-muted/50 text-muted-foreground flex items-center gap-2 rounded-xl border px-3 py-2.5 text-xs">
                 <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
                 Memuat daftar stok akun...
               </div>
@@ -182,11 +187,13 @@ export function CaptionGeneratorModal({
               <select
                 value={selectedInventoryId}
                 onChange={(e) => setSelectedInventoryId(e.target.value)}
-                className="w-full rounded-xl border border-border bg-card px-3 py-2.5 text-sm text-foreground focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                className="border-border bg-card text-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
               >
                 {inventoryList.map((inv) => (
                   <option key={inv.id} value={inv.id}>
-                    [{inv.games?.name || "Game"}] {inv.title_reference || inv.public_id || "Tanpa Ref"} — {formatCurrency(inv.asking_price)} ({inv.status})
+                    [{inv.games?.name || "Game"}]{" "}
+                    {inv.title_reference || inv.public_id || "Tanpa Ref"} —{" "}
+                    {formatCurrency(inv.asking_price)} ({inv.status})
                   </option>
                 ))}
               </select>
@@ -196,7 +203,7 @@ export function CaptionGeneratorModal({
           {/* Template Selection Tabs */}
           {templates.length > 0 && (
             <div className="space-y-1.5">
-              <label className="text-foreground block text-xs font-semibold uppercase tracking-wider">
+              <label className="text-foreground block text-xs font-semibold tracking-wider uppercase">
                 Pilih Template Postingan
               </label>
               <div className="flex gap-2 overflow-x-auto pb-1">
@@ -207,7 +214,7 @@ export function CaptionGeneratorModal({
                     className={`rounded-lg px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-all ${
                       activeTemplateIdx === idx
                         ? "bg-blue-600 text-white shadow-sm"
-                        : "border border-border bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
+                        : "border-border bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground border"
                     }`}
                   >
                     {tpl.name}
@@ -220,14 +227,14 @@ export function CaptionGeneratorModal({
           {/* Output Caption Preview */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <label className="text-foreground block text-xs font-semibold uppercase tracking-wider">
+              <label className="text-foreground block text-xs font-semibold tracking-wider uppercase">
                 Hasil Interpolasi Caption
               </label>
-              <span className="text-[11px] text-muted-foreground">
+              <span className="text-muted-foreground text-[11px]">
                 Presisi static template • Zero AI
               </span>
             </div>
-            <div className="relative min-h-[140px] rounded-xl border border-border bg-muted/40 p-4 font-mono text-xs leading-relaxed text-foreground whitespace-pre-wrap select-all">
+            <div className="border-border bg-muted/40 text-foreground relative min-h-[140px] rounded-xl border p-4 font-mono text-xs leading-relaxed whitespace-pre-wrap select-all">
               {finalCaptionText}
             </div>
           </div>
@@ -255,7 +262,7 @@ export function CaptionGeneratorModal({
           <div className="flex items-center gap-2.5">
             <button
               onClick={onClose}
-              className="rounded-xl border border-border bg-card px-4 py-2 text-xs font-medium text-foreground transition-colors hover:bg-muted active:scale-95"
+              className="border-border bg-card text-foreground hover:bg-muted rounded-xl border px-4 py-2 text-xs font-medium transition-colors active:scale-95"
             >
               Tutup
             </button>

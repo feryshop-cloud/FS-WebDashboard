@@ -242,7 +242,8 @@ export function InventoryTable({ inventory, hideActions = false }: InventoryTabl
       {!hideActions && (
         <>
           <CaptionGeneratorModal
-            item={selectedItem}
+            templates={[]}
+            initialItem={selectedItem}
             isOpen={!!selectedItem}
             onClose={() => setSelectedItem(null)}
           />
