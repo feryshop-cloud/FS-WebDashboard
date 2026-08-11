@@ -14,6 +14,8 @@ import {
   Wand2,
   Copy,
   Check,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import {
   useUserManagement,
@@ -59,6 +61,7 @@ export function UserManagementTab({
   } = useUserManagement(users, onRefresh);
 
   const [copied, setCopied] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const onCopy = async () => {
     await handleCopyPassword();
@@ -397,17 +400,31 @@ export function UserManagementTab({
                         <span className="font-normal">(opsional)</span>
                       </label>
                       <div className="flex gap-2">
-                        <input
-                          id="new-user-password"
-                          type="password"
-                          value={form.password}
-                          onChange={(e) =>
-                            setForm({ ...form, password: e.target.value })
-                          }
-                          placeholder="Kosongkan untuk digenerate otomatis"
-                          minLength={6}
-                          className="border-border flex-1 rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
-                        />
+                        <div className="relative flex-1">
+                          <input
+                            id="new-user-password"
+                            type={showPassword ? "text" : "password"}
+                            value={form.password}
+                            onChange={(e) =>
+                              setForm({ ...form, password: e.target.value })
+                            }
+                            placeholder="Kosongkan untuk digenerate otomatis"
+                            minLength={6}
+                            className="border-border w-full rounded-lg border px-3 py-2 pr-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword((v) => !v)}
+                            title={showPassword ? "Sembunyikan password" : "Lihat password"}
+                            className="text-faint-foreground hover:text-muted-foreground absolute top-1/2 right-2.5 -translate-y-1/2 rounded-md p-0.5 transition-colors"
+                          >
+                            {showPassword ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </button>
+                        </div>
                         <button
                           type="button"
                           onClick={handleGeneratePassword}
