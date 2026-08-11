@@ -234,7 +234,7 @@ export function CaptionGeneratorModal({
                 Presisi static template • Zero AI
               </span>
             </div>
-            <div className="border-border bg-muted/40 text-foreground relative min-h-[140px] rounded-xl border p-4 font-mono text-xs leading-relaxed whitespace-pre-wrap select-all">
+            <div className="border-border bg-muted/40 text-foreground relative min-h-35 rounded-xl border p-4 font-mono text-xs leading-relaxed whitespace-pre-wrap select-all">
               {finalCaptionText}
             </div>
           </div>

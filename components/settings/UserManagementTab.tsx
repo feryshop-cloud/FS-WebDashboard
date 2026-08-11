@@ -292,7 +292,7 @@ export function UserManagementTab({
             >
               {createdUser ? (
                 <div className="flex flex-1 flex-col items-center justify-center gap-4 p-6 text-center">
-                  <div className="bg-emerald-50 text-emerald-600 rounded-full p-4">
+                  <div className="rounded-full bg-emerald-50 p-4 text-emerald-600">
                     <CheckCircle2 className="h-10 w-10" />
                   </div>
                   <div>
@@ -301,15 +301,13 @@ export function UserManagementTab({
                     </h3>
                     <p className="text-muted-foreground mt-1 text-sm">
                       Akun untuk{" "}
-                      <span className="text-foreground font-semibold">
-                        {createdUser.full_name}
-                      </span>{" "}
+                      <span className="text-foreground font-semibold">{createdUser.full_name}</span>{" "}
                       ({createdUser.email}) sudah aktif.
                     </p>
                   </div>
 
                   {createdUser.generatedPassword && (
-                    <div className="bg-muted w-full max-w-xs rounded-xl border border-emerald-200 bg-emerald-50/60 p-4 text-left">
+                    <div className="w-full max-w-xs rounded-xl border border-emerald-200 bg-emerald-50/60 p-4 text-left">
                       <p className="text-muted-foreground text-xs font-semibold">
                         Password otomatis (simpan & bagikan ke pengguna):
                       </p>
@@ -364,9 +362,7 @@ export function UserManagementTab({
                         id="new-user-name"
                         type="text"
                         value={form.full_name}
-                        onChange={(e) =>
-                          setForm({ ...form, full_name: e.target.value })
-                        }
+                        onChange={(e) => setForm({ ...form, full_name: e.target.value })}
                         placeholder="Nama lengkap pengguna"
                         className="border-border rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                       />
@@ -383,9 +379,7 @@ export function UserManagementTab({
                         id="new-user-email"
                         type="email"
                         value={form.email}
-                        onChange={(e) =>
-                          setForm({ ...form, email: e.target.value })
-                        }
+                        onChange={(e) => setForm({ ...form, email: e.target.value })}
                         placeholder="nama@perusahaan.com"
                         className="border-border rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                       />
@@ -396,8 +390,7 @@ export function UserManagementTab({
                         htmlFor="new-user-password"
                         className="text-muted-foreground text-xs font-semibold"
                       >
-                        Password{" "}
-                        <span className="font-normal">(opsional)</span>
+                        Password <span className="font-normal">(opsional)</span>
                       </label>
                       <div className="flex gap-2">
                         <div className="relative flex-1">
@@ -405,9 +398,7 @@ export function UserManagementTab({
                             id="new-user-password"
                             type={showPassword ? "text" : "password"}
                             value={form.password}
-                            onChange={(e) =>
-                              setForm({ ...form, password: e.target.value })
-                            }
+                            onChange={(e) => setForm({ ...form, password: e.target.value })}
                             placeholder="Kosongkan untuk digenerate otomatis"
                             minLength={6}
                             className="border-border w-full rounded-lg border px-3 py-2 pr-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
@@ -436,8 +427,8 @@ export function UserManagementTab({
                         </button>
                       </div>
                       <p className="text-faint-foreground text-[11px]">
-                        Jika dikosongkan, password akan digenerate otomatis dan
-                        ditampilkan sekali setelah pengguna dibuat.
+                        Jika dikosongkan, password akan digenerate otomatis dan ditampilkan sekali
+                        setelah pengguna dibuat.
                       </p>
                     </div>
 
@@ -451,9 +442,7 @@ export function UserManagementTab({
                       <select
                         id="new-user-role"
                         value={form.role_id}
-                        onChange={(e) =>
-                          setForm({ ...form, role_id: e.target.value })
-                        }
+                        onChange={(e) => setForm({ ...form, role_id: e.target.value })}
                         className="border-border bg-card rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                       >
                         <option value="">-- Pilih Role --</option>
