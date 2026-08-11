@@ -17,16 +17,17 @@ export function useTemplates() {
   const [search, setSearch] = useState("");
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  // Add modal state
-  const [isAddOpen, setIsAddOpen] = useState(false);
-  const [isAddClosing, setIsAddClosing] = useState(false);
+  // Modal state (used for both Add and Edit)
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalClosing, setIsModalClosing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Edit inline state
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editContent, setEditContent] = useState("");
-  const [editName, setEditName] = useState("");
-  const [editType, setEditType] = useState("");
+  const [editingTemplate, setEditingTemplate] = useState<TemplateItem | null>(null);
+  const [form, setForm] = useState({
+    name: "",
+    type: "Social Media",
+    content: "",
+  });
 
   const {
     data: templates = [],
@@ -47,52 +48,58 @@ export function useTemplates() {
   };
 
   const openAdd = () => {
-    if (isAddClosing) return;
-    setIsAddOpen(true);
+    if (isModalClosing) return;
+    setEditingTemplate(null);
+    setForm({
+      name: "",
+      type: "Social Media",
+      content: "",
+    });
+    setIsModalOpen(true);
+  };
+
+  const openEdit = (tpl: TemplateItem) => {
+    if (isModalClosing) return;
+    setEditingTemplate(tpl);
+    setForm({
+      name: tpl.name,
+      type: tpl.type || "Social Media",
+      content: tpl.content || "",
+    });
+    setIsModalOpen(true);
   };
 
   const closeModal = () => {
-    if (isAddClosing || isSubmitting) return;
-    setIsAddClosing(true);
+    if (isModalClosing || isSubmitting) return;
+    setIsModalClosing(true);
     setTimeout(() => {
-      setIsAddClosing(false);
-      setIsAddOpen(false);
+      setIsModalClosing(false);
+      setIsModalOpen(false);
+      setEditingTemplate(null);
     }, 200);
   };
 
-  const handleAddSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const setFormField = (field: keyof typeof form, value: string) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       setIsSubmitting(true);
-      const formData = new FormData(e.currentTarget);
-      await addTemplate(formData);
+      const formData = new FormData();
+      formData.append("name", form.name);
+      formData.append("type", form.type);
+      formData.append("content", form.content);
+
+      if (editingTemplate) {
+        await updateTemplate(editingTemplate.id, formData);
+      } else {
+        await addTemplate(formData);
+      }
+
       loadTemplatesData();
       closeModal();
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleStartEdit = (tpl: TemplateItem) => {
-    setEditingId(tpl.id);
-    setEditName(tpl.name);
-    setEditType(tpl.type);
-    setEditContent(tpl.content);
-  };
-
-  const handleSaveEdit = async (id: string) => {
-    try {
-      setIsSubmitting(true);
-      const formData = new FormData();
-      formData.append("name", editName);
-      formData.append("type", editType);
-      formData.append("content", editContent);
-
-      await updateTemplate(id, formData);
-      setEditingId(null);
-      loadTemplatesData();
     } catch (err) {
       console.error(err);
     } finally {
@@ -127,26 +134,20 @@ export function useTemplates() {
     uiState: {
       search,
       copiedId,
-      isAddOpen,
-      isAddClosing,
-      editingId,
-      editContent,
-      editName,
-      editType,
+      isModalOpen,
+      isModalClosing,
+      editingTemplate,
+      form,
     },
     actions: {
       setSearch,
       setCopiedId,
       openAdd,
+      openEdit,
       closeModal,
-      handleAddSubmit,
-      handleStartEdit,
-      handleSaveEdit,
+      setFormField,
+      handleFormSubmit,
       handleDelete,
-      setEditContent,
-      setEditName,
-      setEditType,
-      setEditingId,
       loadTemplatesData,
       handleCopy,
     },

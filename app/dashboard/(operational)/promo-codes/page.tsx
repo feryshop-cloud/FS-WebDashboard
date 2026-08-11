@@ -1,10 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { Plus, Search, Trash2, Edit, X, Save, Loader2, Tag } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
 import { usePromoCodes, type PromoCodeRow } from "@/lib/hooks/features/usePromoCodes";
 import { Pagination } from "@/components/ui/Pagination";
+import { DataTable, type DataTableColumn } from "@/components/ui/DataTable";
 
 export default function PromoCodesPage() {
   const {
@@ -30,6 +31,99 @@ export default function PromoCodesPage() {
     p.discount_type === "percent"
       ? `${Number(p.discount_value)}%`
       : formatRupiah(Math.floor(Number(p.discount_value)));
+
+  const columns = useMemo<DataTableColumn<PromoCodeRow>[]>(
+    () => [
+      {
+        key: "code",
+        header: "Kode",
+        className: "px-5 py-3 font-bold text-blue-600",
+        render: (p) => p.code,
+      },
+      {
+        key: "discount",
+        header: "Diskon",
+        className: "px-4 py-3",
+        render: (p) => discountLabel(p),
+      },
+      {
+        key: "min_order",
+        header: "Min Order",
+        className: "px-4 py-3",
+        render: (p) => formatRupiah(Number(p.min_order || 0)),
+      },
+      {
+        key: "quota",
+        header: "Kuota (Terpakai)",
+        className: "px-4 py-3",
+        render: (p) => {
+          const quota = p.quota ?? 0;
+          const used = p.used_count ?? 0;
+          const full = quota > 0 && used >= quota;
+          return (
+            <>
+              {used} / {quota === 0 ? "∞" : quota}
+              {full && (
+                <span className="ml-2 rounded bg-rose-100 px-1.5 py-0.5 text-[10px] font-bold text-rose-600">
+                  Habis
+                </span>
+              )}
+            </>
+          );
+        },
+      },
+      {
+        key: "period",
+        header: "Periode",
+        className: "text-muted-foreground px-4 py-3 text-xs",
+        render: (p) =>
+          p.start_date || p.end_date
+            ? `${p.start_date ? new Date(p.start_date).toLocaleDateString("id-ID") : "-"} → ${p.end_date ? new Date(p.end_date).toLocaleDateString("id-ID") : "-"}`
+            : "Selalu",
+      },
+      {
+        key: "status",
+        header: "Status",
+        className: "px-4 py-3",
+        render: (p) => (
+          <span
+            className={`inline-block rounded px-2 py-0.5 text-[10px] font-bold ${
+              p.is_active ? "bg-emerald-100 text-emerald-700" : "bg-muted text-muted-foreground"
+            }`}
+          >
+            {p.is_active ? "AKTIF" : "NONAKTIF"}
+          </span>
+        ),
+      },
+      {
+        key: "actions",
+        header: "Aksi",
+        align: "right",
+        className: "px-4 py-3",
+        headerClassName: "text-right",
+        render: (p) => (
+          <div className="flex justify-end gap-1">
+            <button
+              onClick={() => openEdit(p)}
+              className="rounded p-1.5 text-emerald-600 transition-colors hover:bg-emerald-50"
+              title="Edit"
+            >
+              <Edit className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => handleDelete(p.id, p.code)}
+              disabled={isSubmitting}
+              className="rounded p-1.5 text-rose-600 transition-colors hover:bg-rose-50 disabled:opacity-50"
+              title="Hapus"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </div>
+        ),
+      },
+    ],
+    [isSubmitting, openEdit, handleDelete],
+  );
 
   return (
     <>
@@ -68,107 +162,35 @@ export default function PromoCodesPage() {
         />
       </div>
 
-      {/* Table */}
-      {isLoading ? (
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-        </div>
-      ) : filtered.length === 0 ? (
-        <div className="bg-card border-border-soft text-muted-foreground flex flex-col items-center gap-2 rounded-xl border py-12 text-sm">
-          <Tag className="h-6 w-6 opacity-40" />
-          Belum ada kode promo.
-        </div>
-      ) : (
-        <div className="border-border-soft bg-card overflow-x-auto rounded-xl border shadow-sm">
-          <table className="w-full min-w-180 text-left text-sm">
-            <thead className="border-border-soft bg-muted/50 text-faint-foreground border-b text-xs font-bold uppercase">
-              <tr>
-                <th className="px-5 py-3">Kode</th>
-                <th className="px-4 py-3">Diskon</th>
-                <th className="px-4 py-3">Min Order</th>
-                <th className="px-4 py-3">Kuota (Terpakai)</th>
-                <th className="px-4 py-3">Periode</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3 text-right">Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pageItems.map((p) => {
-                const quota = p.quota ?? 0;
-                const used = p.used_count ?? 0;
-                const full = quota > 0 && used >= quota;
-                return (
-                  <tr
-                    key={p.id}
-                    className="border-border-soft hover:bg-muted/30 border-b last:border-0"
-                  >
-                    <td className="px-5 py-3 font-bold text-blue-600">{p.code}</td>
-                    <td className="px-4 py-3">{discountLabel(p)}</td>
-                    <td className="px-4 py-3">{formatRupiah(Number(p.min_order || 0))}</td>
-                    <td className="px-4 py-3">
-                      {used} / {quota === 0 ? "∞" : quota}
-                      {full && (
-                        <span className="ml-2 rounded bg-rose-100 px-1.5 py-0.5 text-[10px] font-bold text-rose-600">
-                          Habis
-                        </span>
-                      )}
-                    </td>
-                    <td className="text-muted-foreground px-4 py-3 text-xs">
-                      {p.start_date || p.end_date
-                        ? `${p.start_date ? new Date(p.start_date).toLocaleDateString("id-ID") : "-"} → ${p.end_date ? new Date(p.end_date).toLocaleDateString("id-ID") : "-"}`
-                        : "Selalu"}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`inline-block rounded px-2 py-0.5 text-[10px] font-bold ${
-                          p.is_active
-                            ? "bg-emerald-100 text-emerald-700"
-                            : "bg-muted text-muted-foreground"
-                        }`}
-                      >
-                        {p.is_active ? "AKTIF" : "NONAKTIF"}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex justify-end gap-1">
-                        <button
-                          onClick={() => openEdit(p)}
-                          className="rounded p-1.5 text-emerald-600 transition-colors hover:bg-emerald-50"
-                          title="Edit"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(p.id, p.code)}
-                          disabled={isSubmitting}
-                          className="rounded p-1.5 text-rose-600 transition-colors hover:bg-rose-50 disabled:opacity-50"
-                          title="Hapus"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {filtered.length > 0 && (
-        <Pagination
-          currentPage={safePage}
-          totalItems={filtered.length}
-          itemsPerPage={itemsPerPage}
-          onPageChange={(page) => setCurrentPage(page)}
-          onPageSizeChange={(size) => {
-            setItemsPerPage(size);
-            setCurrentPage(1);
-          }}
-          itemLabel="promo"
-        />
-      )}
+      {/* Reusable DataTable Component */}
+      <DataTable
+        columns={columns}
+        rows={pageItems}
+        rowKey={(p) => p.id}
+        isLoading={isLoading}
+        emptyMessage="Belum ada kode promo."
+        emptyContent={
+          <div className="text-muted-foreground flex flex-col items-center gap-2 py-6 text-sm">
+            <Tag className="h-6 w-6 opacity-40" />
+            <span>Belum ada kode promo.</span>
+          </div>
+        }
+        footer={
+          filtered.length > 0 ? (
+            <Pagination
+              currentPage={safePage}
+              totalItems={filtered.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={(page) => setCurrentPage(page)}
+              onPageSizeChange={(size) => {
+                setItemsPerPage(size);
+                setCurrentPage(1);
+              }}
+              itemLabel="promo"
+            />
+          ) : undefined
+        }
+      />
 
       {/* Create / Edit Modal */}
       {(isAddOpen || isAddClosing) && (

@@ -50,7 +50,9 @@ export async function setAuditClientIp(
     const ip = await getClientIp();
     if (!ip) return;
 
-    const { error } = await supabase.rpc("set_audit_client_ip", { p_ip: ip });
+    const { error } = await (supabase.rpc as any)("set_audit_client_ip", {
+      p_ip: ip,
+    });
     if (error) {
       console.warn("[audit] set_audit_client_ip failed:", error.message);
     }

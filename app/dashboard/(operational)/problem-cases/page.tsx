@@ -1,10 +1,22 @@
 "use client";
 
-import React from "react";
-import { Search, Plus, Filter, AlertTriangle, X, Loader2, Trash2, Eye } from "lucide-react";
+import React, { useMemo } from "react";
+import {
+  Search,
+  Plus,
+  Filter,
+  AlertTriangle,
+  X,
+  Loader2,
+  Trash2,
+  Eye,
+  ChevronDown,
+} from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { useProblemCases } from "@/lib/hooks/features/useProblemCases";
 import { Pagination } from "@/components/ui/Pagination";
+import { DataTable, type DataTableColumn } from "@/components/ui/DataTable";
+import type { ProblemCaseWithRelations } from "@/types/database";
 
 export default function ProblemCasesPage() {
   const {
@@ -45,6 +57,112 @@ export default function ProblemCasesPage() {
     },
   } = useProblemCases();
 
+  const columns = useMemo<DataTableColumn<ProblemCaseWithRelations>[]>(
+    () => [
+      {
+        key: "case_number",
+        header: "Nomor Case",
+        className: "text-foreground px-6 py-4 font-semibold whitespace-nowrap",
+        render: (c) => (
+          <div className="flex items-center gap-2">
+            {c.status === "OPEN" && <AlertTriangle className="h-4 w-4 text-rose-500" />}
+            {c.case_number}
+          </div>
+        ),
+      },
+      {
+        key: "created_at",
+        header: "Tanggal Laporan",
+        className: "text-muted-foreground px-6 py-4 whitespace-nowrap",
+        render: (c) => formatDate(c.created_at ?? ""),
+      },
+      {
+        key: "issue_type",
+        header: "Tipe Masalah",
+        className: "text-foreground px-6 py-4 font-medium",
+        render: (c) => (c.issue_type as string) || "-",
+      },
+      {
+        key: "related",
+        header: "Stok / Deal Terkait",
+        className: "text-muted-foreground px-6 py-4",
+        render: (c) => {
+          const relatedStr = c.deals
+            ? `Deal: ${c.deals.deal_number}`
+            : c.stocks
+              ? `Stock: ${c.stocks.sku || ""} (${c.stocks.name})`
+              : "-";
+          return (
+            <div className="flex flex-col">
+              <span className="text-foreground font-semibold">{relatedStr}</span>
+              {c.customers && (
+                <span className="text-faint-foreground mt-0.5 text-xs">
+                  Cust: {c.customers.name}
+                </span>
+              )}
+            </div>
+          );
+        },
+      },
+      {
+        key: "status",
+        header: "Status Case",
+        align: "center",
+        className: "px-6 py-4 text-center whitespace-nowrap",
+        headerClassName: "text-center",
+        render: (c) => {
+          let badgeClass = "bg-muted text-muted-foreground border-border";
+          if (c.status === "OPEN") badgeClass = "bg-rose-50 text-rose-600 border-rose-100";
+          if (c.status === "IN_PROGRESS") badgeClass = "bg-blue-50 text-blue-600 border-blue-100";
+          if (c.status === "WAITING_CUSTOMER" || c.status === "WAITING_THIRD_PARTY")
+            badgeClass = "bg-orange-50 text-orange-600 border-orange-100";
+          if (c.status === "RESOLVED")
+            badgeClass = "bg-emerald-50 text-emerald-600 border-emerald-100";
+          if (c.status === "REFUND") badgeClass = "bg-slate-800 text-white border-slate-700";
+
+          return (
+            <span
+              className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${badgeClass}`}
+            >
+              {PROBLEM_CASE_STATUS_LABEL[c.status ?? ""] ?? c.status}
+            </span>
+          );
+        },
+      },
+      {
+        key: "actions",
+        header: "Aksi",
+        align: "center",
+        className: "px-6 py-4 text-center whitespace-nowrap",
+        headerClassName: "text-center",
+        render: (c) => (
+          <div className="flex items-center justify-center gap-2">
+            <button
+              onClick={() => handleOpenDetail(c)}
+              className="rounded-[10px] p-1.5 text-blue-500 transition-colors hover:bg-blue-50 hover:text-blue-700"
+              title="Lihat Detail & Update Status"
+            >
+              <Eye className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => handleDeleteCase(c.id, c.case_number)}
+              disabled={isDeletingId === c.id}
+              className="rounded-[10px] p-1.5 text-rose-600 transition-colors hover:bg-rose-50 hover:text-rose-700 disabled:opacity-50"
+              title="Hapus Case"
+            >
+              {isDeletingId === c.id ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin text-rose-600" />
+              ) : (
+                <Trash2 className="h-3.5 w-3.5" />
+              )}
+            </button>
+          </div>
+        ),
+      },
+    ],
+    [isDeletingId, PROBLEM_CASE_STATUS_LABEL, handleOpenDetail, handleDeleteCase],
+  );
+
   return (
     <>
       {/* Header */}
@@ -69,7 +187,7 @@ export default function ProblemCasesPage() {
       </div>
 
       {/* Action Bar */}
-      <div className="border-border-soft bg-card flex flex-col items-center justify-between gap-4 rounded-2xl border p-4 shadow-sm sm:flex-row">
+      <div className="border-border-soft bg-card flex flex-col items-center justify-between gap-4 rounded-xl border p-4 shadow-sm sm:flex-row">
         <div className="relative w-full sm:w-96">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
             <Search className="text-faint-foreground h-4 w-4" />
@@ -78,17 +196,20 @@ export default function ProblemCasesPage() {
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="border-border bg-muted/70 text-foreground focus:bg-card placeholder-placeholder block w-full rounded-xl border py-2 pr-3 pl-10 transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 sm:text-sm"
+            className="border-border bg-muted text-foreground placeholder-placeholder block w-full rounded-lg border py-2 pr-3 pl-10 transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 sm:text-sm"
             placeholder="Cari ID case, tipe masalah, atau customer..."
           />
         </div>
         <div className="flex w-full items-center gap-3 sm:w-auto">
-          <div className="border-border bg-card text-foreground flex items-center gap-2 rounded-xl border px-3 py-1.5 text-sm font-medium">
-            <Filter className="text-faint-foreground h-4 w-4" />
+          <div className="relative w-full sm:w-auto">
+            <Filter className="text-faint-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="text-foreground cursor-pointer bg-transparent text-sm font-medium outline-none"
+              onChange={(e) => {
+                setStatusFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="border-border bg-card text-foreground hover:bg-muted block w-full min-w-35 cursor-pointer appearance-none rounded-lg border py-2 pr-8 pl-9 text-sm font-medium transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 sm:w-auto"
             >
               <option value="ALL">Semua Status</option>
               <option value="OPEN">Open (Baru)</option>
@@ -97,143 +218,32 @@ export default function ProblemCasesPage() {
               <option value="RESOLVED">Selesai</option>
               <option value="REFUND">Refund</option>
             </select>
+            <ChevronDown className="text-faint-foreground pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
           </div>
         </div>
       </div>
 
-      {/* Table */}
-      <div className="border-border-soft bg-card overflow-hidden rounded-2xl border shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="divide-border-soft min-w-full divide-y text-left text-sm">
-            <thead className="bg-muted/80 text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-              <tr>
-                <th scope="col" className="px-6 py-4">
-                  Nomor Case
-                </th>
-                <th scope="col" className="px-6 py-4">
-                  Tanggal Laporan
-                </th>
-                <th scope="col" className="px-6 py-4">
-                  Tipe Masalah
-                </th>
-                <th scope="col" className="px-6 py-4">
-                  Stok / Deal Terkait
-                </th>
-                <th scope="col" className="px-6 py-4 text-center">
-                  Status Case
-                </th>
-                <th scope="col" className="px-6 py-4 text-center">
-                  Aksi
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-border-soft bg-card text-muted-foreground divide-y">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-16 text-center">
-                    <Loader2 className="mx-auto h-8 w-8 animate-spin text-blue-600" />
-                  </td>
-                </tr>
-              ) : filteredCases.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="text-faint-foreground px-6 py-12 text-center text-sm">
-                    Belum ada tiket masalah yang cocok dengan filter.
-                  </td>
-                </tr>
-              ) : (
-                pageItems.map((c) => {
-                  let badgeClass = "bg-muted text-muted-foreground border-border";
-                  if (c.status === "OPEN") badgeClass = "bg-rose-50 text-rose-600 border-rose-100";
-                  if (c.status === "IN_PROGRESS")
-                    badgeClass = "bg-blue-50 text-blue-600 border-blue-100";
-                  if (c.status === "WAITING_CUSTOMER" || c.status === "WAITING_THIRD_PARTY")
-                    badgeClass = "bg-orange-50 text-orange-600 border-orange-100";
-                  if (c.status === "RESOLVED")
-                    badgeClass = "bg-emerald-50 text-emerald-600 border-emerald-100";
-                  if (c.status === "REFUND")
-                    badgeClass = "bg-slate-800 text-white border-slate-700";
-
-                  const relatedStr = c.deals
-                    ? `Deal: ${c.deals.deal_number}`
-                    : c.stocks
-                      ? `Stock: ${c.stocks.sku || ""} (${c.stocks.name})`
-                      : "-";
-
-                  return (
-                    <tr key={c.id} className="group hover:bg-muted/50 transition-colors">
-                      <td className="text-foreground px-6 py-4 font-semibold whitespace-nowrap">
-                        <div className="flex items-center gap-2">
-                          {c.status === "OPEN" && (
-                            <AlertTriangle className="h-4 w-4 text-rose-500" />
-                          )}
-                          {c.case_number}
-                        </div>
-                      </td>
-                      <td className="text-muted-foreground px-6 py-4 whitespace-nowrap">
-                        {formatDate(c.created_at ?? "")}
-                      </td>
-                      <td className="text-foreground px-6 py-4 font-medium">
-                        {c.issue_type as string}
-                      </td>
-                      <td className="text-muted-foreground px-6 py-4">
-                        <div className="flex flex-col">
-                          <span className="text-foreground font-semibold">{relatedStr}</span>
-                          {c.customers && (
-                            <span className="text-faint-foreground mt-0.5 text-xs">
-                              Cust: {c.customers.name}
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-center whitespace-nowrap">
-                        <span
-                          className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${badgeClass}`}
-                        >
-                          {PROBLEM_CASE_STATUS_LABEL[c.status ?? ""] ?? c.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-center whitespace-nowrap">
-                        <div className="flex items-center justify-center gap-2">
-                          <button
-                            onClick={() => handleOpenDetail(c)}
-                            className="rounded-[10px] p-1.5 text-blue-500 transition-colors hover:bg-blue-50 hover:text-blue-700"
-                            title="Lihat Detail & Update Status"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteCase(c.id, c.case_number)}
-                            disabled={isDeletingId === c.id}
-                            className="rounded-[10px] p-1.5 text-rose-600 transition-colors hover:bg-rose-50 hover:text-rose-700 disabled:opacity-50"
-                            title="Hapus Case"
-                          >
-                            {isDeletingId === c.id ? (
-                              <Loader2 className="h-3.5 w-3.5 animate-spin text-rose-600" />
-                            ) : (
-                              <Trash2 className="h-3.5 w-3.5" />
-                            )}
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-        <Pagination
-          currentPage={safePage}
-          totalItems={filteredCases.length}
-          itemsPerPage={itemsPerPage}
-          onPageChange={(page) => setCurrentPage(page)}
-          onPageSizeChange={(size) => {
-            setItemsPerPage(size);
-            setCurrentPage(1);
-          }}
-          itemLabel="kasus"
-        />
-      </div>
+      {/* Reusable DataTable Component */}
+      <DataTable
+        columns={columns}
+        rows={pageItems}
+        rowKey={(c) => c.id}
+        isLoading={isLoading}
+        emptyMessage="Belum ada tiket masalah yang cocok dengan filter."
+        footer={
+          <Pagination
+            currentPage={safePage}
+            totalItems={filteredCases.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={(page) => setCurrentPage(page)}
+            onPageSizeChange={(size) => {
+              setItemsPerPage(size);
+              setCurrentPage(1);
+            }}
+            itemLabel="kasus"
+          />
+        }
+      />
 
       {/* Buat Case Baru Modal */}
       {(isAddOpen || isAddClosing) && (

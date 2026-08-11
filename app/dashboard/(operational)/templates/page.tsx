@@ -20,27 +20,15 @@ export default function TemplatesPage() {
     data: { filteredTemplates },
     isLoading,
     isSubmitting,
-    uiState: {
-      search,
-      copiedId,
-      isAddOpen,
-      isAddClosing,
-      editingId,
-      editContent,
-      editName,
-      editType,
-    },
+    uiState: { search, copiedId, isModalOpen, isModalClosing, editingTemplate, form },
     actions: {
       setSearch,
       openAdd,
+      openEdit,
       closeModal,
-      handleAddSubmit,
-      handleStartEdit,
-      handleSaveEdit,
+      setFormField,
+      handleFormSubmit,
       handleDelete,
-      setEditContent,
-      setEditName,
-      setEditType,
       handleCopy,
     },
   } = useTemplates();
@@ -76,10 +64,46 @@ export default function TemplatesPage() {
         />
       </div>
 
-      {/* Grid of Templates */}
+      {/* Grid of Templates / Shimmer / Empty State */}
       {isLoading ? (
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {[...Array(6)].map((_, i) => (
+            <div
+              key={i}
+              className="border-border-soft bg-card flex flex-col overflow-hidden rounded-xl border p-0 shadow-sm"
+            >
+              <div className="border-border-soft bg-muted/40 flex items-center justify-between border-b px-5 py-4">
+                <div className="space-y-2">
+                  <div className="bg-muted h-4 w-32 animate-pulse rounded" />
+                  <div className="bg-muted h-3 w-16 animate-pulse rounded" />
+                </div>
+                <div className="bg-muted h-5 w-5 animate-pulse rounded-full" />
+              </div>
+              <div className="bg-muted/20 flex-1 space-y-2 p-5">
+                <div className="bg-muted h-3 w-full animate-pulse rounded" />
+                <div className="bg-muted h-3 w-5/6 animate-pulse rounded" />
+                <div className="bg-muted h-3 w-4/6 animate-pulse rounded" />
+                <div className="bg-muted h-3 w-3/4 animate-pulse rounded" />
+              </div>
+              <div className="border-border-soft bg-card flex items-center justify-between border-t px-5 py-3">
+                <div className="bg-muted h-3 w-20 animate-pulse rounded" />
+                <div className="flex gap-2">
+                  <div className="bg-muted h-6 w-6 animate-pulse rounded" />
+                  <div className="bg-muted h-6 w-6 animate-pulse rounded" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : filteredTemplates.length === 0 ? (
+        <div className="border-border-soft bg-card text-muted-foreground flex flex-col items-center justify-center gap-2 rounded-xl border py-16 text-center text-sm shadow-sm">
+          <LayoutTemplate className="text-faint-foreground h-10 w-10 opacity-40" />
+          <p className="text-foreground font-semibold">Belum ada template</p>
+          <p className="text-muted-foreground max-w-sm text-xs">
+            {search
+              ? "Tidak ada template yang cocok dengan kata kunci pencarian Anda."
+              : "Buat format teks baru untuk postingan social media, invoice, atau auto-reply WhatsApp."}
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -99,46 +123,9 @@ export default function TemplatesPage() {
               </div>
 
               <div className="bg-muted/30 flex-1 p-5">
-                {editingId === tpl.id ? (
-                  <div className="flex flex-col gap-2">
-                    <input
-                      type="text"
-                      value={editName}
-                      onChange={(e) => setEditName(e.target.value)}
-                      placeholder="Nama Template"
-                      className="border-input text-foreground w-full rounded border p-2 text-xs font-bold outline-none focus:border-blue-500"
-                    />
-                    <select
-                      value={editType}
-                      onChange={(e) => setEditType(e.target.value)}
-                      className="border-input text-foreground w-full rounded border p-2 text-xs outline-none focus:border-blue-500"
-                    >
-                      <option value="Social Media">Social Media</option>
-                      <option value="Invoice/Struk">Invoice/Struk</option>
-                      <option value="WhatsApp">WhatsApp</option>
-                      <option value="Lainnya">Lainnya</option>
-                    </select>
-                    <textarea
-                      value={editContent}
-                      onChange={(e) => setEditContent(e.target.value)}
-                      rows={6}
-                      className="border-input text-foreground w-full rounded border p-2 font-mono text-xs outline-none focus:border-blue-500"
-                    />
-                    <div className="flex justify-end gap-2">
-                      <button
-                        onClick={() => handleSaveEdit(tpl.id)}
-                        disabled={isSubmitting}
-                        className="inline-flex items-center gap-1 rounded bg-blue-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
-                      >
-                        <Save className="h-3 w-3" /> Simpan
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <pre className="text-muted-foreground font-mono text-xs leading-relaxed whitespace-pre-wrap">
-                    {tpl.content}
-                  </pre>
-                )}
+                <pre className="text-muted-foreground font-mono text-xs leading-relaxed whitespace-pre-wrap">
+                  {tpl.content}
+                </pre>
               </div>
 
               <div className="border-border-soft bg-card flex items-center justify-between border-t px-5 py-3">
@@ -158,7 +145,7 @@ export default function TemplatesPage() {
                     )}
                   </button>
                   <button
-                    onClick={() => handleStartEdit(tpl)}
+                    onClick={() => openEdit(tpl)}
                     className="rounded p-1.5 text-emerald-600 transition-colors hover:bg-emerald-50 hover:text-emerald-700"
                     title="Edit template"
                   >
@@ -178,25 +165,29 @@ export default function TemplatesPage() {
         </div>
       )}
 
-      {/* Add Modal */}
-      {(isAddOpen || isAddClosing) && (
+      {/* Add / Edit Drawer Modal */}
+      {(isModalOpen || isModalClosing) && (
         <div
           className={`fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm ${
-            isAddClosing ? "fs-overlay-out" : "fs-overlay-in"
+            isModalClosing ? "fs-overlay-out" : "fs-overlay-in"
           }`}
           onClick={closeModal}
         >
           <div
             onClick={(e) => e.stopPropagation()}
             className={`bg-card flex h-full w-full max-w-md flex-col shadow-2xl ${
-              isAddClosing ? "fs-drawer-out" : "fs-drawer-in"
+              isModalClosing ? "fs-drawer-out" : "fs-drawer-in"
             }`}
           >
             <div className="border-border-soft flex items-center justify-between border-b px-6 py-5">
               <div>
-                <h2 className="text-foreground text-base font-bold">Tambah Template Baru</h2>
+                <h2 className="text-foreground text-base font-bold">
+                  {editingTemplate !== null ? "Edit Template" : "Tambah Template Baru"}
+                </h2>
                 <p className="text-muted-foreground mt-0.5 text-xs">
-                  Buat format teks baru untuk postingan, invoice, atau chat.
+                  {editingTemplate !== null
+                    ? "Ubah pengisian format teks template."
+                    : "Buat format teks baru untuk postingan, invoice, atau chat."}
                 </p>
               </div>
               <button
@@ -207,7 +198,7 @@ export default function TemplatesPage() {
               </button>
             </div>
             <form
-              onSubmit={handleAddSubmit}
+              onSubmit={handleFormSubmit}
               className="fs-rise-in flex flex-1 flex-col overflow-hidden"
             >
               <div className="flex-1 space-y-4 overflow-y-auto p-6">
@@ -216,7 +207,9 @@ export default function TemplatesPage() {
                     Nama Template
                   </label>
                   <input
-                    name="name"
+                    type="text"
+                    value={form.name}
+                    onChange={(e) => setFormField("name", e.target.value)}
                     required
                     placeholder="Mis. Template Postingan MLBB"
                     className="border-border w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-blue-500"
@@ -227,7 +220,8 @@ export default function TemplatesPage() {
                     Kategori / Tipe
                   </label>
                   <select
-                    name="type"
+                    value={form.type}
+                    onChange={(e) => setFormField("type", e.target.value)}
                     required
                     className="border-border w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-blue-500"
                   >
@@ -242,9 +236,10 @@ export default function TemplatesPage() {
                     Isi Teks Template
                   </label>
                   <textarea
-                    name="content"
+                    value={form.content}
+                    onChange={(e) => setFormField("content", e.target.value)}
                     required
-                    rows={5}
+                    rows={8}
                     placeholder="Format teks..."
                     className="border-border w-full rounded-lg border px-3 py-2 font-mono text-xs outline-none focus:border-blue-500"
                   />
@@ -265,7 +260,9 @@ export default function TemplatesPage() {
                     ) : (
                       <>
                         <Save className="h-3.5 w-3.5" />
-                        <span>Simpan Template</span>
+                        <span>
+                          {editingTemplate !== null ? "Simpan Perubahan" : "Simpan Template"}
+                        </span>
                       </>
                     )}
                   </button>
