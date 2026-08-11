@@ -12,20 +12,32 @@ import {
   Plus,
   Trash2,
   Loader2,
+  Sparkles,
 } from "lucide-react";
 import { useTemplates } from "@/lib/hooks/features/useTemplates";
+import { CaptionGeneratorModal } from "@/components/features/CaptionGeneratorModal";
 
 export default function TemplatesPage() {
   const {
-    data: { filteredTemplates },
+    data: { templates, filteredTemplates },
     isLoading,
     isSubmitting,
-    uiState: { search, copiedId, isModalOpen, isModalClosing, editingTemplate, form },
+    uiState: {
+      search,
+      copiedId,
+      isModalOpen,
+      isModalClosing,
+      isCaptionModalOpen,
+      editingTemplate,
+      form,
+    },
     actions: {
       setSearch,
       openAdd,
       openEdit,
       closeModal,
+      openCaptionModal,
+      closeCaptionModal,
       setFormField,
       handleFormSubmit,
       handleDelete,
@@ -43,13 +55,22 @@ export default function TemplatesPage() {
             Kelola format teks untuk postingan, invoice, dan auto-reply chat.
           </p>
         </div>
-        <button
-          onClick={openAdd}
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 active:scale-[0.97] sm:w-auto"
-        >
-          <Plus className="h-4 w-4" />
-          Tambah Template
-        </button>
+        <div className="flex items-center gap-2.5">
+          <button
+            onClick={openCaptionModal}
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 shadow-sm transition-colors hover:bg-blue-100 active:scale-[0.97]"
+          >
+            <Sparkles className="h-4 w-4 text-blue-600" />
+            Generate Caption
+          </button>
+          <button
+            onClick={openAdd}
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 active:scale-[0.97]"
+          >
+            <Plus className="h-4 w-4" />
+            Tambah Template
+          </button>
+        </div>
       </div>
 
       {/* Search Input */}
@@ -280,6 +301,13 @@ export default function TemplatesPage() {
           </div>
         </div>
       )}
+
+      {/* Static Caption Generator Modal */}
+      <CaptionGeneratorModal
+        templates={templates}
+        isOpen={isCaptionModalOpen}
+        onClose={closeCaptionModal}
+      />
     </>
   );
 }

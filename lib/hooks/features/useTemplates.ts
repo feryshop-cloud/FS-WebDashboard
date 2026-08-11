@@ -23,6 +23,7 @@ export function useTemplates() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [editingTemplate, setEditingTemplate] = useState<TemplateItem | null>(null);
+  const [isCaptionModalOpen, setIsCaptionModalOpen] = useState(false);
   const [form, setForm] = useState({
     name: "",
     type: "Social Media",
@@ -136,6 +137,7 @@ export function useTemplates() {
       copiedId,
       isModalOpen,
       isModalClosing,
+      isCaptionModalOpen,
       editingTemplate,
       form,
     },
@@ -145,6 +147,8 @@ export function useTemplates() {
       openAdd,
       openEdit,
       closeModal,
+      openCaptionModal: () => setIsCaptionModalOpen(true),
+      closeCaptionModal: () => setIsCaptionModalOpen(false),
       setFormField,
       handleFormSubmit,
       handleDelete,

@@ -22,6 +22,25 @@ export async function getTemplates() {
   });
 }
 
+export async function getInventoryForCaption() {
+  return runAction("getInventoryForCaption", async () => {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("inventory")
+      .select("id, public_id, title_reference, account_specs, asking_price, status, games(name)")
+      .in("status", ["UNPOSTED", "AVAILABLE"])
+      .order("created_at", { ascending: false })
+      .limit(100);
+
+    if (error) {
+      logger.error("Error fetching inventory for caption generation", { error });
+      return [];
+    }
+
+    return data || [];
+  });
+}
+
 export async function addTemplate(formData: FormData) {
   return runAction("addTemplate", async () => {
     const name = formData.get("name") as string;
