@@ -1,0 +1,21 @@
+{
+  "name": "game-inventori-vector-worker",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-01-01",
+  "observability": {
+    "enabled": false,
+    "head_sampling_rate": 1,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "persist": true,
+      "invocation_logs": true,
+    },
+  },
+  "vars": {
+    "SUPABASE_URL": "https://xdvlygpaylnicojuvhyk.supabase.co",
+  },
+  "triggers": {
+    "crons": ["* * * * *"],
+  },
+}

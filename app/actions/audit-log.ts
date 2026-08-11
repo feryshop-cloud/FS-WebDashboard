@@ -45,14 +45,12 @@ export async function getAuditLogs(filters: AuditLogFilters = {}): Promise<Audit
           action,
           module,
           description,
-          old_data,
-          new_data,
           related_id,
           ip_address,
           created_at,
           public_users (full_name)
         `,
-      { count: "exact" },
+      { count: "estimated" },
     );
 
     // Apply Search Filter (ilike on description, module, action, or role_name)
@@ -197,5 +195,31 @@ export async function exportAuditLogsToCsv(
     const csvContent = [headers.map(escapeCsvField).join(","), ...csvRows].join("\n");
 
     return { csvContent };
+  });
+}
+
+/**
+ * Server action to fetch detail data (old_data and new_data) for a single audit log
+ */
+export async function getAuditLogDetails(
+  id: string,
+): Promise<{ old_data: any; new_data: any; error?: string } | null> {
+  return runAction("getAuditLogDetails", async () => {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("audit_logs")
+      .select("old_data, new_data")
+      .eq("id", id)
+      .single();
+
+    if (error) {
+      logger.error("Error fetching audit log details", { id, error });
+      return { old_data: null, new_data: null, error: error.message };
+    }
+
+    return {
+      old_data: data?.old_data,
+      new_data: data?.new_data,
+    };
   });
 }

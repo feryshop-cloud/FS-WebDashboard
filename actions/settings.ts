@@ -521,7 +521,7 @@ export async function createAdminUser(
     const ctx = (error as { context?: Response }).context;
     if (ctx) {
       try {
-        const body = await ctx.json();
+        const body = (await ctx.json()) as any;
         message = body?.error ?? message;
       } catch {
         // ignore non-JSON error body

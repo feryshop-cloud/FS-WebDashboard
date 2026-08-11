@@ -2,6 +2,8 @@
 -- Description: Split incoming_emails SELECT policy into buyer (anon/authenticated) and admin (authenticated only) to prevent anon executing is_admin().
 
 DROP POLICY IF EXISTS "incoming_emails_read" ON public.incoming_emails;
+DROP POLICY IF EXISTS "incoming_emails_buyer_read" ON public.incoming_emails;
+DROP POLICY IF EXISTS "incoming_emails_admin_read" ON public.incoming_emails;
 
 CREATE POLICY "incoming_emails_buyer_read"
   ON public.incoming_emails FOR SELECT

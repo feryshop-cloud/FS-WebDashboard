@@ -550,7 +550,7 @@ An end-to-end test was performed to verify if database modifications propagate t
 ### 7.1. Service Role Key Exposure
 *   **Findings:** The `SUPABASE_SERVICE_ROLE_KEY` is present in the server-side environment file `.env.local` and is read in `lib/supabase/admin.ts` to instantiate a Supabase admin client. This client is imported dynamically in `actions/settings.ts` in `deleteGameCategory`.
 *   **Risk:** While this key is executed strictly on the server and is not bundled into the client-side code, its presence on the Next.js server workspace violates the strict ecosystem-wide guardrail specified in [AI_GUARDRAILS.md:L84](file:///c:/Users/171106/Downloads/game/AI_GUARDRAILS.md#L84):
-    > *`SUPABASE_SERVICE_ROLE_KEY` DILARANG KERAS ada di environment variable, kode, atau bundle frontend repo ferryshop-webmail, dashboard-admin, maupun web-public. Key ini HANYA boleh hidup di: (a) Supabase Edge Function, (b) imap-worker di VPS.*
+    > *`SUPABASE_SERVICE_ROLE_KEY` DILARANG KERAS ada di environment variable, kode, atau bundle frontend repo feryshop-webmail, dashboard-admin, maupun web-public. Key ini HANYA boleh hidup di: (a) Supabase Edge Function, (b) imap-worker di VPS.*
 *   **Recommendation:** **Flagged as a CRITICAL FINDING.** The delete action and all other admin actions requiring RLS bypass must be delegated to a Supabase Edge Function rather than being run on the Next.js server with the service role key.
 
 ### 7.2. Edge Functions Deployment Status

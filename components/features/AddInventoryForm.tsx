@@ -107,14 +107,13 @@ export function AddInventoryForm({ games }: { games: Game[] }) {
 
         <div className="space-y-1">
           <label className="text-foreground block text-sm font-medium" htmlFor="title_reference">
-            Kode Unik Akun
+            Kode Unik Akun (Opsional)
           </label>
           <input
             id="title_reference"
             name="title_reference"
             type="text"
-            required
-            placeholder="e.g. ML-MYTHIC-001"
+            placeholder="Kosongkan untuk generate otomatis"
             className="border-border bg-muted text-foreground w-full rounded-[10px] border px-3 py-2 transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
           />
         </div>

@@ -8,8 +8,8 @@ const basePath =
 const assetPath = (path: string) => `${basePath}${path}`;
 
 export const metadata: Metadata = {
-  title: "Ferryshop Dashboard",
-  description: "Enterprise Ferryshop management platform",
+  title: "Feryshop Dashboard",
+  description: "Enterprise Feryshop management platform",
   icons: {
     icon: [
       { url: assetPath("/favicon.ico"), sizes: "32x32", type: "image/x-icon" },

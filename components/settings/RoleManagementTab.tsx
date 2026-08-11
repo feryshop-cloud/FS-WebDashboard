@@ -8,6 +8,7 @@ interface RoleManagementTabProps {
   roles: Role[];
   errorMsg?: string;
   onRefresh: () => void;
+  isLoading?: boolean;
 }
 
 const DEFAULT_PERMISSIONS_KEYS = [
@@ -22,7 +23,12 @@ const DEFAULT_PERMISSIONS_KEYS = [
 
 const SYSTEM_ROLES = ["OWNER", "ADMIN", "MEMBER"];
 
-export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagementTabProps) {
+export function RoleManagementTab({
+  roles,
+  errorMsg,
+  onRefresh,
+  isLoading = false,
+}: RoleManagementTabProps) {
   const {
     uiState: {
       selectedRole,
@@ -75,7 +81,12 @@ export function RoleManagementTab({ roles, errorMsg, onRefresh }: RoleManagement
           </div>
 
           <div className="space-y-2">
-            {roles.length === 0 ? (
+            {isLoading ? (
+              <div className="border-border-soft bg-card text-faint-foreground flex flex-col items-center justify-center gap-2 rounded-xl border p-8 text-center text-xs">
+                <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+                <span>Memuat data role...</span>
+              </div>
+            ) : roles.length === 0 ? (
               <div className="border-border-soft bg-card text-faint-foreground rounded-xl border p-6 text-center text-xs">
                 Belum ada data role di database.
               </div>

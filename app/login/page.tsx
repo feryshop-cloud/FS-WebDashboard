@@ -91,16 +91,16 @@ export default function LoginPage() {
         {/* Bottom content */}
         <div className="relative z-10 px-14 pb-16">
           <p className="mb-4 text-sm font-medium tracking-wide text-blue-300/80">
-            Sistem Mutasi Ferryshop
+            Sistem Mutasi Feryshop
           </p>
           <h2 className="max-w-[380px] text-[32px] leading-tight font-bold text-white">
             Pusat Data Stok
             <br />& Kas Terpadu
             <br />
-            Ferryshop
+            Feryshop
           </h2>
           <p className="mt-5 max-w-[340px] text-sm leading-relaxed text-white/40">
-            Sistem mutasi khusus untuk efisiensi operasional Admin Ferryshop.
+            Sistem mutasi khusus untuk efisiensi operasional Admin Feryshop.
           </p>
         </div>
       </div>
@@ -147,7 +147,7 @@ export default function LoginPage() {
                   autoComplete="email"
                   required
                   className="border-border bg-card text-foreground placeholder-placeholder block w-full rounded-xl border py-3 pr-4 pl-11 text-sm transition-colors focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
-                  placeholder="admin@ferryshop.com"
+                  placeholder="admin@feryshop.com"
                 />
               </div>
             </div>

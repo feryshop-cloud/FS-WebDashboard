@@ -262,14 +262,13 @@ export default function InventoryPage() {
 
               <div>
                 <label className="text-foreground mb-1 block text-sm font-medium">
-                  Kode Referensi
+                  Kode Referensi (Opsional)
                 </label>
                 <input
                   name="title_reference"
                   type="text"
-                  required
                   className="border-border w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                  placeholder="e.g. ML-MYTHIC-001"
+                  placeholder="Kosongkan untuk generate otomatis"
                 />
               </div>
 

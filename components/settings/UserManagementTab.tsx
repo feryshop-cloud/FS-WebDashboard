@@ -1,7 +1,17 @@
 "use client";
 
 import React from "react";
-import { Search, Shield, CheckCircle2, XCircle, Plus, X, SearchX, Command } from "lucide-react";
+import {
+  Search,
+  Shield,
+  CheckCircle2,
+  XCircle,
+  Plus,
+  X,
+  SearchX,
+  Command,
+  Loader2,
+} from "lucide-react";
 import {
   useUserManagement,
   type UserRecord,
@@ -13,9 +23,16 @@ interface UserManagementTabProps {
   roles: Role[];
   errorMsg?: string;
   onRefresh: () => void;
+  isLoading?: boolean;
 }
 
-export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserManagementTabProps) {
+export function UserManagementTab({
+  users,
+  roles,
+  errorMsg,
+  onRefresh,
+  isLoading = false,
+}: UserManagementTabProps) {
   const {
     data: { filteredUsers },
     isCreating,
@@ -127,7 +144,18 @@ export function UserManagementTab({ users, roles, errorMsg, onRefresh }: UserMan
               </tr>
             </thead>
             <tbody className="divide-border-soft divide-y">
-              {filteredUsers.length === 0 ? (
+              {isLoading ? (
+                <tr>
+                  <td colSpan={4} className="px-6 py-16 text-center">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <Loader2 className="mx-auto h-8 w-8 animate-spin text-blue-600" />
+                      <span className="text-muted-foreground mt-1 text-xs">
+                        Memuat data pengguna...
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+              ) : filteredUsers.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="px-6 py-16 text-center">
                     <div className="flex flex-col items-center justify-center gap-2">

@@ -1,0 +1,21 @@
+# Exclude vector-worker (now deployed to Cloudflare Worker)
+/vector-worker/
+
+# Exclude local Supabase config and migrations
+/supabase/
+
+# Exclude docs and agent tools
+/docs/
+/.agents/
+/.gemini/
+/.kiro/
+/.opencode/
+/.impeccable/
+/.kilo/
+/opencode.json
+/AGENTS.md
+/AI_GUARDRAILS.md
+/DESIGN.md
+/prd.md
+/PRODUCT.md
+/report.md

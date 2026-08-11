@@ -120,14 +120,15 @@ export default function Sidebar({ role }: { role: AdminRole }) {
         className={`relative flex h-22 items-center ${isCollapsed ? "justify-center px-3" : "px-6"}`}
       >
         <Link
+          prefetch={false}
           href="/dashboard"
-          aria-label="Ferryshop dashboard"
+          aria-label="Feryshop dashboard"
           className={`flex min-w-0 items-center ${isCollapsed ? "justify-center" : "gap-3"}`}
         >
           <span className="ring-border flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-black p-1.5 shadow-sm ring-1">
             <Image
               src={SIDEBAR_LOGO_URL}
-              alt="Ferryshop logo"
+              alt="Feryshop logo"
               width={48}
               height={48}
               priority
@@ -137,7 +138,7 @@ export default function Sidebar({ role }: { role: AdminRole }) {
           <span
             className={`text-foreground text-2xl font-bold tracking-tight whitespace-nowrap transition-all duration-300 ${isCollapsed ? "w-0 overflow-hidden opacity-0" : "w-auto opacity-100"} `}
           >
-            Ferryshop
+            Feryshop
           </span>
         </Link>
 
@@ -175,6 +176,7 @@ export default function Sidebar({ role }: { role: AdminRole }) {
 
                 return (
                   <Link
+                    prefetch={false}
                     key={item.href}
                     href={item.href}
                     title={isCollapsed ? item.label : undefined}

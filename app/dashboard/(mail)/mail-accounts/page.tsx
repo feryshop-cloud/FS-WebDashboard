@@ -225,7 +225,7 @@ export default function EmailAccountsPage() {
                     value={form.email}
                     onChange={(e) => setField("email", e.target.value)}
                     required
-                    placeholder="otp@ferryshop.com"
+                    placeholder="otp@feryshop.com"
                     className="border-border w-full rounded-xl border px-3 py-2.5 font-mono text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                   />
                 </div>

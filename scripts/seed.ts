@@ -138,7 +138,7 @@ async function main() {
     // 4. SEED ACCOUNTS
     console.log("Seeding Accounts...");
     const accounts = await insertRows("accounts", [
-      { name: "QRIS Ferryshop", account_number: "QRIS-001", balance: 15000000 },
+      { name: "QRIS Feryshop", account_number: "QRIS-001", balance: 15000000 },
       { name: "Seabank", account_number: "9012345678", balance: 5000000 },
       { name: "Bank Jago", account_number: "1029384756", balance: 2500000 },
       { name: "DANA", account_number: "081234567891", balance: 1000000 },
@@ -147,7 +147,7 @@ async function main() {
       { name: "Mandiri", account_number: "142001234567", balance: 10000000 },
     ]);
 
-    const qrisAccount = accounts.find((a) => a.name === "QRIS Ferryshop");
+    const qrisAccount = accounts.find((a) => a.name === "QRIS Feryshop");
     const seabankAccount = accounts.find((a) => a.name === "Seabank");
     if (!qrisAccount || !seabankAccount) {
       throw new Error("Seeded accounts not found after insert");

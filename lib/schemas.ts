@@ -14,9 +14,7 @@ export const InventoryFormSchema = z.object({
     .string({ message: "Game category is required." })
     .uuid({ message: "Invalid Game category selected." }),
 
-  title_reference: z
-    .string({ message: "Internal reference code is required." })
-    .min(3, { message: "Reference code must be at least 3 characters." }),
+  title_reference: z.string().optional().or(z.literal("")),
 
   account_specs: z
     .string({ message: "Account specifications are required." })

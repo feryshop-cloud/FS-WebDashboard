@@ -72,6 +72,7 @@ export default function SettingsPage() {
             <UserManagementTab
               users={users as never}
               roles={roles as never}
+              isLoading={isLoading}
               errorMsg={usersError ? `Gagal memuat pengguna: ${usersError}` : undefined}
               onRefresh={loadData}
             />
@@ -80,6 +81,7 @@ export default function SettingsPage() {
           {activeTab === "roles" && (
             <RoleManagementTab
               roles={roles as never}
+              isLoading={isLoading}
               errorMsg={rolesError ? `Gagal memuat role: ${rolesError}` : undefined}
               onRefresh={loadData}
             />

@@ -4,9 +4,9 @@ type AppRole = "OWNER" | "ADMIN" | "VIEWER";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const adminEmail = process.env.ADMIN_EMAIL ?? "admin@ferryshop.com";
+const adminEmail = process.env.ADMIN_EMAIL ?? "admin@feryshop.com";
 const adminPassword = process.env.ADMIN_PASSWORD;
-const adminFullName = process.env.ADMIN_FULL_NAME ?? "Ferryshop Admin";
+const adminFullName = process.env.ADMIN_FULL_NAME ?? "Feryshop Admin";
 const adminRole = (process.env.ADMIN_ROLE ?? "OWNER") as AppRole;
 
 const allowedRoles: AppRole[] = ["OWNER", "ADMIN", "VIEWER"];

@@ -60,7 +60,7 @@ Constraints:
 
 ## Brand Commitments
 
-- Product/brand name: **Feryshop** (confirmed spelling; the codebase also contains the variant "Ferryshop").
+- Product/brand name: **Feryshop** (confirmed spelling; the codebase also contains the variant "Feryshop").
 - UI language: Bahasa Indonesia.
 - The incumbent visual implementation is the existing design authority; no new visual commitments were made in this record.
 
