@@ -512,6 +512,7 @@ export async function createAdminUser(
   const { data, error } = await supabase.functions.invoke<{
     id?: string;
     error?: string;
+    generated_password?: string;
   }>("admin-create-user", {
     body: { email, password, full_name, role_id: role_id || null },
   });
@@ -537,7 +538,13 @@ export async function createAdminUser(
   }
 
   revalidatePath("/dashboard/settings");
-  return { success: true, data: { id: data.id } };
+  return {
+    success: true,
+    data: { id: data.id },
+    ...(data.generated_password
+      ? { generatedPassword: data.generated_password }
+      : {}),
+  };
 }
 
 export async function updateRolePermissions(roleId: string, permissions: Record<string, boolean>) {

@@ -14,6 +14,27 @@ function json(body: Record<string, unknown>, status = 200) {
   });
 }
 
+function generatePassword(length = 12): string {
+  const lower = "abcdefghijklmnopqrstuvwxyz";
+  const upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const digits = "0123456789";
+  const all = lower + upper + digits;
+
+  const buf = new Uint8Array(length);
+  crypto.getRandomValues(buf);
+
+  const chars = Array.from(buf, (b) => all[b % all.length]);
+  chars[0] = lower[buf[0] % lower.length];
+  chars[1] = upper[buf[1] % upper.length];
+  chars[2] = digits[buf[2] % digits.length];
+
+  for (let i = length - 1; i > 0; i--) {
+    const j = buf[i] % (i + 1);
+    [chars[i], chars[j]] = [chars[j], chars[i]];
+  }
+  return chars.join("");
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -68,23 +89,26 @@ Deno.serve(async (req) => {
   }
 
   const email = body.email?.trim().toLowerCase();
-  const password = body.password ?? "";
+  const password = body.password?.trim() ?? "";
   const full_name = body.full_name?.trim();
   const role_id = body.role_id?.trim() || null;
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return json({ error: "Email tidak valid" }, 400);
   }
-  if (!password || password.length < 6) {
-    return json({ error: "Password minimal 6 karakter" }, 400);
-  }
   if (!full_name) {
     return json({ error: "Nama lengkap wajib diisi" }, 400);
   }
+  if (password && password.length < 6) {
+    return json({ error: "Password minimal 6 karakter" }, 400);
+  }
+
+  const generatedPassword = password ? undefined : generatePassword();
+  const finalPassword = password || (generatedPassword as string);
 
   const { data: created, error: createErr } = await admin.auth.admin.createUser({
     email,
-    password,
+    password: finalPassword,
     email_confirm: true,
     user_metadata: { full_name },
   });
@@ -108,5 +132,6 @@ Deno.serve(async (req) => {
     success: true,
     id: created.user.id,
     email: created.user.email ?? email,
+    ...(generatedPassword ? { generated_password: generatedPassword } : {}),
   });
 });

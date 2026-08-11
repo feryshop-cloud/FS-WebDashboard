@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   Search,
   Shield,
@@ -11,6 +11,9 @@ import {
   SearchX,
   Command,
   Loader2,
+  Wand2,
+  Copy,
+  Check,
 } from "lucide-react";
 import {
   useUserManagement,
@@ -39,6 +42,7 @@ export function UserManagementTab({
     updatingUserId,
     formError,
     actionError,
+    createdUser,
     uiState: { searchQuery, isModalOpen, isModalClosing, form },
     refs: { searchInputRef },
     actions: {
@@ -49,8 +53,18 @@ export function UserManagementTab({
       handleRoleChange,
       handleToggleStatus,
       handleCreateUser,
+      handleGeneratePassword,
+      handleCopyPassword,
     },
   } = useUserManagement(users, onRefresh);
+
+  const [copied, setCopied] = useState(false);
+
+  const onCopy = async () => {
+    await handleCopyPassword();
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1600);
+  };
 
   return (
     <div className="space-y-6">
@@ -273,107 +287,189 @@ export function UserManagementTab({
               onSubmit={handleCreateUser}
               className="fs-rise-in flex flex-1 flex-col overflow-hidden"
             >
-              <div className="flex-1 space-y-4 overflow-y-auto p-6">
-                {formError && (
-                  <div className="fs-drop-in rounded-lg border border-rose-100 bg-rose-50 px-3 py-2 text-sm text-rose-700">
-                    {formError}
+              {createdUser ? (
+                <div className="flex flex-1 flex-col items-center justify-center gap-4 p-6 text-center">
+                  <div className="bg-emerald-50 text-emerald-600 rounded-full p-4">
+                    <CheckCircle2 className="h-10 w-10" />
                   </div>
-                )}
+                  <div>
+                    <h3 className="text-foreground text-base font-bold">
+                      Pengguna Berhasil Dibuat
+                    </h3>
+                    <p className="text-muted-foreground mt-1 text-sm">
+                      Akun untuk{" "}
+                      <span className="text-foreground font-semibold">
+                        {createdUser.full_name}
+                      </span>{" "}
+                      ({createdUser.email}) sudah aktif.
+                    </p>
+                  </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <label
-                    htmlFor="new-user-name"
-                    className="text-muted-foreground text-xs font-semibold"
-                  >
-                    Nama Lengkap
-                  </label>
-                  <input
-                    id="new-user-name"
-                    type="text"
-                    value={form.full_name}
-                    onChange={(e) => setForm({ ...form, full_name: e.target.value })}
-                    placeholder="Nama lengkap pengguna"
-                    className="border-border rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
-                  />
-                </div>
+                  {createdUser.generatedPassword && (
+                    <div className="bg-muted w-full max-w-xs rounded-xl border border-emerald-200 bg-emerald-50/60 p-4 text-left">
+                      <p className="text-muted-foreground text-xs font-semibold">
+                        Password otomatis (simpan & bagikan ke pengguna):
+                      </p>
+                      <div className="mt-2 flex items-center gap-2">
+                        <code className="border-border-soft bg-card text-foreground flex-1 rounded-lg border px-3 py-2 font-mono text-sm font-semibold tracking-wide">
+                          {createdUser.generatedPassword}
+                        </code>
+                        <button
+                          type="button"
+                          onClick={onCopy}
+                          title="Salin password"
+                          className="border-border-soft bg-card text-muted-foreground hover:text-foreground hover:border-input rounded-lg border p-2 transition-colors"
+                        >
+                          {copied ? (
+                            <Check className="h-4 w-4 text-emerald-600" />
+                          ) : (
+                            <Copy className="h-4 w-4" />
+                          )}
+                        </button>
+                      </div>
+                      <p className="text-faint-foreground mt-2 text-[11px]">
+                        Password hanya ditampilkan sekali setelah pembuatan.
+                      </p>
+                    </div>
+                  )}
 
-                <div className="flex flex-col gap-1.5">
-                  <label
-                    htmlFor="new-user-email"
-                    className="text-muted-foreground text-xs font-semibold"
-                  >
-                    Email
-                  </label>
-                  <input
-                    id="new-user-email"
-                    type="email"
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    placeholder="nama@perusahaan.com"
-                    className="border-border rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label
-                    htmlFor="new-user-password"
-                    className="text-muted-foreground text-xs font-semibold"
-                  >
-                    Password
-                  </label>
-                  <input
-                    id="new-user-password"
-                    type="password"
-                    value={form.password}
-                    onChange={(e) => setForm({ ...form, password: e.target.value })}
-                    placeholder="Minimal 6 karakter"
-                    minLength={6}
-                    className="border-border rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label
-                    htmlFor="new-user-role"
-                    className="text-muted-foreground text-xs font-semibold"
-                  >
-                    Role
-                  </label>
-                  <select
-                    id="new-user-role"
-                    value={form.role_id}
-                    onChange={(e) => setForm({ ...form, role_id: e.target.value })}
-                    className="border-border bg-card rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
-                  >
-                    <option value="">-- Pilih Role --</option>
-                    {roles.map((r) => (
-                      <option key={r.id} value={r.id}>
-                        {r.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="border-border-soft bg-card border-t p-6">
-                <div className="flex w-full flex-col gap-2">
-                  <button
-                    type="submit"
-                    disabled={isCreating}
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
-                  >
-                    {isCreating ? "Membuat..." : "Buat Pengguna"}
-                  </button>
                   <button
                     type="button"
                     onClick={closeModal}
-                    disabled={isCreating}
-                    className="text-muted-foreground hover:bg-muted inline-flex w-full items-center justify-center rounded-lg px-4 py-2 text-xs font-semibold disabled:opacity-50"
+                    className="mt-2 inline-flex w-full max-w-xs items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
                   >
-                    Batal
+                    Selesai
                   </button>
                 </div>
-              </div>
+              ) : (
+                <>
+                  <div className="flex-1 space-y-4 overflow-y-auto p-6">
+                    {formError && (
+                      <div className="fs-drop-in rounded-lg border border-rose-100 bg-rose-50 px-3 py-2 text-sm text-rose-700">
+                        {formError}
+                      </div>
+                    )}
+
+                    <div className="flex flex-col gap-1.5">
+                      <label
+                        htmlFor="new-user-name"
+                        className="text-muted-foreground text-xs font-semibold"
+                      >
+                        Nama Lengkap
+                      </label>
+                      <input
+                        id="new-user-name"
+                        type="text"
+                        value={form.full_name}
+                        onChange={(e) =>
+                          setForm({ ...form, full_name: e.target.value })
+                        }
+                        placeholder="Nama lengkap pengguna"
+                        className="border-border rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label
+                        htmlFor="new-user-email"
+                        className="text-muted-foreground text-xs font-semibold"
+                      >
+                        Email
+                      </label>
+                      <input
+                        id="new-user-email"
+                        type="email"
+                        value={form.email}
+                        onChange={(e) =>
+                          setForm({ ...form, email: e.target.value })
+                        }
+                        placeholder="nama@perusahaan.com"
+                        className="border-border rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label
+                        htmlFor="new-user-password"
+                        className="text-muted-foreground text-xs font-semibold"
+                      >
+                        Password{" "}
+                        <span className="font-normal">(opsional)</span>
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          id="new-user-password"
+                          type="password"
+                          value={form.password}
+                          onChange={(e) =>
+                            setForm({ ...form, password: e.target.value })
+                          }
+                          placeholder="Kosongkan untuk digenerate otomatis"
+                          minLength={6}
+                          className="border-border flex-1 rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleGeneratePassword}
+                          title="Generate password otomatis"
+                          className="border-border bg-muted text-muted-foreground hover:text-foreground hover:border-input inline-flex shrink-0 items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors"
+                        >
+                          <Wand2 className="h-3.5 w-3.5 text-blue-600" />
+                          Auto
+                        </button>
+                      </div>
+                      <p className="text-faint-foreground text-[11px]">
+                        Jika dikosongkan, password akan digenerate otomatis dan
+                        ditampilkan sekali setelah pengguna dibuat.
+                      </p>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label
+                        htmlFor="new-user-role"
+                        className="text-muted-foreground text-xs font-semibold"
+                      >
+                        Role
+                      </label>
+                      <select
+                        id="new-user-role"
+                        value={form.role_id}
+                        onChange={(e) =>
+                          setForm({ ...form, role_id: e.target.value })
+                        }
+                        className="border-border bg-card rounded-lg border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                      >
+                        <option value="">-- Pilih Role --</option>
+                        {roles.map((r) => (
+                          <option key={r.id} value={r.id}>
+                            {r.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="border-border-soft bg-card border-t p-6">
+                    <div className="flex w-full flex-col gap-2">
+                      <button
+                        type="submit"
+                        disabled={isCreating}
+                        className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
+                      >
+                        {isCreating ? "Membuat..." : "Buat Pengguna"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={closeModal}
+                        disabled={isCreating}
+                        className="text-muted-foreground hover:bg-muted inline-flex w-full items-center justify-center rounded-lg px-4 py-2 text-xs font-semibold disabled:opacity-50"
+                      >
+                        Batal
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
             </form>
           </div>
         </div>
