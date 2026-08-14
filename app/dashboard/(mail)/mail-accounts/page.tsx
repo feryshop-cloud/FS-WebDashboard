@@ -1,7 +1,21 @@
 "use client";
 
 import React, { useState } from "react";
-import { Plus, Search, Trash2, Edit, X, Save, Loader2, Mail, AlertCircle, Key, Copy, Check, RefreshCw } from "lucide-react";
+import {
+  Plus,
+  Search,
+  Trash2,
+  Edit,
+  X,
+  Save,
+  Loader2,
+  Mail,
+  AlertCircle,
+  Key,
+  Copy,
+  Check,
+  RefreshCw,
+} from "lucide-react";
 import { useEmailAccounts } from "@/lib/hooks/features/useEmailAccounts";
 import { Pagination } from "@/components/ui/Pagination";
 
@@ -70,7 +84,7 @@ export default function EmailAccountsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Cari email, nama, atau PIN..."
-            className="border-border bg-card text-foreground placeholder:text-muted-foreground w-full rounded-xl border py-2 text-xs font-medium pr-3 pl-9 shadow-xs outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+            className="border-border bg-card text-foreground placeholder:text-muted-foreground w-full rounded-xl border py-2 pr-3 pl-9 text-xs font-medium shadow-xs outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
           />
           {search && (
             <button
@@ -87,7 +101,9 @@ export default function EmailAccountsPage() {
       {isLoading ? (
         <div className="border-border-soft bg-card flex flex-col items-center justify-center rounded-2xl border py-16 text-center shadow-xs">
           <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-          <p className="text-muted-foreground mt-3 text-xs font-medium">Memuat data akun email...</p>
+          <p className="text-muted-foreground mt-3 text-xs font-medium">
+            Memuat data akun email...
+          </p>
         </div>
       ) : pageItems.length === 0 ? (
         <div className="border-border-soft bg-card flex flex-col items-center justify-center rounded-2xl border py-16 text-center shadow-xs">
@@ -102,7 +118,7 @@ export default function EmailAccountsPage() {
       ) : (
         <div className="border-border-soft bg-card overflow-x-auto rounded-2xl border shadow-sm">
           <table className="w-full min-w-140 text-left text-sm">
-            <thead className="border-border-soft bg-muted/50 text-faint-foreground border-b text-xs font-semibold uppercase tracking-wider">
+            <thead className="border-border-soft bg-muted/50 text-faint-foreground border-b text-xs font-semibold tracking-wider uppercase">
               <tr>
                 <th className="px-5 py-3.5">Akun Email</th>
                 <th className="px-5 py-3.5">PIN Akses WebMail</th>
@@ -111,9 +127,10 @@ export default function EmailAccountsPage() {
                 <th className="px-5 py-3.5 text-right">Aksi</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border">
+            <tbody className="divide-border divide-y">
               {pageItems.map((acc) => {
-                const currentPin = (acc as unknown as { access_pin?: string }).access_pin || "123456";
+                const currentPin =
+                  (acc as unknown as { access_pin?: string }).access_pin || "123456";
                 return (
                   <tr
                     key={acc.id}
@@ -133,12 +150,12 @@ export default function EmailAccountsPage() {
                     {/* PIN Akses Column */}
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-2">
-                        <span className="rounded-md border border-slate-200 bg-slate-100 px-2.5 py-1 font-mono text-xs font-bold text-slate-800 tracking-wider">
+                        <span className="rounded-md border border-slate-200 bg-slate-100 px-2.5 py-1 font-mono text-xs font-bold tracking-wider text-slate-800">
                           {currentPin}
                         </span>
                         <button
                           onClick={() => handleCopyPin(acc.id, currentPin)}
-                          className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors"
+                          className="rounded-lg p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
                           title="Salin PIN Akses"
                         >
                           {copiedId === acc.id ? (
@@ -278,7 +295,9 @@ export default function EmailAccountsPage() {
 
                 {/* Nama Tampilan */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-foreground text-xs font-semibold">Nama Tampilan (Catatan Internal)</label>
+                  <label className="text-foreground text-xs font-semibold">
+                    Nama Tampilan (Catatan Internal)
+                  </label>
                   <input
                     type="text"
                     value={form.display_name}

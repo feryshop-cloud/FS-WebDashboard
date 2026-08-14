@@ -22,7 +22,11 @@ import { CaptionGeneratorModal } from "@/components/features/CaptionGeneratorMod
 
 const PLACEHOLDERS = [
   { key: "{{game_name}}", desc: "Nama kategori game", example: "Mobile Legends" },
-  { key: "{{account_specs}}", desc: "Spesifikasi lengkap akun", example: "Mythic III, 80 Skin, WR 62%" },
+  {
+    key: "{{account_specs}}",
+    desc: "Spesifikasi lengkap akun",
+    example: "Mythic III, 80 Skin, WR 62%",
+  },
   { key: "{{asking_price}}", desc: "Harga jual (format Rupiah)", example: "Rp 1.500.000" },
   { key: "{{ref_code}}", desc: "Kode referensi unik stok", example: "ML-0001-MYTHIC-III" },
   { key: "{{public_id}}", desc: "ID publik stok otomatis", example: "ML-0001" },
@@ -103,56 +107,66 @@ export default function TemplatesPage() {
         <button
           type="button"
           onClick={() => setShowPlaceholderHelp((v) => !v)}
-          className="text-foreground flex w-full items-center justify-between px-4 py-3 text-sm font-semibold transition-colors hover:bg-muted/50 rounded-xl"
+          className="text-foreground hover:bg-muted/50 flex w-full items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold transition-colors"
         >
           <div className="flex items-center gap-2">
             <BookOpen className="h-4 w-4 text-blue-500" />
             Panduan Placeholder Template Caption
           </div>
           <ChevronDown
-            className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${
+            className={`text-muted-foreground h-4 w-4 transition-transform duration-200 ${
               showPlaceholderHelp ? "rotate-180" : ""
             }`}
           />
         </button>
 
         {showPlaceholderHelp && (
-          <div className="border-border border-t px-4 pb-4 pt-3">
+          <div className="border-border border-t px-4 pt-3 pb-4">
             <p className="text-muted-foreground mb-3 text-xs leading-relaxed">
-              Tulis isi template menggunakan <strong className="text-foreground font-mono">&#123;&#123;variable&#125;&#125;</strong> sebagai
-              placeholder. Saat admin menekan <strong>Generate Caption</strong> dan memilih akun stok, semua
-              placeholder akan otomatis diisi dengan data akun tersebut.
+              Tulis isi template menggunakan{" "}
+              <strong className="text-foreground font-mono">
+                &#123;&#123;variable&#125;&#125;
+              </strong>{" "}
+              sebagai placeholder. Saat admin menekan <strong>Generate Caption</strong> dan memilih
+              akun stok, semua placeholder akan otomatis diisi dengan data akun tersebut.
             </p>
 
-            <div className="overflow-x-auto rounded-lg border border-border">
+            <div className="border-border overflow-x-auto rounded-lg border">
               <table className="w-full text-xs">
                 <thead>
-                  <tr className="border-b border-border bg-muted/50">
-                    <th className="px-3 py-2 text-left font-semibold text-foreground">Placeholder</th>
-                    <th className="px-3 py-2 text-left font-semibold text-foreground">Keterangan</th>
-                    <th className="px-3 py-2 text-left font-semibold text-foreground">Contoh Output</th>
+                  <tr className="border-border bg-muted/50 border-b">
+                    <th className="text-foreground px-3 py-2 text-left font-semibold">
+                      Placeholder
+                    </th>
+                    <th className="text-foreground px-3 py-2 text-left font-semibold">
+                      Keterangan
+                    </th>
+                    <th className="text-foreground px-3 py-2 text-left font-semibold">
+                      Contoh Output
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {PLACEHOLDERS.map((p) => (
-                    <tr key={p.key} className="border-b border-border/60 last:border-0">
+                    <tr key={p.key} className="border-border/60 border-b last:border-0">
                       <td className="px-3 py-2">
                         <code className="rounded bg-blue-50 px-1.5 py-0.5 font-mono text-blue-700 dark:bg-blue-950 dark:text-blue-300">
                           {p.key}
                         </code>
                       </td>
-                      <td className="px-3 py-2 text-muted-foreground">{p.desc}</td>
-                      <td className="px-3 py-2 text-muted-foreground italic">{p.example}</td>
+                      <td className="text-muted-foreground px-3 py-2">{p.desc}</td>
+                      <td className="text-muted-foreground px-3 py-2 italic">{p.example}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
 
-            <div className="mt-3 rounded-lg border border-border bg-muted/40 p-3">
-              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Contoh Isi Template</p>
-              <pre className="font-mono text-xs text-foreground leading-relaxed whitespace-pre-wrap">{
-`🔥 READY STOCK {{game_name}} 🔥
+            <div className="border-border bg-muted/40 mt-3 rounded-lg border p-3">
+              <p className="text-muted-foreground mb-1.5 text-[11px] font-semibold tracking-wider uppercase">
+                Contoh Isi Template
+              </p>
+              <pre className="text-foreground font-mono text-xs leading-relaxed whitespace-pre-wrap">{`🔥 READY STOCK {{game_name}} 🔥
 
 Ref: {{ref_code}}
 
@@ -161,8 +175,7 @@ Ref: {{ref_code}}
 
 💰 Harga: {{asking_price}}
 
-✅ DM Admin untuk info lebih lanjut!`
-              }</pre>
+✅ DM Admin untuk info lebih lanjut!`}</pre>
             </div>
           </div>
         )}

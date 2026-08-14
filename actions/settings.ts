@@ -541,9 +541,7 @@ export async function createAdminUser(
   return {
     success: true,
     data: { id: data.id },
-    ...(data.generated_password
-      ? { generatedPassword: data.generated_password }
-      : {}),
+    ...(data.generated_password ? { generatedPassword: data.generated_password } : {}),
   };
 }
 

@@ -171,7 +171,9 @@ export function useUserManagement(users: UserRecord[], onRefresh: () => void) {
     setFormError("");
 
     if (!form.email || !form.full_name) {
-      setFormError("Email dan nama lengkap wajib diisi. Password boleh dikosongkan untuk digenerate otomatis.");
+      setFormError(
+        "Email dan nama lengkap wajib diisi. Password boleh dikosongkan untuk digenerate otomatis.",
+      );
       return;
     }
 
@@ -184,8 +186,7 @@ export function useUserManagement(users: UserRecord[], onRefresh: () => void) {
         form.role_id || null,
       );
       if (res.success) {
-        const generatedPassword =
-          "generatedPassword" in res ? res.generatedPassword : undefined;
+        const generatedPassword = "generatedPassword" in res ? res.generatedPassword : undefined;
         setCreatedUser({
           full_name: form.full_name,
           email: form.email,
