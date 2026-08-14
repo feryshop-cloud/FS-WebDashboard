@@ -34,6 +34,7 @@ const GROUP_LABELS: Record<string, string> = {
   theme: "Tema",
   social: "Sosial Media",
   footer: "Footer",
+  marketplace: "Marketplace",
   _other: "Lainnya",
 };
 
@@ -271,9 +272,15 @@ export function SiteSettingsTab({ settings, errorMsg, onRefresh }: SiteSettingsT
   const [openGroup, setOpenGroup] = useState<string | null>(null);
 
   // Preferred order
-  const orderedKeys = ["general", "seo", "theme", "social", "footer", "_other"].filter(
-    (k) => groups[k]?.length,
-  );
+  const orderedKeys = [
+    "general",
+    "seo",
+    "theme",
+    "social",
+    "footer",
+    "marketplace",
+    "_other",
+  ].filter((k) => groups[k]?.length);
   // Any unrecognized groups not in the order list
   const extraKeys = Object.keys(groups).filter((k) => !orderedKeys.includes(k));
   const allKeys = [...orderedKeys, ...extraKeys];

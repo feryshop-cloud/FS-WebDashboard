@@ -74,7 +74,6 @@ async function main() {
       { name: "PUBG Mobile", slug: "pubg-mobile" },
       { name: "Genshin Impact", slug: "genshin-impact" },
       { name: "Valorant", slug: "valorant" },
-      { name: "Lainnya", slug: "lainnya" },
     ];
     await insertRows("games", gameCategories);
 
