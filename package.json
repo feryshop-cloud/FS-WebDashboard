@@ -11,6 +11,7 @@
     "create-admin": "node --env-file=.env.local scripts/create-admin-user.ts",
     "seed:inbox": "node --env-file=.env.local scripts/seed-master-inbox.js",
     "lint": "eslint",
+    "test": "vitest run",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
@@ -39,6 +40,7 @@
     "prettier": "^3.9.6",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.7"
   }
 }
