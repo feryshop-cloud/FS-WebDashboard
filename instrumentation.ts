@@ -13,9 +13,8 @@ export function onRequestError(
       : (headers as Record<string, string> | undefined)?.["x-request-id"];
 
   logger.error("request error", {
-    error: err,
-    path: request.path,
-    method: request.method,
+    err,
+    context: `Route: ${request.method} ${request.path}`,
     requestId: requestId ?? undefined,
   });
 }

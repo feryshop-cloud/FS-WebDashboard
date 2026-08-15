@@ -29,14 +29,14 @@ export async function runAction<T>(name: string, fn: () => Promise<T>): Promise<
     try {
       const result = await fn();
       logger.debug("action completed", {
-        action: name,
+        context: `ServerAction: ${name}`,
         durationMs: Math.round(performance.now() - start),
       });
       return result;
     } catch (err) {
       logger.error("action failed", {
-        action: name,
-        error: err,
+        context: `ServerAction: ${name}`,
+        err,
         durationMs: Math.round(performance.now() - start),
       });
       throw err;
