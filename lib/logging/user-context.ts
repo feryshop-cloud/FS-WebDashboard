@@ -19,7 +19,9 @@ function decodeJwtPayload(token: string): Record<string, unknown> | null {
   }
 }
 
-function cookieMapFromHeaders(headers: Headers | Record<string, string | string[] | undefined> | unknown): Map<string, string> {
+function cookieMapFromHeaders(
+  headers: Headers | Record<string, string | string[] | undefined> | unknown,
+): Map<string, string> {
   let cookieHeader: string | null = null;
   if (headers instanceof Headers) {
     cookieHeader = headers.get("cookie");
