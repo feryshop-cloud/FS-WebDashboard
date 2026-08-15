@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { purgeStorefront, STOREFRONT_TAGS } from "@/lib/store-revalidate";
 import { logger } from "@/lib/logger";
 import { runAction } from "@/lib/logging/server-action";
 import type { Database } from "@/types/database.types";
@@ -122,6 +123,7 @@ export async function createPenjualan(formData: FormData) {
     revalidatePath("/dashboard/inventory");
     revalidatePath("/dashboard/accounts");
     revalidatePath("/dashboard/ledger");
+    purgeStorefront(STOREFRONT_TAGS.marketplace);
   });
 }
 
@@ -159,6 +161,7 @@ export async function deleteDeal(id: string) {
     revalidatePath("/dashboard/accounts");
     revalidatePath("/dashboard/ledger");
     revalidatePath("/dashboard/trade-in");
+    purgeStorefront(STOREFRONT_TAGS.marketplace);
   });
 }
 
@@ -183,5 +186,6 @@ export async function updateDeal(id: string, data: DealUpdate) {
     revalidatePath("/dashboard/inventory");
     revalidatePath("/dashboard/accounts");
     revalidatePath("/dashboard/ledger");
+    purgeStorefront(STOREFRONT_TAGS.marketplace);
   });
 }

@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import type { DealStatus, StockStatus } from "@/types/database";
 import { revalidatePath } from "next/cache";
+import { purgeStorefront, STOREFRONT_TAGS } from "@/lib/store-revalidate";
 import { logger } from "@/lib/logger";
 import { runAction } from "@/lib/logging/server-action";
 
@@ -296,6 +297,7 @@ export async function createTukarTambah(formData: FormData) {
     revalidatePath("/dashboard/inventory");
     revalidatePath("/dashboard/accounts");
     revalidatePath("/dashboard/ledger");
+    purgeStorefront(STOREFRONT_TAGS.marketplace);
   });
 }
 
@@ -484,5 +486,6 @@ export async function updateTukarTambah(id: string, formData: FormData) {
     revalidatePath("/dashboard/inventory");
     revalidatePath("/dashboard/accounts");
     revalidatePath("/dashboard/ledger");
+    purgeStorefront(STOREFRONT_TAGS.marketplace);
   });
 }

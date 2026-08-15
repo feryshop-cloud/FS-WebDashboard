@@ -3,6 +3,7 @@
 import { logger } from "@/lib/logger";
 import { createClient } from "../lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { purgeStorefront, STOREFRONT_TAGS } from "../lib/store-revalidate";
 import { InventoryFormSchema } from "../lib/schemas";
 
 export async function getInventory() {
@@ -111,6 +112,7 @@ export async function addInventoryItem(formData: FormData) {
   }
 
   revalidatePath("/dashboard/inventory");
+  purgeStorefront(STOREFRONT_TAGS.marketplace);
   return { success: true };
 }
 
@@ -128,6 +130,7 @@ export async function updateItemStatus(id: string, newStatus: "UNPOSTED" | "AVAI
   }
 
   revalidatePath("/dashboard/inventory");
+  purgeStorefront(STOREFRONT_TAGS.marketplace);
   return { success: true };
 }
 
@@ -151,5 +154,6 @@ export async function markItemAsSold(id: string, soldPrice: number) {
 
   revalidatePath("/dashboard/inventory");
   revalidatePath("/dashboard");
+  purgeStorefront(STOREFRONT_TAGS.marketplace);
   return { success: true };
 }

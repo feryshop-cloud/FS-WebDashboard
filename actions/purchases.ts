@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getErrorMessage } from "@/lib/error";
 import { logger } from "@/lib/logger";
 import { revalidatePath } from "next/cache";
+import { purgeStorefront, STOREFRONT_TAGS } from "@/lib/store-revalidate";
 import { Game, PurchasePaymentStatus, PurchaseWithRelations } from "@/types/database";
 
 export async function purchaseStock(data: {
@@ -56,6 +57,7 @@ export async function purchaseStock(data: {
 
     revalidatePath("/dashboard/inventory");
     revalidatePath("/dashboard/purchases");
+    purgeStorefront(STOREFRONT_TAGS.marketplace);
 
     return { success: true, stockId: stockId as string, error: null };
   } catch (error: unknown) {
@@ -132,6 +134,7 @@ export async function deletePurchase(
 
     revalidatePath("/dashboard/purchases");
     revalidatePath("/dashboard/inventory");
+    purgeStorefront(STOREFRONT_TAGS.marketplace);
 
     return { success: true, error: null };
   } catch (error: unknown) {
@@ -166,6 +169,7 @@ export async function updatePurchase(
 
     revalidatePath("/dashboard/purchases");
     revalidatePath("/dashboard/inventory");
+    purgeStorefront(STOREFRONT_TAGS.marketplace);
 
     return { success: true, error: null };
   } catch (error: unknown) {

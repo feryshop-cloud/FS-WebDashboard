@@ -14,6 +14,7 @@ import {
 } from "@/types/database";
 import type { Database } from "@/types/database.types";
 import { revalidatePath } from "next/cache";
+import { purgeStorefront, STOREFRONT_TAGS } from "@/lib/store-revalidate";
 
 type AccountRow = Database["public"]["Tables"]["accounts"]["Row"];
 type CustomerRow = Database["public"]["Tables"]["customers"]["Row"];
@@ -250,6 +251,7 @@ export async function createDeal(
     };
 
     revalidatePath("/dashboard/deals", "page");
+    purgeStorefront(STOREFRONT_TAGS.marketplace);
     return { data: mappedDeal, error: null };
   } catch (error: unknown) {
     logger.error("Error creating deal", { error });
@@ -290,6 +292,7 @@ export async function addPayment(
 
     revalidatePath("/dashboard/deals");
     revalidatePath(`/dashboard/deals/${dealId}`);
+    purgeStorefront(STOREFRONT_TAGS.marketplace);
     return { success: true, error: null };
   } catch (error: unknown) {
     logger.error("Error processing payment", { error });
@@ -324,6 +327,7 @@ export async function cancelDeal(
     revalidatePath("/dashboard/deals");
     revalidatePath(`/dashboard/deals/${dealId}`);
     revalidatePath("/dashboard/inventory");
+    purgeStorefront(STOREFRONT_TAGS.marketplace);
 
     return { success: true, error: null };
   } catch (error: unknown) {

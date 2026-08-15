@@ -7,6 +7,7 @@ const basePath =
 const nextConfig: NextConfig = {
   output: "standalone",
   ...(basePath ? { basePath } : {}),
+  reactCompiler: true,
   experimental: {
     serverActions: {
       bodySizeLimit: "50mb",

@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { purgeStorefront, STOREFRONT_TAGS } from "@/lib/store-revalidate";
 import { InventoryFormSchema } from "@/lib/schemas";
 import { logger } from "@/lib/logger";
 import { runAction } from "@/lib/logging/server-action";
@@ -133,6 +134,7 @@ export async function addInventoryItem(formData: FormData) {
     }
 
     revalidatePath("/dashboard/inventory");
+    purgeStorefront(STOREFRONT_TAGS.marketplace);
     return { success: true };
   });
 }
@@ -152,6 +154,7 @@ export async function updateItemStatus(id: string, newStatus: "UNPOSTED" | "AVAI
     }
 
     revalidatePath("/dashboard/inventory");
+    purgeStorefront(STOREFRONT_TAGS.marketplace);
     return { success: true };
   });
 }
@@ -177,6 +180,7 @@ export async function markItemAsSold(id: string, soldPrice: number) {
 
     revalidatePath("/dashboard/inventory");
     revalidatePath("/dashboard");
+    purgeStorefront(STOREFRONT_TAGS.marketplace);
     return { success: true };
   });
 }
@@ -220,6 +224,7 @@ export async function updateInventoryItem(id: string, formData: FormData) {
     }
 
     revalidatePath("/dashboard/inventory");
+    purgeStorefront(STOREFRONT_TAGS.marketplace);
     return { success: true };
   });
 }
@@ -258,6 +263,7 @@ export async function deleteInventoryItem(id: string) {
     }
 
     revalidatePath("/dashboard/inventory");
+    purgeStorefront(STOREFRONT_TAGS.marketplace);
     return { success: true };
   });
 }

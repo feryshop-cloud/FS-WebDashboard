@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { purgeStorefront, STOREFRONT_TAGS } from "@/lib/store-revalidate";
 import { logger } from "@/lib/logger";
 import { runAction } from "@/lib/logging/server-action";
 
@@ -105,6 +106,7 @@ export async function addTopupProduct(input: TopupProductInput) {
     }
 
     revalidatePath("/dashboard/topup-products");
+    purgeStorefront(STOREFRONT_TAGS.products);
     return { success: true };
   });
 }
@@ -142,6 +144,7 @@ export async function updateTopupProduct(id: string, input: TopupProductInput) {
     }
 
     revalidatePath("/dashboard/topup-products");
+    purgeStorefront(STOREFRONT_TAGS.products);
     return { success: true };
   });
 }
@@ -166,6 +169,7 @@ export async function deleteTopupProduct(id: string) {
     }
 
     revalidatePath("/dashboard/topup-products");
+    purgeStorefront(STOREFRONT_TAGS.products);
     return { success: true };
   });
 }

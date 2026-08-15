@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { purgeStorefront, STOREFRONT_TAGS } from "@/lib/store-revalidate";
 import { logger } from "@/lib/logger";
 import { runAction } from "@/lib/logging/server-action";
 
@@ -78,6 +79,7 @@ export async function createPromoCode(formData: FormData) {
     }
 
     revalidatePath("/dashboard/promo-codes");
+    purgeStorefront(STOREFRONT_TAGS.products);
   });
 }
 
@@ -125,6 +127,7 @@ export async function updatePromoCode(id: number, formData: FormData) {
     }
 
     revalidatePath("/dashboard/promo-codes");
+    purgeStorefront(STOREFRONT_TAGS.products);
   });
 }
 
@@ -142,5 +145,6 @@ export async function deletePromoCode(id: number) {
     }
 
     revalidatePath("/dashboard/promo-codes");
+    purgeStorefront(STOREFRONT_TAGS.products);
   });
 }

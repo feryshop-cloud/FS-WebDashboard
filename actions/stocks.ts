@@ -5,6 +5,7 @@ import { getErrorMessage } from "@/lib/error";
 import { PurchasePaymentStatus, Stock, StockStatus } from "@/types/database";
 import type { Database } from "@/types/database.types";
 import { revalidatePath } from "next/cache";
+import { purgeStorefront, STOREFRONT_TAGS } from "@/lib/store-revalidate";
 import { logger } from "@/lib/logger";
 import { runAction } from "@/lib/logging/server-action";
 
@@ -121,6 +122,7 @@ export async function createStock(
       const mapped = mapStockRow(data);
 
       revalidatePath("/dashboard/inventory");
+      purgeStorefront(STOREFRONT_TAGS.marketplace);
       return { data: mapped, error: null };
     } catch (error: unknown) {
       logger.error("Error creating stock", { error });
@@ -148,6 +150,7 @@ export async function updateStockStatus(
       const mapped = mapStockRow(data);
 
       revalidatePath("/dashboard/inventory");
+      purgeStorefront(STOREFRONT_TAGS.marketplace);
       return { data: mapped, error: null };
     } catch (error: unknown) {
       logger.error("Error updating stock status", { error });
@@ -197,6 +200,7 @@ export async function updateStock(
       const mapped = mapStockRow(data);
 
       revalidatePath("/dashboard/inventory");
+      purgeStorefront(STOREFRONT_TAGS.marketplace);
       return { data: mapped, error: null };
     } catch (error: unknown) {
       logger.error("Error updating stock", { error });
@@ -240,6 +244,7 @@ export async function deleteStock(id: string): Promise<{ success: boolean; error
       }
 
       revalidatePath("/dashboard/inventory");
+      purgeStorefront(STOREFRONT_TAGS.marketplace);
       return { success: true, error: null };
     } catch (error: unknown) {
       logger.error("Error deleting stock", { error });

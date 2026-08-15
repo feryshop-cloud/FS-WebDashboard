@@ -3,7 +3,15 @@
 import { logger } from "@/lib/logger";
 import { createClient } from "../lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { purgeStorefront, STOREFRONT_TAGS } from "@/lib/store-revalidate";
 import type { Database, Json } from "@/types/database.types";
+
+const CATALOG_TAGS = [
+  ...STOREFRONT_TAGS.categories,
+  ...STOREFRONT_TAGS.games,
+  ...STOREFRONT_TAGS.products,
+  ...STOREFRONT_TAGS.marketplace,
+];
 
 export async function addGameCategory(
   title: string,
@@ -51,6 +59,7 @@ export async function addGameCategory(
 
   revalidatePath("/dashboard/settings");
   revalidatePath("/dashboard/inventory");
+  purgeStorefront(CATALOG_TAGS);
 
   return { success: true, data };
 }
@@ -101,6 +110,7 @@ export async function updateGameCategory(
 
   revalidatePath("/dashboard/settings");
   revalidatePath("/dashboard/inventory");
+  purgeStorefront(CATALOG_TAGS);
 
   return { success: true };
 }
@@ -124,6 +134,7 @@ export async function toggleGameCategoryStatus(id: number, is_active: boolean) {
 
   revalidatePath("/dashboard/settings");
   revalidatePath("/dashboard/inventory");
+  purgeStorefront(CATALOG_TAGS);
 
   return { success: true };
 }
@@ -159,6 +170,7 @@ export async function deleteGameCategory(id: number) {
 
   revalidatePath("/dashboard/settings");
   revalidatePath("/dashboard/inventory");
+  purgeStorefront(CATALOG_TAGS);
 
   return { success: true };
 }
@@ -282,6 +294,7 @@ export async function addGame(name: string, slug: string, logo?: string, instruc
 
   revalidatePath("/dashboard/settings");
   revalidatePath("/dashboard/topup-products");
+  purgeStorefront(CATALOG_TAGS);
   return { success: true, data };
 }
 
@@ -352,6 +365,7 @@ export async function updateGame(
 
   revalidatePath("/dashboard/settings");
   revalidatePath("/dashboard/topup-products");
+  purgeStorefront(CATALOG_TAGS);
   return { success: true };
 }
 
@@ -375,6 +389,7 @@ export async function toggleGameStatus(id: string, is_active: boolean) {
 
   revalidatePath("/dashboard/settings");
   revalidatePath("/dashboard/topup-products");
+  purgeStorefront(CATALOG_TAGS);
   return { success: true };
 }
 
@@ -695,5 +710,11 @@ export async function updateSiteSetting(key: string, value: Json, description?: 
   }
 
   revalidatePath("/dashboard/settings");
+  purgeStorefront([
+    ...STOREFRONT_TAGS.settings,
+    ...STOREFRONT_TAGS.games,
+    ...STOREFRONT_TAGS.products,
+    ...STOREFRONT_TAGS.marketplace,
+  ]);
   return { success: true };
 }
