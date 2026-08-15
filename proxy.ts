@@ -1,6 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { formatLog } from "@/lib/logging/format";
 
 export async function proxy(request: NextRequest) {
   const incomingId = request.headers.get("x-request-id");
@@ -15,18 +14,6 @@ export async function proxy(request: NextRequest) {
     },
   });
   supabaseResponse.headers.set("x-request-id", requestId);
-
-  console.log(
-    formatLog(
-      "info",
-      "request start",
-      {
-        method: request.method,
-        path: request.nextUrl.pathname,
-      },
-      { service: "game-inventori", requestId },
-    ),
-  );
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

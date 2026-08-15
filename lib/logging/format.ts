@@ -36,10 +36,10 @@ export function serializeError(error: unknown): unknown {
       message: error.message,
     };
     if (error.stack) result.stack = error.stack;
+    if ("code" in error) result.code = (error as { code?: unknown }).code;
     if (error.cause !== undefined && error.cause !== null) {
       result.cause = serializeError(error.cause);
     }
-    if ("code" in error) result.code = (error as { code?: unknown }).code;
     return result;
   }
   if (typeof error === "object" && error !== null) {

@@ -8,7 +8,6 @@
  * `requestId` for correlation.
  */
 import pino, { type Logger, type LoggerOptions } from "pino";
-import os from "node:os";
 import { resolveLogLevel, serializeError, type LogLevel } from "@/lib/logging/format";
 import { getRequestId } from "@/lib/logging/request-context";
 
@@ -17,12 +16,10 @@ const SERVICE = "game-inventori";
 function createLogger(): Logger {
   const options: LoggerOptions = {
     level: resolveLogLevel(),
-    base: {
-      pid: process.pid,
-      hostname: os.hostname(),
+    mixin: () => ({
       service: SERVICE,
       environment: process.env.NODE_ENV ?? "development",
-    },
+    }),
     timestamp: pino.stdTimeFunctions.epochTime,
     serializers: {
       err: serializeError,
