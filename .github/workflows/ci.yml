@@ -1,28 +1,39 @@
-name: CI - Admin Dashboard (game-inventori)
+name: CI
 
 on:
   push:
-    branches: [main, master, develop]
+    branches: [main]
   pull_request:
-    branches: [main, master, develop]
+    branches: [main]
 
 jobs:
-  build-and-lint:
-    name: Build & Lint (game-inventori)
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: "npm"
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+
+      - name: Restore Next.js cache
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('**/*.ts', '**/*.tsx', 'next.config.*') }}
+          restore-keys: |
+            nextjs-${{ runner.os }}-
+
       - name: Install dependencies
         run: npm ci
-      - name: Check Code Format (Prettier)
-        run: npm run format:check
-      - name: Run Lint
+
+      - name: Lint
         run: npm run lint
-      - name: Run Tests
-        run: npm run test
-      - name: Run Build
+
+      - name: Build
         run: npm run build
+
+      - name: Test
+        run: npm run test
