@@ -1,11 +1,12 @@
 import * as xlsx from "xlsx";
 
 /**
- * Konversi array of objects/arrays menjadi buffer Excel (.xlsx)
- * @param data Array data yang akan di-export (tiap baris adalah satu object/array)
- * @param headers Nama kolom (opsional)
- * @param sheetName Nama Sheet (default "Sheet1")
- * @returns Buffer
+ * Converts an array of objects or 2D matrix data into an Excel spreadsheet binary Buffer (.xlsx).
+ *
+ * @param data - Array of row objects or raw matrix array values to export.
+ * @param headers - Optional array of column header titles.
+ * @param sheetName - Name of target Excel sheet (defaults to "Sheet1").
+ * @returns Node.js Buffer containing compiled `.xlsx` binary data.
  */
 export function generateExcelBuffer(
   data: unknown[],

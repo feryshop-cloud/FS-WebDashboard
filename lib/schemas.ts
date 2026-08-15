@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+/**
+ * Zod validation schema for Admin Panel authentication login form.
+ */
 export const LoginSchema = z.object({
   email: z
     .string({ message: "Email is required." })
@@ -9,6 +12,9 @@ export const LoginSchema = z.object({
     .min(6, { message: "Password must be at least 6 characters long." }),
 });
 
+/**
+ * Zod validation schema for creating and updating game account inventory entries.
+ */
 export const InventoryFormSchema = z.object({
   game_id: z
     .string({ message: "Game category is required." })
