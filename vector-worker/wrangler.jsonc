@@ -9,13 +9,35 @@
       "enabled": true,
       "head_sampling_rate": 1,
       "persist": true,
-      "invocation_logs": true,
-    },
+      "invocation_logs": true
+    }
   },
   "vars": {
     "SUPABASE_URL": "https://xdvlygpaylnicojuvhyk.supabase.co",
+    "VECTOR_WEBHOOK_SECRET": ""
+  },
+  "queues": {
+    "producers": [
+      {
+        "binding": "inventory_vector_queue",
+        "queue": "inventory-vector-queue"
+      }
+    ],
+    "consumers": [
+      {
+        "queue": "inventory-vector-queue",
+        "max_batch_size": 10,
+        "max_batch_timeout": 5,
+        "max_retries": 5,
+        "dead_letter_queue": "inventory-vector-dlq"
+      },
+      {
+        "queue": "inventory-vector-dlq",
+        "max_batch_size": 10
+      }
+    ]
   },
   "triggers": {
-    "crons": ["* * * * *"],
-  },
+    "crons": ["0 0 * * *"]
+  }
 }
