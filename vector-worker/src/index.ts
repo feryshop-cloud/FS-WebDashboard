@@ -1,101 +1,35 @@
-import { createClient } from "@supabase/supabase-js";
+/**
+ * Vector Worker — Main Entry Point
+ *
+ * Cloudflare Worker that maintains vector embeddings for inventory data.
+ *
+ * Architecture:
+ * - **Webhook ingestion**: Supabase sends real-time change events to `/webhooks/supabase`
+ * - **Queue processing**: Record IDs are enqueued and processed asynchronously via Cloudflare Queues
+ * - **Daily reconciliation**: Cron job runs at midnight UTC to backfill any missed records
+ *
+ * Data flow:
+ * ```
+ * Supabase DB change → Webhook → Queue → RPC: create_inventory_vector
+ *                                      ↓
+ *                              Daily cron: backfill_inventory_vectors
+ * ```
+ */
+
 import { logger, setRequestId } from "./utils/logger";
-
-interface VectorQueueMessage {
-	recordId: string;
-	table: string;
-	operation: "INSERT" | "UPDATE" | "DELETE";
-	timestamp: string;
-}
-
-interface Env {
-	SUPABASE_URL: string;
-	SUPABASE_SERVICE_ROLE_KEY: string;
-	BACKFILL_SECRET?: string;
-	VECTOR_WEBHOOK_SECRET?: string;
-	inventory_vector_queue?: Queue;
-	inventory_vector_dlq?: Queue;
-}
-
-function toU8(value: string): Uint8Array {
-	return new TextEncoder().encode(value);
-}
-
-function toHex(buffer: ArrayBuffer): string {
-	return [...new Uint8Array(buffer)].map((b) => b.toString(16).padStart(2, "0")).join("");
-}
-
-async function signWebhook(secret: string, rawBody: string): Promise<string> {
-	const key = await crypto.subtle.importKey(
-		"raw",
-		toU8(secret) as BufferSource,
-		{ name: "HMAC", hash: "SHA-256" },
-		false,
-		["sign"],
-	);
-	const signature = await crypto.subtle.sign("HMAC", key, toU8(rawBody) as BufferSource);
-	const sigBytes = new Uint8Array(signature);
-	return `sha256=${toHex(sigBytes.buffer)}`;
-}
-
-async function verifyWebhook(
-	secret: string,
-	rawBody: string,
-	signatureHeader: string | null,
-): Promise<boolean> {
-	if (!secret || !signatureHeader) return false;
-	const expected = await signWebhook(secret, rawBody);
-	return signatureHeader === expected;
-}
-
-async function runBackfill(env: Env) {
-	if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) {
-		throw new Error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
-	}
-
-	const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
-		auth: {
-			autoRefreshToken: false,
-			persistSession: false,
-		},
-	});
-
-	const started = Date.now();
-	const { data, error } = await supabase.rpc("backfill_inventory_vectors");
-	if (error) throw error;
-
-	return {
-		rows: data,
-		durationMs: Date.now() - started,
-	};
-}
-
-async function runVectorizeRecord(env: Env, recordId: string) {
-	if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) {
-		throw new Error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
-	}
-
-	const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
-		auth: {
-			autoRefreshToken: false,
-			persistSession: false,
-		},
-	});
-
-	const started = Date.now();
-	const { data, error } = await supabase.rpc("create_inventory_vector", {
-		p_record_id: recordId,
-	});
-	if (error) throw error;
-
-	return {
-		recordId,
-		rows: data,
-		durationMs: Date.now() - started,
-	};
-}
+import { handleSupabaseWebhook } from "./webhook";
+import { processInventoryQueue, processDeadLetterQueue } from "./queue";
+import { runBackfill } from "./backfill";
+import type { Env, VectorQueueMessage } from "./types";
 
 export default {
+	/**
+	 * Scheduled handler — runs daily at midnight UTC.
+	 *
+	 * Executes a full backfill reconciliation to ensure all inventory
+	 * records have up-to-date vector embeddings, catching any that
+	 * were missed by the webhook queue.
+	 */
 	async scheduled(_event: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
 		ctx.waitUntil(
 			runBackfill(env)
@@ -108,6 +42,15 @@ export default {
 		);
 	},
 
+	/**
+	 * Fetch handler — processes incoming HTTP requests.
+	 *
+	 * Routes:
+	 * - `GET /__health` — Health check endpoint
+	 * - `POST /__backfill` — Manual backfill trigger (requires BACKFILL_SECRET)
+	 * - `POST /webhooks/supabase` — Supabase webhook endpoint (requires HMAC signature)
+	 * - `*` — Returns 404
+	 */
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
 		const requestId = request.headers.get("x-request-id") || undefined;
 		setRequestId(requestId);
@@ -149,64 +92,25 @@ export default {
 		}
 
 		if (url.pathname === "/webhooks/supabase" && request.method === "POST") {
-			const rawBody = await request.text();
-			const signature = request.headers.get("x-webhook-signature");
-
-			const valid = await verifyWebhook(env.VECTOR_WEBHOOK_SECRET || "", rawBody, signature);
-			if (!valid) {
-				logger.warn("webhook signature verification failed");
-				return new Response("Unauthorized", { status: 401 });
-			}
-
-			let payload: any;
-			try {
-				payload = JSON.parse(rawBody);
-			} catch {
-				return new Response("Bad Request", { status: 400 });
-			}
-
-			const recordId = payload?.record?.id;
-			if (!recordId) {
-				return new Response("Bad Request: missing record.id", { status: 400 });
-			}
-
-			const message: VectorQueueMessage = {
-				recordId,
-				table: payload.table || "",
-				operation: payload.type || "INSERT",
-				timestamp: new Date().toISOString(),
-			};
-
-			if (env.inventory_vector_queue) {
-				await env.inventory_vector_queue.send(message);
-				logger.info("enqueued record", { recordId, table: message.table, operation: message.operation });
-			}
-
-			return new Response("OK", { status: 200 });
+			return handleSupabaseWebhook(request, env);
 		}
 
 		return new Response("Not found", { status: 404 });
 	},
 
+	/**
+	 * Queue handler — processes messages from Cloudflare Queues.
+	 *
+	 * Routes:
+	 * - `inventory-vector-queue` — Processes individual record vectorization
+	 * - `inventory-vector-dlq` — Acknowledges dead-lettered messages
+	 */
 	async queue(batch: MessageBatch<unknown>, env: Env, ctx: ExecutionContext): Promise<void> {
 		const queueName = batch.queue;
 		if (queueName === "inventory-vector-queue") {
-			for (const msg of batch.messages) {
-				try {
-					const body = msg.body as VectorQueueMessage;
-					const result = await runVectorizeRecord(env, body.recordId);
-					logger.info("vectorized record", { recordId: result.recordId, durationMs: result.durationMs });
-					msg.ack();
-				} catch (error: any) {
-					logger.error("vectorize record failed", { recordId: (msg.body as VectorQueueMessage).recordId, error: error.message });
-					msg.retry();
-				}
-			}
+			await processInventoryQueue(batch as MessageBatch<VectorQueueMessage>, env);
 		} else if (queueName === "inventory-vector-dlq") {
-			logger.warn("DLQ message received, acking");
-			for (const msg of batch.messages) {
-				msg.ack();
-			}
+			await processDeadLetterQueue(batch as MessageBatch<VectorQueueMessage>, env);
 		} else {
 			logger.warn("unknown queue", { queueName });
 		}
