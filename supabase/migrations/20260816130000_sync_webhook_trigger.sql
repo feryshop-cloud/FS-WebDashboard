@@ -1,14 +1,15 @@
 -- =============================================================================
--- Migration: Vector worker webhook trigger using generic supabase_functions.http_request
+-- Migration: Sync webhook trigger state to match remote
 -- Created: 2026-08-16
 -- Updated: 2026-08-16
--- Purpose: Align inventory webhook trigger with generic trigger function
+-- Purpose: Ensure supabase_functions.http_request() trigger function and
+--          inventory_vector_worker_webhook_trigger exist in correct state
 -- =============================================================================
 
--- 1. Drop old wrapper function if it exists
+-- 1. Drop old wrapper function if it exists (from earlier migration)
 DROP FUNCTION IF EXISTS supabase_functions.http_request(text, jsonb, jsonb, integer);
 
--- 2. Drop trigger if it exists
+-- 2. Drop trigger first (required before dropping/replacing function)
 DROP TRIGGER IF EXISTS inventory_vector_worker_webhook_trigger ON public.inventory;
 
 -- 3. Create/replace the generic trigger function
@@ -83,7 +84,7 @@ BEGIN
 END;
 $$;
 
--- 4. Create trigger on inventory table using generic supabase_functions.http_request()
+-- 4. Recreate trigger with correct configuration
 CREATE TRIGGER inventory_vector_worker_webhook_trigger
   AFTER INSERT OR UPDATE ON public.inventory
   FOR EACH ROW

@@ -1,62 +1,85 @@
 -- =============================================================================
--- Migration: Enable pgcrypto + pg_net, create webhook trigger for inventory
+-- Migration: Enable pg_net, create generic Supabase-compatible webhook trigger
 -- Created: 2026-08-16
--- Purpose: Send real-time webhook to vector-worker when inventory records change
+-- Updated: 2026-08-16
+-- Purpose: Generic webhook trigger function compatible with Supabase Dashboard
 -- =============================================================================
 
--- 1. Enable required extensions
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
-CREATE EXTENSION IF NOT EXISTS pg_net;
+-- 1. Buat schema supabase_functions jika belum tersedia
 CREATE SCHEMA IF NOT EXISTS supabase_functions;
 
--- 2. Drop existing trigger if it exists (idempotent)
-DROP TRIGGER IF EXISTS inventory_vector_worker_webhook_trigger ON public.inventory;
+-- 2. Aktifkan extension pg_net jika belum tersedia
+CREATE EXTENSION IF NOT EXISTS pg_net;
 
--- 3. Create trigger function
-CREATE OR REPLACE FUNCTION public.send_vector_worker_webhook()
+-- 3. Drop existing trigger and functions if they exist (idempotent)
+DROP TRIGGER IF EXISTS inventory_vector_worker_webhook_trigger ON public.inventory;
+DROP FUNCTION IF EXISTS public.send_vector_worker_webhook();
+DROP FUNCTION IF EXISTS supabase_functions.http_request();
+
+-- 4. Buat fungsi trigger webhook generik
+CREATE OR REPLACE FUNCTION supabase_functions.http_request()
 RETURNS trigger
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path TO 'public'
 AS $$
 DECLARE
-  v_secret text := '577b3db1bf6b23c0bcf772e4f6308fc2bae3a2c80f7fa68e5ae3050a2be695a8'; -- Replace with actual VECTOR_WEBHOOK_SECRET
-  v_payload jsonb;
-  v_raw_body text;
-  v_signature text;
+  request_id bigint;
+  payload jsonb;
+  url text;
+  method text;
+  headers jsonb;
+  params jsonb;
+  timeout_ms integer;
+  webhook_secret text;
+  raw_body text;
+  signature text;
 BEGIN
-  -- Build payload based on operation type
-  IF TG_OP = 'DELETE' THEN
-    v_payload := jsonb_build_object(
+  url := TG_ARGV[0];
+  method := TG_ARGV[1];
+  headers := TG_ARGV[2]::jsonb;
+  params := TG_ARGV[3]::jsonb;
+  timeout_ms := TG_ARGV[4]::integer;
+  webhook_secret := TG_ARGV[5];
+
+  IF TG_OP = 'INSERT' THEN
+    payload := jsonb_build_object(
       'type', TG_OP,
       'table', TG_TABLE_NAME,
       'schema', TG_TABLE_SCHEMA,
-      'record', row_to_json(OLD)
+      'record', to_jsonb(NEW),
+      'old_record', null
     );
-  ELSE
-    v_payload := jsonb_build_object(
+  ELSIF TG_OP = 'UPDATE' THEN
+    payload := jsonb_build_object(
       'type', TG_OP,
       'table', TG_TABLE_NAME,
       'schema', TG_TABLE_SCHEMA,
-      'record', row_to_json(NEW)
+      'record', to_jsonb(NEW),
+      'old_record', to_jsonb(OLD)
+    );
+  ELSIF TG_OP = 'DELETE' THEN
+    payload := jsonb_build_object(
+      'type', TG_OP,
+      'table', TG_TABLE_NAME,
+      'schema', TG_TABLE_SCHEMA,
+      'record', null,
+      'old_record', to_jsonb(OLD)
     );
   END IF;
 
-  -- Prepare raw body and compute HMAC-SHA256 signature
-  v_raw_body := v_payload::text;
-  v_signature := encode(hmac(v_raw_body, v_secret, 'sha256'), 'hex');
+  raw_body := payload::text;
+  signature := 'sha256=' || encode(extensions.hmac(raw_body, webhook_secret, 'sha256'::text), 'hex');
+  headers := headers || jsonb_build_object('x-webhook-signature', signature);
 
-  -- Fire HTTP POST to vector-worker
-  PERFORM net.http_post(
-    url := 'https://game-inventori-vector-worker.aitiga226.workers.dev/webhooks/supabase',
-    body := v_payload,
-    headers := jsonb_build_object(
-      'Content-Type', 'application/json',
-      'x-webhook-signature', v_signature
-    ),
-    timeout_milliseconds := 5000
+  request_id := net.http_post(
+    url,
+    payload,
+    params,
+    headers,
+    timeout_ms
   );
 
-  -- Return appropriate row for trigger
   IF TG_OP = 'DELETE' THEN
     RETURN OLD;
   ELSE
@@ -65,34 +88,15 @@ BEGIN
 END;
 $$;
 
--- 4. Create trigger on inventory table
+-- 5. Buat trigger pada tabel inventory menggunakan fungsi generik
 CREATE TRIGGER inventory_vector_worker_webhook_trigger
-  AFTER INSERT OR UPDATE OR DELETE ON public.inventory
+  AFTER INSERT OR UPDATE ON public.inventory
   FOR EACH ROW
-  EXECUTE FUNCTION public.send_vector_worker_webhook();
-
-
--- 5. Buat fungsi wrapper http_request yang dibutuhkan UI Dashboard
-CREATE OR REPLACE FUNCTION supabase_functions.http_request(
-  url text,
-  method text,
-  headers jsonb,
-  params jsonb,
-  timeout_ms integer
-)
-RETURNS bigint
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-DECLARE
-  request_id bigint;
-BEGIN
-  SELECT net.http_post(
-    url := url,
-    headers := headers,
-    body := params,
-    timeout_milliseconds := timeout_ms
-  ) INTO request_id;
-  RETURN request_id;
-END;
-$$;
+  EXECUTE FUNCTION supabase_functions.http_request(
+    'https://game-inventori-vector-worker.aitiga226.workers.dev/webhooks/supabase',
+    'POST',
+    '{"Content-Type": "application/json"}',
+    '{}',
+    5000,
+    '577b3db1bf6b23c0bcf772e4f6308fc2bae3a2c80f7fa68e5ae3050a2be695a8'
+  );
