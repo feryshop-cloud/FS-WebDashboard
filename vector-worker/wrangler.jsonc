@@ -14,7 +14,8 @@
   },
   "vars": {
     "SUPABASE_URL": "https://xdvlygpaylnicojuvhyk.supabase.co",
-    "VECTOR_WEBHOOK_SECRET": ""
+    "VECTOR_WEBHOOK_SECRET": "",
+    "LOG_LEVEL": "info"
   },
   "queues": {
     "producers": [

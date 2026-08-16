@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { logger, setRequestId } from "./utils/logger";
 
 interface VectorQueueMessage {
 	recordId: string;
@@ -99,19 +100,17 @@ export default {
 		ctx.waitUntil(
 			runBackfill(env)
 				.then((result) => {
-					console.log(
-						`[${new Date().toISOString()}] daily backfill completed: ${result.rows} row(s) in ${result.durationMs}ms`,
-					);
+					logger.info("daily backfill completed", { rows: result.rows, durationMs: result.durationMs });
 				})
 				.catch((error) => {
-					console.error(
-						`[${new Date().toISOString()}] daily backfill failed: ${error.message}`,
-					);
+					logger.error("daily backfill failed", { error: error.message });
 				}),
 		);
 	},
 
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+		const requestId = request.headers.get("x-request-id") || undefined;
+		setRequestId(requestId);
 		const url = new URL(request.url);
 
 		if (url.pathname === "/__health") {
@@ -134,13 +133,14 @@ export default {
 				});
 			}
 
-			console.log("Manual trigger via /__backfill");
+			logger.info("manual trigger via /__backfill");
 			try {
 				const result = await runBackfill(env);
 				return new Response(JSON.stringify({ ok: true, ...result }), {
 					headers: { "Content-Type": "application/json" },
 				});
 			} catch (err: any) {
+				logger.error("manual backfill failed", { error: err.message });
 				return new Response(JSON.stringify({ ok: false, error: err.message }), {
 					status: 500,
 					headers: { "Content-Type": "application/json" },
@@ -154,7 +154,7 @@ export default {
 
 			const valid = await verifyWebhook(env.VECTOR_WEBHOOK_SECRET || "", rawBody, signature);
 			if (!valid) {
-				console.warn(`[${new Date().toISOString()}] webhook signature verification failed`);
+				logger.warn("webhook signature verification failed");
 				return new Response("Unauthorized", { status: 401 });
 			}
 
@@ -179,9 +179,7 @@ export default {
 
 			if (env.inventory_vector_queue) {
 				await env.inventory_vector_queue.send(message);
-				console.log(
-					`[${new Date().toISOString()}] enqueued record ${recordId} from ${message.table}`,
-				);
+				logger.info("enqueued record", { recordId, table: message.table, operation: message.operation });
 			}
 
 			return new Response("OK", { status: 200 });
@@ -197,24 +195,20 @@ export default {
 				try {
 					const body = msg.body as VectorQueueMessage;
 					const result = await runVectorizeRecord(env, body.recordId);
-					console.log(
-						`[${new Date().toISOString()}] vectorized record ${result.recordId} in ${result.durationMs}ms`,
-					);
+					logger.info("vectorized record", { recordId: result.recordId, durationMs: result.durationMs });
 					msg.ack();
 				} catch (error: any) {
-					console.error(
-						`[${new Date().toISOString()}] vectorize record failed: ${error.message}`,
-					);
+					logger.error("vectorize record failed", { recordId: (msg.body as VectorQueueMessage).recordId, error: error.message });
 					msg.retry();
 				}
 			}
 		} else if (queueName === "inventory-vector-dlq") {
-			console.log(`[${new Date().toISOString()}] DLQ message received, acking`);
+			logger.warn("DLQ message received, acking");
 			for (const msg of batch.messages) {
 				msg.ack();
 			}
 		} else {
-			console.warn(`[${new Date().toISOString()}] unknown queue: ${queueName}`);
+			logger.warn("unknown queue", { queueName });
 		}
 	},
 } satisfies ExportedHandler<Env>;
