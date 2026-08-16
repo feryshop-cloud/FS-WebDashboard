@@ -103,7 +103,7 @@ export async function updatePromoCode(id: number, formData: FormData) {
 
     const supabase = await createClient();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase.from as any)("promo_codes")
+    const { data, error } = await (supabase.from as any)("promo_codes")
       .update({
         code,
         discount_type: discountType,
@@ -115,15 +115,21 @@ export async function updatePromoCode(id: number, formData: FormData) {
         start_date: startDate || null,
         end_date: endDate || null,
       })
-      .eq("id", id);
+      .eq("id", id)
+      .select("id");
 
     if (error) {
       logger.error("Error updating promo code", { error });
       throw new Error(
         error.message.includes("duplicate")
           ? "Kode promo sudah ada."
-          : "Gagal memperbarui kode promo.",
+          : `Gagal memperbarui kode promo (${error.code ?? error.message}).`,
       );
+    }
+
+    if (!data || data.length === 0) {
+      logger.error("Promo code update matched 0 rows", { id });
+      throw new Error("Kode promo tidak ditemukan atau tidak dapat diubah.");
     }
 
     revalidatePath("/dashboard/promo-codes");

@@ -9,7 +9,7 @@ import { DataTable, type DataTableColumn } from "@/components/ui/DataTable";
 
 export default function PromoCodesPage() {
   const {
-    data: { filtered, pageItems, safePage, itemsPerPage },
+    data: { filtered, pageItems, safePage, itemsPerPage, sortKey, sortDir },
     isLoading,
     isSubmitting,
     error,
@@ -24,6 +24,7 @@ export default function PromoCodesPage() {
       handleDelete,
       setCurrentPage,
       setItemsPerPage,
+      handleSort,
     },
   } = usePromoCodes();
 
@@ -37,24 +38,28 @@ export default function PromoCodesPage() {
       {
         key: "code",
         header: "Kode",
+        sortable: true,
         className: "px-5 py-3 font-bold text-blue-600",
         render: (p) => p.code,
       },
       {
         key: "discount",
         header: "Diskon",
+        sortable: true,
         className: "px-4 py-3",
         render: (p) => discountLabel(p),
       },
       {
         key: "min_order",
         header: "Min Order",
+        sortable: true,
         className: "px-4 py-3",
         render: (p) => formatRupiah(Number(p.min_order || 0)),
       },
       {
         key: "quota",
         header: "Kuota (Terpakai)",
+        sortable: true,
         className: "px-4 py-3",
         render: (p) => {
           const quota = p.quota ?? 0;
@@ -75,6 +80,7 @@ export default function PromoCodesPage() {
       {
         key: "period",
         header: "Periode",
+        sortable: true,
         className: "text-muted-foreground px-4 py-3 text-xs",
         render: (p) =>
           p.start_date || p.end_date
@@ -84,6 +90,7 @@ export default function PromoCodesPage() {
       {
         key: "status",
         header: "Status",
+        sortable: true,
         className: "px-4 py-3",
         render: (p) => (
           <span
@@ -168,6 +175,9 @@ export default function PromoCodesPage() {
         rows={pageItems}
         rowKey={(p) => p.id}
         isLoading={isLoading}
+        sortKey={sortKey}
+        sortDir={sortDir}
+        onSort={handleSort}
         emptyMessage="Belum ada kode promo."
         emptyContent={
           <div className="text-muted-foreground flex flex-col items-center gap-2 py-6 text-sm">

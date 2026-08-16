@@ -54,6 +54,8 @@ export function usePromoCodes() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [sortKey, setSortKey] = useState<string>("");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
   const {
     data: promos = [],
@@ -136,8 +138,14 @@ export function usePromoCodes() {
         await createPromoCode(payload);
       }
 
-      closeModal();
       loadData();
+      setIsSubmitting(false);
+      setError("");
+      setIsAddClosing(true);
+      setTimeout(() => {
+        setIsAddClosing(false);
+        setIsAddOpen(false);
+      }, 200);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal menyimpan promo.");
     } finally {
@@ -159,10 +167,52 @@ export function usePromoCodes() {
     return promos.filter((p) => p.code.toLowerCase().includes(search.toLowerCase()));
   }, [promos, search]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
+  const sorted = useMemo(() => {
+    if (!sortKey) return filtered;
+    const arr = [...filtered];
+    const getVal = (p: PromoCodeRow): string | number => {
+      switch (sortKey) {
+        case "code":
+          return p.code.toLowerCase();
+        case "discount":
+          return Number(p.discount_value);
+        case "min_order":
+          return Number(p.min_order ?? 0);
+        case "quota":
+          return Number(p.quota ?? 0);
+        case "period":
+          return p.start_date || "";
+        case "status":
+          return p.is_active ? 1 : 0;
+        default:
+          return "";
+      }
+    };
+    arr.sort((a, b) => {
+      const av = getVal(a);
+      const bv = getVal(b);
+      if (typeof av === "string" && typeof bv === "string") {
+        return sortDir === "asc" ? av.localeCompare(bv) : bv.localeCompare(av);
+      }
+      return sortDir === "asc" ? Number(av) - Number(bv) : Number(bv) - Number(av);
+    });
+    return arr;
+  }, [filtered, sortKey, sortDir]);
+
+  const totalPages = Math.max(1, Math.ceil(sorted.length / itemsPerPage));
   const safePage = Math.min(currentPage, totalPages);
   const pageStart = (safePage - 1) * itemsPerPage;
-  const pageItems = filtered.slice(pageStart, pageStart + itemsPerPage);
+  const pageItems = sorted.slice(pageStart, pageStart + itemsPerPage);
+
+  const handleSort = (key: string) => {
+    if (sortKey === key) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
+    setCurrentPage(1);
+  };
 
   return {
     data: {
@@ -173,6 +223,8 @@ export function usePromoCodes() {
       safePage,
       pageStart,
       itemsPerPage,
+      sortKey,
+      sortDir,
     },
     isLoading,
     isSubmitting,
@@ -185,6 +237,8 @@ export function usePromoCodes() {
       form,
       currentPage,
       itemsPerPage,
+      sortKey,
+      sortDir,
     },
     helpers: {
       toDateTimeLocal,
@@ -199,6 +253,7 @@ export function usePromoCodes() {
       handleDelete,
       setCurrentPage,
       setItemsPerPage,
+      handleSort,
       loadData,
     },
   };

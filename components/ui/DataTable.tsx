@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Loader2 } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, Loader2 } from "lucide-react";
 import { cn } from "./cn";
 
 export interface DataTableColumn<T> {
@@ -8,6 +8,7 @@ export interface DataTableColumn<T> {
   align?: "left" | "center" | "right";
   className?: string;
   headerClassName?: string;
+  sortable?: boolean;
   render: (row: T) => ReactNode;
 }
 
@@ -22,6 +23,9 @@ interface DataTableProps<T> {
   loadingColor?: "blue";
   footer?: ReactNode;
   onRowClick?: (row: T) => void;
+  sortKey?: string;
+  sortDir?: "asc" | "desc";
+  onSort?: (key: string) => void;
 }
 
 const ALIGN_CLASS: Record<string, string> = {
@@ -45,6 +49,9 @@ export function DataTable<T>({
   loadingColor = "blue",
   footer,
   onRowClick,
+  sortKey,
+  sortDir = "asc",
+  onSort,
 }: DataTableProps<T>) {
   return (
     <div className="border-border-soft bg-card overflow-hidden rounded-xl border shadow-sm">
@@ -56,19 +63,43 @@ export function DataTable<T>({
         <table className="divide-border min-w-full divide-y">
           <thead className="bg-muted/80">
             <tr>
-              {columns.map((col) => (
-                <th
-                  key={col.key}
-                  scope="col"
-                  className={cn(
-                    "text-muted-foreground px-6 py-4 text-xs font-semibold tracking-wider uppercase",
-                    ALIGN_CLASS[col.align ?? "left"],
-                    col.headerClassName,
-                  )}
-                >
-                  {col.header}
-                </th>
-              ))}
+              {columns.map((col) => {
+                const sortable = Boolean(col.sortable) && Boolean(onSort);
+                const active = sortKey === col.key;
+                return (
+                  <th
+                    key={col.key}
+                    scope="col"
+                    className={cn(
+                      "text-muted-foreground px-6 py-4 text-xs font-semibold tracking-wider uppercase",
+                      ALIGN_CLASS[col.align ?? "left"],
+                      col.headerClassName,
+                    )}
+                  >
+                    {sortable ? (
+                      <button
+                        type="button"
+                        onClick={() => onSort?.(col.key)}
+                        title="Urutkan"
+                        className="hover:text-foreground inline-flex cursor-pointer items-center gap-1 transition-colors"
+                      >
+                        {col.header}
+                        {active ? (
+                          sortDir === "asc" ? (
+                            <ArrowUp className="h-3.5 w-3.5" />
+                          ) : (
+                            <ArrowDown className="h-3.5 w-3.5" />
+                          )
+                        ) : (
+                          <ArrowUpDown className="h-3 w-3 opacity-40" />
+                        )}
+                      </button>
+                    ) : (
+                      col.header
+                    )}
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody className="divide-border-soft bg-card divide-y">

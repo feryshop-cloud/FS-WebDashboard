@@ -1,5 +1,6 @@
 import React from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { cn } from "./cn";
 
 interface PaginationProps {
   currentPage: number;
@@ -12,6 +13,25 @@ interface PaginationProps {
 }
 
 const DEFAULT_PAGE_SIZES = [10, 25, 50, 100];
+
+function pageWindow(current: number, total: number): (number | "…")[] {
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+  const pages = new Set<number>([1, total]);
+  for (let p = current - 1; p <= current + 1; p += 1) {
+    if (p >= 1 && p <= total) pages.add(p);
+  }
+  const sorted = [...pages].sort((a, b) => a - b);
+  const result: (number | "…")[] = [];
+  let prev = 0;
+  for (const p of sorted) {
+    if (prev && p - prev > 1) result.push("…");
+    result.push(p);
+    prev = p;
+  }
+  return result;
+}
 
 export const Pagination: React.FC<PaginationProps> = ({
   currentPage,
@@ -29,6 +49,8 @@ export const Pagination: React.FC<PaginationProps> = ({
   const options = pageSizeOptions.some((s) => s === itemsPerPage)
     ? pageSizeOptions
     : [...pageSizeOptions, itemsPerPage].sort((a, b) => a - b);
+
+  const pages = pageWindow(currentPage, totalPages);
 
   return (
     <div className="border-border-soft bg-card flex flex-col gap-4 border-t px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
@@ -55,30 +77,76 @@ export const Pagination: React.FC<PaginationProps> = ({
           </div>
         )}
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-1.5">
+        <button
+          type="button"
+          onClick={() => onPageChange(1)}
+          disabled={currentPage <= 1}
+          aria-label="Ke halaman pertama"
+          className="border-border bg-card text-foreground hover:bg-muted tap-large inline-flex h-9 items-center justify-center rounded-lg border px-2 text-sm shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <ChevronsLeft className="h-4 w-4" />
+        </button>
+
         <button
           type="button"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage <= 1}
-          className="border-border bg-card text-foreground hover:bg-muted hover:text-foreground tap-large inline-flex items-center gap-1 rounded-lg border text-sm font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+          aria-label="Halaman sebelumnya"
+          className="border-border bg-card text-foreground hover:bg-muted tap-large inline-flex items-center gap-1 rounded-lg border px-2.5 text-sm font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
         >
           <ChevronLeft className="h-4 w-4" />
-          <span>Sebelumnya</span>
         </button>
 
-        <span className="text-muted-foreground px-2 text-xs font-semibold">
-          Halaman {currentPage} dari {totalPages}
-        </span>
+        {pages.map((p, i) =>
+          p === "…" ? (
+            <span
+              key={`gap-${i}`}
+              className="text-muted-foreground flex h-9 items-center px-1 text-xs"
+            >
+              …
+            </span>
+          ) : (
+            <button
+              key={p}
+              type="button"
+              onClick={() => onPageChange(p)}
+              aria-current={p === currentPage ? "page" : undefined}
+              className={cn(
+                "tap-large inline-flex h-9 min-w-9 items-center justify-center rounded-lg border px-2 text-sm font-medium shadow-sm transition-colors",
+                p === currentPage
+                  ? "border-blue-600 bg-blue-600 text-white"
+                  : "border-border bg-card text-foreground hover:bg-muted",
+              )}
+            >
+              {p}
+            </button>
+          ),
+        )}
 
         <button
           type="button"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage >= totalPages}
-          className="border-border bg-card text-foreground hover:bg-muted hover:text-foreground tap-large inline-flex items-center gap-1 rounded-lg border text-sm font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+          aria-label="Halaman selanjutnya"
+          className="border-border bg-card text-foreground hover:bg-muted tap-large inline-flex items-center gap-1 rounded-lg border px-2.5 text-sm font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <span>Selanjutnya</span>
           <ChevronRight className="h-4 w-4" />
         </button>
+
+        <button
+          type="button"
+          onClick={() => onPageChange(totalPages)}
+          disabled={currentPage >= totalPages}
+          aria-label="Ke halaman terakhir"
+          className="border-border bg-card text-foreground hover:bg-muted tap-large inline-flex h-9 items-center justify-center rounded-lg border px-2 text-sm shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <ChevronsRight className="h-4 w-4" />
+        </button>
+
+        <span className="text-muted-foreground px-2 text-xs font-semibold whitespace-nowrap">
+          Halaman {currentPage} dari {totalPages}
+        </span>
       </div>
     </div>
   );
