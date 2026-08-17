@@ -15,6 +15,7 @@ import {
 import { formatRupiah, formatDate } from "@/lib/utils";
 import { useTopupOrders } from "@/lib/hooks/features/useTopupOrders";
 import { BuyStatus, PaymentStatus } from "@/types/status";
+import type { Database } from "@/types/database.types";
 import { Pagination } from "@/components/ui/Pagination";
 
 export default function TopupOrdersPage() {
@@ -481,7 +482,11 @@ export default function TopupOrdersPage() {
                   <select
                     value={selectedOrder.buy_status.toLowerCase()}
                     onChange={(e) =>
-                      setSelectedOrder({ ...selectedOrder, buy_status: e.target.value })
+                      setSelectedOrder({
+                        ...selectedOrder,
+                        buy_status: e.target
+                          .value as Database["public"]["Enums"]["order_buy_status"],
+                      })
                     }
                     disabled={LOCKED_BUY_STATUSES.includes(selectedOrder.buy_status.toLowerCase())}
                     className="border-border disabled:bg-muted disabled:text-faint-foreground w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed"

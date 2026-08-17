@@ -1,4 +1,4 @@
-﻿export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type Database = {
   // Allows to automatically instantiate createClient with right options
@@ -687,7 +687,7 @@ export type Database = {
       orders: {
         Row: {
           account_data: Json | null;
-          buy_status: string;
+          buy_status: Database["public"]["Enums"]["order_buy_status"];
           created_at: string;
           discount_price: number | null;
           email: string | null;
@@ -703,7 +703,7 @@ export type Database = {
           payment_code_display: string | null;
           payment_method_id: string | null;
           payment_name: string;
-          payment_status: string;
+          payment_status: Database["public"]["Enums"]["order_payment_status"];
           price: number;
           pricing_json: Json | null;
           product_id: string;
@@ -723,7 +723,7 @@ export type Database = {
         };
         Insert: {
           account_data?: Json | null;
-          buy_status?: string;
+          buy_status?: Database["public"]["Enums"]["order_buy_status"];
           created_at?: string;
           discount_price?: number | null;
           email?: string | null;
@@ -739,7 +739,7 @@ export type Database = {
           payment_code_display?: string | null;
           payment_method_id?: string | null;
           payment_name: string;
-          payment_status?: string;
+          payment_status?: Database["public"]["Enums"]["order_payment_status"];
           price: number;
           pricing_json?: Json | null;
           product_id: string;
@@ -759,7 +759,7 @@ export type Database = {
         };
         Update: {
           account_data?: Json | null;
-          buy_status?: string;
+          buy_status?: Database["public"]["Enums"]["order_buy_status"];
           created_at?: string;
           discount_price?: number | null;
           email?: string | null;
@@ -775,7 +775,7 @@ export type Database = {
           payment_code_display?: string | null;
           payment_method_id?: string | null;
           payment_name?: string;
-          payment_status?: string;
+          payment_status?: Database["public"]["Enums"]["order_payment_status"];
           price?: number;
           pricing_json?: Json | null;
           product_id?: string;
@@ -1749,6 +1749,8 @@ export type Database = {
         | "TRANSFER_OUT"
         | "STOCK_PURCHASE"
         | "ADJUSTMENT";
+      order_buy_status: "pending" | "processing" | "success" | "failed";
+      order_payment_status: "pending" | "paid" | "success" | "failed" | "expired";
       payment_status: "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";
       payment_type: "IN" | "OUT";
       problem_case_status:
@@ -1918,6 +1920,8 @@ export const Constants = {
         "STOCK_PURCHASE",
         "ADJUSTMENT",
       ],
+      order_buy_status: ["pending", "processing", "success", "failed"],
+      order_payment_status: ["pending", "paid", "success", "failed", "expired"],
       payment_status: ["PENDING", "COMPLETED", "FAILED", "REFUNDED"],
       payment_type: ["IN", "OUT"],
       problem_case_status: [

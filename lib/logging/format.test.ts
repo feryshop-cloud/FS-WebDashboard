@@ -112,9 +112,14 @@ describe("formatLog", () => {
   });
 
   it("flattens meta fields into payload", () => {
-    const output = formatLog("warn", "slow query", { durationMs: 1200, table: "products" }, {
-      service: "svc",
-    });
+    const output = formatLog(
+      "warn",
+      "slow query",
+      { durationMs: 1200, table: "products" },
+      {
+        service: "svc",
+      },
+    );
     const parsed = JSON.parse(output);
 
     expect(parsed.durationMs).toBe(1200);

@@ -15,16 +15,16 @@ import { toU8, toHex } from "./helpers";
  * @returns The signature in the format `sha256=<hex-encoded-signature>`
  */
 export async function signWebhook(secret: string, rawBody: string): Promise<string> {
-	const key = await crypto.subtle.importKey(
-		"raw",
-		toU8(secret) as BufferSource,
-		{ name: "HMAC", hash: "SHA-256" },
-		false,
-		["sign"],
-	);
-	const signature = await crypto.subtle.sign("HMAC", key, toU8(rawBody) as BufferSource);
-	const sigBytes = new Uint8Array(signature);
-	return `sha256=${toHex(sigBytes.buffer)}`;
+  const key = await crypto.subtle.importKey(
+    "raw",
+    toU8(secret) as BufferSource,
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const signature = await crypto.subtle.sign("HMAC", key, toU8(rawBody) as BufferSource);
+  const sigBytes = new Uint8Array(signature);
+  return `sha256=${toHex(sigBytes.buffer)}`;
 }
 
 /**
@@ -36,11 +36,11 @@ export async function signWebhook(secret: string, rawBody: string): Promise<stri
  * @returns True if the signature is valid, false otherwise
  */
 export async function verifyWebhook(
-	secret: string,
-	rawBody: string,
-	signatureHeader: string | null,
+  secret: string,
+  rawBody: string,
+  signatureHeader: string | null,
 ): Promise<boolean> {
-	if (!secret || !signatureHeader) return false;
-	const expected = await signWebhook(secret, rawBody);
-	return signatureHeader === expected;
+  if (!secret || !signatureHeader) return false;
+  const expected = await signWebhook(secret, rawBody);
+  return signatureHeader === expected;
 }

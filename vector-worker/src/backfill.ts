@@ -21,23 +21,23 @@ import type { Env, OperationResult } from "./types";
  * @throws If Supabase client cannot be initialized or RPC call fails
  */
 export async function runBackfill(env: Env): Promise<OperationResult> {
-	if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) {
-		throw new Error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
-	}
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
+  }
 
-	const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
-		auth: {
-			autoRefreshToken: false,
-			persistSession: false,
-		},
-	});
+  const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
 
-	const started = Date.now();
-	const { data, error } = await supabase.rpc("backfill_inventory_vectors");
-	if (error) throw error;
+  const started = Date.now();
+  const { data, error } = await supabase.rpc("backfill_inventory_vectors");
+  if (error) throw error;
 
-	return {
-		rows: data,
-		durationMs: Date.now() - started,
-	};
+  return {
+    rows: data,
+    durationMs: Date.now() - started,
+  };
 }

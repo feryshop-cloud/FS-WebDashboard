@@ -1,34 +1,43 @@
-export const BuyStatus = {
-  PENDING: "pending",
-  PROCESSING: "processing",
-  SUCCESS: "success",
-  FAILED: "failed",
-} as const;
+/**
+ * Standard PostgreSQL ENUMs for Order Statuses.
+ * Synchronized with Database ENUMs: public.order_payment_status & public.order_buy_status
+ */
 
-export type BuyStatus = (typeof BuyStatus)[keyof typeof BuyStatus];
+export enum OrderBuyStatus {
+  PENDING = "pending",
+  PROCESSING = "processing",
+  SUCCESS = "success",
+  FAILED = "failed",
+}
 
-export const BuyStatusLabel: Record<BuyStatus, string> = {
-  [BuyStatus.PENDING]: "Menunggu",
-  [BuyStatus.PROCESSING]: "Diproses",
-  [BuyStatus.SUCCESS]: "Sukses",
-  [BuyStatus.FAILED]: "Gagal",
+export type BuyStatus = OrderBuyStatus;
+export const BuyStatus = OrderBuyStatus;
+
+export const BuyStatusLabel: Record<OrderBuyStatus, string> = {
+  [OrderBuyStatus.PENDING]: "Menunggu",
+  [OrderBuyStatus.PROCESSING]: "Diproses",
+  [OrderBuyStatus.SUCCESS]: "Sukses",
+  [OrderBuyStatus.FAILED]: "Gagal",
 };
 
-export const PaymentStatus = {
-  PENDING: "pending",
-  PAID: "paid",
-  FAILED: "failed",
-  EXPIRED: "expired",
-} as const;
+export enum OrderPaymentStatus {
+  PENDING = "pending",
+  PAID = "paid",
+  SUCCESS = "success",
+  FAILED = "failed",
+  EXPIRED = "expired",
+}
 
-export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus];
+export type PaymentStatus = OrderPaymentStatus;
+export const PaymentStatus = OrderPaymentStatus;
 
-export const PaymentStatusLabel: Record<PaymentStatus, string> = {
-  [PaymentStatus.PENDING]: "Menunggu",
-  [PaymentStatus.PAID]: "Lunas",
-  [PaymentStatus.FAILED]: "Gagal",
-  [PaymentStatus.EXPIRED]: "Kadaluarsa",
+export const PaymentStatusLabel: Record<OrderPaymentStatus, string> = {
+  [OrderPaymentStatus.PENDING]: "Menunggu",
+  [OrderPaymentStatus.PAID]: "Lunas",
+  [OrderPaymentStatus.SUCCESS]: "Sukses",
+  [OrderPaymentStatus.FAILED]: "Gagal",
+  [OrderPaymentStatus.EXPIRED]: "Kadaluarsa",
 };
 
-export const VALID_BUY_STATUSES: readonly BuyStatus[] = Object.values(BuyStatus);
-export const VALID_PAYMENT_STATUSES: readonly PaymentStatus[] = Object.values(PaymentStatus);
+export const VALID_BUY_STATUSES: readonly OrderBuyStatus[] = Object.values(OrderBuyStatus);
+export const VALID_PAYMENT_STATUSES: readonly OrderPaymentStatus[] = Object.values(OrderPaymentStatus);

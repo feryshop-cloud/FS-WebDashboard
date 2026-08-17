@@ -42,15 +42,29 @@ export async function getTopupOrders(filters: TopupOrdersFilters = {}): Promise<
     }
 
     if (paymentStatus) {
-      let dbPaymentStatus = paymentStatus.toUpperCase();
-      if (dbPaymentStatus === "PAID") {
-        dbPaymentStatus = "COMPLETED";
+      let dbPaymentStatus: Database["public"]["Enums"]["order_payment_status"] = "pending";
+      const normalized = paymentStatus.toLowerCase();
+      if (normalized === "paid" || normalized === "completed" || normalized === "success") {
+        dbPaymentStatus = "success";
+      } else if (normalized === "failed") {
+        dbPaymentStatus = "failed";
+      } else if (normalized === "expired") {
+        dbPaymentStatus = "expired";
       }
       query = query.eq("payment_status", dbPaymentStatus);
     }
 
     if (buyStatus) {
-      query = query.eq("buy_status", buyStatus.toUpperCase());
+      let dbBuyStatus: Database["public"]["Enums"]["order_buy_status"] = "pending";
+      const normalized = buyStatus.toLowerCase();
+      if (normalized === "success") {
+        dbBuyStatus = "success";
+      } else if (normalized === "processing") {
+        dbBuyStatus = "processing";
+      } else if (normalized === "failed") {
+        dbBuyStatus = "failed";
+      }
+      query = query.eq("buy_status", dbBuyStatus);
     }
 
     const { data, error, count } = await query
@@ -106,7 +120,15 @@ export async function updateTopupOrder(
       };
 
       if (payload.buy_status !== undefined) {
-        updatePayload.buy_status = payload.buy_status.toUpperCase();
+        const norm = payload.buy_status.toLowerCase();
+        if (
+          norm === "success" ||
+          norm === "processing" ||
+          norm === "pending" ||
+          norm === "failed"
+        ) {
+          updatePayload.buy_status = norm;
+        }
       }
       if (payload.serial_number !== undefined) {
         updatePayload.serial_number = payload.serial_number;

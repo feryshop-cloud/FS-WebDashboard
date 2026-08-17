@@ -12,7 +12,7 @@
  * @returns A Uint8Array containing the UTF-8 bytes
  */
 export function toU8(value: string): Uint8Array {
-	return new TextEncoder().encode(value);
+  return new TextEncoder().encode(value);
 }
 
 /**
@@ -22,5 +22,5 @@ export function toU8(value: string): Uint8Array {
  * @returns A hex string representation of the buffer
  */
 export function toHex(buffer: ArrayBuffer): string {
-	return [...new Uint8Array(buffer)].map((b) => b.toString(16).padStart(2, "0")).join("");
+  return [...new Uint8Array(buffer)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }

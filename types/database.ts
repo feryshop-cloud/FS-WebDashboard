@@ -47,6 +47,45 @@ export type LedgerTransactionType =
   | "STOCK_PURCHASE"
   | "ADJUSTMENT";
 export type InventoryStatus = "UNPOSTED" | "AVAILABLE" | "SOLD";
+export type OrderPaymentStatus = "pending" | "paid" | "success" | "failed" | "expired";
+export type OrderBuyStatus = "pending" | "processing" | "success" | "failed";
+
+export interface Order {
+  id: string; // UUID
+  order_id: string;
+  user_id?: string | null;
+  game_slug: string;
+  product_id: string;
+  product_title: string;
+  id_games: string;
+  server_games?: string | null;
+  nickname?: string | null;
+  quantity: number;
+  price: number;
+  fee: number;
+  discount_price: number;
+  promo_price: number;
+  promo_code?: string | null;
+  promo_discount: number;
+  total_price: number;
+  payment_method_id?: string | null;
+  payment_name: string;
+  payment_code: string;
+  payment_code_display?: string | null;
+  qr_string?: string | null;
+  qr_image_url?: string | null;
+  payment_status: OrderPaymentStatus;
+  buy_status: OrderBuyStatus;
+  serial_number?: string | null;
+  whatsapp?: string | null;
+  email?: string | null;
+  expired_time?: number | null;
+  account_data?: Record<string, JsonValue> | null;
+  pricing_json?: Record<string, JsonValue> | null;
+  gateway_response?: Record<string, JsonValue> | null;
+  created_at: string;
+  updated_at: string;
+}
 
 // ============================================================================
 // INTERFACES

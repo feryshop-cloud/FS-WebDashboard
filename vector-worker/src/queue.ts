@@ -19,19 +19,25 @@ import { runVectorizeRecord } from "./vectorize";
  * @param env - Cloudflare Worker environment bindings
  */
 export async function processInventoryQueue(
-	batch: MessageBatch<VectorQueueMessage>,
-	env: Env,
+  batch: MessageBatch<VectorQueueMessage>,
+  env: Env,
 ): Promise<void> {
-	for (const msg of batch.messages) {
-		try {
-			const result = await runVectorizeRecord(env, msg.body.recordId);
-			logger.info("vectorized record", { recordId: result.recordId, durationMs: result.durationMs });
-			msg.ack();
-		} catch (error: any) {
-			logger.error("vectorize record failed", { recordId: msg.body.recordId, error: error.message });
-			msg.retry();
-		}
-	}
+  for (const msg of batch.messages) {
+    try {
+      const result = await runVectorizeRecord(env, msg.body.recordId);
+      logger.info("vectorized record", {
+        recordId: result.recordId,
+        durationMs: result.durationMs,
+      });
+      msg.ack();
+    } catch (error: any) {
+      logger.error("vectorize record failed", {
+        recordId: msg.body.recordId,
+        error: error.message,
+      });
+      msg.retry();
+    }
+  }
 }
 
 /**
@@ -44,17 +50,17 @@ export async function processInventoryQueue(
  * @param env - Cloudflare Worker environment bindings
  */
 export async function processDeadLetterQueue(
-	batch: MessageBatch<VectorQueueMessage>,
-	env: Env,
+  batch: MessageBatch<VectorQueueMessage>,
+  env: Env,
 ): Promise<void> {
-	logger.warn("DLQ message received, acking", { queueSize: batch.messages.length });
-	for (const msg of batch.messages) {
-		logger.warn("dead-lettered message", {
-			recordId: msg.body.recordId,
-			table: msg.body.table,
-			operation: msg.body.operation,
-			timestamp: msg.body.timestamp,
-		});
-		msg.ack();
-	}
+  logger.warn("DLQ message received, acking", { queueSize: batch.messages.length });
+  for (const msg of batch.messages) {
+    logger.warn("dead-lettered message", {
+      recordId: msg.body.recordId,
+      table: msg.body.table,
+      operation: msg.body.operation,
+      timestamp: msg.body.timestamp,
+    });
+    msg.ack();
+  }
 }
