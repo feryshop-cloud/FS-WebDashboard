@@ -179,13 +179,13 @@ describe("resolveLogLevel", () => {
 
   it("defaults to 'info' in production when LOG_LEVEL not set", () => {
     delete process.env.LOG_LEVEL;
-    process.env.NODE_ENV = "production";
+    (process.env as Record<string, string | undefined>).NODE_ENV = "production";
     expect(resolveLogLevel()).toBe("info");
   });
 
   it("defaults to 'debug' in non-production when LOG_LEVEL not set", () => {
     delete process.env.LOG_LEVEL;
-    process.env.NODE_ENV = "development";
+    (process.env as Record<string, string | undefined>).NODE_ENV = "development";
     expect(resolveLogLevel()).toBe("debug");
   });
 });
