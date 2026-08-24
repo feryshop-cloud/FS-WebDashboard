@@ -51,6 +51,33 @@ Sistem Dashboard Admin (SaaS ERP) untuk mengelola inventori, transaksi jual beli
    ```
    Buka [http://localhost:3000](http://localhost:3000) di browser Anda.
 
+5. **Build & Jalankan Produksi (Standalone)**
+   ```bash
+   npm run build
+   npm start
+   ```
+
+## Deployment Docker & GitHub Container Registry (GHCR)
+
+Repositori ini memiliki image resmi di GitHub Container Registry: `ghcr.io/feryshop-cloud/fs-webdashboard:latest`.
+
+### 1. Menjalankan via Docker Langsung
+```bash
+docker run -d \
+  --name fs-webdashboard \
+  --restart unless-stopped \
+  -p 8080:8080 \
+  -e NEXT_PUBLIC_BASE_PATH=/admin \
+  --env-file .env.local \
+  ghcr.io/feryshop-cloud/fs-webdashboard:latest
+```
+
+### 2. Build Docker Image Lokal
+```bash
+docker build -t fs-webdashboard .
+docker run -d -p 8080:8080 -e NEXT_PUBLIC_BASE_PATH=/admin --env-file .env.local fs-webdashboard
+```
+
 ## Struktur Modul Utama
 
 - `/dashboard` - Pusat metrik (Omzet, Profit, Piutang)
