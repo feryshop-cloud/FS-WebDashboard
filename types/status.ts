@@ -40,4 +40,5 @@ export const PaymentStatusLabel: Record<OrderPaymentStatus, string> = {
 };
 
 export const VALID_BUY_STATUSES: readonly OrderBuyStatus[] = Object.values(OrderBuyStatus);
-export const VALID_PAYMENT_STATUSES: readonly OrderPaymentStatus[] = Object.values(OrderPaymentStatus);
+export const VALID_PAYMENT_STATUSES: readonly OrderPaymentStatus[] =
+  Object.values(OrderPaymentStatus);
