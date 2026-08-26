@@ -1,26 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
-import { MoreHorizontal, Edit2, Trash2, Loader2, AlertTriangle } from "lucide-react";
-import { deleteInventoryItem } from "@/app/actions/inventory";
-import { EditInventoryModal } from "./EditInventoryModal";
+import { MoreHorizontal, Edit2, Trash2, Loader2, AlertTriangle, Globe, EyeOff } from "lucide-react";
+import { deleteInventoryItem, updateItemStatus } from "@/app/actions/inventory";
+import { EditInventoryModal, type InventoryItemToEdit } from "./EditInventoryModal";
 import { useFocusTrap } from "@/lib/hooks/useFocusTrap";
-
-type InventoryItem = {
-  id: string;
-  game_id: string;
-  title_reference: string | null;
-  account_specs: string | null;
-  capital_price: number;
-  asking_price: number;
-  status: string | null;
-  games?: { name: string; slug?: string } | null;
-};
 
 type Game = { id: string; name: string; slug: string };
 
 interface InventoryRowActionsProps {
-  item: InventoryItem;
+  item: InventoryItemToEdit;
   games: Game[];
   onRefresh: () => void;
 }
@@ -30,6 +19,7 @@ export function InventoryRowActions({ item, games, onRefresh }: InventoryRowActi
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isTogglingStatus, setIsTogglingStatus] = useState(false);
   const [deleteError, setDeleteError] = useState("");
 
   const deleteDialogRef = useFocusTrap<HTMLDivElement>(
@@ -37,6 +27,24 @@ export function InventoryRowActions({ item, games, onRefresh }: InventoryRowActi
     null,
     () => !isDeleting && setIsDeleteOpen(false),
   );
+
+  const handleTogglePublish = async () => {
+    try {
+      setIsTogglingStatus(true);
+      const newStatus = item.status === "AVAILABLE" ? "UNPOSTED" : "AVAILABLE";
+      const res = await updateItemStatus(item.id, newStatus);
+      if (res.success) {
+        setIsOpenMenu(false);
+        onRefresh();
+      } else {
+        alert(res.error || "Gagal mengubah status publikasi.");
+      }
+    } catch {
+      alert("Terjadi kesalahan saat mengubah status.");
+    } finally {
+      setIsTogglingStatus(false);
+    }
+  };
 
   const handleDelete = async () => {
     try {
@@ -71,7 +79,27 @@ export function InventoryRowActions({ item, games, onRefresh }: InventoryRowActi
       {isOpenMenu && (
         <>
           <div className="fixed inset-0 z-20" onClick={() => setIsOpenMenu(false)} />
-          <div className="fs-drop-in border-border bg-card absolute right-0 z-30 mt-1 w-36 rounded-lg border py-1 shadow-lg">
+          <div className="fs-drop-in border-border bg-card absolute right-0 z-30 mt-1 w-44 rounded-lg border py-1 shadow-lg">
+            {item.status !== "SOLD" && (
+              <button
+                onClick={handleTogglePublish}
+                disabled={isTogglingStatus}
+                className="text-foreground hover:bg-muted flex w-full items-center gap-2 px-4 py-2 text-xs font-medium"
+              >
+                {item.status === "AVAILABLE" ? (
+                  <>
+                    <EyeOff className="h-3.5 w-3.5 text-amber-500" />
+                    <span>Tarik ke Draft</span>
+                  </>
+                ) : (
+                  <>
+                    <Globe className="h-3.5 w-3.5 text-emerald-500" />
+                    <span>Publikasikan</span>
+                  </>
+                )}
+              </button>
+            )}
+
             <button
               onClick={() => {
                 setIsOpenMenu(false);
@@ -80,7 +108,7 @@ export function InventoryRowActions({ item, games, onRefresh }: InventoryRowActi
               className="text-foreground hover:bg-muted flex w-full items-center gap-2 px-4 py-2 text-xs font-medium"
             >
               <Edit2 className="h-3.5 w-3.5 text-blue-600" />
-              Edit Data
+              Edit Data & Foto
             </button>
             <button
               onClick={() => {

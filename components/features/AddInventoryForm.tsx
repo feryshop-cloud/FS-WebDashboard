@@ -183,16 +183,23 @@ export function AddInventoryForm({ games }: { games: Game[] }) {
       </div>
 
       <div className="space-y-1">
-        <label className="text-foreground block text-sm font-medium" htmlFor="account_specs">
-          Spesifikasi Akun (Rank, Skin, Winrate...)
-        </label>
+        <div className="flex items-center justify-between">
+          <label className="text-foreground block text-sm font-medium" htmlFor="account_specs">
+            Spesifikasi Akun (Rank, Skin, Login, Bind...)
+          </label>
+          <span className="text-muted-foreground text-xs">
+            Tip: Gunakan format &quot;Rank: ...&quot; dan &quot;Login: ...&quot;
+          </span>
+        </div>
         <textarea
           id="account_specs"
           name="account_specs"
           required
           rows={4}
-          placeholder="Details like rank, skins, win rate..."
-          className="border-border bg-muted text-foreground w-full rounded-[10px] border px-3 py-2 transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+          placeholder={
+            "Rank: Mythic Glory 100*\nLogin: Moonton Sepaket Gmail\nSkin: 180 (Collector, Legend, Epic Limit)\nEmblem: Max All, Winrate 68%"
+          }
+          className="border-border bg-muted text-foreground w-full rounded-[10px] border px-3 py-2 font-mono text-xs transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
         />
       </div>
 
@@ -214,7 +221,7 @@ export function AddInventoryForm({ games }: { games: Game[] }) {
 
         <div className="space-y-1">
           <label className="text-foreground block text-sm font-medium" htmlFor="asking_price">
-            Target Jual
+            Target Jual (Rp)
           </label>
           <input
             id="asking_price"
@@ -226,6 +233,29 @@ export function AddInventoryForm({ games }: { games: Game[] }) {
             className="border-border bg-muted text-foreground w-full rounded-[10px] border px-3 py-2 transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
           />
         </div>
+      </div>
+
+      {/* Marketplace Publishing Option */}
+      <div className="border-border/70 bg-card rounded-[10px] border p-4 shadow-sm">
+        <label className="flex cursor-pointer items-start gap-3">
+          <input
+            type="checkbox"
+            name="status"
+            value="AVAILABLE"
+            defaultChecked
+            className="text-primary focus:ring-primary mt-1 h-4 w-4 rounded border-gray-300"
+          />
+          <div className="space-y-0.5">
+            <span className="text-foreground text-sm font-semibold">
+              Langsung Publikasikan ke Storefront Marketplace
+            </span>
+            <p className="text-muted-foreground text-xs">
+              Jika dicentang, status akun menjadi <strong>AVAILABLE</strong> dan langsung tayang di
+              katalog <code>/marketplace/*</code>. Jika tidak dicentang, status menjadi{" "}
+              <strong>UNPOSTED</strong> (draft internal).
+            </p>
+          </div>
+        </label>
       </div>
 
       <div className="flex justify-end pt-4">

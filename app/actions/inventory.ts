@@ -114,6 +114,7 @@ export async function addInventoryItem(formData: FormData) {
     }
 
     const screenshot_url = image_urls.length > 0 ? image_urls[0] : "";
+    const status = (formData.get("status") as "UNPOSTED" | "AVAILABLE" | "SOLD") || "AVAILABLE";
 
     const { error } = await supabase.from("inventory").insert({
       game_id: parsed.data.game_id,
@@ -123,7 +124,7 @@ export async function addInventoryItem(formData: FormData) {
       asking_price: parsed.data.asking_price,
       screenshot_url: screenshot_url,
       image_urls: image_urls,
-      status: "UNPOSTED",
+      status: status,
       added_by: user.id,
       public_id: null as any,
     });
@@ -201,22 +202,94 @@ export async function updateInventoryItem(id: string, formData: FormData) {
     const account_specs = formData.get("account_specs") as string;
     const capital_price = Number(formData.get("capital_price"));
     const asking_price = Number(formData.get("asking_price"));
+    const status = (formData.get("status") as "UNPOSTED" | "AVAILABLE" | "SOLD") || undefined;
 
     if (!game_id || !title_reference || isNaN(capital_price) || isNaN(asking_price)) {
       return { success: false, error: "Data form tidak lengkap atau tidak valid." };
     }
 
-    const { error } = await supabase
-      .from("inventory")
-      .update({
-        game_id,
-        title_reference,
-        account_specs,
-        capital_price,
-        asking_price,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", id);
+    // Handle existing images passed from the form
+    let retained_urls: string[] = [];
+    const existingImagesRaw = formData.getAll("existing_images");
+    if (existingImagesRaw.length > 0) {
+      retained_urls = existingImagesRaw.filter(
+        (u): u is string => typeof u === "string" && u.length > 0,
+      );
+    } else {
+      const singleExisting = formData.get("existing_images");
+      if (typeof singleExisting === "string" && singleExisting) {
+        try {
+          const parsed = JSON.parse(singleExisting);
+          if (Array.isArray(parsed)) {
+            retained_urls = parsed.filter(Boolean);
+          }
+        } catch {
+          retained_urls = [singleExisting];
+        }
+      }
+    }
+
+    // Handle new uploaded image files
+    let new_uploaded_urls: string[] = [];
+    const newImageFiles = (formData.getAll("images") as File[]).filter((f) => f && f.size > 0);
+
+    if (newImageFiles.length > 0) {
+      const uploadPromises = newImageFiles.map(async (file, index) => {
+        const fileExt = file.name.split(".").pop();
+        const fileName = `${Date.now()}-${index}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const fileBody = await file.arrayBuffer();
+
+        const { error: uploadError } = await supabase.storage
+          .from("screenshots")
+          .upload(fileName, fileBody, { contentType: file.type, upsert: true });
+
+        if (uploadError) {
+          logger.error("Supabase Storage Error during update", { error: uploadError });
+          throw new Error("Failed to upload new screenshot.");
+        }
+
+        const { data: publicUrlData } = supabase.storage.from("screenshots").getPublicUrl(fileName);
+
+        return publicUrlData.publicUrl;
+      });
+
+      try {
+        const urls = await Promise.all(uploadPromises);
+        new_uploaded_urls = urls.filter((url): url is string => url !== null);
+      } catch {
+        return {
+          success: false,
+          error: "Gagal meng-upload gambar baru. Silakan coba lagi.",
+        };
+      }
+    }
+
+    const final_image_urls = [...retained_urls, ...new_uploaded_urls];
+    const screenshot_url = final_image_urls.length > 0 ? final_image_urls[0] : "";
+
+    const updatePayload: {
+      game_id: string;
+      title_reference: string;
+      account_specs: string;
+      capital_price: number;
+      asking_price: number;
+      image_urls: string[];
+      screenshot_url: string;
+      updated_at: string;
+      status?: "UNPOSTED" | "AVAILABLE" | "SOLD";
+    } = {
+      game_id,
+      title_reference,
+      account_specs,
+      capital_price,
+      asking_price,
+      image_urls: final_image_urls,
+      screenshot_url,
+      updated_at: new Date().toISOString(),
+      ...(status ? { status } : {}),
+    };
+
+    const { error } = await supabase.from("inventory").update(updatePayload).eq("id", id);
 
     if (error) {
       logger.error("Database Error updating inventory", { error });
