@@ -3,8 +3,18 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { addGame, updateGame, toggleGameStatus } from "@/actions/settings";
+import { uploadImage } from "@/actions/upload";
 import type { Database } from "@/types/database.types";
-import { Loader2, Plus, Check, Gamepad2, X } from "lucide-react";
+import {
+  Loader2,
+  Plus,
+  Check,
+  Gamepad2,
+  X,
+  Image as ImageIcon,
+  Upload,
+  Trash2,
+} from "lucide-react";
 import { DynamicInputBuilder, DynamicField } from "@/components/features/DynamicInputBuilder";
 import { GameTable } from "./GameTable";
 
@@ -53,12 +63,20 @@ export function GameManager({
   // Form state
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
+  const [logo, setLogo] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [banner, setBanner] = useState("");
   const [isActive, setIsActive] = useState(true);
   const [isPopular, setIsPopular] = useState(false);
   const [fields, setFields] = useState<DynamicField[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  // Upload states
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isUploadingBanner, setIsUploadingBanner] = useState(false);
 
   // Sync when server props revalidate
   if (initialGames !== prevGames) {
@@ -85,6 +103,9 @@ export function GameManager({
   const resetFields = () => {
     setName("");
     setSlug("");
+    setLogo("");
+    setImageUrl("");
+    setBanner("");
     setIsActive(true);
     setIsPopular(false);
     setFields([]);
@@ -110,12 +131,41 @@ export function GameManager({
     setEditingId(game.id);
     setName(game.name);
     setSlug(game.slug);
+    setLogo(game.logo || "");
+    setImageUrl(game.image_url || "");
+    setBanner(game.banner || "");
     setIsActive(game.is_active ?? true);
     setIsPopular(game.is_popular ?? false);
     setFields(parseFields(game.instructions));
     setError(null);
     setSuccess(false);
     setIsDrawerOpen(true);
+  };
+
+  const handleFileUpload = async (file: File, type: "logo" | "image" | "banner") => {
+    if (type === "logo") setIsUploadingLogo(true);
+    if (type === "image") setIsUploadingImage(true);
+    if (type === "banner") setIsUploadingBanner(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await uploadImage(formData);
+
+      if (res.success && res.url) {
+        if (type === "logo") setLogo(res.url);
+        if (type === "image") setImageUrl(res.url);
+        if (type === "banner") setBanner(res.url);
+      } else {
+        setError(res.error || "Gagal mengunggah gambar.");
+      }
+    } catch (_err) {
+      setError("Terjadi kesalahan saat mengunggah gambar.");
+    } finally {
+      if (type === "logo") setIsUploadingLogo(false);
+      if (type === "image") setIsUploadingImage(false);
+      if (type === "banner") setIsUploadingBanner(false);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -138,9 +188,19 @@ export function GameManager({
     startTransition(async () => {
       let res;
       if (editingId) {
-        res = await updateGame(editingId, name, gameSlug, undefined, isActive, isPopular, fields);
+        res = await updateGame(
+          editingId,
+          name,
+          gameSlug,
+          logo,
+          imageUrl,
+          banner,
+          isActive,
+          isPopular,
+          fields,
+        );
       } else {
-        res = await addGame(name, gameSlug, undefined, fields);
+        res = await addGame(name, gameSlug, logo, imageUrl, banner, fields);
       }
 
       if (res.success) {
@@ -180,7 +240,7 @@ export function GameManager({
         <div>
           <h2 className="text-foreground font-sans text-base font-bold">Master Game</h2>
           <p className="text-muted-foreground text-xs">
-            Kelola game dan konfigurasi field input order pembeli.
+            Kelola game, gambar thumbnail/banner, dan konfigurasi field input order.
           </p>
         </div>
       </div>
@@ -206,8 +266,8 @@ export function GameManager({
                 </h3>
                 <p className="text-muted-foreground mt-0.5 text-xs">
                   {editingId
-                    ? "Perbarui detail game dan field input order."
-                    : "Tambahkan game baru beserta field input order."}
+                    ? "Perbarui detail game, gambar, dan field input order."
+                    : "Tambahkan game baru beserta gambar dan field input order."}
                 </p>
               </div>
               <button
@@ -223,7 +283,7 @@ export function GameManager({
               onSubmit={handleSubmit}
               className="fs-rise-in flex flex-1 flex-col overflow-hidden"
             >
-              <div className="flex-1 space-y-4 overflow-y-auto p-6">
+              <div className="flex-1 space-y-5 overflow-y-auto p-6">
                 {error && (
                   <div className="fs-drop-in rounded-[10px] bg-rose-50 p-3 text-sm text-rose-600 ring-1 ring-rose-200">
                     {error}
@@ -270,6 +330,184 @@ export function GameManager({
                   />
                 </div>
 
+                {/* Bagian Pengaturan Gambar Game */}
+                <div className="border-border bg-muted/20 space-y-4 rounded-xl border p-4">
+                  <div className="flex items-center gap-2">
+                    <ImageIcon className="h-4 w-4 text-violet-600" />
+                    <h4 className="text-foreground text-xs font-bold tracking-wider uppercase">
+                      Media & Gambar Game
+                    </h4>
+                  </div>
+
+                  {/* 1. Thumbnail Kartu Game */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <label className="text-muted-foreground block text-xs font-medium">
+                        Thumbnail Kartu (image_url)
+                      </label>
+                      {imageUrl && (
+                        <button
+                          type="button"
+                          onClick={() => setImageUrl("")}
+                          className="text-muted-foreground flex items-center gap-1 text-[10px] hover:text-rose-600"
+                        >
+                          <Trash2 className="h-3 w-3" /> Hapus
+                        </button>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={imageUrl}
+                        onChange={(e) => setImageUrl(e.target.value)}
+                        placeholder="URL / Path gambar (e.g. /mlbb-icon.webp)"
+                        className="border-border bg-card text-foreground placeholder:text-faint-foreground flex-1 rounded-[8px] border px-3 py-2 text-xs focus:border-violet-500 focus:outline-none"
+                      />
+                      <label className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground inline-flex cursor-pointer items-center gap-1.5 rounded-[8px] border px-3 py-2 text-xs font-medium shadow-sm transition-colors">
+                        {isUploadingImage ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <Upload className="h-3.5 w-3.5" />
+                        )}
+                        <span>Upload</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="sr-only"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            if (f) handleFileUpload(f, "image");
+                          }}
+                        />
+                      </label>
+                    </div>
+                    {imageUrl && (
+                      <div className="mt-1 flex items-center gap-2">
+                        <img
+                          src={imageUrl}
+                          alt="Thumbnail Preview"
+                          className="border-border h-12 w-12 rounded-lg border object-cover shadow-xs"
+                          onError={(e) => (e.currentTarget.style.display = "none")}
+                        />
+                        <span className="text-muted-foreground max-w-[200px] truncate text-[10px]">
+                          Preview Thumbnail
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 2. Logo Ikon Game */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <label className="text-muted-foreground block text-xs font-medium">
+                        Logo Ikon (logo)
+                      </label>
+                      {logo && (
+                        <button
+                          type="button"
+                          onClick={() => setLogo("")}
+                          className="text-muted-foreground flex items-center gap-1 text-[10px] hover:text-rose-600"
+                        >
+                          <Trash2 className="h-3 w-3" /> Hapus
+                        </button>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={logo}
+                        onChange={(e) => setLogo(e.target.value)}
+                        placeholder="URL / Path logo (e.g. /mlbb-icon.webp)"
+                        className="border-border bg-card text-foreground placeholder:text-faint-foreground flex-1 rounded-[8px] border px-3 py-2 text-xs focus:border-violet-500 focus:outline-none"
+                      />
+                      <label className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground inline-flex cursor-pointer items-center gap-1.5 rounded-[8px] border px-3 py-2 text-xs font-medium shadow-sm transition-colors">
+                        {isUploadingLogo ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <Upload className="h-3.5 w-3.5" />
+                        )}
+                        <span>Upload</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="sr-only"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            if (f) handleFileUpload(f, "logo");
+                          }}
+                        />
+                      </label>
+                    </div>
+                    {logo && (
+                      <div className="mt-1 flex items-center gap-2">
+                        <img
+                          src={logo}
+                          alt="Logo Preview"
+                          className="border-border h-10 w-10 rounded-lg border object-cover shadow-xs"
+                          onError={(e) => (e.currentTarget.style.display = "none")}
+                        />
+                        <span className="text-muted-foreground max-w-[200px] truncate text-[10px]">
+                          Preview Logo
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 3. Banner Hero Halaman Order */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <label className="text-muted-foreground block text-xs font-medium">
+                        Banner Hero Halaman Order (banner)
+                      </label>
+                      {banner && (
+                        <button
+                          type="button"
+                          onClick={() => setBanner("")}
+                          className="text-muted-foreground flex items-center gap-1 text-[10px] hover:text-rose-600"
+                        >
+                          <Trash2 className="h-3 w-3" /> Hapus
+                        </button>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={banner}
+                        onChange={(e) => setBanner(e.target.value)}
+                        placeholder="URL / Path banner (e.g. /images/mlbb-banner.webp)"
+                        className="border-border bg-card text-foreground placeholder:text-faint-foreground flex-1 rounded-[8px] border px-3 py-2 text-xs focus:border-violet-500 focus:outline-none"
+                      />
+                      <label className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground inline-flex cursor-pointer items-center gap-1.5 rounded-[8px] border px-3 py-2 text-xs font-medium shadow-sm transition-colors">
+                        {isUploadingBanner ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <Upload className="h-3.5 w-3.5" />
+                        )}
+                        <span>Upload</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="sr-only"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            if (f) handleFileUpload(f, "banner");
+                          }}
+                        />
+                      </label>
+                    </div>
+                    {banner && (
+                      <div className="mt-1">
+                        <img
+                          src={banner}
+                          alt="Banner Preview"
+                          className="border-border h-16 w-full rounded-lg border object-cover shadow-xs"
+                          onError={(e) => (e.currentTarget.style.display = "none")}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
                 {editingId && (
                   <div className="flex items-center gap-6">
                     <label className="flex cursor-pointer items-center gap-2.5">
@@ -310,7 +548,9 @@ export function GameManager({
                 <div className="flex w-full flex-col gap-2">
                   <button
                     type="submit"
-                    disabled={isPending || !name}
+                    disabled={
+                      isPending || !name || isUploadingLogo || isUploadingImage || isUploadingBanner
+                    }
                     className="inline-flex w-full items-center justify-center gap-2 rounded-[10px] bg-violet-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-70"
                   >
                     {isPending ? (

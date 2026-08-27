@@ -246,7 +246,14 @@ export async function getGamesList() {
   return { data, error: null };
 }
 
-export async function addGame(name: string, slug: string, logo?: string, instructions?: unknown[]) {
+export async function addGame(
+  name: string,
+  slug: string,
+  logo?: string,
+  image_url?: string,
+  banner?: string,
+  instructions?: unknown[],
+) {
   const supabase = await createClient();
 
   const {
@@ -280,6 +287,8 @@ export async function addGame(name: string, slug: string, logo?: string, instruc
       name,
       slug: finalSlug,
       logo: logo || null,
+      image_url: image_url || logo || null,
+      banner: banner || null,
       instructions: finalInstructions as Json,
       is_active: true,
       code: null as any,
@@ -303,6 +312,8 @@ export async function updateGame(
   name: string,
   slug: string,
   logo?: string,
+  image_url?: string,
+  banner?: string,
   is_active?: boolean,
   is_popular?: boolean,
   instructions?: unknown[],
@@ -321,7 +332,9 @@ export async function updateGame(
   const updatePayload: Database["public"]["Tables"]["games"]["Update"] = {
     name,
     slug: finalSlug,
-    logo: logo || null,
+    logo: logo !== undefined ? logo || null : undefined,
+    image_url: image_url !== undefined ? image_url || null : undefined,
+    banner: banner !== undefined ? banner || null : undefined,
     is_active: is_active ?? true,
     is_popular: is_popular ?? false,
     updated_at: new Date().toISOString(),

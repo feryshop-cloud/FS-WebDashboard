@@ -99,14 +99,37 @@ export function GameTable({
                     className={`hover:bg-muted/50 transition-colors ${!game.is_active ? "opacity-60" : ""}`}
                   >
                     <td className="px-5 py-3.5">
-                      <div className="flex items-center gap-2">
-                        <span className="text-foreground font-medium">{game.name}</span>
-                        {game.is_popular && (
-                          <Star
-                            className="h-3.5 w-3.5 fill-amber-400 text-amber-400"
-                            strokeWidth={1}
+                      <div className="flex items-center gap-3">
+                        {game.logo || game.image_url ? (
+                          <img
+                            src={game.logo || game.image_url || ""}
+                            alt={game.name}
+                            className="border-border h-8 w-8 shrink-0 rounded-lg border object-cover shadow-xs"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLElement).style.display = "none";
+                            }}
                           />
+                        ) : (
+                          <div className="border-border bg-muted/60 text-muted-foreground flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border">
+                            <Gamepad2 className="h-4 w-4" strokeWidth={1.5} />
+                          </div>
                         )}
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-foreground font-medium">{game.name}</span>
+                            {game.is_popular && (
+                              <Star
+                                className="h-3.5 w-3.5 fill-amber-400 text-amber-400"
+                                strokeWidth={1}
+                              />
+                            )}
+                          </div>
+                          {game.developers && (
+                            <span className="text-muted-foreground block text-[11px]">
+                              {game.developers}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </td>
                     <td className="px-5 py-3.5">
