@@ -1,7 +1,18 @@
 "use client";
 
 import React from "react";
-import { Search, Filter, Plus, ChevronDown, X, Loader2, Download, Trash2 } from "lucide-react";
+import {
+  Search,
+  Filter,
+  Plus,
+  ChevronDown,
+  X,
+  Loader2,
+  Download,
+  Trash2,
+  CreditCard,
+  CheckCircle2,
+} from "lucide-react";
 import { formatRupiah, formatDate } from "@/lib/utils";
 import { usePurchases } from "@/lib/hooks/features/usePurchases";
 import { Pagination } from "@/components/ui/Pagination";
@@ -11,19 +22,29 @@ export default function PurchasesPage() {
     data: { purchases, games, accounts, filteredPurchases, pageItems, safePage, itemsPerPage },
     isLoading,
     isSubmitting,
+    isSettling,
     error,
+    settleError,
     uiState: {
       isAddOpen,
       isAddClosing,
+      isSettleOpen,
+      isSettleClosing,
+      selectedPurchaseToSettle,
+      settleAccountId,
       searchQuery,
       statusFilter,
       isFilterDropdownOpen,
       selectedStatus,
     },
-    refs: { filterButtonRef, filterMenuRef, addDrawerRef },
+    refs: { filterButtonRef, filterMenuRef, addDrawerRef, settleModalRef },
     actions: {
       openAdd,
       closeAdd,
+      openSettle,
+      closeSettle,
+      setSettleAccountId,
+      handleSettlePurchase,
       handleAddPurchase,
       handleExportData,
       handleDeletePurchase,
@@ -241,11 +262,11 @@ export default function PurchasesPage() {
                     <tr key={purchase.id} className="group hover:bg-muted/50 transition-colors">
                       <td className="text-muted-foreground px-6 py-4 text-sm whitespace-nowrap">
                         <div className="flex flex-col">
-                          <span className="text-foreground font-semibold">
-                            {purchase.sku || "N/A"}
+                          <span className="text-foreground font-mono text-xs font-semibold">
+                            {purchase.sku || `STK-${purchase.id.slice(0, 6).toUpperCase()}`}
                           </span>
-                          <span className="mt-0.5 text-[10px]">
-                            {formatDate(purchase.purchase_date ?? purchase.created_at ?? "")}
+                          <span className="text-muted-foreground mt-0.5 text-[10px]">
+                            {formatDate(purchase.purchase_date || purchase.created_at || "")}
                           </span>
                         </div>
                       </td>
@@ -279,14 +300,27 @@ export default function PurchasesPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-center text-sm font-medium whitespace-nowrap">
-                        <button
-                          onClick={() => handleDeletePurchase(purchase.id, purchase.name)}
-                          aria-label={`Hapus pembelian ${purchase.name || purchase.sku || ""}`}
-                          title="Hapus Pembelian"
-                          className="tap-large rounded-md text-rose-600 transition-colors hover:bg-rose-50 hover:text-rose-700"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
+                        <div className="flex items-center justify-center gap-2">
+                          {!isLunas && (
+                            <button
+                              onClick={() => openSettle(purchase)}
+                              aria-label={`Lunasi pembelian ${purchase.name || purchase.sku || ""}`}
+                              title="Lunasi Pembayaran"
+                              className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 shadow-xs transition-colors hover:border-emerald-300 hover:bg-emerald-100"
+                            >
+                              <CreditCard className="h-3.5 w-3.5 text-emerald-600" />
+                              <span>Bayar</span>
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleDeletePurchase(purchase.id, purchase.name)}
+                            aria-label={`Hapus pembelian ${purchase.name || purchase.sku || ""}`}
+                            title="Hapus Pembelian"
+                            className="tap-large rounded-md p-1.5 text-rose-600 transition-colors hover:bg-rose-50 hover:text-rose-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -531,6 +565,138 @@ export default function PurchasesPage() {
                     </>
                   ) : (
                     <span>Catat Pembelian</span>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Pelunasan Pembelian Stok */}
+      {(isSettleOpen || isSettleClosing) && selectedPurchaseToSettle && (
+        <div
+          ref={settleModalRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="settle-purchase-title"
+          tabIndex={-1}
+          onClick={closeSettle}
+          className={`fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs transition-opacity duration-200 ${
+            isSettleClosing ? "opacity-0" : "opacity-100"
+          }`}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={`border-border bg-card w-full max-w-md rounded-2xl border shadow-xl transition-all duration-200 ${
+              isSettleClosing ? "scale-95 opacity-0" : "scale-100 opacity-100"
+            }`}
+          >
+            <div className="border-border flex items-center justify-between border-b p-5">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40">
+                  <CreditCard className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 id="settle-purchase-title" className="text-foreground text-base font-bold">
+                    Pelunasan Pembelian Stok
+                  </h3>
+                  <p className="text-muted-foreground text-xs">
+                    Bayar hutang kulakan akun ke supplier
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={closeSettle}
+                aria-label="Tutup modal"
+                className="text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg p-1.5 transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSettlePurchase} className="space-y-4 p-5">
+              {settleError && (
+                <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-700 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-300">
+                  {settleError}
+                </div>
+              )}
+
+              <div className="bg-muted/60 space-y-2 rounded-xl p-3.5 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Item / Akun:</span>
+                  <span className="text-foreground max-w-[200px] truncate text-right font-semibold">
+                    {selectedPurchaseToSettle.name}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">SKU / ID:</span>
+                  <span className="text-foreground font-mono">
+                    {selectedPurchaseToSettle.sku || "-"}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Supplier:</span>
+                  <span className="text-foreground">
+                    {selectedPurchaseToSettle.seller_info || "-"}
+                  </span>
+                </div>
+                <div className="border-border/60 flex items-center justify-between border-t pt-2">
+                  <span className="text-muted-foreground font-medium">Nominal Pelunasan:</span>
+                  <span className="text-sm font-bold text-emerald-600">
+                    {formatRupiah(selectedPurchaseToSettle.capital_price ?? 0)}
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-foreground mb-1.5 block text-xs font-semibold">
+                  Sumber Dana / Rekening Pembayaran <span className="text-red-500">*</span>
+                </label>
+                <select
+                  required
+                  value={settleAccountId}
+                  onChange={(e) => setSettleAccountId(e.target.value)}
+                  className="border-border bg-card text-foreground w-full rounded-lg border px-3 py-2 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none"
+                >
+                  <option value="">-- Pilih Rekening Kas / Bank --</option>
+                  {accounts
+                    .filter((acc) => acc.is_active)
+                    .map((acc) => (
+                      <option key={acc.id} value={acc.id}>
+                        {acc.name} (Saldo: {formatRupiah(acc.balance)})
+                      </option>
+                    ))}
+                </select>
+                <p className="text-muted-foreground mt-1 text-[11px]">
+                  Saldo rekening yang dipilih akan otomatis terpotong dan tercatat di Buku Kas.
+                </p>
+              </div>
+
+              <div className="border-border flex items-center justify-end gap-2.5 border-t pt-4">
+                <button
+                  type="button"
+                  onClick={closeSettle}
+                  disabled={isSettling}
+                  className="border-border bg-card text-foreground hover:bg-muted rounded-lg border px-4 py-2 text-sm font-medium transition-colors"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSettling || !settleAccountId}
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700 disabled:opacity-50"
+                >
+                  {isSettling ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>Memproses...</span>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="h-4 w-4" />
+                      <span>Konfirmasi Pelunasan</span>
+                    </>
                   )}
                 </button>
               </div>

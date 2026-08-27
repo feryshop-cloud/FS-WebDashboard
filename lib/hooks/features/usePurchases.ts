@@ -4,7 +4,13 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import useSWR from "swr";
 import { formatRupiah } from "@/lib/utils";
 import { getErrorMessage } from "@/lib/error";
-import { getPurchases, purchaseStock, getGames, deletePurchase } from "@/actions/purchases";
+import {
+  getPurchases,
+  purchaseStock,
+  getGames,
+  deletePurchase,
+  settlePurchasePayment,
+} from "@/actions/purchases";
 import { getAccounts } from "@/app/actions/accounts";
 import { useFocusTrap } from "@/lib/hooks/useFocusTrap";
 import { useDebouncedValue } from "@/lib/hooks/useDebouncedValue";
@@ -27,6 +33,14 @@ export function usePurchases() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [selectedStatus, setSelectedStatus] = useState<"LUNAS" | "PENDING">("LUNAS");
 
+  // State untuk Pelunasan Pembelian
+  const [isSettleOpen, setIsSettleOpen] = useState(false);
+  const [isSettleClosing, setIsSettleClosing] = useState(false);
+  const [isSettling, setIsSettling] = useState(false);
+  const [settleError, setSettleError] = useState("");
+  const [selectedPurchaseToSettle, setSelectedPurchaseToSettle] = useState<Purchase | null>(null);
+  const [settleAccountId, setSettleAccountId] = useState("");
+
   const filterButtonRef = useRef<HTMLButtonElement>(null);
   const filterMenuRef = useRef<HTMLDivElement>(null);
 
@@ -44,6 +58,31 @@ export function usePurchases() {
   const openAdd = () => {
     setError("");
     setIsAddOpen(true);
+  };
+
+  const closeSettle = () => {
+    if (isSettleClosing) return;
+    setIsSettleClosing(true);
+    setTimeout(() => {
+      setIsSettleClosing(false);
+      setIsSettleOpen(false);
+      setSelectedPurchaseToSettle(null);
+      setSettleAccountId("");
+      setSettleError("");
+    }, 200);
+  };
+
+  const settleModalRef = useFocusTrap<HTMLDivElement>(
+    isSettleOpen || isSettleClosing,
+    null,
+    closeSettle,
+  );
+
+  const openSettle = (purchase: Purchase) => {
+    setSelectedPurchaseToSettle(purchase);
+    setSettleAccountId("");
+    setSettleError("");
+    setIsSettleOpen(true);
   };
 
   const purchasesKey = "purchases";
@@ -255,6 +294,32 @@ export function usePurchases() {
     }
   };
 
+  const handleSettlePurchase = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!selectedPurchaseToSettle) return;
+    if (!settleAccountId) {
+      setSettleError("Pilih rekening pembayaran untuk pelunasan.");
+      return;
+    }
+
+    setIsSettling(true);
+    setSettleError("");
+
+    try {
+      const res = await settlePurchasePayment(selectedPurchaseToSettle.id, settleAccountId);
+      if (res.error) {
+        setSettleError(res.error);
+      } else {
+        closeSettle();
+        loadData();
+      }
+    } catch (err: unknown) {
+      setSettleError(getErrorMessage(err, "Gagal memproses pelunasan pembelian."));
+    } finally {
+      setIsSettling(false);
+    }
+  };
+
   return {
     data: {
       purchases,
@@ -269,10 +334,16 @@ export function usePurchases() {
     },
     isLoading,
     isSubmitting,
+    isSettling,
     error,
+    settleError,
     uiState: {
       isAddOpen,
       isAddClosing,
+      isSettleOpen,
+      isSettleClosing,
+      selectedPurchaseToSettle,
+      settleAccountId,
       searchQuery,
       statusFilter,
       isFilterDropdownOpen,
@@ -284,10 +355,15 @@ export function usePurchases() {
       filterButtonRef,
       filterMenuRef,
       addDrawerRef,
+      settleModalRef,
     },
     actions: {
       openAdd,
       closeAdd,
+      openSettle,
+      closeSettle,
+      setSettleAccountId,
+      handleSettlePurchase,
       handleAddPurchase,
       handleExportData,
       handleDeletePurchase,

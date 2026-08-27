@@ -1688,6 +1688,14 @@ export type Database = {
         };
         Returns: string;
       };
+      settle_stock_purchase: {
+        Args: {
+          p_account_id: string;
+          p_admin_id: string;
+          p_stock_id: string;
+        };
+        Returns: boolean;
+      };
       search_inventory: {
         Args: {
           game_slug_filter?: string;

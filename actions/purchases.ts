@@ -132,6 +132,9 @@ export async function deletePurchase(
 
     if (error) throw error;
 
+    // Synchronize removal in inventory table
+    await supabase.from("inventory").delete().eq("id", id);
+
     revalidatePath("/dashboard/purchases");
     revalidatePath("/dashboard/inventory");
     purgeStorefront(STOREFRONT_TAGS.marketplace);
@@ -167,6 +170,20 @@ export async function updatePurchase(
 
     if (error) throw error;
 
+    // Synchronize update in inventory table
+    const inventoryUpdates: {
+      title_reference?: string;
+      capital_price?: number;
+      asking_price?: number;
+    } = {};
+    if (data.name) inventoryUpdates.title_reference = data.name;
+    if (data.capital_price !== undefined) inventoryUpdates.capital_price = data.capital_price;
+    if (data.post_price !== undefined) inventoryUpdates.asking_price = data.post_price;
+
+    if (Object.keys(inventoryUpdates).length > 0) {
+      await supabase.from("inventory").update(inventoryUpdates).eq("id", id);
+    }
+
     revalidatePath("/dashboard/purchases");
     revalidatePath("/dashboard/inventory");
     purgeStorefront(STOREFRONT_TAGS.marketplace);
@@ -174,6 +191,46 @@ export async function updatePurchase(
     return { success: true, error: null };
   } catch (error: unknown) {
     logger.error("Error updating purchase stock", { error });
+    return { success: false, error: getErrorMessage(error) };
+  }
+}
+
+export async function settlePurchasePayment(
+  stockId: string,
+  paymentAccountId: string,
+): Promise<{ success: boolean; error: string | null }> {
+  try {
+    const supabase = await createClient();
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    const adminId = session?.user?.id;
+
+    if (!adminId) {
+      return { success: false, error: "Sesi admin tidak ditemukan. Silakan login kembali." };
+    }
+
+    if (!paymentAccountId) {
+      return { success: false, error: "Pilih rekening pembayaran untuk pelunasan." };
+    }
+
+    const { error } = await supabase.rpc("settle_stock_purchase", {
+      p_stock_id: stockId,
+      p_account_id: paymentAccountId,
+      p_admin_id: adminId,
+    });
+
+    if (error) throw error;
+
+    revalidatePath("/dashboard/purchases");
+    revalidatePath("/dashboard/ledger");
+    revalidatePath("/dashboard/accounts");
+    purgeStorefront(STOREFRONT_TAGS.marketplace);
+
+    return { success: true, error: null };
+  } catch (error: unknown) {
+    logger.error("Error settling purchase payment", { error });
     return { success: false, error: getErrorMessage(error) };
   }
 }
