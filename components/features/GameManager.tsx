@@ -389,7 +389,7 @@ export function GameManager({
                           className="border-border h-12 w-12 rounded-lg border object-cover shadow-xs"
                           onError={(e) => (e.currentTarget.style.display = "none")}
                         />
-                        <span className="text-muted-foreground max-w-[200px] truncate text-[10px]">
+                        <span className="text-muted-foreground max-w-50 truncate text-[10px]">
                           Preview Thumbnail
                         </span>
                       </div>
@@ -446,7 +446,7 @@ export function GameManager({
                           className="border-border h-10 w-10 rounded-lg border object-cover shadow-xs"
                           onError={(e) => (e.currentTarget.style.display = "none")}
                         />
-                        <span className="text-muted-foreground max-w-[200px] truncate text-[10px]">
+                        <span className="text-muted-foreground max-w-50 truncate text-[10px]">
                           Preview Logo
                         </span>
                       </div>
