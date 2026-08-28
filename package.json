@@ -2,15 +2,18 @@
   "name": "game",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "bun": ">=1.4.0"
+  },
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "postbuild": "node scripts/prepare-standalone.mjs",
+    "dev": "bun --bun next dev",
+    "build": "bun --bun next build",
+    "postbuild": "bun scripts/prepare-standalone.mjs",
     "start": "node server.mjs",
     "start:railway": "node server.mjs",
     "start:pino": "node server.mjs",
-    "create-admin": "node --env-file=.env.local scripts/create-admin-user.ts",
-    "seed:inbox": "node --env-file=.env.local scripts/seed-master-inbox.js",
+    "create-admin": "bun --env-file=.env.local scripts/create-admin-user.ts",
+    "seed:inbox": "bun --env-file=.env.local scripts/seed-master-inbox.js",
     "lint": "eslint",
     "test": "vitest run",
     "format": "prettier --write .",

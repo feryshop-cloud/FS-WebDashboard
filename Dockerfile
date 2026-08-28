@@ -1,12 +1,11 @@
 # 1. Base stage
-FROM node:20-alpine AS base
+FROM oven/bun:1.4-alpine AS base
 WORKDIR /app
-RUN apk add --no-cache libc6-compat
 
 # 2. Dependencies stage
 FROM base AS deps
-COPY package.json package-lock.json ./
-RUN npm ci
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
 
 # 3. Builder stage
 FROM base AS builder
@@ -19,7 +18,7 @@ ENV NEXT_PUBLIC_BASE_PATH=$NEXT_PUBLIC_BASE_PATH
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
-RUN npm run build
+RUN bun run build
 
 # 4. Production Runner stage
 FROM base AS runner
