@@ -319,6 +319,9 @@ export interface PurchaseWithRelations {
   capital_price?: number;
   purchase_payment_status?: PurchasePaymentStatus | null;
   created_at?: string;
+  images?: string[] | null;
+  image_urls?: string[] | null;
+  screenshot_url?: string | null;
   games?: Game | null;
   accounts?: Account | null;
   [key: string]: unknown;

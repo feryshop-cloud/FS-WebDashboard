@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import {
   Package,
   Plus,
@@ -18,6 +19,10 @@ import {
   X,
   Edit2,
   ShieldCheck,
+  UploadCloud,
+  ImageIcon,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { formatRupiah, formatDate } from "@/lib/utils";
 import { useUnifiedStock, UnifiedStockItem } from "@/lib/hooks/features/useUnifiedStock";
@@ -47,6 +52,9 @@ export default function UnifiedStockPage() {
       selectedStockCredentials,
       isEditOpen,
       selectedStockToEdit,
+      isGalleryOpen,
+      galleryImages,
+      galleryTitle,
     },
     refs: { addDrawerRef, settleModalRef },
     actions: {
@@ -58,6 +66,8 @@ export default function UnifiedStockPage() {
       closeCredentials,
       openEdit,
       closeEdit,
+      openGallery,
+      closeGallery,
       setSettleAccountId,
       handleAddStockPurchase,
       handleSettlePayment,
@@ -84,6 +94,7 @@ export default function UnifiedStockPage() {
   const [formInternalNotes, setFormInternalNotes] = useState("");
   const [formPaymentStatus, setFormPaymentStatus] = useState<PurchasePaymentStatus>("LUNAS");
   const [formPaymentAccountId, setFormPaymentAccountId] = useState("");
+  const [formImages, setFormImages] = useState<File[]>([]);
 
   // Edit State
   const [editName, setEditName] = useState("");
@@ -91,7 +102,12 @@ export default function UnifiedStockPage() {
   const [editPostPrice, setEditPostPrice] = useState<number | "">("");
   const [editSellerInfo, setEditSellerInfo] = useState("");
   const [editInternalNotes, setEditInternalNotes] = useState("");
+  const [editExistingImages, setEditExistingImages] = useState<string[]>([]);
+  const [editNewImages, setEditNewImages] = useState<File[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
+
+  // Gallery Active Index
+  const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
 
   // Copy Feedback State
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
@@ -100,6 +116,11 @@ export default function UnifiedStockPage() {
     navigator.clipboard.writeText(text);
     setCopiedKey(key);
     setTimeout(() => setCopiedKey(null), 2000);
+  };
+
+  const handleOpenGalleryModal = (images: string[], title: string, startIndex = 0) => {
+    setActiveGalleryIndex(startIndex);
+    openGallery(images, title);
   };
 
   const handleAddSubmit = async (e: React.FormEvent) => {
@@ -117,22 +138,27 @@ export default function UnifiedStockPage() {
       return;
     }
 
-    const payload = {
-      category: formCategory,
-      name: formName.trim(),
-      account_details: formSpecs.trim(),
-      username: formUsername.trim(),
-      password: formPassword.trim(),
-      capital_price: Number(formCapitalPrice) || 0,
-      post_price: Number(formAskingPrice) || 0,
-      current_price: Number(formAskingPrice) || 0,
-      seller_info: formSellerInfo.trim(),
-      internal_notes: formInternalNotes.trim(),
-      purchase_payment_status: formPaymentStatus,
-      payment_account_id: formPaymentStatus === "LUNAS" ? formPaymentAccountId : null,
-    };
+    const formData = new FormData();
+    formData.append("category", formCategory);
+    formData.append("name", formName.trim());
+    formData.append("account_details", formSpecs.trim());
+    formData.append("username", formUsername.trim());
+    formData.append("password", formPassword.trim());
+    formData.append("capital_price", String(Number(formCapitalPrice) || 0));
+    formData.append("post_price", String(Number(formAskingPrice) || 0));
+    formData.append("current_price", String(Number(formAskingPrice) || 0));
+    formData.append("seller_info", formSellerInfo.trim());
+    formData.append("internal_notes", formInternalNotes.trim());
+    formData.append("purchase_payment_status", formPaymentStatus);
+    if (formPaymentStatus === "LUNAS" && formPaymentAccountId) {
+      formData.append("payment_account_id", formPaymentAccountId);
+    }
 
-    const res = await handleAddStockPurchase(payload);
+    formImages.forEach((img) => {
+      formData.append("images", img);
+    });
+
+    const res = await handleAddStockPurchase(formData);
     if (res?.success) {
       setFormCategory("");
       setFormName("");
@@ -145,6 +171,7 @@ export default function UnifiedStockPage() {
       setFormInternalNotes("");
       setFormPaymentStatus("LUNAS");
       setFormPaymentAccountId("");
+      setFormImages([]);
     }
   };
 
@@ -160,6 +187,16 @@ export default function UnifiedStockPage() {
     );
     setEditSellerInfo(stock.seller_info || "");
     setEditInternalNotes(stock.internal_notes || "");
+
+    const imgs = Array.isArray(stock.images)
+      ? (stock.images as string[]).filter(Boolean)
+      : Array.isArray(stock.image_urls)
+        ? (stock.image_urls as string[]).filter(Boolean)
+        : stock.screenshot_url
+          ? [stock.screenshot_url]
+          : [];
+    setEditExistingImages(imgs);
+    setEditNewImages([]);
     openEdit(stock);
   };
 
@@ -168,13 +205,18 @@ export default function UnifiedStockPage() {
     if (!selectedStockToEdit) return;
 
     setIsUpdating(true);
-    await handleUpdateStock(selectedStockToEdit.id, {
-      name: editName.trim(),
-      capital_price: Number(editCapitalPrice) || 0,
-      post_price: Number(editPostPrice) || 0,
-      seller_info: editSellerInfo.trim(),
-      internal_notes: editInternalNotes.trim(),
-    });
+    await handleUpdateStock(
+      selectedStockToEdit.id,
+      {
+        name: editName.trim(),
+        capital_price: Number(editCapitalPrice) || 0,
+        post_price: Number(editPostPrice) || 0,
+        seller_info: editSellerInfo.trim(),
+        internal_notes: editInternalNotes.trim(),
+        images: editExistingImages,
+      },
+      editNewImages,
+    );
     setIsUpdating(false);
   };
 
@@ -324,7 +366,7 @@ export default function UnifiedStockPage() {
             <thead className="bg-muted/60 text-muted-foreground text-[11px] font-bold tracking-wider uppercase">
               <tr>
                 <th className="px-5 py-3.5">SKU & Tanggal</th>
-                <th className="px-5 py-3.5">Game & Nama Akun</th>
+                <th className="px-5 py-3.5">Foto & Akun Game</th>
                 <th className="px-5 py-3.5">Kredensial</th>
                 <th className="px-5 py-3.5">Harga Modal & Seller</th>
                 <th className="px-5 py-3.5">Harga Jual</th>
@@ -356,6 +398,16 @@ export default function UnifiedStockPage() {
                   const capitalPrice = Number(item.capital_price) || 0;
                   const estimatedMargin = sellingPrice - capitalPrice;
 
+                  const allItemImages =
+                    Array.isArray(item.images) && item.images.length > 0
+                      ? (item.images as string[]).filter(Boolean)
+                      : Array.isArray(item.image_urls) && item.image_urls.length > 0
+                        ? (item.image_urls as string[]).filter(Boolean)
+                        : item.screenshot_url
+                          ? [item.screenshot_url]
+                          : [];
+                  const primaryThumbnail = allItemImages.length > 0 ? allItemImages[0] : null;
+
                   return (
                     <tr key={item.id} className="hover:bg-muted/30 transition-colors">
                       {/* SKU & Date */}
@@ -368,20 +420,57 @@ export default function UnifiedStockPage() {
                         </p>
                       </td>
 
-                      {/* Game & Name */}
+                      {/* Photo & Game & Name */}
                       <td className="px-5 py-4">
-                        <div className="max-w-xs">
-                          <span className="inline-block rounded-md bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-700">
-                            {item.category || "Game"}
-                          </span>
-                          <p className="text-foreground mt-1 truncate font-semibold">
-                            {item.name || "-"}
-                          </p>
-                          {item.account_details && (
-                            <p className="text-muted-foreground mt-0.5 truncate text-xs">
-                              {item.account_details}
+                        <div className="flex items-center gap-3">
+                          {/* Account Thumbnail / Image Preview */}
+                          <div
+                            onClick={() => {
+                              if (allItemImages.length > 0) {
+                                handleOpenGalleryModal(allItemImages, item.name || "Akun Game");
+                              }
+                            }}
+                            className={`group relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-100 ${
+                              allItemImages.length > 0
+                                ? "cursor-pointer hover:ring-2 hover:ring-blue-500/50"
+                                : ""
+                            }`}
+                          >
+                            {primaryThumbnail ? (
+                              <>
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={primaryThumbnail}
+                                  alt={item.name || "Thumbnail"}
+                                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                />
+                                {allItemImages.length > 1 && (
+                                  <span className="absolute right-0 bottom-0 rounded-tl-md bg-black/70 px-1 text-[9px] font-bold text-white">
+                                    +{allItemImages.length - 1}
+                                  </span>
+                                )}
+                              </>
+                            ) : (
+                              <div className="flex h-full w-full items-center justify-center text-slate-400">
+                                <ImageIcon className="h-5 w-5" />
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Info Text */}
+                          <div className="max-w-xs">
+                            <span className="inline-block rounded-md bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-700">
+                              {item.category || "Game"}
+                            </span>
+                            <p className="text-foreground mt-0.5 truncate font-semibold">
+                              {item.name || "-"}
                             </p>
-                          )}
+                            {item.account_details && (
+                              <p className="text-muted-foreground mt-0.5 truncate text-xs">
+                                {item.account_details}
+                              </p>
+                            )}
+                          </div>
                         </div>
                       </td>
 
@@ -464,7 +553,7 @@ export default function UnifiedStockPage() {
                           )}
                           <button
                             onClick={() => handleOpenEdit(item)}
-                            title="Edit Data Stok"
+                            title="Edit Data Stok & Gambar"
                             className="text-muted-foreground rounded-lg p-1.5 transition-colors hover:bg-blue-50 hover:text-blue-600"
                           >
                             <Edit2 className="h-4 w-4" />
@@ -551,6 +640,71 @@ export default function UnifiedStockPage() {
                   placeholder="Contoh: MLBB Mythic Glory 150 Skin"
                   className="border-border bg-card text-foreground w-full rounded-xl border px-3 py-2 text-sm outline-none focus:border-blue-500"
                 />
+              </div>
+
+              {/* Upload Screenshot Akun */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-foreground block text-xs font-semibold">
+                    Screenshot Akun (Maks. 20)
+                  </label>
+                  <span className="text-muted-foreground text-[11px]">
+                    {formImages.length}/20 gambar
+                  </span>
+                </div>
+
+                {formImages.length > 0 && (
+                  <div className="grid grid-cols-4 gap-2">
+                    {formImages.map((file, idx) => (
+                      <div
+                        key={idx}
+                        className="group border-border bg-muted relative aspect-square overflow-hidden rounded-xl border"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt={`Preview ${idx}`}
+                          className="h-full w-full object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setFormImages((prev) => prev.filter((_, i) => i !== idx))}
+                          className="absolute top-1 right-1 rounded-md bg-black/70 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-rose-600"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {formImages.length < 20 && (
+                  <label className="group border-border bg-muted/30 relative flex h-24 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed transition-colors hover:border-blue-500 hover:bg-blue-50/20">
+                    <div className="flex flex-col items-center justify-center text-center">
+                      <UploadCloud className="text-muted-foreground h-6 w-6 transition-colors group-hover:text-blue-500" />
+                      <p className="text-foreground mt-1 text-xs font-medium">
+                        <span className="font-semibold text-blue-600">Klik untuk upload foto</span>{" "}
+                        atau seret file
+                      </p>
+                      <p className="text-muted-foreground text-[10px]">PNG, JPG, WEBP (Maks 5MB)</p>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files || []);
+                        if (formImages.length + files.length > 20) {
+                          alert("Maksimal 20 foto yang dapat diunggah.");
+                          return;
+                        }
+                        setFormImages((prev) => [...prev, ...files]);
+                        e.target.value = "";
+                      }}
+                    />
+                  </label>
+                )}
               </div>
 
               <div>
@@ -720,14 +874,14 @@ export default function UnifiedStockPage() {
         </form>
       </SlideOverDrawer>
 
-      {/* 6. Modal: Intip Kredensial Akun */}
+      {/* 6. Modal: Intip Kredensial & Foto Akun */}
       {isCredentialsOpen && selectedStockCredentials && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
-          <div className="bg-card border-border w-full max-w-md rounded-2xl border p-6 shadow-xl">
+          <div className="bg-card border-border max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border p-6 shadow-xl">
             <div className="border-border flex items-center justify-between border-b pb-3">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="h-5 w-5 text-emerald-600" />
-                <h3 className="text-foreground font-bold">Kredensial Akun Game</h3>
+                <h3 className="text-foreground font-bold">Detail & Kredensial Akun</h3>
               </div>
               <button
                 onClick={closeCredentials}
@@ -744,6 +898,52 @@ export default function UnifiedStockPage() {
                   {selectedStockCredentials.name || "-"}
                 </p>
               </div>
+
+              {/* Foto Screenshots Gallery */}
+              {(() => {
+                const credImages =
+                  Array.isArray(selectedStockCredentials.images) &&
+                  selectedStockCredentials.images.length > 0
+                    ? (selectedStockCredentials.images as string[]).filter(Boolean)
+                    : Array.isArray(selectedStockCredentials.image_urls) &&
+                        selectedStockCredentials.image_urls.length > 0
+                      ? (selectedStockCredentials.image_urls as string[]).filter(Boolean)
+                      : selectedStockCredentials.screenshot_url
+                        ? [selectedStockCredentials.screenshot_url]
+                        : [];
+
+                if (credImages.length === 0) return null;
+
+                return (
+                  <div>
+                    <span className="text-muted-foreground text-xs font-semibold">
+                      Galeri Foto Akun ({credImages.length} Foto):
+                    </span>
+                    <div className="mt-2 grid grid-cols-4 gap-2">
+                      {credImages.map((imgUrl, idx) => (
+                        <div
+                          key={idx}
+                          onClick={() =>
+                            handleOpenGalleryModal(
+                              credImages,
+                              selectedStockCredentials.name || "Foto Akun",
+                              idx,
+                            )
+                          }
+                          className="group relative aspect-square cursor-pointer overflow-hidden rounded-xl border border-slate-200 bg-slate-100 hover:ring-2 hover:ring-blue-500"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={imgUrl}
+                            alt={`Foto ${idx + 1}`}
+                            className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
 
               <div className="space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-3.5">
                 <div>
@@ -895,12 +1095,12 @@ export default function UnifiedStockPage() {
         </div>
       )}
 
-      {/* 8. Modal: Edit Data Stok */}
+      {/* 8. Modal: Edit Data Stok & Foto */}
       {isEditOpen && selectedStockToEdit && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
-          <div className="bg-card border-border w-full max-w-md rounded-2xl border p-6 shadow-xl">
+          <div className="bg-card border-border max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border p-6 shadow-xl">
             <div className="border-border flex items-center justify-between border-b pb-3">
-              <h3 className="text-foreground font-bold">Edit Data Stok</h3>
+              <h3 className="text-foreground font-bold">Edit Data Stok & Foto</h3>
               <button
                 onClick={closeEdit}
                 className="text-muted-foreground hover:text-foreground rounded-lg p-1"
@@ -921,6 +1121,88 @@ export default function UnifiedStockPage() {
                   onChange={(e) => setEditName(e.target.value)}
                   className="border-border bg-card text-foreground w-full rounded-xl border px-3 py-2 text-sm outline-none focus:border-blue-500"
                 />
+              </div>
+
+              {/* Manage Existing & New Photos */}
+              <div className="space-y-2">
+                <label className="text-foreground block text-xs font-semibold">
+                  Foto Screenshot Akun
+                </label>
+
+                {/* Existing Images */}
+                {editExistingImages.length > 0 && (
+                  <div className="grid grid-cols-4 gap-2">
+                    {editExistingImages.map((url, idx) => (
+                      <div
+                        key={idx}
+                        className="group border-border bg-muted relative aspect-square overflow-hidden rounded-xl border"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={url} alt={`Foto ${idx}`} className="h-full w-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setEditExistingImages((prev) => prev.filter((_, i) => i !== idx))
+                          }
+                          className="absolute top-1 right-1 rounded-md bg-black/70 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-rose-600"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* New Image Uploads */}
+                {editNewImages.length > 0 && (
+                  <div className="grid grid-cols-4 gap-2 pt-1">
+                    {editNewImages.map((file, idx) => (
+                      <div
+                        key={idx}
+                        className="group relative aspect-square overflow-hidden rounded-xl border border-blue-300 bg-blue-50/50"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt={`New ${idx}`}
+                          className="h-full w-full object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setEditNewImages((prev) => prev.filter((_, i) => i !== idx))
+                          }
+                          className="absolute top-1 right-1 rounded-md bg-black/70 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-rose-600"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                        <span className="absolute right-0 bottom-0 left-0 bg-blue-600 py-0.5 text-center text-[9px] font-bold text-white">
+                          Baru
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <label className="group border-border bg-muted/30 relative flex h-20 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed transition-colors hover:border-blue-500 hover:bg-blue-50/20">
+                  <div className="flex flex-col items-center justify-center text-center">
+                    <UploadCloud className="text-muted-foreground h-5 w-5 transition-colors group-hover:text-blue-500" />
+                    <p className="text-foreground mt-1 text-xs font-medium">
+                      <span className="font-semibold text-blue-600">Tambah Screenshot Baru</span>
+                    </p>
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    className="hidden"
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files || []);
+                      setEditNewImages((prev) => [...prev, ...files]);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -995,6 +1277,88 @@ export default function UnifiedStockPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* 9. Lightbox Photo Gallery Modal */}
+      {isGalleryOpen && galleryImages.length > 0 && (
+        <div
+          onClick={closeGallery}
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/85 p-4 backdrop-blur-md"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative flex max-h-[90vh] max-w-4xl flex-col items-center justify-center"
+          >
+            {/* Header / Info */}
+            <div className="mb-3 flex w-full items-center justify-between text-white">
+              <span className="max-w-md truncate text-sm font-semibold">{galleryTitle}</span>
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-white/70">
+                  {activeGalleryIndex + 1} / {galleryImages.length}
+                </span>
+                <button
+                  onClick={closeGallery}
+                  className="rounded-full bg-white/10 p-1.5 transition-colors hover:bg-white/20"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Main Active Image */}
+            <div className="relative flex max-h-[70vh] items-center justify-center overflow-hidden rounded-2xl bg-black/40">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={galleryImages[activeGalleryIndex]}
+                alt={`Screenshot ${activeGalleryIndex + 1}`}
+                className="max-h-[70vh] max-w-full rounded-2xl object-contain shadow-2xl"
+              />
+
+              {galleryImages.length > 1 && (
+                <>
+                  <button
+                    onClick={() =>
+                      setActiveGalleryIndex(
+                        (prev) => (prev - 1 + galleryImages.length) % galleryImages.length,
+                      )
+                    }
+                    className="absolute left-2 rounded-full bg-black/60 p-2 text-white transition-colors hover:bg-black/80"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={() =>
+                      setActiveGalleryIndex((prev) => (prev + 1) % galleryImages.length)
+                    }
+                    className="absolute right-2 rounded-full bg-black/60 p-2 text-white transition-colors hover:bg-black/80"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Thumbnail Strip */}
+            {galleryImages.length > 1 && (
+              <div className="mt-3 flex max-w-full gap-2 overflow-x-auto p-1">
+                {galleryImages.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveGalleryIndex(idx)}
+                    className={`relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border-2 transition-all ${
+                      idx === activeGalleryIndex
+                        ? "border-blue-500 ring-2 ring-blue-500/40"
+                        : "border-white/20 opacity-60 hover:opacity-100"
+                    }`}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={img} alt={`Thumb ${idx}`} className="h-full w-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

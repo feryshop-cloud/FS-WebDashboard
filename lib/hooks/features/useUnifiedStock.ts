@@ -34,6 +34,9 @@ export interface UnifiedStockItem {
   purchase_payment_status?: PurchasePaymentStatus | null;
   purchase_date?: string | null;
   created_at?: string;
+  images?: string[] | null;
+  image_urls?: string[] | null;
+  screenshot_url?: string | null;
   accounts?: { name: string } | null;
 }
 
@@ -73,6 +76,11 @@ export function useUnifiedStock() {
   // Edit Stock Modal State
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedStockToEdit, setSelectedStockToEdit] = useState<UnifiedStockItem | null>(null);
+
+  // Gallery Modal Lightbox State
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [galleryImages, setGalleryImages] = useState<string[]>([]);
+  const [galleryTitle, setGalleryTitle] = useState("");
 
   // Drawer & Modal refs for focus traps
   const closeAdd = () => {
@@ -126,6 +134,18 @@ export function useUnifiedStock() {
   const closeEdit = () => {
     setIsEditOpen(false);
     setSelectedStockToEdit(null);
+  };
+
+  const openGallery = (images: string[], title: string) => {
+    setGalleryImages(images);
+    setGalleryTitle(title);
+    setIsGalleryOpen(true);
+  };
+
+  const closeGallery = () => {
+    setIsGalleryOpen(false);
+    setGalleryImages([]);
+    setGalleryTitle("");
   };
 
   const addDrawerRef = useFocusTrap<HTMLDivElement>(isAddOpen || isAddClosing, null, closeAdd);
@@ -259,20 +279,7 @@ export function useUnifiedStock() {
   const pageItems = filteredStocks.slice(startIndex, startIndex + itemsPerPage);
 
   // Actions
-  const handleAddStockPurchase = async (formData: {
-    category: string;
-    name: string;
-    account_details: string;
-    username?: string;
-    password?: string;
-    capital_price: number;
-    post_price: number;
-    current_price: number;
-    seller_info?: string;
-    internal_notes?: string;
-    purchase_payment_status: PurchasePaymentStatus;
-    payment_account_id?: string | null;
-  }) => {
+  const handleAddStockPurchase = async (formData: FormData) => {
     setIsSubmitting(true);
     setError("");
 
@@ -327,10 +334,12 @@ export function useUnifiedStock() {
       post_price?: number;
       seller_info?: string;
       internal_notes?: string;
+      images?: string[];
     },
+    newFiles?: File[],
   ) => {
     try {
-      const res = await updatePurchase(id, data);
+      const res = await updatePurchase(id, data, newFiles);
       if (!res.success || res.error) {
         throw new Error(res.error || "Gagal memperbarui stok.");
       }
@@ -435,12 +444,16 @@ export function useUnifiedStock() {
       isAddOpen,
       isAddClosing,
       isSettleOpen,
+      isSettleClosing,
       selectedStockToSettle,
       settleAccountId,
       isCredentialsOpen,
       selectedStockCredentials,
       isEditOpen,
       selectedStockToEdit,
+      isGalleryOpen,
+      galleryImages,
+      galleryTitle,
     },
     refs: {
       addDrawerRef,
@@ -455,6 +468,8 @@ export function useUnifiedStock() {
       closeCredentials,
       openEdit,
       closeEdit,
+      openGallery,
+      closeGallery,
       setSettleAccountId,
       handleAddStockPurchase,
       handleSettlePayment,
