@@ -57,6 +57,7 @@ export async function purchaseStock(data: {
 
     revalidatePath("/dashboard/inventory");
     revalidatePath("/dashboard/purchases");
+    revalidatePath("/dashboard/stock");
     purgeStorefront(STOREFRONT_TAGS.marketplace);
 
     return { success: true, stockId: stockId as string, error: null };
@@ -80,8 +81,15 @@ export async function getPurchases(): Promise<{
         sku,
         name,
         category,
-        seller_info,
+        account_details,
+        username,
+        password,
         capital_price,
+        post_price,
+        current_price,
+        status,
+        seller_info,
+        internal_notes,
         purchase_payment_status,
         purchase_date,
         created_at,
@@ -137,6 +145,7 @@ export async function deletePurchase(
 
     revalidatePath("/dashboard/purchases");
     revalidatePath("/dashboard/inventory");
+    revalidatePath("/dashboard/stock");
     purgeStorefront(STOREFRONT_TAGS.marketplace);
 
     return { success: true, error: null };
@@ -186,6 +195,7 @@ export async function updatePurchase(
 
     revalidatePath("/dashboard/purchases");
     revalidatePath("/dashboard/inventory");
+    revalidatePath("/dashboard/stock");
     purgeStorefront(STOREFRONT_TAGS.marketplace);
 
     return { success: true, error: null };
@@ -224,6 +234,8 @@ export async function settlePurchasePayment(
     if (error) throw error;
 
     revalidatePath("/dashboard/purchases");
+    revalidatePath("/dashboard/inventory");
+    revalidatePath("/dashboard/stock");
     revalidatePath("/dashboard/ledger");
     revalidatePath("/dashboard/accounts");
     purgeStorefront(STOREFRONT_TAGS.marketplace);

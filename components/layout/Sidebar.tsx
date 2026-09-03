@@ -49,8 +49,7 @@ const navGroups: { title: string; items: NavItem[] }[] = [
   {
     title: "Manajemen Stok",
     items: [
-      { label: "Daftar Stok", icon: Package, href: "/dashboard/inventory" },
-      { label: "Pembelian Stok", icon: ShoppingBag, href: "/dashboard/purchases" },
+      { label: "Stok Akun", icon: Package, href: "/dashboard/stock" },
       { label: "Produk Top-Up", icon: ShoppingBag, href: "/dashboard/topup-products" },
     ],
   },

@@ -19,7 +19,7 @@ export default async function GameCategoryPage({ params }: { params: Promise<{ s
     .single();
 
   if (gameError || !game) {
-    redirect("/dashboard/inventory");
+    redirect("/dashboard/stock");
   }
 
   // 2. Fetch inventory for this game
@@ -44,7 +44,7 @@ export default async function GameCategoryPage({ params }: { params: Promise<{ s
       {/* Top Bar */}
       <div>
         <Link
-          href="/dashboard/inventory"
+          href="/dashboard/stock"
           className="text-muted-foreground hover:text-foreground inline-flex items-center space-x-2 text-sm font-medium transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />

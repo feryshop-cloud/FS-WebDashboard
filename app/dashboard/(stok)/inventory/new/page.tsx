@@ -16,7 +16,7 @@ export default async function AddInventoryPage() {
       {/* Header */}
       <div className="flex items-center space-x-4">
         <Link
-          href="/dashboard/inventory"
+          href="/dashboard/stock"
           className="border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground rounded-[10px] border p-2 transition-colors"
         >
           <ArrowLeft className="h-5 w-5" />

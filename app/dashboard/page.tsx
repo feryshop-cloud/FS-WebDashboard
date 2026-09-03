@@ -294,7 +294,7 @@ export default async function DashboardOverview() {
                 tx.reference_type === "STOCK_PURCHASE" ||
                 tx.transaction_type === "STOCK_PURCHASE"
               ) {
-                href = "/dashboard/purchases";
+                href = "/dashboard/stock";
               } else if (tx.reference_type === "TOPUP_ORDER") {
                 href = "/dashboard/topup-orders";
               }
