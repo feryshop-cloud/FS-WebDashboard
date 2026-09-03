@@ -90,7 +90,11 @@ export function useTradeIn() {
     try {
       setIsSubmitting(true);
       setError("");
-      await createTukarTambah(formData);
+      const res = await createTukarTambah(formData);
+      if (res && !res.success) {
+        setError(res.error || "Gagal membuat transaksi Tukar Tambah.");
+        return;
+      }
       loadData();
       closeAddTT();
     } catch (err: unknown) {
@@ -193,7 +197,11 @@ export function useTradeIn() {
       setIsDeleting(true);
       setDeleteError("");
       const { deleteDeal } = await import("@/app/actions/deals");
-      await deleteDeal(id);
+      const res = await deleteDeal(id);
+      if (res && !res.success) {
+        setDeleteError(res.error || "Gagal menghapus transaksi.");
+        return;
+      }
       loadData();
       setDeleteTarget(null);
     } catch (err: unknown) {
@@ -230,7 +238,11 @@ export function useTradeIn() {
       setIsSubmitting(true);
       setError("");
       const { updateTukarTambah } = await import("@/app/actions/trade-in");
-      await updateTukarTambah(editTarget.id, formData);
+      const res = await updateTukarTambah(editTarget.id, formData);
+      if (res && !res.success) {
+        setError(res.error || "Gagal mengubah transaksi Tukar Tambah.");
+        return;
+      }
       loadData();
       closeEditTT();
     } catch (err: unknown) {

@@ -179,9 +179,9 @@ export async function createDeal(
 
     const supabase = await createClient();
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    const adminId = session?.user?.id;
+      data: { user },
+    } = await supabase.auth.getUser();
+    const adminId = user?.id;
 
     if (!adminId) {
       return { data: null, error: "Sesi admin tidak ditemukan. Silakan login kembali." };
@@ -200,7 +200,7 @@ export async function createDeal(
     } else {
       const { data: newCustomer, error: customerErr } = await supabase
         .from("customers")
-        .insert({ name: customerName, phone: customerContact })
+        .insert({ name: customerName, phone: customerContact || null })
         .select()
         .single();
       if (customerErr) throw customerErr;
@@ -214,10 +214,17 @@ export async function createDeal(
       .insert({
         deal_number: dealNumber,
         customer_id: customerId,
+        customer_name: customerName,
+        customer_contact: customerContact || null,
+        stock_id: stockId,
         deal_type: "Penjualan",
+        deal_price: dealPrice,
         total_deal_price: dealPrice,
         total_paid: 0,
+        remaining_balance: dealPrice,
+        payment_percentage: 0,
         status: "DRAFT",
+        admin_id: adminId,
         handled_by: adminId,
       })
       .select()
@@ -251,6 +258,8 @@ export async function createDeal(
     };
 
     revalidatePath("/dashboard/deals", "page");
+    revalidatePath("/dashboard/inventory", "page");
+    revalidatePath("/dashboard/stock", "page");
     purgeStorefront(STOREFRONT_TAGS.marketplace);
     return { data: mappedDeal, error: null };
   } catch (error: unknown) {
@@ -272,9 +281,9 @@ export async function addPayment(
 
     const supabase = await createClient();
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    const adminId = session?.user?.id;
+      data: { user },
+    } = await supabase.auth.getUser();
+    const adminId = user?.id;
 
     if (!adminId) {
       return { success: false, error: "Sesi admin tidak ditemukan. Silakan login kembali." };
@@ -290,8 +299,41 @@ export async function addPayment(
 
     if (error) throw error;
 
+    // Synchronize inventory status to match stocks status
+    const { data: dealRow } = await supabase
+      .from("deals")
+      .select("stock_id, deal_items(stock_id)")
+      .eq("id", dealId)
+      .maybeSingle();
+
+    const linkedStockId = dealRow?.stock_id || dealRow?.deal_items?.[0]?.stock_id;
+    if (linkedStockId) {
+      const { data: stockRow } = await supabase
+        .from("stocks")
+        .select("status")
+        .eq("id", linkedStockId)
+        .maybeSingle();
+
+      if (stockRow?.status) {
+        const invStatus =
+          stockRow.status === "SOLD"
+            ? "SOLD"
+            : stockRow.status === "AVAILABLE"
+              ? "AVAILABLE"
+              : "UNPOSTED";
+        await supabase
+          .from("inventory")
+          .update({ status: invStatus, updated_at: new Date().toISOString() })
+          .eq("id", linkedStockId);
+      }
+    }
+
     revalidatePath("/dashboard/deals");
     revalidatePath(`/dashboard/deals/${dealId}`);
+    revalidatePath("/dashboard/inventory");
+    revalidatePath("/dashboard/stock");
+    revalidatePath("/dashboard/accounts");
+    revalidatePath("/dashboard/ledger");
     purgeStorefront(STOREFRONT_TAGS.marketplace);
     return { success: true, error: null };
   } catch (error: unknown) {
@@ -306,27 +348,36 @@ export async function cancelDeal(
 ): Promise<{ success: boolean; error: string | null }> {
   try {
     const supabase = await createClient();
+    const nowIso = new Date().toISOString();
 
     const { error: dealError } = await supabase
       .from("deals")
       .update({
         status: "CANCELLED_BY_BUYER",
-        updated_at: new Date().toISOString(),
+        updated_at: nowIso,
       })
       .eq("id", dealId);
 
     if (dealError) throw dealError;
 
-    const { error: stockError } = await supabase
-      .from("stocks")
-      .update({ status: "AVAILABLE", updated_at: new Date().toISOString() })
-      .eq("id", stockId);
+    if (stockId) {
+      const { error: stockError } = await supabase
+        .from("stocks")
+        .update({ status: "AVAILABLE", booking_date: null, sold_date: null, updated_at: nowIso })
+        .eq("id", stockId);
 
-    if (stockError) throw stockError;
+      if (stockError) throw stockError;
+
+      await supabase
+        .from("inventory")
+        .update({ status: "AVAILABLE", updated_at: nowIso })
+        .eq("id", stockId);
+    }
 
     revalidatePath("/dashboard/deals");
     revalidatePath(`/dashboard/deals/${dealId}`);
     revalidatePath("/dashboard/inventory");
+    revalidatePath("/dashboard/stock");
     purgeStorefront(STOREFRONT_TAGS.marketplace);
 
     return { success: true, error: null };

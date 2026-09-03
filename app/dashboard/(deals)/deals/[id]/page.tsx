@@ -71,7 +71,9 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground text-sm font-medium">Stock Linked</span>
                 <span className="text-foreground text-sm font-semibold">
-                  {deal.stock?.name} ({deal.stock?.category})
+                  {deal.stock
+                    ? `${deal.stock.name} (${deal.stock.category})`
+                    : "Tidak ada stok tertaut"}
                 </span>
               </div>
             </div>
@@ -107,21 +109,27 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
                 <tbody className="divide-border bg-card divide-y">
                   {deal.payments && deal.payments.length > 0 ? (
                     deal.payments.map((payment: PaymentWithRelations) => (
-                      <tr key={payment.id} className="hover:bg-muted transition-colors">
+                      <tr key={payment.id} className="hover:bg-muted/50 transition-colors">
                         <td className="text-muted-foreground px-6 py-4 text-sm whitespace-nowrap">
                           {formatDate(payment.created_at)}
                         </td>
                         <td className="text-foreground px-6 py-4 text-sm font-medium whitespace-nowrap">
-                          {payment.account?.name || "Unknown Account"}
+                          {payment.account?.name || "Direct Cash"}
                         </td>
-                        <td className="px-6 py-4 font-mono text-sm font-bold whitespace-nowrap text-emerald-600">
-                          + {formatRupiah(payment.amount)}
+                        <td className="px-6 py-4 text-sm font-semibold whitespace-nowrap text-emerald-600">
+                          {formatRupiah(Number(payment.amount || 0))}
                         </td>
-                        <td className="text-muted-foreground px-6 py-4 text-sm whitespace-nowrap">
+                        <td className="text-muted-foreground px-6 py-4 text-sm">
                           {payment.notes || "-"}
                         </td>
-                        <td className="text-muted-foreground px-6 py-4 text-sm whitespace-nowrap">
-                          <span className="inline-flex items-center rounded-[10px] bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-600 ring-1 ring-emerald-200/50">
+                        <td className="px-6 py-4 text-sm whitespace-nowrap">
+                          <span
+                            className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${
+                              payment.status === "COMPLETED"
+                                ? "bg-emerald-50 text-emerald-700"
+                                : "bg-amber-50 text-amber-700"
+                            }`}
+                          >
                             {payment.status}
                           </span>
                         </td>
@@ -131,7 +139,7 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
                     <tr>
                       <td
                         colSpan={5}
-                        className="text-muted-foreground px-6 py-12 text-center text-sm"
+                        className="text-muted-foreground px-6 py-8 text-center text-sm"
                       >
                         No payments recorded yet.
                       </td>
@@ -154,13 +162,13 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground text-sm">Deal Price</span>
                 <span className="text-foreground font-mono font-medium">
-                  {formatRupiah(deal.deal_price)}
+                  {formatRupiah(Number(deal.deal_price || 0))}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground text-sm">Total Paid</span>
                 <span className="font-mono font-bold text-emerald-600">
-                  {formatRupiah(deal.total_paid)}
+                  {formatRupiah(Number(deal.total_paid || 0))}
                 </span>
               </div>
 
@@ -168,9 +176,9 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
                 <div className="flex items-center justify-between">
                   <span className="text-foreground font-medium">Remaining Balance</span>
                   <span
-                    className={`font-mono text-lg font-bold ${deal.remaining_balance > 0 ? "text-red-600" : "text-emerald-600"}`}
+                    className={`font-mono text-lg font-bold ${Number(deal.remaining_balance || 0) > 0 ? "text-red-600" : "text-emerald-600"}`}
                   >
-                    {formatRupiah(deal.remaining_balance)}
+                    {formatRupiah(Number(deal.remaining_balance || 0))}
                   </span>
                 </div>
               </div>
@@ -181,13 +189,13 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
                     Payment Progress
                   </span>
                   <span className="text-sm font-bold text-blue-600">
-                    {deal.payment_percentage.toFixed(0)}%
+                    {Number(deal.payment_percentage || 0).toFixed(0)}%
                   </span>
                 </div>
                 <div className="bg-muted h-2.5 w-full overflow-hidden rounded-[10px]">
                   <div
-                    className={`h-full rounded-[10px] transition-all duration-1000 ease-out ${deal.payment_percentage >= 100 ? "bg-emerald-500" : "bg-blue-600"}`}
-                    style={{ width: `${Math.min(deal.payment_percentage, 100)}%` }}
+                    className={`h-full rounded-[10px] transition-all duration-1000 ease-out ${Number(deal.payment_percentage || 0) >= 100 ? "bg-emerald-500" : "bg-blue-600"}`}
+                    style={{ width: `${Math.min(Number(deal.payment_percentage || 0), 100)}%` }}
                   ></div>
                 </div>
               </div>

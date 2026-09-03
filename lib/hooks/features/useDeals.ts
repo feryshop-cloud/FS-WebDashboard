@@ -92,7 +92,11 @@ export function useDeals() {
     try {
       setIsSubmitting(true);
       setError("");
-      await createPenjualan(formData);
+      const res = await createPenjualan(formData);
+      if (res && !res.success) {
+        setError(res.error || "Gagal membuat transaksi deal.");
+        return;
+      }
       loadData();
       closeAddDeal();
     } catch (err: unknown) {
@@ -137,7 +141,11 @@ export function useDeals() {
     try {
       setIsDeleting(true);
       setDeleteError("");
-      await deleteDeal(deleteTarget.id);
+      const res = await deleteDeal(deleteTarget.id);
+      if (res && !res.success) {
+        setDeleteError(res.error || "Gagal menghapus transaksi.");
+        return;
+      }
       setDeleteTarget(null);
       loadData();
     } catch (err: unknown) {
@@ -152,7 +160,10 @@ export function useDeals() {
       return false;
     }
     if (dateFilter) {
-      const dealDate = new Date(deal.created_at).toISOString().split("T")[0];
+      if (!deal.created_at) return false;
+      const d = new Date(deal.created_at);
+      if (isNaN(d.getTime())) return false;
+      const dealDate = d.toISOString().split("T")[0];
       if (dealDate !== dateFilter) {
         return false;
       }

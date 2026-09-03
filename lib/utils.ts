@@ -10,6 +10,8 @@ export function formatRupiah(amount: number): string {
 
 export function formatDate(dateString: string, includeTime: boolean = true): string {
   if (!dateString) return "-";
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return "-";
   const options: Intl.DateTimeFormatOptions = {
     day: "numeric",
     month: "short",
@@ -19,5 +21,5 @@ export function formatDate(dateString: string, includeTime: boolean = true): str
     options.hour = "2-digit";
     options.minute = "2-digit";
   }
-  return new Intl.DateTimeFormat("id-ID", options).format(new Date(dateString));
+  return new Intl.DateTimeFormat("id-ID", options).format(date);
 }
