@@ -12,11 +12,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: "20"
-          cache: "npm"
-          cache-dependency-path: "package-lock.json"
+          bun-version: latest
 
       - name: Restore Next.js cache
         uses: actions/cache@v4
@@ -27,13 +25,13 @@ jobs:
             nextjs-${{ runner.os }}-
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
       - name: Lint
-        run: npm run lint
+        run: bun run lint
 
       - name: Build
-        run: npm run build
+        run: bun run build
 
       - name: Test
-        run: npm run test
+        run: bun run test
