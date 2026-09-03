@@ -15,6 +15,9 @@ import {
   Copy,
   Check,
   RefreshCw,
+  Shield,
+  ShieldOff,
+  Lock,
 } from "lucide-react";
 import { useEmailAccounts } from "@/lib/hooks/features/useEmailAccounts";
 import { Pagination } from "@/components/ui/Pagination";
@@ -129,6 +132,8 @@ export default function EmailAccountsPage() {
             </thead>
             <tbody className="divide-border divide-y">
               {pageItems.map((acc) => {
+                const isPinEnabled =
+                  (acc as unknown as { is_pin_enabled?: boolean }).is_pin_enabled !== false;
                 const currentPin =
                   (acc as unknown as { access_pin?: string }).access_pin || "123456";
                 return (
@@ -149,22 +154,29 @@ export default function EmailAccountsPage() {
 
                     {/* PIN Akses Column */}
                     <td className="px-5 py-4">
-                      <div className="flex items-center gap-2">
-                        <span className="rounded-md border border-slate-200 bg-slate-100 px-2.5 py-1 font-mono text-xs font-bold tracking-wider text-slate-800">
-                          {currentPin}
+                      {isPinEnabled ? (
+                        <div className="flex items-center gap-2">
+                          <span className="rounded-md border border-slate-200 bg-slate-100 px-2.5 py-1 font-mono text-xs font-bold tracking-wider text-slate-800">
+                            {currentPin}
+                          </span>
+                          <button
+                            onClick={() => handleCopyPin(acc.id, currentPin)}
+                            className="rounded-lg p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+                            title="Salin PIN Akses"
+                          >
+                            {copiedId === acc.id ? (
+                              <Check className="h-3.5 w-3.5 text-emerald-600" />
+                            ) : (
+                              <Copy className="h-3.5 w-3.5" />
+                            )}
+                          </button>
+                        </div>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
+                          <ShieldOff className="h-3 w-3" />
+                          Tanpa Sandi
                         </span>
-                        <button
-                          onClick={() => handleCopyPin(acc.id, currentPin)}
-                          className="rounded-lg p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
-                          title="Salin PIN Akses"
-                        >
-                          {copiedId === acc.id ? (
-                            <Check className="h-3.5 w-3.5 text-emerald-600" />
-                          ) : (
-                            <Copy className="h-3.5 w-3.5" />
-                          )}
-                        </button>
-                      </div>
+                      )}
                     </td>
 
                     <td className="text-muted-foreground px-5 py-4 text-xs">
@@ -307,35 +319,89 @@ export default function EmailAccountsPage() {
                   />
                 </div>
 
-                {/* PIN Akses WebMail */}
-                <div className="flex flex-col gap-1.5">
-                  <div className="flex items-center justify-between">
-                    <label className="text-foreground text-xs font-semibold">
-                      PIN Akses WebMail (6-Digit) <span className="text-rose-500">*</span>
-                    </label>
-                    <button
-                      type="button"
-                      onClick={generateNewPin}
-                      className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline"
-                    >
-                      <RefreshCw className="h-3 w-3" />
-                      Acak PIN Baru
-                    </button>
-                  </div>
-                  <div className="relative">
+                {/* Toggle Proteksi Sandi / PIN */}
+                <div className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-slate-50/50 p-4">
+                  <label className="flex cursor-pointer items-start justify-between gap-3">
+                    <div>
+                      <div className="text-foreground flex items-center gap-1.5 text-xs font-semibold">
+                        {form.is_pin_enabled ? (
+                          <Lock className="h-3.5 w-3.5 text-blue-600" />
+                        ) : (
+                          <ShieldOff className="h-3.5 w-3.5 text-amber-600" />
+                        )}
+                        Proteksi Sandi / PIN Akses WebMail
+                      </div>
+                      <div className="text-muted-foreground mt-0.5 text-xs font-normal">
+                        {form.is_pin_enabled
+                          ? "PIN wajib dimasukkan pembeli saat mengakses inbox WebMail (default: 123456)."
+                          : "PIN dinonaktifkan manual: pengguna dapat membuka inbox tanpa memasukkan sandi."}
+                      </div>
+                    </div>
                     <input
-                      type="text"
-                      value={form.access_pin}
-                      onChange={(e) => setField("access_pin", e.target.value)}
-                      required
-                      placeholder="Misal: 849201"
-                      className="border-border w-full rounded-xl border px-3 py-2.5 font-mono text-sm font-bold tracking-widest text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                      type="checkbox"
+                      checked={form.is_pin_enabled}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        setField("is_pin_enabled", checked);
+                        if (checked && (!form.access_pin || !form.access_pin.trim())) {
+                          setField("access_pin", "123456");
+                        }
+                      }}
+                      className="mt-0.5 h-4 w-4 rounded accent-blue-600"
                     />
-                    <Key className="absolute top-3 right-3 h-4 w-4 text-slate-400" />
-                  </div>
-                  <p className="text-muted-foreground text-[11px]">
-                    PIN ini akan diberikan kepada pembeli untuk membaca OTP di WebMail.
-                  </p>
+                  </label>
+
+                  {/* Input PIN (hanya aktif jika proteksi dinyalakan) */}
+                  {form.is_pin_enabled ? (
+                    <div className="mt-2 flex flex-col gap-1.5 border-t border-slate-200 pt-3">
+                      <div className="flex items-center justify-between">
+                        <label className="text-foreground text-xs font-semibold">
+                          Nilai PIN Akses (6-Digit) <span className="text-rose-500">*</span>
+                        </label>
+                        <button
+                          type="button"
+                          onClick={generateNewPin}
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline"
+                        >
+                          <RefreshCw className="h-3 w-3" />
+                          Acak PIN Baru
+                        </button>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={form.access_pin}
+                          onChange={(e) => setField("access_pin", e.target.value)}
+                          required={form.is_pin_enabled}
+                          maxLength={6}
+                          placeholder="Default: 123456"
+                          className="border-border w-full rounded-xl border px-3 py-2.5 font-mono text-sm font-bold tracking-widest text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                        />
+                        <Key className="absolute top-3 right-3 h-4 w-4 text-slate-400" />
+                      </div>
+                      <p className="text-muted-foreground text-[11px]">
+                        PIN default adalah <strong>123456</strong>. Anda dapat mengubahnya atau
+                        menonaktifkannya kapan saja.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="mt-1 flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 p-2.5 text-xs text-amber-800">
+                      <span className="flex items-center gap-1.5">
+                        <ShieldOff className="h-3.5 w-3.5 text-amber-600" />
+                        Akses bebas tanpa PIN aktif
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setField("is_pin_enabled", true);
+                          setField("access_pin", "123456");
+                        }}
+                        className="font-semibold text-blue-600 hover:underline"
+                      >
+                        Aktifkan Default (123456)
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {/* Toggle Aktif */}

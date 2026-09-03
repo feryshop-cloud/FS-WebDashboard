@@ -38,6 +38,8 @@ export async function createEmailAccount(formData: FormData) {
     const displayName = String(formData.get("display_name") || "").trim() || null;
     const accessPin = String(formData.get("access_pin") || "").trim() || "123456";
     const isActive = formData.get("is_active") === "on";
+    const isPinEnabled =
+      formData.get("is_pin_enabled") !== "off" && formData.get("is_pin_enabled") !== "false";
 
     if (!email) {
       throw new Error("Alamat email wajib diisi.");
@@ -50,6 +52,7 @@ export async function createEmailAccount(formData: FormData) {
       display_name: displayName,
       access_pin: accessPin,
       is_active: isActive,
+      is_pin_enabled: isPinEnabled,
     });
 
     if (error) {
@@ -75,6 +78,8 @@ export async function updateEmailAccount(id: string, formData: FormData) {
     const displayName = String(formData.get("display_name") || "").trim() || null;
     const accessPin = String(formData.get("access_pin") || "").trim() || "123456";
     const isActive = formData.get("is_active") === "on";
+    const isPinEnabled =
+      formData.get("is_pin_enabled") !== "off" && formData.get("is_pin_enabled") !== "false";
 
     if (!email) {
       throw new Error("Alamat email wajib diisi.");
@@ -88,6 +93,7 @@ export async function updateEmailAccount(id: string, formData: FormData) {
         display_name: displayName,
         access_pin: accessPin,
         is_active: isActive,
+        is_pin_enabled: isPinEnabled,
       })
       .eq("id", id);
 

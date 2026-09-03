@@ -17,6 +17,7 @@ export type EmailAccountForm = {
   display_name: string;
   access_pin: string;
   is_active: boolean;
+  is_pin_enabled: boolean;
 };
 
 export const emptyEmailAccountForm: EmailAccountForm = {
@@ -24,6 +25,7 @@ export const emptyEmailAccountForm: EmailAccountForm = {
   display_name: "",
   access_pin: "123456",
   is_active: true,
+  is_pin_enabled: true,
 };
 
 export function generateRandomPin(): string {
@@ -77,7 +79,8 @@ export function useEmailAccounts() {
     setEditing(null);
     setForm({
       ...emptyEmailAccountForm,
-      access_pin: generateRandomPin(),
+      access_pin: "123456",
+      is_pin_enabled: true,
     });
     setIsAddOpen(true);
   };
@@ -85,11 +88,14 @@ export function useEmailAccounts() {
   const openEdit = (acc: EmailAccountRow) => {
     setError("");
     setEditing(acc);
+    const pinVal = (acc as unknown as { access_pin?: string | null }).access_pin;
+    const pinEnabledVal = (acc as unknown as { is_pin_enabled?: boolean | null }).is_pin_enabled;
     setForm({
       email: acc.email,
       display_name: acc.display_name || "",
-      access_pin: (acc as unknown as { access_pin?: string }).access_pin || "123456",
+      access_pin: pinVal || "123456",
       is_active: acc.is_active,
+      is_pin_enabled: pinEnabledVal !== false,
     });
     setIsAddOpen(true);
   };
@@ -109,6 +115,7 @@ export function useEmailAccounts() {
       payload.set("display_name", form.display_name.trim());
       payload.set("access_pin", form.access_pin.trim() || "123456");
       payload.set("is_active", form.is_active ? "on" : "off");
+      payload.set("is_pin_enabled", form.is_pin_enabled ? "on" : "off");
 
       if (editing) {
         await updateEmailAccount(editing.id, payload);
@@ -146,7 +153,9 @@ export function useEmailAccounts() {
       const e = acc.email.toLowerCase();
       const d = (acc.display_name || "").toLowerCase();
       const p = ((acc as unknown as { access_pin?: string }).access_pin || "").toLowerCase();
-      return e.includes(q) || d.includes(q) || p.includes(q);
+      const pinEnabled = (acc as unknown as { is_pin_enabled?: boolean }).is_pin_enabled !== false;
+      const pinStatus = pinEnabled ? "pin aktif" : "pin nonaktif tanpa pin";
+      return e.includes(q) || d.includes(q) || p.includes(q) || pinStatus.includes(q);
     });
   }, [accounts, debouncedSearch]);
 

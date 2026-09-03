@@ -348,29 +348,35 @@ export type Database = {
       };
       email_accounts: {
         Row: {
+          access_pin: string | null;
           created_at: string;
           display_name: string | null;
           email: string;
           id: string;
           is_active: boolean;
+          is_pin_enabled: boolean;
           last_synced_at: string | null;
           updated_at: string;
         };
         Insert: {
+          access_pin?: string | null;
           created_at?: string;
           display_name?: string | null;
           email: string;
           id?: string;
           is_active?: boolean;
+          is_pin_enabled?: boolean;
           last_synced_at?: string | null;
           updated_at?: string;
         };
         Update: {
+          access_pin?: string | null;
           created_at?: string;
           display_name?: string | null;
           email?: string;
           id?: string;
           is_active?: boolean;
+          is_pin_enabled?: boolean;
           last_synced_at?: string | null;
           updated_at?: string;
         };
