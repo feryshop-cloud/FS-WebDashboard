@@ -143,10 +143,10 @@ export async function purchaseStock(
       finalImageUrls = [...finalImageUrls, ...uploadedUrls];
     }
 
-    if (finalImageUrls.length > 0 && stockId) {
-      const screenshot_url = finalImageUrls[0];
+    if (stockId) {
+      const screenshot_url = finalImageUrls.length > 0 ? finalImageUrls[0] : null;
       await Promise.all([
-        supabase.from("stocks").update({ images: finalImageUrls }).eq("id", stockId),
+        (supabase.from("stocks").update as any)({ images: finalImageUrls }).eq("id", stockId),
         supabase
           .from("inventory")
           .update({
@@ -383,7 +383,48 @@ export async function updatePurchase(
     }
 
     if (Object.keys(inventoryUpdates).length > 0) {
-      await supabase.from("inventory").update(inventoryUpdates).eq("id", id);
+      const { data: existingInv } = await supabase
+        .from("inventory")
+        .select("id")
+        .eq("id", id)
+        .maybeSingle();
+
+      if (existingInv) {
+        await supabase.from("inventory").update(inventoryUpdates).eq("id", id);
+      } else {
+        const { data: stockRow } = await supabase
+          .from("stocks")
+          .select("*")
+          .eq("id", id)
+          .maybeSingle();
+
+        if (stockRow) {
+          let resolvedGameId = inventoryUpdates.game_id;
+          if (!resolvedGameId) {
+            const { data: defaultGame } = await supabase
+              .from("games")
+              .select("id")
+              .limit(1)
+              .single();
+            resolvedGameId = defaultGame?.id;
+          }
+
+          if (resolvedGameId) {
+            await (supabase.from("inventory").insert as any)({
+              id: id,
+              game_id: resolvedGameId,
+              title_reference: data.name || stockRow.name,
+              account_specs: data.account_details || stockRow.account_details || stockRow.name,
+              capital_price: data.capital_price ?? stockRow.capital_price,
+              asking_price: data.post_price ?? stockRow.post_price ?? stockRow.current_price,
+              status: (data.status || stockRow.status || "AVAILABLE") as any,
+              screenshot_url: finalImages.length > 0 ? finalImages[0] : null,
+              image_urls: finalImages,
+              public_id: stockRow.sku || `STK-${id.slice(0, 8).toUpperCase()}`,
+            });
+          }
+        }
+      }
     }
 
     revalidatePath("/dashboard/purchases");
