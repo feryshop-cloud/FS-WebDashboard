@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
+import useSWR from "swr";
 import {
   Package,
   Plus,
@@ -15,28 +15,26 @@ import {
   CreditCard,
   TrendingUp,
   Tag,
-  AlertCircle,
   X,
   Edit2,
   ShieldCheck,
-  UploadCloud,
   ImageIcon,
   ChevronLeft,
   ChevronRight,
+  Wand2,
 } from "lucide-react";
 import { formatRupiah, formatDate } from "@/lib/utils";
 import { useUnifiedStock, UnifiedStockItem } from "@/lib/hooks/features/useUnifiedStock";
 import { Pagination } from "@/components/ui/Pagination";
-import { SlideOverDrawer } from "@/components/ui/SlideOverDrawer";
-import { PurchasePaymentStatus } from "@/types/database";
+import { StockFormDrawer } from "@/components/stock/StockFormDrawer";
+import { CaptionGeneratorModal } from "@/components/features/CaptionGeneratorModal";
+import { getTemplates } from "@/app/actions/templates";
+import { TemplateItem } from "@/lib/hooks/features/useTemplates";
 
 export default function UnifiedStockPage() {
   const {
     data: { games, accounts, kpis, totalItems, pageItems, safePage, totalPages, itemsPerPage },
     isLoading,
-    isSubmitting,
-    isSettling,
-    error,
     settleError,
     uiState: {
       searchQuery,
@@ -82,29 +80,26 @@ export default function UnifiedStockPage() {
     },
   } = useUnifiedStock();
 
-  // Form State for Add Stock
-  const [formCategory, setFormCategory] = useState("");
-  const [formName, setFormName] = useState("");
-  const [formSpecs, setFormSpecs] = useState("");
-  const [formUsername, setFormUsername] = useState("");
-  const [formPassword, setFormPassword] = useState("");
-  const [formCapitalPrice, setFormCapitalPrice] = useState<number | "">("");
-  const [formAskingPrice, setFormAskingPrice] = useState<number | "">("");
-  const [formSellerInfo, setFormSellerInfo] = useState("");
-  const [formInternalNotes, setFormInternalNotes] = useState("");
-  const [formPaymentStatus, setFormPaymentStatus] = useState<PurchasePaymentStatus>("LUNAS");
-  const [formPaymentAccountId, setFormPaymentAccountId] = useState("");
-  const [formImages, setFormImages] = useState<File[]>([]);
+  // Caption Generator State
+  const [isCaptionOpen, setIsCaptionOpen] = useState(false);
+  const [selectedStockForCaption, setSelectedStockForCaption] = useState<UnifiedStockItem | null>(
+    null,
+  );
 
-  // Edit State
-  const [editName, setEditName] = useState("");
-  const [editCapitalPrice, setEditCapitalPrice] = useState<number | "">("");
-  const [editPostPrice, setEditPostPrice] = useState<number | "">("");
-  const [editSellerInfo, setEditSellerInfo] = useState("");
-  const [editInternalNotes, setEditInternalNotes] = useState("");
-  const [editExistingImages, setEditExistingImages] = useState<string[]>([]);
-  const [editNewImages, setEditNewImages] = useState<File[]>([]);
-  const [isUpdating, setIsUpdating] = useState(false);
+  const { data: templates = [] } = useSWR<TemplateItem[]>("promotional-templates", async () => {
+    const res = await getTemplates();
+    return (res as unknown as TemplateItem[]) || [];
+  });
+
+  const openCaptionModal = (stock: UnifiedStockItem) => {
+    setSelectedStockForCaption(stock);
+    setIsCaptionOpen(true);
+  };
+
+  const closeCaptionModal = () => {
+    setIsCaptionOpen(false);
+    setSelectedStockForCaption(null);
+  };
 
   // Gallery Active Index
   const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
@@ -121,103 +116,6 @@ export default function UnifiedStockPage() {
   const handleOpenGalleryModal = (images: string[], title: string, startIndex = 0) => {
     setActiveGalleryIndex(startIndex);
     openGallery(images, title);
-  };
-
-  const handleAddSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formCategory) {
-      alert("Pilih kategori game.");
-      return;
-    }
-    if (!formName.trim()) {
-      alert("Nama atau judul akun wajib diisi.");
-      return;
-    }
-    if (formPaymentStatus === "LUNAS" && !formPaymentAccountId) {
-      alert("Pilih rekening pembayaran kas untuk status LUNAS.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("category", formCategory);
-    formData.append("name", formName.trim());
-    formData.append("account_details", formSpecs.trim());
-    formData.append("username", formUsername.trim());
-    formData.append("password", formPassword.trim());
-    formData.append("capital_price", String(Number(formCapitalPrice) || 0));
-    formData.append("post_price", String(Number(formAskingPrice) || 0));
-    formData.append("current_price", String(Number(formAskingPrice) || 0));
-    formData.append("seller_info", formSellerInfo.trim());
-    formData.append("internal_notes", formInternalNotes.trim());
-    formData.append("purchase_payment_status", formPaymentStatus);
-    if (formPaymentStatus === "LUNAS" && formPaymentAccountId) {
-      formData.append("payment_account_id", formPaymentAccountId);
-    }
-
-    formImages.forEach((img) => {
-      formData.append("images", img);
-    });
-
-    const res = await handleAddStockPurchase(formData);
-    if (res?.success) {
-      setFormCategory("");
-      setFormName("");
-      setFormSpecs("");
-      setFormUsername("");
-      setFormPassword("");
-      setFormCapitalPrice("");
-      setFormAskingPrice("");
-      setFormSellerInfo("");
-      setFormInternalNotes("");
-      setFormPaymentStatus("LUNAS");
-      setFormPaymentAccountId("");
-      setFormImages([]);
-    }
-  };
-
-  const handleOpenEdit = (stock: UnifiedStockItem) => {
-    setEditName(stock.name || "");
-    setEditCapitalPrice(stock.capital_price ? Number(stock.capital_price) : "");
-    setEditPostPrice(
-      stock.current_price
-        ? Number(stock.current_price)
-        : stock.post_price
-          ? Number(stock.post_price)
-          : "",
-    );
-    setEditSellerInfo(stock.seller_info || "");
-    setEditInternalNotes(stock.internal_notes || "");
-
-    const imgs = Array.isArray(stock.images)
-      ? (stock.images as string[]).filter(Boolean)
-      : Array.isArray(stock.image_urls)
-        ? (stock.image_urls as string[]).filter(Boolean)
-        : stock.screenshot_url
-          ? [stock.screenshot_url]
-          : [];
-    setEditExistingImages(imgs);
-    setEditNewImages([]);
-    openEdit(stock);
-  };
-
-  const handleEditSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedStockToEdit) return;
-
-    setIsUpdating(true);
-    await handleUpdateStock(
-      selectedStockToEdit.id,
-      {
-        name: editName.trim(),
-        capital_price: Number(editCapitalPrice) || 0,
-        post_price: Number(editPostPrice) || 0,
-        seller_info: editSellerInfo.trim(),
-        internal_notes: editInternalNotes.trim(),
-        images: editExistingImages,
-      },
-      editNewImages,
-    );
-    setIsUpdating(false);
   };
 
   return (
@@ -343,6 +241,7 @@ export default function UnifiedStockPage() {
           >
             <option value="ALL">Semua Stok</option>
             <option value="AVAILABLE">Tersedia (Ready)</option>
+            <option value="UNPOSTED">Belum Tayang (Draft)</option>
             <option value="SOLD">Terjual (Sold)</option>
           </select>
 
@@ -393,6 +292,7 @@ export default function UnifiedStockPage() {
               ) : (
                 pageItems.map((item) => {
                   const isAvailable = (item.status || "AVAILABLE").toUpperCase() === "AVAILABLE";
+                  const isUnposted = (item.status || "").toUpperCase() === "UNPOSTED";
                   const isPending = item.purchase_payment_status === "PENDING";
                   const sellingPrice = Number(item.current_price || item.post_price) || 0;
                   const capitalPrice = Number(item.capital_price) || 0;
@@ -530,19 +430,37 @@ export default function UnifiedStockPage() {
                           className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold ${
                             isAvailable
                               ? "border border-emerald-200 bg-emerald-50 text-emerald-700"
-                              : "border border-blue-200 bg-blue-50 text-blue-700"
+                              : isUnposted
+                                ? "border border-slate-200 bg-slate-100 text-slate-700"
+                                : "border border-blue-200 bg-blue-50 text-blue-700"
                           }`}
                         >
                           <span
-                            className={`h-1.5 w-1.5 rounded-full ${isAvailable ? "bg-emerald-500" : "bg-blue-500"}`}
+                            className={`h-1.5 w-1.5 rounded-full ${
+                              isAvailable
+                                ? "bg-emerald-500"
+                                : isUnposted
+                                  ? "bg-slate-400"
+                                  : "bg-blue-500"
+                            }`}
                           />
-                          {isAvailable ? "AVAILABLE" : "SOLD"}
+                          {item.status || "AVAILABLE"}
                         </span>
                       </td>
 
                       {/* Actions */}
                       <td className="px-5 py-4 text-right whitespace-nowrap">
                         <div className="flex items-center justify-end gap-1.5">
+                          {/* Buat Caption Promosi Button */}
+                          <button
+                            onClick={() => openCaptionModal(item)}
+                            title="Buat Caption Promosi Sosmed"
+                            className="inline-flex items-center gap-1 rounded-lg border border-blue-100 bg-blue-50 px-2 py-1 text-xs font-medium text-blue-600 transition-colors hover:bg-blue-100"
+                          >
+                            <Wand2 className="h-3.5 w-3.5" />
+                            <span>Caption</span>
+                          </button>
+
                           {isPending && (
                             <button
                               onClick={() => openSettle(item)}
@@ -552,8 +470,8 @@ export default function UnifiedStockPage() {
                             </button>
                           )}
                           <button
-                            onClick={() => handleOpenEdit(item)}
-                            title="Edit Data Stok & Gambar"
+                            onClick={() => openEdit(item)}
+                            title="Edit Data Stok & Foto"
                             className="text-muted-foreground rounded-lg p-1.5 transition-colors hover:bg-blue-50 hover:text-blue-600"
                           >
                             <Edit2 className="h-4 w-4" />
@@ -586,295 +504,33 @@ export default function UnifiedStockPage() {
         )}
       </div>
 
-      {/* 5. SlideOverDrawer: Beli & Tambah Stok */}
-      <SlideOverDrawer
+      {/* 5. Unified Form Drawer: Mode CREATE (Beli & Tambah Stok) */}
+      <StockFormDrawer
+        mode="create"
         open={isAddOpen}
         closing={isAddClosing}
         onClose={closeAdd}
-        title="Beli & Tambah Stok Baru"
         drawerRef={addDrawerRef}
-      >
-        <form onSubmit={handleAddSubmit} className="flex h-full flex-col justify-between">
-          <div className="space-y-6 overflow-y-auto p-6">
-            {error && (
-              <div className="flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700">
-                <AlertCircle className="h-4 w-4 shrink-0" />
-                <span>{error}</span>
-              </div>
-            )}
+        games={games}
+        accounts={accounts}
+        onSubmitCreate={handleAddStockPurchase}
+        onSubmitEdit={handleUpdateStock}
+      />
 
-            {/* Section 1: Detail Akun Game */}
-            <div className="space-y-4">
-              <h3 className="border-border text-foreground border-b pb-2 text-xs font-bold tracking-wider uppercase">
-                1. Informasi Akun Game
-              </h3>
+      {/* 6. Unified Form Drawer: Mode EDIT (Edit Data Stok & Foto) */}
+      <StockFormDrawer
+        mode="edit"
+        open={isEditOpen}
+        closing={false}
+        onClose={closeEdit}
+        stockItem={selectedStockToEdit}
+        games={games}
+        accounts={accounts}
+        onSubmitCreate={handleAddStockPurchase}
+        onSubmitEdit={handleUpdateStock}
+      />
 
-              <div>
-                <label className="text-foreground mb-1 block text-xs font-semibold">
-                  Kategori Game <span className="text-rose-500">*</span>
-                </label>
-                <select
-                  required
-                  value={formCategory}
-                  onChange={(e) => setFormCategory(e.target.value)}
-                  className="border-border bg-card text-foreground w-full rounded-xl border px-3 py-2 text-sm outline-none focus:border-blue-500"
-                >
-                  <option value="">-- Pilih Game --</option>
-                  {games.map((g) => (
-                    <option key={g.id} value={g.name}>
-                      {g.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="text-foreground mb-1 block text-xs font-semibold">
-                  Nama / Judul Akun <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  required
-                  type="text"
-                  value={formName}
-                  onChange={(e) => setFormName(e.target.value)}
-                  placeholder="Contoh: MLBB Mythic Glory 150 Skin"
-                  className="border-border bg-card text-foreground w-full rounded-xl border px-3 py-2 text-sm outline-none focus:border-blue-500"
-                />
-              </div>
-
-              {/* Upload Screenshot Akun */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="text-foreground block text-xs font-semibold">
-                    Screenshot Akun (Maks. 20)
-                  </label>
-                  <span className="text-muted-foreground text-[11px]">
-                    {formImages.length}/20 gambar
-                  </span>
-                </div>
-
-                {formImages.length > 0 && (
-                  <div className="grid grid-cols-4 gap-2">
-                    {formImages.map((file, idx) => (
-                      <div
-                        key={idx}
-                        className="group border-border bg-muted relative aspect-square overflow-hidden rounded-xl border"
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={URL.createObjectURL(file)}
-                          alt={`Preview ${idx}`}
-                          className="h-full w-full object-cover"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setFormImages((prev) => prev.filter((_, i) => i !== idx))}
-                          className="absolute top-1 right-1 rounded-md bg-black/70 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-rose-600"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {formImages.length < 20 && (
-                  <label className="group border-border bg-muted/30 relative flex h-24 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed transition-colors hover:border-blue-500 hover:bg-blue-50/20">
-                    <div className="flex flex-col items-center justify-center text-center">
-                      <UploadCloud className="text-muted-foreground h-6 w-6 transition-colors group-hover:text-blue-500" />
-                      <p className="text-foreground mt-1 text-xs font-medium">
-                        <span className="font-semibold text-blue-600">Klik untuk upload foto</span>{" "}
-                        atau seret file
-                      </p>
-                      <p className="text-muted-foreground text-[10px]">PNG, JPG, WEBP (Maks 5MB)</p>
-                    </div>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      className="hidden"
-                      onChange={(e) => {
-                        const files = Array.from(e.target.files || []);
-                        if (formImages.length + files.length > 20) {
-                          alert("Maksimal 20 foto yang dapat diunggah.");
-                          return;
-                        }
-                        setFormImages((prev) => [...prev, ...files]);
-                        e.target.value = "";
-                      }}
-                    />
-                  </label>
-                )}
-              </div>
-
-              <div>
-                <label className="text-foreground mb-1 block text-xs font-semibold">
-                  Spesifikasi / Detail Akun
-                </label>
-                <textarea
-                  rows={2}
-                  value={formSpecs}
-                  onChange={(e) => setFormSpecs(e.target.value)}
-                  placeholder="Rank, skin langka, status email monsep, dsb..."
-                  className="border-border bg-card text-foreground w-full rounded-xl border px-3 py-2 text-sm outline-none focus:border-blue-500"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-foreground mb-1 block text-xs font-semibold">
-                    Username / Email Login
-                  </label>
-                  <input
-                    type="text"
-                    value={formUsername}
-                    onChange={(e) => setFormUsername(e.target.value)}
-                    placeholder="user@email.com"
-                    className="border-border bg-card text-foreground w-full rounded-xl border px-3 py-2 font-mono text-xs outline-none focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="text-foreground mb-1 block text-xs font-semibold">
-                    Password Login
-                  </label>
-                  <input
-                    type="text"
-                    value={formPassword}
-                    onChange={(e) => setFormPassword(e.target.value)}
-                    placeholder="Password"
-                    className="border-border bg-card text-foreground w-full rounded-xl border px-3 py-2 font-mono text-xs outline-none focus:border-blue-500"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Section 2: Transaksi Kulakan & Modal */}
-            <div className="space-y-4">
-              <h3 className="border-border text-foreground border-b pb-2 text-xs font-bold tracking-wider uppercase">
-                2. Transaksi Kulakan & Finansial
-              </h3>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-foreground mb-1 block text-xs font-semibold">
-                    Harga Modal (Beli) <span className="text-rose-500">*</span>
-                  </label>
-                  <input
-                    required
-                    type="number"
-                    min={0}
-                    value={formCapitalPrice}
-                    onChange={(e) =>
-                      setFormCapitalPrice(e.target.value ? Number(e.target.value) : "")
-                    }
-                    placeholder="Rp 0"
-                    className="border-border bg-card text-foreground w-full rounded-xl border px-3 py-2 text-sm outline-none focus:border-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-foreground mb-1 block text-xs font-semibold">
-                    Target Jual (Etalase) <span className="text-rose-500">*</span>
-                  </label>
-                  <input
-                    required
-                    type="number"
-                    min={0}
-                    value={formAskingPrice}
-                    onChange={(e) =>
-                      setFormAskingPrice(e.target.value ? Number(e.target.value) : "")
-                    }
-                    placeholder="Rp 0"
-                    className="border-border bg-card text-foreground w-full rounded-xl border px-3 py-2 text-sm outline-none focus:border-blue-500"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="text-foreground mb-1 block text-xs font-semibold">
-                  Info Penjual / Supplier
-                </label>
-                <input
-                  type="text"
-                  value={formSellerInfo}
-                  onChange={(e) => setFormSellerInfo(e.target.value)}
-                  placeholder="Nama & no WA seller"
-                  className="border-border bg-card text-foreground w-full rounded-xl border px-3 py-2 text-sm outline-none focus:border-blue-500"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-foreground mb-1 block text-xs font-semibold">
-                    Status Bayar Kulakan
-                  </label>
-                  <select
-                    value={formPaymentStatus}
-                    onChange={(e) => setFormPaymentStatus(e.target.value as PurchasePaymentStatus)}
-                    className="border-border bg-card text-foreground w-full rounded-xl border px-3 py-2 text-sm outline-none focus:border-blue-500"
-                  >
-                    <option value="LUNAS">LUNAS (Potong Kas)</option>
-                    <option value="PENDING">PENDING (Hutang)</option>
-                  </select>
-                </div>
-
-                {formPaymentStatus === "LUNAS" && (
-                  <div>
-                    <label className="text-foreground mb-1 block text-xs font-semibold">
-                      Rekening Kas <span className="text-rose-500">*</span>
-                    </label>
-                    <select
-                      required
-                      value={formPaymentAccountId}
-                      onChange={(e) => setFormPaymentAccountId(e.target.value)}
-                      className="border-border bg-card text-foreground w-full rounded-xl border px-3 py-2 text-sm outline-none focus:border-blue-500"
-                    >
-                      <option value="">-- Pilih Rekening --</option>
-                      {accounts.map((acc) => (
-                        <option key={acc.id} value={acc.id}>
-                          {acc.name} ({formatRupiah(acc.balance)})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <label className="text-foreground mb-1 block text-xs font-semibold">
-                  Catatan Internal (Opsional)
-                </label>
-                <input
-                  type="text"
-                  value={formInternalNotes}
-                  onChange={(e) => setFormInternalNotes(e.target.value)}
-                  placeholder="Catatan tambahan untuk admin"
-                  className="border-border bg-card text-foreground w-full rounded-xl border px-3 py-2 text-sm outline-none focus:border-blue-500"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="border-border bg-card border-t p-6">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-50"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Menyimpan & Menambah Stok...</span>
-                </>
-              ) : (
-                <span>Simpan & Masukkan ke Stok</span>
-              )}
-            </button>
-          </div>
-        </form>
-      </SlideOverDrawer>
-
-      {/* 6. Modal: Intip Kredensial & Foto Akun */}
+      {/* 7. Modal: Intip Kredensial & Foto Akun */}
       {isCredentialsOpen && selectedStockCredentials && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
           <div className="bg-card border-border max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border p-6 shadow-xl">
@@ -1021,7 +677,7 @@ export default function UnifiedStockPage() {
         </div>
       )}
 
-      {/* 7. Modal: Pelunasan Hutang Kulakan */}
+      {/* 8. Modal: Pelunasan Hutang Kulakan */}
       {isSettleOpen && selectedStockToSettle && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
           <div
@@ -1076,7 +732,6 @@ export default function UnifiedStockPage() {
               <button
                 type="button"
                 onClick={closeSettle}
-                disabled={isSettling}
                 className="border-border bg-card text-muted-foreground hover:bg-muted rounded-xl border px-4 py-2 text-xs font-semibold"
               >
                 Batal
@@ -1084,199 +739,11 @@ export default function UnifiedStockPage() {
               <button
                 type="button"
                 onClick={handleSettlePayment}
-                disabled={isSettling}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-700"
               >
-                {isSettling ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                {isSettling ? "Memproses..." : "Konfirmasi Lunas"}
+                Konfirmasi Lunas
               </button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* 8. Modal: Edit Data Stok & Foto */}
-      {isEditOpen && selectedStockToEdit && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
-          <div className="bg-card border-border max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border p-6 shadow-xl">
-            <div className="border-border flex items-center justify-between border-b pb-3">
-              <h3 className="text-foreground font-bold">Edit Data Stok & Foto</h3>
-              <button
-                onClick={closeEdit}
-                className="text-muted-foreground hover:text-foreground rounded-lg p-1"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            <form onSubmit={handleEditSubmit} className="space-y-4 py-4">
-              <div>
-                <label className="text-foreground mb-1 block text-xs font-semibold">
-                  Nama Akun
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  className="border-border bg-card text-foreground w-full rounded-xl border px-3 py-2 text-sm outline-none focus:border-blue-500"
-                />
-              </div>
-
-              {/* Manage Existing & New Photos */}
-              <div className="space-y-2">
-                <label className="text-foreground block text-xs font-semibold">
-                  Foto Screenshot Akun
-                </label>
-
-                {/* Existing Images */}
-                {editExistingImages.length > 0 && (
-                  <div className="grid grid-cols-4 gap-2">
-                    {editExistingImages.map((url, idx) => (
-                      <div
-                        key={idx}
-                        className="group border-border bg-muted relative aspect-square overflow-hidden rounded-xl border"
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={url} alt={`Foto ${idx}`} className="h-full w-full object-cover" />
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setEditExistingImages((prev) => prev.filter((_, i) => i !== idx))
-                          }
-                          className="absolute top-1 right-1 rounded-md bg-black/70 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-rose-600"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* New Image Uploads */}
-                {editNewImages.length > 0 && (
-                  <div className="grid grid-cols-4 gap-2 pt-1">
-                    {editNewImages.map((file, idx) => (
-                      <div
-                        key={idx}
-                        className="group relative aspect-square overflow-hidden rounded-xl border border-blue-300 bg-blue-50/50"
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={URL.createObjectURL(file)}
-                          alt={`New ${idx}`}
-                          className="h-full w-full object-cover"
-                        />
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setEditNewImages((prev) => prev.filter((_, i) => i !== idx))
-                          }
-                          className="absolute top-1 right-1 rounded-md bg-black/70 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-rose-600"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                        <span className="absolute right-0 bottom-0 left-0 bg-blue-600 py-0.5 text-center text-[9px] font-bold text-white">
-                          Baru
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <label className="group border-border bg-muted/30 relative flex h-20 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed transition-colors hover:border-blue-500 hover:bg-blue-50/20">
-                  <div className="flex flex-col items-center justify-center text-center">
-                    <UploadCloud className="text-muted-foreground h-5 w-5 transition-colors group-hover:text-blue-500" />
-                    <p className="text-foreground mt-1 text-xs font-medium">
-                      <span className="font-semibold text-blue-600">Tambah Screenshot Baru</span>
-                    </p>
-                  </div>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    className="hidden"
-                    onChange={(e) => {
-                      const files = Array.from(e.target.files || []);
-                      setEditNewImages((prev) => [...prev, ...files]);
-                      e.target.value = "";
-                    }}
-                  />
-                </label>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-foreground mb-1 block text-xs font-semibold">
-                    Harga Modal
-                  </label>
-                  <input
-                    type="number"
-                    min={0}
-                    value={editCapitalPrice}
-                    onChange={(e) =>
-                      setEditCapitalPrice(e.target.value ? Number(e.target.value) : "")
-                    }
-                    className="border-border bg-card text-foreground w-full rounded-xl border px-3 py-2 text-sm outline-none focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="text-foreground mb-1 block text-xs font-semibold">
-                    Harga Jual
-                  </label>
-                  <input
-                    type="number"
-                    min={0}
-                    value={editPostPrice}
-                    onChange={(e) => setEditPostPrice(e.target.value ? Number(e.target.value) : "")}
-                    className="border-border bg-card text-foreground w-full rounded-xl border px-3 py-2 text-sm outline-none focus:border-blue-500"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="text-foreground mb-1 block text-xs font-semibold">
-                  Info Seller
-                </label>
-                <input
-                  type="text"
-                  value={editSellerInfo}
-                  onChange={(e) => setEditSellerInfo(e.target.value)}
-                  className="border-border bg-card text-foreground w-full rounded-xl border px-3 py-2 text-sm outline-none focus:border-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="text-foreground mb-1 block text-xs font-semibold">
-                  Catatan Internal
-                </label>
-                <input
-                  type="text"
-                  value={editInternalNotes}
-                  onChange={(e) => setEditInternalNotes(e.target.value)}
-                  className="border-border bg-card text-foreground w-full rounded-xl border px-3 py-2 text-sm outline-none focus:border-blue-500"
-                />
-              </div>
-
-              <div className="flex justify-end gap-2.5 pt-2">
-                <button
-                  type="button"
-                  onClick={closeEdit}
-                  disabled={isUpdating}
-                  className="border-border bg-card text-muted-foreground hover:bg-muted rounded-xl border px-4 py-2 text-xs font-semibold"
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  disabled={isUpdating}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
-                >
-                  {isUpdating ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                  {isUpdating ? "Menyimpan..." : "Simpan Perubahan"}
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       )}
@@ -1361,6 +828,25 @@ export default function UnifiedStockPage() {
             )}
           </div>
         </div>
+      )}
+
+      {/* 10. Caption Generator Modal (Marketing Sosmed) */}
+      {isCaptionOpen && selectedStockForCaption && (
+        <CaptionGeneratorModal
+          templates={templates}
+          isOpen={isCaptionOpen}
+          onClose={closeCaptionModal}
+          initialItem={{
+            id: selectedStockForCaption.id,
+            title_reference: selectedStockForCaption.name,
+            account_specs: selectedStockForCaption.account_details,
+            asking_price:
+              Number(selectedStockForCaption.current_price || selectedStockForCaption.post_price) ||
+              0,
+            status: selectedStockForCaption.status || "AVAILABLE",
+            games: { name: selectedStockForCaption.category || "Game" },
+          }}
+        />
       )}
     </div>
   );

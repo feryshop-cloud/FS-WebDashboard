@@ -298,8 +298,13 @@ export async function updatePurchase(
   id: string,
   data: {
     name?: string;
+    category?: string;
+    account_details?: string;
+    username?: string;
+    password?: string;
     capital_price?: number;
     post_price?: number;
+    status?: string;
     seller_info?: string;
     internal_notes?: string;
     images?: string[];
@@ -324,11 +329,16 @@ export async function updatePurchase(
 
     const stockUpdates: Record<string, unknown> = {};
     if (data.name !== undefined) stockUpdates.name = data.name;
+    if (data.category !== undefined) stockUpdates.category = data.category;
+    if (data.account_details !== undefined) stockUpdates.account_details = data.account_details;
+    if (data.username !== undefined) stockUpdates.username = data.username;
+    if (data.password !== undefined) stockUpdates.password = data.password;
     if (data.capital_price !== undefined) stockUpdates.capital_price = data.capital_price;
     if (data.post_price !== undefined) {
       stockUpdates.post_price = data.post_price;
       stockUpdates.current_price = data.post_price;
     }
+    if (data.status !== undefined) stockUpdates.status = data.status;
     if (data.seller_info !== undefined) stockUpdates.seller_info = data.seller_info;
     if (data.internal_notes !== undefined) stockUpdates.internal_notes = data.internal_notes;
     if (data.images !== undefined || (newImageFiles && newImageFiles.length > 0)) {
@@ -341,18 +351,35 @@ export async function updatePurchase(
 
     // Synchronize update in inventory table
     const inventoryUpdates: {
+      game_id?: string;
       title_reference?: string;
+      account_specs?: string;
       capital_price?: number;
       asking_price?: number;
+      status?: any;
       screenshot_url?: string | null;
       image_urls?: string[];
     } = {};
     if (data.name) inventoryUpdates.title_reference = data.name;
+    if (data.account_details !== undefined) inventoryUpdates.account_specs = data.account_details;
     if (data.capital_price !== undefined) inventoryUpdates.capital_price = data.capital_price;
     if (data.post_price !== undefined) inventoryUpdates.asking_price = data.post_price;
+    if (data.status !== undefined) inventoryUpdates.status = data.status;
     if (data.images !== undefined || (newImageFiles && newImageFiles.length > 0)) {
       inventoryUpdates.image_urls = finalImages;
       inventoryUpdates.screenshot_url = finalImages.length > 0 ? finalImages[0] : null;
+    }
+
+    if (data.category) {
+      const { data: matchedGame } = await supabase
+        .from("games")
+        .select("id")
+        .ilike("name", data.category)
+        .limit(1)
+        .maybeSingle();
+      if (matchedGame?.id) {
+        inventoryUpdates.game_id = matchedGame.id;
+      }
     }
 
     if (Object.keys(inventoryUpdates).length > 0) {
