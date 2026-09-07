@@ -95,9 +95,14 @@ export async function POST(request: Request) {
       );
     }
 
+    const ticketData = {
+      ...json.data,
+      expires_at: json.data?.expires_at || new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
+    };
+
     return NextResponse.json({
       ok: true,
-      data: json.data,
+      data: ticketData,
     });
   } catch (error) {
     logger.error("Failed to proxy Digiflazz deposit request", { error });
