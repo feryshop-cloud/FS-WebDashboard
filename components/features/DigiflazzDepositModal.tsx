@@ -219,9 +219,9 @@ export function DigiflazzDepositModal({ isOpen, onClose, onSuccess }: DigiflazzD
       {/* Modal Container */}
       <div className="border-border bg-card relative z-10 w-full max-w-lg overflow-hidden rounded-2xl border p-6 shadow-2xl transition-all">
         {/* Header */}
-        <div className="flex items-center justify-between border-b pb-4 dark:border-slate-800">
+        <div className="border-border flex items-center justify-between border-b pb-4">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400">
+            <div className="bg-primary/10 text-primary flex h-9 w-9 items-center justify-center rounded-xl">
               <Wallet className="h-5 w-5" />
             </div>
             <div>
@@ -251,8 +251,8 @@ export function DigiflazzDepositModal({ isOpen, onClose, onSuccess }: DigiflazzD
           /* Form Input */
           <form onSubmit={handleSubmit} className="mt-4 space-y-4">
             {errorMsg && (
-              <div className="flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700 dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-300">
-                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-rose-600" />
+              <div className="flex items-start gap-2.5 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-rose-600 dark:text-rose-400">
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-rose-600 dark:text-rose-400" />
                 <span>{errorMsg}</span>
               </div>
             )}
@@ -287,8 +287,8 @@ export function DigiflazzDepositModal({ isOpen, onClose, onSuccess }: DigiflazzD
                     onClick={() => setAmount(preset.value)}
                     className={`rounded-lg px-2.5 py-1 text-xs font-medium transition ${
                       amount === preset.value
-                        ? "bg-blue-600 text-white shadow-sm"
-                        : "bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground border"
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "border-border bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground border"
                     }`}
                   >
                     {preset.label}
@@ -310,13 +310,13 @@ export function DigiflazzDepositModal({ isOpen, onClose, onSuccess }: DigiflazzD
                     onClick={() => setBank(b.id)}
                     className={`flex flex-col items-center justify-center rounded-xl border p-2.5 transition ${
                       bank === b.id
-                        ? "border-blue-600 bg-blue-50/70 ring-2 ring-blue-500/20 dark:border-blue-500 dark:bg-blue-950/40"
+                        ? "border-primary bg-primary/10 ring-primary/20 ring-2"
                         : "border-border hover:border-muted-foreground/30 bg-background"
                     }`}
                   >
                     <Building2
                       className={`h-4 w-4 ${
-                        bank === b.id ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground"
+                        bank === b.id ? "text-primary" : "text-muted-foreground"
                       }`}
                     />
                     <span className="text-foreground mt-1 text-xs font-bold">{b.name}</span>
@@ -345,12 +345,12 @@ export function DigiflazzDepositModal({ isOpen, onClose, onSuccess }: DigiflazzD
             </div>
 
             {/* Timeout Info (Fixed 8 hours) */}
-            <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-3 text-[11px] text-slate-700 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-300">
-              <div className="flex items-center gap-1.5 font-semibold text-slate-900 dark:text-slate-100">
-                <Clock className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+            <div className="border-border bg-muted/40 rounded-xl border p-3 text-[11px]">
+              <div className="text-foreground flex items-center gap-1.5 font-semibold">
+                <Clock className="text-primary h-3.5 w-3.5" />
                 <span>Batas Waktu Pembayaran: Maksimal 8 Jam</span>
               </div>
-              <p className="mt-1 text-[11px] leading-relaxed text-slate-600 dark:text-slate-400">
+              <p className="text-muted-foreground mt-1 text-[11px] leading-relaxed">
                 Batas waktu pembayaran tiket ditetapkan otomatis selama <strong>8 jam</strong> oleh
                 sistem dan tidak dapat diatur manual. Tiket akan kedaluwarsa jika transfer tidak
                 diselesaikan dalam kurun waktu tersebut.
@@ -358,8 +358,8 @@ export function DigiflazzDepositModal({ isOpen, onClose, onSuccess }: DigiflazzD
             </div>
 
             {/* Warning Info */}
-            <div className="flex items-start gap-2 rounded-xl bg-amber-50 p-3 text-[11px] text-amber-800 dark:bg-amber-950/30 dark:text-amber-300">
-              <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+            <div className="flex items-start gap-2 rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-[11px] text-amber-800 dark:text-amber-300">
+              <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
               <span>
                 Digiflazz akan menambahkan <strong>kode unik otomatis</strong> pada nominal
                 transfer. Pastikan Anda mentransfer sesuai angka unik tersebut nantinya.
@@ -371,7 +371,7 @@ export function DigiflazzDepositModal({ isOpen, onClose, onSuccess }: DigiflazzD
               <button
                 type="submit"
                 disabled={isLoading}
-                className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 font-semibold text-white shadow-md transition hover:bg-blue-700 disabled:opacity-50"
+                className="bg-primary hover:bg-primary-hover text-primary-foreground flex h-11 w-full items-center justify-center gap-2 rounded-xl font-semibold shadow-md transition disabled:opacity-50"
               >
                 {isLoading ? (
                   <>
@@ -392,23 +392,23 @@ export function DigiflazzDepositModal({ isOpen, onClose, onSuccess }: DigiflazzD
           <div className="mt-4 space-y-4">
             {/* Countdown / Timeout Banner */}
             {!isExpired ? (
-              <div className="flex items-center justify-between rounded-xl border border-blue-200 bg-blue-50/80 px-4 py-3 text-xs text-blue-900 dark:border-blue-900/60 dark:bg-blue-950/40 dark:text-blue-200">
+              <div className="border-primary/30 bg-primary/10 flex items-center justify-between rounded-xl border px-4 py-3 text-xs">
                 <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
+                  <Clock className="text-primary h-4 w-4 shrink-0" />
                   <div>
-                    <span className="font-semibold">Sisa Waktu Pembayaran:</span>
-                    <p className="text-[10px] text-blue-700 dark:text-blue-300">
+                    <span className="text-foreground font-semibold">Sisa Waktu Pembayaran:</span>
+                    <p className="text-muted-foreground text-[10px]">
                       Batas maksimal 8 jam (otomatis sistem)
                     </p>
                   </div>
                 </div>
-                <div className="font-mono text-base font-extrabold tracking-wider text-blue-700 dark:text-blue-300">
+                <div className="text-primary font-mono text-base font-extrabold tracking-wider">
                   {formattedCountdown}
                 </div>
               </div>
             ) : (
-              <div className="flex items-start gap-2.5 rounded-xl border border-rose-300 bg-rose-50 p-3 text-xs text-rose-900 dark:border-rose-800 dark:bg-rose-950/40 dark:text-rose-200">
-                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-rose-600" />
+              <div className="flex items-start gap-2.5 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-rose-700 dark:text-rose-300">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-rose-600 dark:text-rose-400" />
                 <div>
                   <p className="font-bold">Waktu Pembayaran Telah Habis (Kedaluwarsa)</p>
                   <p className="mt-0.5 text-[11px]">
@@ -421,8 +421,8 @@ export function DigiflazzDepositModal({ isOpen, onClose, onSuccess }: DigiflazzD
 
             {/* Warning Box */}
             {!isExpired && (
-              <div className="flex items-start gap-2.5 rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900 dark:border-amber-700/60 dark:bg-amber-950/40 dark:text-amber-200">
-                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+              <div className="flex items-start gap-2.5 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-800 dark:text-amber-300">
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
                 <div>
                   <p className="font-bold">PENTING: Transfer Tepat Sesuai Nominal</p>
                   <p className="mt-0.5 text-[11px]">
@@ -437,8 +437,8 @@ export function DigiflazzDepositModal({ isOpen, onClose, onSuccess }: DigiflazzD
             <div
               className={`rounded-xl border p-4 ${
                 isExpired
-                  ? "border-slate-200 bg-slate-50 opacity-60 dark:border-slate-800 dark:bg-slate-900/30"
-                  : "border-blue-200 bg-blue-50/60 dark:border-blue-900/60 dark:bg-blue-950/30"
+                  ? "border-border bg-muted/40 opacity-60"
+                  : "border-primary/30 bg-primary/5"
               }`}
             >
               <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
@@ -447,7 +447,7 @@ export function DigiflazzDepositModal({ isOpen, onClose, onSuccess }: DigiflazzD
               <div className="mt-1 flex items-center justify-between">
                 <span
                   className={`font-mono text-2xl font-extrabold ${
-                    isExpired ? "text-slate-400 line-through" : "text-blue-600 dark:text-blue-400"
+                    isExpired ? "text-muted-foreground line-through" : "text-primary"
                   }`}
                 >
                   {formatRupiah(ticketResult.amount)}
@@ -456,11 +456,11 @@ export function DigiflazzDepositModal({ isOpen, onClose, onSuccess }: DigiflazzD
                   <button
                     type="button"
                     onClick={() => handleCopy(String(ticketResult.amount), "amount")}
-                    className="inline-flex items-center gap-1.5 rounded-lg border bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                    className="border-border bg-card text-foreground hover:bg-muted inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-semibold shadow-sm transition"
                   >
                     {copiedField === "amount" ? (
                       <>
-                        <Check className="h-3.5 w-3.5 text-emerald-600" />
+                        <Check className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
                         Tersalin!
                       </>
                     ) : (
@@ -476,18 +476,18 @@ export function DigiflazzDepositModal({ isOpen, onClose, onSuccess }: DigiflazzD
 
             {/* Account Details */}
             <div
-              className={`space-y-2 rounded-xl border p-4 text-xs dark:border-slate-800 ${
+              className={`border-border bg-muted/20 space-y-2 rounded-xl border p-4 text-xs ${
                 isExpired ? "opacity-60" : ""
               }`}
             >
-              <div className="flex items-center justify-between border-b pb-2 dark:border-slate-800">
+              <div className="border-border flex items-center justify-between border-b pb-2">
                 <span className="text-muted-foreground">Bank Tujuan</span>
                 <span className="text-foreground font-bold">
                   {ticketResult.bank} ({ticketResult.payment_method})
                 </span>
               </div>
 
-              <div className="flex items-center justify-between border-b pb-2 dark:border-slate-800">
+              <div className="border-border flex items-center justify-between border-b pb-2">
                 <span className="text-muted-foreground">Nomor Rekening</span>
                 <div className="flex items-center gap-2">
                   <span className="text-foreground font-mono text-sm font-bold">
@@ -499,11 +499,11 @@ export function DigiflazzDepositModal({ isOpen, onClose, onSuccess }: DigiflazzD
                       onClick={() =>
                         handleCopy(ticketResult.account_no.replace(/\s+/g, ""), "account")
                       }
-                      className="text-muted-foreground hover:text-foreground rounded p-1 hover:bg-slate-100 dark:hover:bg-slate-800"
+                      className="text-muted-foreground hover:text-foreground hover:bg-muted rounded p-1"
                       title="Salin No Rekening"
                     >
                       {copiedField === "account" ? (
-                        <Check className="h-3.5 w-3.5 text-emerald-600" />
+                        <Check className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
                       ) : (
                         <Copy className="h-3.5 w-3.5" />
                       )}
@@ -513,7 +513,7 @@ export function DigiflazzDepositModal({ isOpen, onClose, onSuccess }: DigiflazzD
               </div>
 
               {ticketResult.notes && (
-                <div className="flex items-center justify-between border-b pb-2 dark:border-slate-800">
+                <div className="border-border flex items-center justify-between border-b pb-2">
                   <span className="text-muted-foreground">Berita / Catatan</span>
                   <div className="flex items-center gap-2">
                     <span className="text-foreground font-mono text-xs font-bold">
@@ -523,11 +523,11 @@ export function DigiflazzDepositModal({ isOpen, onClose, onSuccess }: DigiflazzD
                       <button
                         type="button"
                         onClick={() => handleCopy(ticketResult.notes, "notes")}
-                        className="text-muted-foreground hover:text-foreground rounded p-1 hover:bg-slate-100 dark:hover:bg-slate-800"
+                        className="text-muted-foreground hover:text-foreground hover:bg-muted rounded p-1"
                         title="Salin Berita Transfer"
                       >
                         {copiedField === "notes" ? (
-                          <Check className="h-3.5 w-3.5 text-emerald-600" />
+                          <Check className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
                         ) : (
                           <Copy className="h-3.5 w-3.5" />
                         )}
@@ -539,7 +539,7 @@ export function DigiflazzDepositModal({ isOpen, onClose, onSuccess }: DigiflazzD
 
               <div className="flex items-center justify-between pt-1">
                 <span className="text-muted-foreground">Kedaluwarsa Pada</span>
-                <span className="font-mono text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                <span className="text-foreground font-mono text-[11px] font-semibold">
                   {formatDate(ticketResult.expires_at)}
                 </span>
               </div>
@@ -551,7 +551,7 @@ export function DigiflazzDepositModal({ isOpen, onClose, onSuccess }: DigiflazzD
                 <button
                   type="button"
                   onClick={handleResetTicket}
-                  className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 font-semibold text-white shadow-md transition hover:bg-blue-700"
+                  className="bg-primary hover:bg-primary-hover text-primary-foreground flex h-11 w-full items-center justify-center gap-2 rounded-xl font-semibold shadow-md transition"
                 >
                   <RotateCcw className="h-4 w-4" />
                   Buat Tiket Baru
@@ -561,7 +561,7 @@ export function DigiflazzDepositModal({ isOpen, onClose, onSuccess }: DigiflazzD
                   <button
                     type="button"
                     onClick={handleResetTicket}
-                    className="flex h-11 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                    className="border-border bg-card text-foreground hover:bg-muted flex h-11 items-center justify-center gap-1.5 rounded-xl border px-4 text-xs font-semibold transition"
                     title="Batalkan tiket ini dan buat baru"
                   >
                     <RotateCcw className="h-3.5 w-3.5" />
