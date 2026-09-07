@@ -42,16 +42,30 @@ export async function GET(request: Request) {
     });
 
     if (!response.ok) {
-      const errorText = await response.text().catch(() => "");
+      let errorMessage = `Layanan Digiflazz mengembalikan status ${response.status}`;
+      try {
+        const errorJson = await response.json();
+        if (errorJson?.message) {
+          errorMessage = errorJson.message;
+        } else if (errorJson?.error) {
+          errorMessage = String(errorJson.error);
+        }
+      } catch {
+        const errorText = await response.text().catch(() => "");
+        if (errorText) {
+          errorMessage = errorText.slice(0, 200);
+        }
+      }
+
       logger.warn("Digiflazz service balance check returned non-ok", {
         status: response.status,
-        body: errorText.slice(0, 200),
+        error: errorMessage,
       });
 
       return NextResponse.json(
         {
           ok: false,
-          error: `Layanan Digiflazz mengembalikan status ${response.status}`,
+          error: errorMessage,
         },
         { status: response.status },
       );
