@@ -23,3 +23,8 @@ export function formatDate(dateString: string, includeTime: boolean = true): str
   }
   return new Intl.DateTimeFormat("id-ID", options).format(date);
 }
+
+export function getBasePath(): string {
+  const routePrefix = process.env.NEXT_PUBLIC_BASE_PATH?.trim();
+  return routePrefix && routePrefix !== "/" ? `/${routePrefix.replace(/^\/+|\/+$/g, "")}` : "";
+}

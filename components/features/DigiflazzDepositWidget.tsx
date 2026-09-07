@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Coins, RefreshCw, CheckCircle2, AlertTriangle, AlertCircle, Clock } from "lucide-react";
-import { formatRupiah, formatDate } from "@/lib/utils";
+import { formatRupiah, formatDate, getBasePath } from "@/lib/utils";
 
 interface BalanceData {
   deposit: number;
@@ -26,15 +26,28 @@ export function DigiflazzDepositWidget() {
     setError(null);
 
     try {
-      const url = `/api/digiflazz/balance${forceRefresh ? "?refresh=true" : ""}`;
+      const basePath = getBasePath();
+      const url = `${basePath}/api/digiflazz/balance${forceRefresh ? "?refresh=true" : ""}`;
       const res = await fetch(url);
-      const json = await res.json();
 
-      if (!res.ok || !json.ok) {
-        throw new Error(json.error || "Gagal memuat saldo Digiflazz");
+      let json: { ok?: boolean; data?: BalanceData; error?: string } | null = null;
+      try {
+        json = await res.json();
+      } catch {
+        throw new Error(
+          res.ok
+            ? "Format respons server tidak valid"
+            : `Gagal memuat saldo (${res.status} ${res.statusText})`,
+        );
       }
 
-      setData(json.data);
+      if (!res.ok || !json?.ok) {
+        throw new Error(json?.error || `Gagal memuat saldo (HTTP ${res.status})`);
+      }
+
+      if (json?.data) {
+        setData(json.data);
+      }
       lastFetchTimeRef.current = Date.now();
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Terjadi kesalahan";
