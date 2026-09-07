@@ -28,12 +28,7 @@ CREATE POLICY "Admins can view digiflazz_transactions"
     ON public.digiflazz_transactions
     FOR SELECT
     TO authenticated
-    USING (
-        EXISTS (
-            SELECT 1 FROM public.users
-            WHERE users.id = auth.uid() AND users.role = 'admin'
-        )
-    );
+    USING ((select public.is_admin()));
 
 -- Indexes for fast query lookup
 CREATE INDEX IF NOT EXISTS idx_digi_tx_order_id ON public.digiflazz_transactions(order_id);
