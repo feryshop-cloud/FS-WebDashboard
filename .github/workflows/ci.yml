@@ -31,6 +31,12 @@ jobs:
         run: bun run lint
 
       - name: Build
+        env:
+          NEXT_PUBLIC_BASE_PATH: /admin
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.placeholder
+          DIGIFLAZZ_SERVICE_URL: http://localhost:3002
+          DIGIFLAZZ_SERVICE_API_KEY: ci-test-key
         run: bun run build
 
       - name: Test

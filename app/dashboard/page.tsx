@@ -19,6 +19,7 @@ import {
 } from "@/actions/analytics";
 import { formatRupiah, formatDate } from "@/lib/utils";
 import { RevenueProfitChart } from "@/components/features/RevenueProfitChart";
+import { DigiflazzDepositWidget } from "@/components/features/DigiflazzDepositWidget";
 
 export default async function DashboardOverview() {
   const supabase = await createClient();
@@ -150,7 +151,12 @@ export default async function DashboardOverview() {
         </div>
       </div>
 
-      {/* 2. MAIN VISUALIZATION (2-Column Grid) */}
+      {/* 2. OPERATIONAL / DEPOSIT MONITORING */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <DigiflazzDepositWidget />
+      </div>
+
+      {/* 3. MAIN VISUALIZATION (2-Column Grid) */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {/* Tren Pendapatan & Profit (Span 2/3) */}
         <div className="border-border-soft bg-card flex h-90 flex-col rounded-xl border p-6 shadow-sm md:col-span-2">
