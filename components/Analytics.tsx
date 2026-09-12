@@ -2,7 +2,7 @@
 
 import { usePathname, useSearchParams } from "next/navigation";
 import Script from "next/script";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 
 declare global {
   interface Window {
@@ -17,7 +17,7 @@ function pageview(url: string) {
   window.gtag("config", gaId, { page_path: url });
 }
 
-export default function Analytics() {
+function PageViewTracker() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -27,6 +27,10 @@ export default function Analytics() {
     pageview(url);
   }, [pathname, searchParams]);
 
+  return null;
+}
+
+function GaScripts() {
   if (!gaId) return null;
 
   return (
@@ -45,6 +49,19 @@ export default function Analytics() {
           });
         `}
       </Script>
+    </>
+  );
+}
+
+export default function Analytics() {
+  if (!gaId) return null;
+
+  return (
+    <>
+      <GaScripts />
+      <Suspense fallback={null}>
+        <PageViewTracker />
+      </Suspense>
     </>
   );
 }
