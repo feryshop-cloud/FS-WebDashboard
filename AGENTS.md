@@ -4,7 +4,7 @@ description: "Use to build features spanning database, API, frontend as cohesive
 tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 
-Senior fullstack developer. Deliver complete features across TypeScript-first stack: Next.js 15+ / React 19, Node.js 22+ with Hono or tRPC, PostgreSQL with Drizzle ORM, deploy to Vercel / Railway / Fly.io. Focus: cohesive, end-to-end, database to UI, working seamless.
+Senior fullstack developer. Deliver complete features across TypeScript-first stack: Next.js 15+ / React 19, Node.js 22+ with Hono or tRPC, PostgreSQL with Drizzle ORM, deploy to VPS (Docker). Focus: cohesive, end-to-end, database to UI, working seamless.
 
 ## Repository Shell Command Map
 
@@ -20,6 +20,7 @@ Project normally operates from Windows PowerShell 5.1, even when tool labels she
 | Start dev server on port | `npm run dev -- --port 3002` |
 | Production build | `npm run build` |
 | Start production server | `npm run start` |
+| Start production server on VPS | `npm run start:vps` |
 | Lint | `npm run lint` |
 | Create admin user | `npm run create-admin` |
 

@@ -73,12 +73,14 @@ jobs:
           DIGIFLAZZ_SERVICE_API_KEY: ${{ secrets.DIGIFLAZZ_SERVICE_API_KEY }}
           STORE_REVALIDATE_URL: ${{ vars.STORE_REVALIDATE_URL }}
           STORE_REVALIDATE_SECRET: ${{ secrets.STORE_REVALIDATE_SECRET }}
+          NEXT_PUBLIC_PUSHER_APP_KEY: ${{ secrets.NEXT_PUBLIC_PUSHER_APP_KEY }}
+          NEXT_PUBLIC_PUSHER_CLUSTER: ${{ secrets.NEXT_PUBLIC_PUSHER_CLUSTER }}
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT || 22 }}
-          envs: DIGIFLAZZ_SERVICE_API_KEY,STORE_REVALIDATE_URL,STORE_REVALIDATE_SECRET
+          envs: DIGIFLAZZ_SERVICE_API_KEY,STORE_REVALIDATE_URL,STORE_REVALIDATE_SECRET,NEXT_PUBLIC_PUSHER_APP_KEY,NEXT_PUBLIC_PUSHER_CLUSTER
           script: |
             cd /opt/feryshop
             touch .env
@@ -94,6 +96,8 @@ jobs:
             update_env "DIGIFLAZZ_SERVICE_API_KEY" "$DIGIFLAZZ_SERVICE_API_KEY"
             update_env "STORE_REVALIDATE_URL" "$STORE_REVALIDATE_URL"
             update_env "STORE_REVALIDATE_SECRET" "$STORE_REVALIDATE_SECRET"
+            update_env "NEXT_PUBLIC_PUSHER_APP_KEY" "$NEXT_PUBLIC_PUSHER_APP_KEY"
+            update_env "NEXT_PUBLIC_PUSHER_CLUSTER" "$NEXT_PUBLIC_PUSHER_CLUSTER"
 
             docker compose -f docker-compose.prod.yml pull admin-dashboard
             docker compose -f docker-compose.prod.yml up -d --no-deps admin-dashboard

@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentRole } from "@/lib/auth/role";
 import { isAdminRole } from "@/lib/roles";
 import Sidebar from "../../components/layout/Sidebar";
+import { NotificationBell } from "@/components/NotificationBell";
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const supabase = await createClient();
@@ -30,8 +31,8 @@ export default async function DashboardLayout({ children }: { children: ReactNod
       <div className="flex flex-1 flex-col overflow-hidden transition-all duration-300">
         {/* Header */}
         <header className="border-border bg-card flex h-16 shrink-0 items-center justify-between border-b px-6 py-3 shadow-sm">
-          <div className="flex items-center">
-            {/* Reserved for far-left alignment (e.g. mobile toggle) */}
+          <div className="flex items-center gap-2">
+            <NotificationBell userId={user.id} />
           </div>
 
           <div className="flex items-center">
