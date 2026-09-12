@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { pusher } from "@/lib/pusher";
+import { getPusher } from "@/lib/pusher";
 import useSWR from "swr";
 
 export interface Notification {
@@ -29,6 +29,9 @@ export function useNotifications(userId: string | undefined) {
 
   useEffect(() => {
     if (!userId) return;
+
+    const pusher = getPusher();
+    if (!pusher) return;
 
     const channel = pusher.subscribe("admin-notifications");
 

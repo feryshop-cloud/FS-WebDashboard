@@ -3,10 +3,12 @@ import Pusher from "pusher-js";
 const pusherKey = process.env.NEXT_PUBLIC_PUSHER_APP_KEY;
 const pusherCluster = process.env.NEXT_PUBLIC_PUSHER_CLUSTER;
 
-if (!pusherKey || !pusherCluster) {
-  throw new Error("Pusher environment variables not configured");
-}
+let pusherInstance: Pusher | null = null;
 
-export const pusher = new Pusher(pusherKey, {
-  cluster: pusherCluster,
-});
+export function getPusher(): Pusher | null {
+  if (!pusherKey || !pusherCluster) return null;
+  if (!pusherInstance) {
+    pusherInstance = new Pusher(pusherKey, { cluster: pusherCluster });
+  }
+  return pusherInstance;
+}
