@@ -13,7 +13,6 @@ import type { Database } from "@/types/database.types";
 import {
   BuyStatus,
   BuyStatusLabel,
-  PaymentStatus,
   PaymentStatusLabel,
   VALID_BUY_STATUSES,
   VALID_PAYMENT_STATUSES,

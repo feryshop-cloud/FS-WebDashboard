@@ -383,6 +383,7 @@ export function GameManager({
                     </div>
                     {imageUrl && (
                       <div className="mt-1 flex items-center gap-2">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={imageUrl}
                           alt="Thumbnail Preview"
@@ -440,6 +441,7 @@ export function GameManager({
                     </div>
                     {logo && (
                       <div className="mt-1 flex items-center gap-2">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={logo}
                           alt="Logo Preview"
@@ -497,6 +499,7 @@ export function GameManager({
                     </div>
                     {banner && (
                       <div className="mt-1">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={banner}
                           alt="Banner Preview"

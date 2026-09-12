@@ -122,7 +122,7 @@ export function useInventory() {
   );
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setCurrentPage(1);
   }, [activeCategory, activeStatus, debouncedSearchQuery, inventory.length]);
 

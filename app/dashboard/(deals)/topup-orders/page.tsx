@@ -3,12 +3,10 @@
 import React from "react";
 import {
   Search,
-  Filter,
   FileText,
   ChevronDown,
   X,
   Loader2,
-  ShoppingBag,
   RefreshCw,
   CheckCircle2,
 } from "lucide-react";
@@ -40,7 +38,6 @@ export default function TopupOrdersPage() {
       setPaymentStatus,
       setBuyStatus,
       setSelectedOrder,
-      handleApplyFilters,
       handleResetFilters,
       handlePageChange,
       handlePageSizeChange,

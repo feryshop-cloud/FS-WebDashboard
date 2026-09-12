@@ -24,7 +24,7 @@ export interface PromoCodeRow {
 export async function getPromoCodes() {
   return runAction("getPromoCodes", async () => {
     const supabase = await createClient();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { data, error } = await (supabase.from as any)("promo_codes")
       .select("*")
       .order("created_at", { ascending: false });
@@ -57,7 +57,7 @@ export async function createPromoCode(formData: FormData) {
     }
 
     const supabase = await createClient();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { error } = await (supabase.from as any)("promo_codes").insert({
       code,
       discount_type: discountType,
@@ -102,7 +102,7 @@ export async function updatePromoCode(id: number, formData: FormData) {
     }
 
     const supabase = await createClient();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { data, error } = await (supabase.from as any)("promo_codes")
       .update({
         code,
@@ -142,7 +142,7 @@ export async function deletePromoCode(id: number) {
     if (!id) throw new Error("ID promo wajib diisi.");
 
     const supabase = await createClient();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { error } = await (supabase.from as any)("promo_codes").delete().eq("id", id);
 
     if (error) {

@@ -41,7 +41,7 @@ export async function getTopupProducts(filters: TopupProductsFilters = {}) {
 
     const supabase = await createClient();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     let query = (supabase as any).from("products").select("*", { count: "exact" });
 
     if (search.trim()) {
@@ -88,7 +88,7 @@ export async function addTopupProduct(input: TopupProductInput) {
       return { success: false, error: "Unauthorized" };
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { error } = await (supabase as any).from("products").insert({
       game_slug: input.game_slug,
       title: input.title,
@@ -122,7 +122,7 @@ export async function updateTopupProduct(id: string, input: TopupProductInput) {
       return { success: false, error: "Unauthorized" };
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { error } = await (supabase as any)
       .from("products")
       .update({
@@ -160,7 +160,7 @@ export async function deleteTopupProduct(id: string) {
       return { success: false, error: "Unauthorized" };
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { error } = await (supabase as any).from("products").delete().eq("id", id);
 
     if (error) {

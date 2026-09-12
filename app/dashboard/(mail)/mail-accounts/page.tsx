@@ -15,7 +15,6 @@ import {
   Copy,
   Check,
   RefreshCw,
-  Shield,
   ShieldOff,
   Lock,
 } from "lucide-react";
@@ -26,7 +25,7 @@ export default function EmailAccountsPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const {
-    data: { accounts, filtered, pageItems, safePage, itemsPerPage },
+    data: { filtered, pageItems, safePage, itemsPerPage },
     isLoading,
     isSubmitting,
     error,

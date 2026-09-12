@@ -51,7 +51,7 @@ export async function processInventoryQueue(
  */
 export async function processDeadLetterQueue(
   batch: MessageBatch<VectorQueueMessage>,
-  env: Env,
+  _env: Env,
 ): Promise<void> {
   logger.warn("DLQ message received, acking", { queueSize: batch.messages.length });
   for (const msg of batch.messages) {

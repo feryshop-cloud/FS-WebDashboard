@@ -26,10 +26,10 @@ export function useTopupProducts() {
   const searchQuery = searchParams.get("search") || "";
   const [localSearch, setLocalSearch] = useState(searchQuery);
   const debouncedSearch = useDebouncedValue(localSearch, 300);
-  const pushWithParams = (params: URLSearchParams) => {
+  const pushWithParams = useCallback((params: URLSearchParams) => {
     params.set("page", "1");
     router.push(`/dashboard/topup-products?${params.toString()}`);
-  };
+  }, [router]);
 
   useEffect(() => {
     setLocalSearch(searchQuery);
@@ -45,7 +45,7 @@ export function useTopupProducts() {
       }
       pushWithParams(params);
     }
-  }, [debouncedSearch]);
+  }, [debouncedSearch, searchQuery, searchParams, pushWithParams]);
   const sortBy = searchParams.get("sortBy") || "game_slug";
   const sortOrder = (searchParams.get("sortOrder") || "asc") as "asc" | "desc";
   const isActiveFilter = searchParams.get("isActive") || "";

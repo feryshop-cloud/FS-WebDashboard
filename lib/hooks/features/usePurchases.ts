@@ -204,7 +204,7 @@ export function usePurchases() {
   }, [purchases, query, statusFilter]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setPageNumber(1);
   }, [query, statusFilter]);
 

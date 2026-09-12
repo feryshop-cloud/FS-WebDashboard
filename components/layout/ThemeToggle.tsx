@@ -10,7 +10,7 @@ export default function ThemeToggle() {
 
   useEffect(() => {
     // Hydration guard: initial theme must be read client-side only.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setMounted(true);
     setThemeState(getInitialTheme());
   }, []);

@@ -101,6 +101,7 @@ export function GameTable({
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-3">
                         {game.logo || game.image_url ? (
+                          /* eslint-disable-next-line @next/next/no-img-element */
                           <img
                             src={game.logo || game.image_url || ""}
                             alt={game.name}

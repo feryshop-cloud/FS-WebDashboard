@@ -6,7 +6,6 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
-import { logger } from "./utils/logger";
 import type { Env, OperationResult } from "./types";
 
 /**

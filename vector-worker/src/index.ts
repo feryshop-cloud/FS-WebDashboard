@@ -54,7 +54,7 @@ export default {
    * - `POST /webhooks/supabase` — Supabase webhook endpoint (requires HMAC signature)
    * - `*` — Returns 404
    */
-  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+  async fetch(request: Request, env: Env, _ctx: ExecutionContext): Promise<Response> {
     const requestId = request.headers.get("x-request-id") || undefined;
     setRequestId(requestId);
     const url = new URL(request.url);
@@ -108,7 +108,7 @@ export default {
    * - `inventory-vector-queue` — Processes individual record vectorization
    * - `inventory-vector-dlq` — Acknowledges dead-lettered messages
    */
-  async queue(batch: MessageBatch<unknown>, env: Env, ctx: ExecutionContext): Promise<void> {
+  async queue(batch: MessageBatch<unknown>, env: Env, _ctx: ExecutionContext): Promise<void> {
     const queueName = batch.queue;
     if (queueName === "inventory-vector-queue") {
       await processInventoryQueue(batch as MessageBatch<VectorQueueMessage>, env);

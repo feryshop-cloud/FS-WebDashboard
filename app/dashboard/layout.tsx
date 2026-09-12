@@ -30,16 +30,12 @@ export default async function DashboardLayout({ children }: { children: ReactNod
       {/* Main Content Area */}
       <div className="flex flex-1 flex-col overflow-hidden transition-all duration-300">
         {/* Header */}
-        <header className="border-border bg-card flex h-16 shrink-0 items-center justify-between border-b px-6 py-3 shadow-sm">
-          <div className="flex items-center gap-2">
-            <NotificationBell userId={user.id} />
-          </div>
+        <header className="border-border bg-card flex h-16 shrink-0 items-center justify-end gap-3 border-b px-6 py-3 shadow-sm">
+          <NotificationBell userId={user.id} />
 
-          <div className="flex items-center">
-            <span className="border-border bg-muted text-muted-foreground inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold tracking-wide">
-              {role}
-            </span>
-          </div>
+          <span className="border-border bg-muted text-muted-foreground inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold tracking-wide">
+            {role}
+          </span>
         </header>
 
         {/* Scrollable Main */}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import ThemeProvider from "@/components/layout/ThemeProvider";
+import Analytics from "@/components/Analytics";
 
 const routePrefix = process.env.NEXT_PUBLIC_BASE_PATH?.trim();
 const basePath =
@@ -28,6 +29,7 @@ export default function RootLayout({
   return (
     <html lang="id" className="h-full antialiased">
       <body className="flex min-h-full flex-col bg-[var(--background)] font-sans text-[var(--foreground)]">
+        <Analytics />
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>

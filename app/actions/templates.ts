@@ -8,7 +8,7 @@ import { runAction } from "@/lib/logging/server-action";
 export async function getTemplates() {
   return runAction("getTemplates", async () => {
     const supabase = await createClient();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { data, error } = await (supabase.from as any)("promotional_templates")
       .select("*")
       .order("created_at", { ascending: false });
@@ -52,7 +52,7 @@ export async function addTemplate(formData: FormData) {
     }
 
     const supabase = await createClient();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { error } = await (supabase.from as any)("promotional_templates").insert({
       name,
       type,
@@ -79,7 +79,7 @@ export async function updateTemplate(id: string, formData: FormData) {
     }
 
     const supabase = await createClient();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { error } = await (supabase.from as any)("promotional_templates")
       .update({
         name,
@@ -101,7 +101,7 @@ export async function updateTemplate(id: string, formData: FormData) {
 export async function deleteTemplate(id: string) {
   return runAction("deleteTemplate", async () => {
     const supabase = await createClient();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const { error } = await (supabase.from as any)("promotional_templates").delete().eq("id", id);
 
     if (error) {

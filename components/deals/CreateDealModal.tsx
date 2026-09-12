@@ -32,7 +32,7 @@ export function CreateDealModal({ isOpen, onClose }: CreateDealModalProps) {
 
   useEffect(() => {
     if (isOpen) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
       loadStocks();
     }
   }, [isOpen]);
