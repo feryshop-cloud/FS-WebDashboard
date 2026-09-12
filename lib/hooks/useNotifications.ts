@@ -15,6 +15,8 @@ export interface Notification {
   created_at: string;
 }
 
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export function useNotifications(userId: string | undefined) {
@@ -22,7 +24,7 @@ export function useNotifications(userId: string | undefined) {
   const [latest, setLatest] = useState<Notification | null>(null);
 
   const { data: notifications, mutate } = useSWR<Notification[]>(
-    userId ? "/api/notifications" : null,
+    userId ? `${basePath}/api/notifications` : null,
     fetcher,
     { revalidateOnFocus: true },
   );
@@ -57,14 +59,14 @@ export function useNotifications(userId: string | undefined) {
 
   const markAsRead = useCallback(
     async (id: string) => {
-      await fetch(`/api/notifications/${id}/read`, { method: "PATCH" });
+      await fetch(`${basePath}/api/notifications/${id}/read`, { method: "PATCH" });
       mutate();
     },
     [mutate],
   );
 
   const markAllAsRead = useCallback(async () => {
-    await fetch("/api/notifications/read-all", { method: "PATCH" });
+    await fetch(`${basePath}/api/notifications/read-all`, { method: "PATCH" });
     mutate();
   }, [mutate]);
 
