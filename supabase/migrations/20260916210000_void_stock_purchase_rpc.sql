@@ -56,7 +56,7 @@ CREATE TRIGGER trg_sync_inventory_on_stock_void
   FOR EACH ROW
   EXECUTE FUNCTION public.sync_inventory_on_stock_void();
 
--- 4. Stored Procedure Orkestrasi Pembatalan / Void Stok
+-- 4. Stored Procedure Orkestrasi Pembatalan / Void / Soft Delete Stok
 CREATE OR REPLACE FUNCTION public.void_stock_purchase(p_stock_id UUID)
 RETURNS JSONB
 LANGUAGE plpgsql
@@ -67,7 +67,6 @@ DECLARE
   v_admin_id UUID;
   v_stock RECORD;
   v_ledger RECORD;
-  v_deal_item_count INT;
 BEGIN
   -- Verifikasi admin
   v_admin_id := auth.uid();
@@ -76,7 +75,7 @@ BEGIN
   END IF;
 
   IF NOT public.is_admin() THEN
-    RAISE EXCEPTION 'Akses ditolak: Hanya admin yang dapat membatalkan pembelian stok.';
+    RAISE EXCEPTION 'Akses ditolak: Hanya admin yang dapat menghapus stok.';
   END IF;
 
   -- Ambil data stok
@@ -85,71 +84,74 @@ BEGIN
     RAISE EXCEPTION 'Data stok tidak ditemukan.';
   END IF;
 
-  -- Cek apakah sudah dibatalkan
-  IF v_stock.status = 'CANCELLED' OR v_stock.deleted_at IS NOT NULL THEN
-    RAISE EXCEPTION 'Stok sudah dalam status dibatalkan (VOID/CANCELLED).';
+  -- Cek apakah sudah dibatalkan/dihapus
+  IF v_stock.deleted_at IS NOT NULL THEN
+    RAISE EXCEPTION 'Entri stok ini sudah pernah dihapus sebelumnya.';
   END IF;
 
-  -- Cek apakah stok sudah terjual atau terikat transaksi aktif
-  IF v_stock.status IN ('SOLD', 'BOOKED', 'LIMITED_ACCESS') THEN
-    RAISE EXCEPTION 'Stok tidak dapat dibatalkan karena berstatus % (sudah terjual atau terikat transaksi).', v_stock.status;
-  END IF;
+  -- Pembedaan Logika:
+  -- Jika stok BELUM TERJUAL (AVAILABLE, UNPOSTED, dll):
+  -- Ini adalah pembatalan pembelian (VOID) -> batalkan modal di finance_ledger & set status CANCELLED
+  IF v_stock.status NOT IN ('SOLD', 'BOOKED') THEN
+    SELECT * INTO v_ledger
+    FROM public.finance_ledger
+    WHERE stock_id = p_stock_id AND transaction_type = 'STOCK_PURCHASE'
+    ORDER BY created_at DESC
+    LIMIT 1;
 
-  -- Periksa apakah ada deal_items yang menunjuk ke stok ini
-  SELECT COUNT(*) INTO v_deal_item_count
-  FROM public.deal_items
-  WHERE stock_id = p_stock_id;
+    IF FOUND AND v_ledger.account_id IS NOT NULL THEN
+      -- Entri jurnal balik (REFUND / Kas masuk kembali)
+      INSERT INTO public.finance_ledger (
+        account_id,
+        transaction_type,
+        amount,
+        stock_id,
+        description,
+        admin_id
+      ) VALUES (
+        v_ledger.account_id,
+        'REFUND',
+        ABS(v_ledger.amount),
+        p_stock_id,
+        'Pembatalan/Void Pembelian Stok ' || COALESCE(v_stock.sku, v_stock.name, p_stock_id::text),
+        v_admin_id
+      );
 
-  IF v_deal_item_count > 0 THEN
-    RAISE EXCEPTION 'Stok tidak dapat dibatalkan karena memiliki riwayat pada transaksi/deal.';
-  END IF;
+      -- Kembalikan saldo akun kas/bank
+      UPDATE public.accounts
+      SET balance = balance + ABS(v_ledger.amount),
+          updated_at = NOW()
+      WHERE id = v_ledger.account_id;
+    END IF;
 
-  -- Reversing Entry pada finance_ledger jika ada pengeluaran pembelian stok
-  SELECT * INTO v_ledger
-  FROM public.finance_ledger
-  WHERE stock_id = p_stock_id AND transaction_type = 'STOCK_PURCHASE'
-  ORDER BY created_at DESC
-  LIMIT 1;
-
-  IF FOUND AND v_ledger.account_id IS NOT NULL THEN
-    -- Entri jurnal balik (REFUND / Kas masuk kembali)
-    INSERT INTO public.finance_ledger (
-      account_id,
-      transaction_type,
-      amount,
-      stock_id,
-      description,
-      admin_id
-    ) VALUES (
-      v_ledger.account_id,
-      'REFUND',
-      ABS(v_ledger.amount),
-      p_stock_id,
-      'Pembatalan/Void Pembelian Stok ' || COALESCE(v_stock.sku, v_stock.name, p_stock_id::text),
-      v_admin_id
-    );
-
-    -- Kembalikan saldo akun kas/bank
-    UPDATE public.accounts
-    SET balance = balance + ABS(v_ledger.amount),
+    -- Soft delete stok dan set status CANCELLED
+    UPDATE public.stocks
+    SET status = 'CANCELLED',
+        deleted_at = NOW(),
+        deleted_by = v_admin_id,
         updated_at = NOW()
-    WHERE id = v_ledger.account_id;
+    WHERE id = p_stock_id;
+  ELSE
+    -- Jika stok SUDAH TERJUAL (SOLD / BOOKED):
+    -- Pengguna menghapus entri dari tampilan stok (soft delete riwayat).
+    -- Uang modal sah terpakai dan penjualan sah, jadi TIDAK ADA jurnal balik (kas tidak di-refund).
+    -- Status tetap dipertahankan ('SOLD' / 'BOOKED') agar laporan transaksi deals tetap konsisten.
+    UPDATE public.stocks
+    SET deleted_at = NOW(),
+        deleted_by = v_admin_id,
+        updated_at = NOW()
+    WHERE id = p_stock_id;
   END IF;
 
-  -- Soft delete stok
-  UPDATE public.stocks
-  SET status = 'CANCELLED',
-      deleted_at = NOW(),
-      deleted_by = v_admin_id,
-      updated_at = NOW()
-  WHERE id = p_stock_id;
+  -- Hapus dari inventory jika masih ada
+  DELETE FROM public.inventory WHERE id = p_stock_id;
 
   -- trg_sync_inventory_on_stock_void akan otomatis menghapus dari public.inventory
   -- trg_audit_stocks akan otomatis mencatat log audit ke audit_logs
 
   RETURN jsonb_build_object(
     'success', true,
-    'message', 'Stok berhasil dibatalkan dan dipindahkan ke tong sampah.',
+    'message', 'Entri stok berhasil dihapus.',
     'stock_id', p_stock_id
   );
 END;

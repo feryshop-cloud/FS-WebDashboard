@@ -199,6 +199,7 @@ export async function getPurchases(): Promise<{
         accounts (name)
       `,
       )
+      .is("deleted_at", null)
       .order("purchase_date", { ascending: false });
 
     if (error) throw error;
