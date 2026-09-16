@@ -47,3 +47,13 @@ export function parseBackupCodes(raw: string | null | undefined): string[] {
     .map((s) => s.trim().replace(/\s+/g, ""))
     .filter((s) => s.length > 0);
 }
+
+/**
+ * Meng-obfuscate string kode cadangan dengan bullet (•),
+ * namun tetap mempertahankan tanda koma (,), spasi, titik koma (;), dan baris baru
+ * agar pemisah kode tetap terlihat apa adanya oleh pengguna.
+ */
+export function maskBackupCodes(raw: string | null | undefined): string {
+  if (!raw) return "";
+  return raw.replace(/[^,\s\r\n;]/g, "•");
+}

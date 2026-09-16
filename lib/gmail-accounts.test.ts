@@ -6,7 +6,7 @@ import {
   deleteGmailAccount,
 } from "@/app/actions/gmail-accounts";
 import { decryptCredential } from "./crypto";
-import { parseBackupCodes } from "./utils";
+import { parseBackupCodes, maskBackupCodes } from "./utils";
 
 const mockInsert = vi.fn();
 const mockUpdate = vi.fn();
@@ -211,6 +211,32 @@ describe("Gmail Accounts Server Actions Unit Tests", () => {
       expect(parsed[0]).toBe("11112222");
       expect(parsed[9]).toBe("00001111");
       expect(parsed.every((c) => c.length === 8)).toBe(true);
+    });
+  });
+
+  describe("maskBackupCodes (Obfuscasi Kode dengan Koma Tetap Terlihat Apa Adanya)", () => {
+    it("meng-obfuscate digit menjadi bullet namun mempertahankan koma dan spasi apa adanya", () => {
+      const raw = "12345678, 87654321, 11223344";
+      const masked = maskBackupCodes(raw);
+      expect(masked).toBe("••••••••, ••••••••, ••••••••");
+    });
+
+    it("mempertahankan koma tanpa spasi apa adanya", () => {
+      const raw = "11112222,33334444";
+      const masked = maskBackupCodes(raw);
+      expect(masked).toBe("••••••••,••••••••");
+    });
+
+    it("mempertahankan format baris baru (newline)", () => {
+      const raw = "1234 5678\n8765 4321";
+      const masked = maskBackupCodes(raw);
+      expect(masked).toBe("•••• ••••\n•••• ••••");
+    });
+
+    it("menangani input kosong atau null dengan aman", () => {
+      expect(maskBackupCodes("")).toBe("");
+      expect(maskBackupCodes(null)).toBe("");
+      expect(maskBackupCodes(undefined)).toBe("");
     });
   });
 });

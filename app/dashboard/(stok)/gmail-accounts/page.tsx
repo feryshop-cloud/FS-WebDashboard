@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   Plus,
   Search,
@@ -25,7 +25,7 @@ import {
 import { useGmailAccounts } from "@/lib/hooks/features/useGmailAccounts";
 import { Pagination } from "@/components/ui/Pagination";
 import { GmailStatusBadge } from "@/components/ui/StatusBadge";
-import { formatDate, parseBackupCodes } from "@/lib/utils";
+import { formatDate, parseBackupCodes, maskBackupCodes } from "@/lib/utils";
 import type { GmailAccount, GmailAccountStatus } from "@/types/database";
 
 const STATUS_OPTIONS: GmailAccountStatus[] = [
@@ -44,6 +44,7 @@ export default function GmailAccountsPage() {
   const [revealedBackupCodes, setRevealedBackupCodes] = useState<Record<string, boolean>>({});
   const [showPasswordInForm, setShowPasswordInForm] = useState(false);
   const [showBackupCodesInForm, setShowBackupCodesInForm] = useState(false);
+  const backupCodesOverlayRef = useRef<HTMLDivElement | null>(null);
 
   const {
     data: { filtered, pageItems, safePage, itemsPerPage, kpis, logs },
@@ -733,19 +734,35 @@ export default function GmailAccountsPage() {
                       Beri tanda koma (,) atau baris baru untuk memisahkan setiap kode.
                     </span>
                   </p>
-                  <textarea
-                    rows={5}
-                    value={form.backup_codes}
-                    onChange={(e) => setField("backup_codes", e.target.value)}
-                    style={
-                      {
-                        WebkitTextSecurity:
-                          showBackupCodesInForm || !form.backup_codes ? "none" : "disc",
-                      } as React.CSSProperties
-                    }
-                    placeholder={`Tempel 10 kode cadangan dari Google. Pisahkan dengan tanda koma (,), contoh:\n12345678, 23456789, 34567890, 45678901...\natau dengan baris baru:\n1234 5678\n8765 4321`}
-                    className="border-border bg-background text-foreground w-full rounded-xl border px-3 py-2.5 font-mono text-xs outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-                  />
+                  <div className="relative w-full">
+                    {/* Overlay teks ter-obfuscate: mendigitalkan kode jadi bullet tetapi membiarkan koma tetap terlihat apa adanya */}
+                    {!showBackupCodesInForm && form.backup_codes && (
+                      <div
+                        ref={backupCodesOverlayRef}
+                        aria-hidden="true"
+                        className="text-foreground pointer-events-none absolute inset-0 z-10 overflow-y-auto rounded-xl border border-transparent px-3 py-2.5 font-mono text-xs leading-relaxed break-words whitespace-pre-wrap select-none"
+                      >
+                        {maskBackupCodes(form.backup_codes)}
+                      </div>
+                    )}
+
+                    <textarea
+                      rows={5}
+                      value={form.backup_codes}
+                      onChange={(e) => setField("backup_codes", e.target.value)}
+                      onScroll={(e) => {
+                        if (backupCodesOverlayRef.current) {
+                          backupCodesOverlayRef.current.scrollTop = e.currentTarget.scrollTop;
+                        }
+                      }}
+                      placeholder={`Tempel 10 kode cadangan dari Google. Pisahkan dengan tanda koma (,), contoh:\n12345678, 23456789, 34567890, 45678901...\natau dengan baris baru:\n1234 5678\n8765 4321`}
+                      className={`border-border bg-background w-full resize-none rounded-xl border px-3 py-2.5 font-mono text-xs leading-relaxed outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 ${
+                        !showBackupCodesInForm && form.backup_codes
+                          ? "caret-foreground text-transparent selection:bg-blue-500/20"
+                          : "text-foreground"
+                      }`}
+                    />
+                  </div>
                 </div>
 
                 {/* Status Akun */}
