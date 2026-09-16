@@ -51,9 +51,7 @@ export function useNotifications(userId: string | undefined) {
 
   useEffect(() => {
     if (notifications && userId) {
-      setUnreadCount(
-        notifications.filter((n) => !n.read_by?.includes(userId)).length,
-      );
+      setUnreadCount(notifications.filter((n) => !n.read_by?.includes(userId)).length);
     }
   }, [notifications, userId]);
 

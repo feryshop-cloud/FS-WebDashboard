@@ -347,7 +347,47 @@ export interface ProblemCaseWithRelations {
   deals?: { deal_number?: string | null } | null;
   stocks?: { sku?: string | null; name?: string | null } | null;
   customers?: { name?: string | null } | null;
-  deal?: Deal | null;
   stock?: Stock | null;
   [key: string]: unknown;
+}
+
+export type GmailAccountStatus =
+  | "Belum diamankan"
+  | "Diproses"
+  | "Dipakai sementara"
+  | "Stok Permanen"
+  | "Diserahkan ke Customer"
+  | "Bermasalah"
+  | "Non Aktif";
+
+export interface GmailAccount {
+  id: string;
+  email: string;
+  google_password: string | null;
+  backup_codes: string | null;
+  notes: string | null;
+  status: GmailAccountStatus;
+  managed_by: string | null;
+  created_at: string;
+  updated_at: string;
+  manager?: {
+    id: string;
+    full_name: string;
+    email: string;
+  } | null;
+}
+
+export interface GmailAccountStatusLog {
+  id: string;
+  account_id: string;
+  previous_status: GmailAccountStatus | null;
+  new_status: GmailAccountStatus;
+  changed_by: string | null;
+  notes: string | null;
+  created_at: string;
+  changer?: {
+    id: string;
+    full_name: string;
+    email: string;
+  } | null;
 }

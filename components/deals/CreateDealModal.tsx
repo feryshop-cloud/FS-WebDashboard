@@ -32,7 +32,6 @@ export function CreateDealModal({ isOpen, onClose }: CreateDealModalProps) {
 
   useEffect(() => {
     if (isOpen) {
-       
       loadStocks();
     }
   }, [isOpen]);

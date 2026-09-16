@@ -122,7 +122,6 @@ export function useInventory() {
   );
 
   useEffect(() => {
-     
     setCurrentPage(1);
   }, [activeCategory, activeStatus, debouncedSearchQuery, inventory.length]);
 

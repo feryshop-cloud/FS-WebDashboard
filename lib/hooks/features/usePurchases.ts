@@ -204,7 +204,6 @@ export function usePurchases() {
   }, [purchases, query, statusFilter]);
 
   useEffect(() => {
-     
     setPageNumber(1);
   }, [query, statusFilter]);
 

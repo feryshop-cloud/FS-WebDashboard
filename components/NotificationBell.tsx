@@ -24,7 +24,7 @@ export function NotificationBell({ userId }: NotificationBellProps) {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative rounded-lg p-2 text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+        className="text-muted-foreground hover:bg-accent hover:text-foreground relative rounded-lg p-2 transition-colors"
       >
         <Bell className="h-5 w-5" />
         {unreadCount > 0 && (

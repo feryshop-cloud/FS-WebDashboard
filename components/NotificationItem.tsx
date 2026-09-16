@@ -20,11 +20,7 @@ function getTimeAgo(dateString: string): string {
   return `${Math.floor(seconds / 86400)} hari lalu`;
 }
 
-export function NotificationItem({
-  notification,
-  userId,
-  onMarkAsRead,
-}: NotificationItemProps) {
+export function NotificationItem({ notification, userId, onMarkAsRead }: NotificationItemProps) {
   const isUnread = userId && !notification.read_by?.includes(userId);
   const isOrderFailed = notification.type === "order_failed";
   const icon = isOrderFailed ? (
@@ -38,7 +34,7 @@ export function NotificationItem({
   return (
     <div
       onClick={onMarkAsRead}
-      className={`cursor-pointer border-b border-border px-4 py-3 transition-colors hover:bg-accent/50 ${isUnread ? "bg-accent/20" : ""}`}
+      className={`border-border hover:bg-accent/50 cursor-pointer border-b px-4 py-3 transition-colors ${isUnread ? "bg-accent/20" : ""}`}
     >
       <div className="flex items-start gap-3">
         <div className={`shrink-0 rounded-lg p-2 ${bgColor}`}>
@@ -47,16 +43,12 @@ export function NotificationItem({
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <p className="truncate text-sm font-medium">{notification.title}</p>
-            {isUnread && (
-              <span className="h-2 w-2 shrink-0 rounded-full bg-blue-500" />
-            )}
+            {isUnread && <span className="h-2 w-2 shrink-0 rounded-full bg-blue-500" />}
           </div>
           {notification.body && (
-            <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
-              {notification.body}
-            </p>
+            <p className="text-muted-foreground mt-0.5 line-clamp-2 text-xs">{notification.body}</p>
           )}
-          <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+          <div className="text-muted-foreground mt-1 flex items-center gap-1 text-xs">
             <Clock className="h-3 w-3" />
             <span>{getTimeAgo(notification.created_at)}</span>
           </div>

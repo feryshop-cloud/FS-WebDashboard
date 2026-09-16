@@ -103,3 +103,23 @@ const DEAL_LABEL: Record<string, string> = {
 export function DealStatusBadge({ status }: { status: string }) {
   return <StatusBadge label={DEAL_LABEL[status] ?? status} tone={DEAL_TONE[status] ?? "neutral"} />;
 }
+
+const GMAIL_STATUS_TONE: Record<string, BadgeTone> = {
+  "Belum diamankan": "amber",
+  Diproses: "blue",
+  "Dipakai sementara": "violet",
+  "Stok Permanen": "emerald",
+  "Diserahkan ke Customer": "orange",
+  Bermasalah: "red",
+  "Non Aktif": "neutral",
+};
+
+export function GmailStatusBadge({ status, className }: { status: string; className?: string }) {
+  return (
+    <StatusBadge
+      label={status}
+      tone={GMAIL_STATUS_TONE[status] ?? "neutral"}
+      className={className}
+    />
+  );
+}

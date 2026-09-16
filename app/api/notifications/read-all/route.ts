@@ -23,10 +23,7 @@ export async function PATCH(request: Request) {
       const readBy = n.read_by || [];
       if (!readBy.includes(userId)) {
         readBy.push(userId);
-        await supabase
-          .from("notifications")
-          .update({ read_by: readBy })
-          .eq("id", n.id);
+        await supabase.from("notifications").update({ read_by: readBy }).eq("id", n.id);
       }
     }
   }

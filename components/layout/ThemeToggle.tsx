@@ -10,7 +10,7 @@ export default function ThemeToggle() {
 
   useEffect(() => {
     // Hydration guard: initial theme must be read client-side only.
-     
+
     setMounted(true);
     setThemeState(getInitialTheme());
   }, []);

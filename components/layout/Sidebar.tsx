@@ -51,6 +51,7 @@ const navGroups: { title: string; items: NavItem[] }[] = [
     items: [
       { label: "Stok Akun", icon: Package, href: "/dashboard/stock" },
       { label: "Produk Top-Up", icon: ShoppingBag, href: "/dashboard/topup-products" },
+      { label: "Inventori Gmail", icon: Mail, href: "/dashboard/gmail-accounts" },
     ],
   },
   {
