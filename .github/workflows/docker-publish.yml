@@ -57,6 +57,7 @@ jobs:
             NEXT_PUBLIC_BASE_PATH=/admin
             NEXT_PUBLIC_PUSHER_APP_KEY=${{ secrets.NEXT_PUBLIC_PUSHER_APP_KEY }}
             NEXT_PUBLIC_PUSHER_CLUSTER=${{ secrets.NEXT_PUBLIC_PUSHER_CLUSTER }}
+            NEXT_SERVER_ACTIONS_ENCRYPTION_KEY=${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
