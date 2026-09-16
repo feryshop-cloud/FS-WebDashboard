@@ -177,9 +177,13 @@ export function useUnifiedStock() {
   const accountsKey = "unified-accounts";
   const { data: accounts = [] } = useSWR<AccountItem[]>(accountsKey, async () => {
     const res = await getAccounts();
-    return ((res as unknown as { accounts?: AccountItem[] })?.accounts || []).filter(
-      (a: AccountItem) => a.is_active,
-    );
+    if (Array.isArray(res)) {
+      return (res as unknown as AccountItem[]).filter((a) => a.is_active);
+    }
+    if (res && typeof res === "object" && "error" in res && (res as { error?: string }).error) {
+      throw new Error((res as { error?: string }).error);
+    }
+    return [];
   });
 
   // Calculate High-Level KPIs

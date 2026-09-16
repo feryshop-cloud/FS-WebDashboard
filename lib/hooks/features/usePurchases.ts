@@ -114,9 +114,13 @@ export function usePurchases() {
     mutate: mutateAccounts,
   } = useSWR<Account[]>(accountsKey, async () => {
     const res = await getAccounts();
-    if ((res as unknown as { error?: string }).error)
-      throw new Error((res as unknown as { error?: string }).error);
-    return (res as unknown as Account[]) || [];
+    if (Array.isArray(res)) {
+      return (res as unknown as Account[]).filter((a) => a.is_active);
+    }
+    if (res && typeof res === "object" && "error" in res && (res as { error?: string }).error) {
+      throw new Error((res as { error?: string }).error);
+    }
+    return [];
   });
 
   const isLoading = purchasesLoading || gamesLoading || accountsLoading;
