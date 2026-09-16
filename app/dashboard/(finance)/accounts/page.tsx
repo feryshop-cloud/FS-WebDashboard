@@ -57,6 +57,7 @@ export default function AccountsPage() {
       handleRequestAdjustment,
       handleApproveAdjustment,
       handleRejectAdjustment,
+      setError,
     },
   } = useAccounts();
 
@@ -94,6 +95,20 @@ export default function AccountsPage() {
           </button>
         </div>
       </div>
+
+      {/* Error Alert Banner (for non-modal actions like delete) */}
+      {error && !isAddAccountOpen && !editingAccount && !isMutasiOpen && !isAdjustOpen && (
+        <div className="fs-drop-in flex items-center justify-between rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm font-medium text-rose-800 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-400">
+          <span>{error}</span>
+          <button
+            onClick={() => setError("")}
+            className="text-rose-600 hover:text-rose-800 dark:text-rose-400 dark:hover:text-rose-200"
+            title="Tutup pesan"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
 
       {/* Summary Card */}
       <div className="group border-border-soft bg-card relative flex flex-col items-start justify-between gap-4 overflow-hidden rounded-2xl border p-6 shadow-sm sm:flex-row sm:items-center">

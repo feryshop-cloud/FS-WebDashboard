@@ -115,7 +115,11 @@ export function useAccounts() {
     try {
       setIsSubmitting(true);
       setError("");
-      await addAccount(formData);
+      const res = await addAccount(formData);
+      if (res && !res.success) {
+        setError(res.error || "Gagal menambahkan rekening baru.");
+        return;
+      }
       loadAccounts();
       closeAddAccount();
     } catch (err: unknown) {
@@ -130,7 +134,11 @@ export function useAccounts() {
     try {
       setIsSubmitting(true);
       setError("");
-      await updateAccount(editingAccount.id, formData);
+      const res = await updateAccount(editingAccount.id, formData);
+      if (res && !res.success) {
+        setError(res.error || "Gagal mengolah/mengubah data rekening.");
+        return;
+      }
       loadAccounts();
       closeEditAccount();
     } catch (err: unknown) {
@@ -146,11 +154,15 @@ export function useAccounts() {
     try {
       setIsDeletingId(account.id);
       setError("");
-      await deleteAccount(account.id);
+      const res = await deleteAccount(account.id);
+      if (res && !res.success) {
+        setError(res.error || "Gagal menghapus rekening.");
+        return;
+      }
       setOpenMenuId(null);
       loadAccounts();
     } catch (err: unknown) {
-      alert(getErrorMessage(err));
+      setError(getErrorMessage(err));
     } finally {
       setIsDeletingId(null);
     }
@@ -160,7 +172,11 @@ export function useAccounts() {
     try {
       setIsSubmitting(true);
       setError("");
-      await transferBalance(formData);
+      const res = await transferBalance(formData);
+      if (res && !res.success) {
+        setError(res.error || "Gagal melakukan mutasi saldo.");
+        return;
+      }
       loadAccounts();
       closeMutasi();
     } catch (err: unknown) {
@@ -198,7 +214,11 @@ export function useAccounts() {
       setIsSubmitting(true);
       setError("");
       const { requestBalanceAdjustment } = await import("@/app/actions/accounts");
-      await requestBalanceAdjustment(formData);
+      const res = await requestBalanceAdjustment(formData);
+      if (res && !res.success) {
+        setError(res.error || "Gagal mengajukan penyesuaian saldo.");
+        return;
+      }
       loadAccounts();
       mutateAdjustments();
       closeAdjust();
@@ -214,7 +234,11 @@ export function useAccounts() {
       setIsSubmitting(true);
       setError("");
       const { approveBalanceAdjustment } = await import("@/app/actions/accounts");
-      await approveBalanceAdjustment(id);
+      const res = await approveBalanceAdjustment(id);
+      if (res && !res.success) {
+        setError(res.error || "Gagal menyetujui penyesuaian saldo.");
+        return;
+      }
       loadAccounts();
       mutateAdjustments();
     } catch (err: unknown) {
@@ -229,7 +253,11 @@ export function useAccounts() {
       setIsSubmitting(true);
       setError("");
       const { rejectBalanceAdjustment } = await import("@/app/actions/accounts");
-      await rejectBalanceAdjustment(id);
+      const res = await rejectBalanceAdjustment(id);
+      if (res && !res.success) {
+        setError(res.error || "Gagal menolak penyesuaian saldo.");
+        return;
+      }
       loadAccounts();
       mutateAdjustments();
     } catch (err: unknown) {
@@ -301,6 +329,7 @@ export function useAccounts() {
       handleApproveAdjustment,
       handleRejectAdjustment,
       loadAccounts,
+      setError,
     },
   };
 }

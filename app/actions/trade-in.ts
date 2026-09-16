@@ -9,11 +9,8 @@ import { runAction } from "@/lib/logging/server-action";
 
 import { getErrorMessage } from "@/lib/error";
 
-export interface ActionResult<T = unknown> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
+import type { ActionResult } from "@/lib/action-result";
+export type { ActionResult };
 
 function toInventoryStatus(status: StockStatus): "AVAILABLE" | "SOLD" | "UNPOSTED" {
   if (status === "SOLD") return "SOLD";

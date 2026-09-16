@@ -11,11 +11,8 @@ import { getErrorMessage } from "@/lib/error";
 
 type DealUpdate = Database["public"]["Tables"]["deals"]["Update"];
 
-export interface ActionResult<T = unknown> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
+import type { ActionResult } from "@/lib/action-result";
+export type { ActionResult };
 
 export async function getDeals() {
   return runAction("getDeals", async () => {

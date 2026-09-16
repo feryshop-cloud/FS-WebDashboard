@@ -740,7 +740,7 @@ export default function GmailAccountsPage() {
                       <div
                         ref={backupCodesOverlayRef}
                         aria-hidden="true"
-                        className="text-foreground pointer-events-none absolute inset-0 z-10 overflow-y-auto rounded-xl border border-transparent px-3 py-2.5 font-mono text-xs leading-relaxed break-words whitespace-pre-wrap select-none"
+                        className="text-foreground pointer-events-none absolute inset-0 z-10 overflow-y-auto rounded-xl border border-transparent px-3 py-2.5 font-mono text-xs leading-relaxed wrap-break-word whitespace-pre-wrap select-none"
                       >
                         {maskBackupCodes(form.backup_codes)}
                       </div>
