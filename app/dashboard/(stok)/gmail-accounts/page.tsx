@@ -43,6 +43,7 @@ export default function GmailAccountsPage() {
   const [revealedPasswords, setRevealedPasswords] = useState<Record<string, boolean>>({});
   const [revealedBackupCodes, setRevealedBackupCodes] = useState<Record<string, boolean>>({});
   const [showPasswordInForm, setShowPasswordInForm] = useState(false);
+  const [showBackupCodesInForm, setShowBackupCodesInForm] = useState(false);
 
   const {
     data: { filtered, pageItems, safePage, itemsPerPage, kpis, logs },
@@ -76,6 +77,24 @@ export default function GmailAccountsPage() {
       setItemsPerPage,
     },
   } = useGmailAccounts();
+
+  const handleOpenAdd = () => {
+    setShowPasswordInForm(false);
+    setShowBackupCodesInForm(false);
+    openAdd();
+  };
+
+  const handleOpenEdit = (acc: GmailAccount) => {
+    setShowPasswordInForm(false);
+    setShowBackupCodesInForm(false);
+    openEdit(acc);
+  };
+
+  const handleCloseModal = () => {
+    setShowPasswordInForm(false);
+    setShowBackupCodesInForm(false);
+    closeModal();
+  };
 
   const formBackupCodesList = parseBackupCodes(form.backup_codes);
 
@@ -111,7 +130,7 @@ export default function GmailAccountsPage() {
           </p>
         </div>
         <button
-          onClick={openAdd}
+          onClick={handleOpenAdd}
           className="inline-flex items-center justify-center gap-2 rounded-xl border border-transparent bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 active:scale-[0.98]"
         >
           <Plus className="h-4 w-4" />
@@ -558,7 +577,7 @@ export default function GmailAccountsPage() {
 
                     <button
                       type="button"
-                      onClick={() => openEdit(acc)}
+                      onClick={() => handleOpenEdit(acc)}
                       className="rounded-lg p-1.5 text-emerald-600 transition-colors hover:bg-emerald-50 dark:hover:bg-emerald-950/40"
                       title="Edit Akun"
                     >
@@ -603,7 +622,7 @@ export default function GmailAccountsPage() {
           className={`fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm ${
             isAddClosing ? "fs-overlay-out" : "fs-overlay-in"
           }`}
-          onClick={closeModal}
+          onClick={handleCloseModal}
         >
           <div
             onClick={(e) => e.stopPropagation()}
@@ -624,7 +643,7 @@ export default function GmailAccountsPage() {
                 </p>
               </div>
               <button
-                onClick={closeModal}
+                onClick={handleCloseModal}
                 className="text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg p-1 transition-colors"
               >
                 <X className="h-5 w-5" />
@@ -649,9 +668,9 @@ export default function GmailAccountsPage() {
                   </label>
                   <input
                     type="email"
+                    required
                     value={form.email}
                     onChange={(e) => setField("email", e.target.value)}
-                    required
                     placeholder="namaakun@gmail.com"
                     className="border-border bg-background text-foreground w-full rounded-xl border px-3 py-2.5 font-mono text-xs outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                   />
@@ -686,28 +705,45 @@ export default function GmailAccountsPage() {
                     <label className="text-foreground text-xs font-semibold">
                       Kode Cadangan (10 Kode × 8 Digit)
                     </label>
-                    {formBackupCodesList.length > 0 && (
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
-                          formBackupCodesList.length === 10
-                            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                            : "bg-amber-500/10 text-amber-600 dark:text-amber-400"
-                        }`}
+                    <div className="flex items-center gap-2">
+                      {formBackupCodesList.length > 0 && (
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                            formBackupCodesList.length === 10
+                              ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                              : "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                          }`}
+                        >
+                          {formBackupCodesList.length}/10 kode terdeteksi
+                        </span>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setShowBackupCodesInForm(!showBackupCodesInForm)}
+                        className="text-muted-foreground hover:text-foreground text-[11px] font-medium"
                       >
-                        {formBackupCodesList.length}/10 kode terdeteksi
-                      </span>
-                    )}
+                        {showBackupCodesInForm ? "Sembunyikan" : "Tampilkan"}
+                      </button>
+                    </div>
                   </div>
                   <p className="text-muted-foreground text-[11px] leading-relaxed">
                     Ditemukan di Akun Google: <strong>Keamanan &amp; Login</strong> &gt;{" "}
-                    <strong>Kode Cadangan</strong>. Berisi 10 kode cadangan yang masing-masing 8
-                    digit angka.
+                    <strong>Kode Cadangan</strong>. Berisi 10 kode cadangan 8 digit angka.{" "}
+                    <span className="text-foreground/90 font-medium">
+                      Beri tanda koma (,) atau baris baru untuk memisahkan setiap kode.
+                    </span>
                   </p>
                   <textarea
                     rows={5}
                     value={form.backup_codes}
                     onChange={(e) => setField("backup_codes", e.target.value)}
-                    placeholder={`Tempel 10 kode cadangan dari Google (format 8 digit):\n1234 5678\n2345 6789\n3456 7890\n...`}
+                    style={
+                      {
+                        WebkitTextSecurity:
+                          showBackupCodesInForm || !form.backup_codes ? "none" : "disc",
+                      } as React.CSSProperties
+                    }
+                    placeholder={`Tempel 10 kode cadangan dari Google. Pisahkan dengan tanda koma (,), contoh:\n12345678, 23456789, 34567890, 45678901...\natau dengan baris baru:\n1234 5678\n8765 4321`}
                     className="border-border bg-background text-foreground w-full rounded-xl border px-3 py-2.5 font-mono text-xs outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                   />
                 </div>
@@ -747,7 +783,7 @@ export default function GmailAccountsPage() {
               <div className="border-border-soft bg-muted/20 flex items-center justify-end gap-2.5 border-t px-6 py-4">
                 <button
                   type="button"
-                  onClick={closeModal}
+                  onClick={handleCloseModal}
                   disabled={isSubmitting}
                   className="border-border text-foreground hover:bg-muted rounded-xl border px-4 py-2 text-xs font-semibold transition-colors"
                 >

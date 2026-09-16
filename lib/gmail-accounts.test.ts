@@ -202,5 +202,15 @@ describe("Gmail Accounts Server Actions Unit Tests", () => {
       const parsed = parseBackupCodes(raw);
       expect(parsed).toEqual(["12345678", "87654321", "99887766"]);
     });
+
+    it("berhasil mem-parsing 10 kode Google yang dipisahkan tanda koma", () => {
+      const raw =
+        "11112222, 22223333, 33334444, 44445555, 55556666, 66667777, 77778888, 88889999, 99990000, 00001111";
+      const parsed = parseBackupCodes(raw);
+      expect(parsed).toHaveLength(10);
+      expect(parsed[0]).toBe("11112222");
+      expect(parsed[9]).toBe("00001111");
+      expect(parsed.every((c) => c.length === 8)).toBe(true);
+    });
   });
 });
