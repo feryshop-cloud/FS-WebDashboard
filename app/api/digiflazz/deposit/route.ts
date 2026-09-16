@@ -11,8 +11,9 @@ const depositSchema = z.object({
     .int({ message: "Nominal harus berupa bilangan bulat" })
     .min(10_000, { message: "Nominal deposit minimal Rp 10.000" })
     .max(100_000_000, { message: "Nominal deposit maksimal Rp 100.000.000" }),
-  bank: z.enum(["BCA", "MANDIRI", "BNI", "BRI", "Flip", "ShopeePay"], {
-    message: "Pilihan bank harus salah satu dari: BCA, MANDIRI, BNI, BRI, Flip, ShopeePay",
+  bank: z.enum(["Flip", "ShopeePay"], {
+    message:
+      "Pilihan bank harus Flip atau ShopeePay (metode transfer bank lain saat ini dinonaktifkan)",
   }),
   ownerName: z
     .string({ message: "Nama pemilik rekening wajib diisi" })

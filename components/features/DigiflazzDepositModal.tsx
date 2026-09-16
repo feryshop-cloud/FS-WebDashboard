@@ -46,18 +46,25 @@ const PRESET_AMOUNTS = [
   { label: "5 Juta", value: 5_000_000 },
 ];
 
-const AVAILABLE_BANKS = [
-  { id: "BCA", name: "BCA", type: "Perusahaan" },
-  { id: "MANDIRI", name: "Mandiri", type: "Perusahaan" },
-  { id: "BNI", name: "BNI", type: "Perusahaan" },
-  { id: "BRI", name: "BRI", type: "Perusahaan" },
-  { id: "Flip", name: "Flip", type: "Perorangan" },
-  { id: "ShopeePay", name: "ShopeePay", type: "Perorangan" },
+interface BankOption {
+  id: string;
+  name: string;
+  type: string;
+  disabled?: boolean;
+}
+
+const AVAILABLE_BANKS: BankOption[] = [
+  { id: "Flip", name: "Flip", type: "Perorangan", disabled: false },
+  { id: "ShopeePay", name: "ShopeePay", type: "Perorangan", disabled: false },
+  { id: "BCA", name: "BCA", type: "Perusahaan", disabled: true },
+  { id: "MANDIRI", name: "Mandiri", type: "Perusahaan", disabled: true },
+  { id: "BNI", name: "BNI", type: "Perusahaan", disabled: true },
+  { id: "BRI", name: "BRI", type: "Perusahaan", disabled: true },
 ];
 
 export function DigiflazzDepositModal({ isOpen, onClose, onSuccess }: DigiflazzDepositModalProps) {
   const [amount, setAmount] = useState<number>(500_000);
-  const [bank, setBank] = useState<string>("BCA");
+  const [bank, setBank] = useState<string>("Flip");
   const [ownerName, setOwnerName] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -131,6 +138,12 @@ export function DigiflazzDepositModal({ isOpen, onClose, onSuccess }: DigiflazzD
 
     if (!ownerName.trim()) {
       setErrorMsg("Nama pemilik rekening pengirim wajib diisi");
+      return;
+    }
+
+    const selectedBank = AVAILABLE_BANKS.find((b) => b.id === bank);
+    if (!selectedBank || selectedBank.disabled) {
+      setErrorMsg("Metode transfer bank yang dipilih saat ini dinonaktifkan");
       return;
     }
 
@@ -299,28 +312,49 @@ export function DigiflazzDepositModal({ isOpen, onClose, onSuccess }: DigiflazzD
 
             {/* Bank Selection */}
             <div>
-              <label className="text-foreground block text-xs font-semibold">
-                Pilih Bank Tujuan Transfer
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-foreground block text-xs font-semibold">
+                  Pilih Bank Tujuan Transfer
+                </label>
+                <span className="text-muted-foreground text-[10px]">
+                  Hanya Flip & ShopeePay yang aktif
+                </span>
+              </div>
               <div className="mt-1.5 grid grid-cols-3 gap-2">
                 {AVAILABLE_BANKS.map((b) => (
                   <button
                     key={b.id}
                     type="button"
-                    onClick={() => setBank(b.id)}
-                    className={`flex flex-col items-center justify-center rounded-xl border p-2.5 transition ${
-                      bank === b.id
-                        ? "border-primary bg-primary/10 ring-primary/20 ring-2"
-                        : "border-border hover:border-muted-foreground/30 bg-background"
+                    disabled={b.disabled}
+                    onClick={() => !b.disabled && setBank(b.id)}
+                    aria-disabled={b.disabled}
+                    className={`relative flex flex-col items-center justify-center rounded-xl border p-2.5 transition ${
+                      b.disabled
+                        ? "border-border/50 bg-muted/30 cursor-not-allowed opacity-40 select-none"
+                        : bank === b.id
+                          ? "border-primary bg-primary/10 ring-primary/20 cursor-pointer ring-2"
+                          : "border-border hover:border-muted-foreground/30 bg-background cursor-pointer"
                     }`}
                   >
                     <Building2
                       className={`h-4 w-4 ${
-                        bank === b.id ? "text-primary" : "text-muted-foreground"
+                        b.disabled
+                          ? "text-muted-foreground/50"
+                          : bank === b.id
+                            ? "text-primary"
+                            : "text-muted-foreground"
                       }`}
                     />
-                    <span className="text-foreground mt-1 text-xs font-bold">{b.name}</span>
-                    <span className="text-muted-foreground text-[10px]">{b.type}</span>
+                    <span
+                      className={`mt-1 text-xs font-bold ${
+                        b.disabled ? "text-muted-foreground" : "text-foreground"
+                      }`}
+                    >
+                      {b.name}
+                    </span>
+                    <span className="text-muted-foreground text-[10px]">
+                      {b.disabled ? "Nonaktif" : b.type}
+                    </span>
                   </button>
                 ))}
               </div>
