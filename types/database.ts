@@ -159,6 +159,9 @@ export interface Stock {
 
   admin_id: string | null;
 
+  deleted_at?: string | null;
+  deleted_by?: string | null;
+
   created_at: string;
   updated_at: string;
 }

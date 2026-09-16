@@ -276,21 +276,69 @@ export async function deletePurchase(
       return { success: false, error: "Sesi admin tidak ditemukan. Silakan login kembali." };
     }
 
-    const { error: stockError } = await supabase.from("stocks").delete().eq("id", id);
-    if (stockError) throw stockError;
+    // Panggil RPC void_stock_purchase yang menggabungkan soft-delete, trigger inventory,
+    // jurnal balik finance_ledger, dan audit logging dalam 1 transaksi ACID.
+    const { error: rpcError } = await supabase.rpc("void_stock_purchase", {
+      p_stock_id: id,
+    });
 
-    // Also delete corresponding entry in inventory
-    await supabase.from("inventory").delete().eq("id", id);
+    if (rpcError) {
+      logger.error("RPC void_stock_purchase error", { error: rpcError, stockId: id });
+      return { success: false, error: rpcError.message || "Gagal membatalkan stok." };
+    }
 
     revalidatePath("/dashboard/purchases");
     revalidatePath("/dashboard/inventory");
     revalidatePath("/dashboard/stock");
+    revalidatePath("/dashboard/ledger");
     purgeStorefront(STOREFRONT_TAGS.marketplace);
 
     return { success: true, error: null };
   } catch (error: unknown) {
-    logger.error("Error deleting purchase stock", { error });
+    logger.error("Error voiding purchase stock", { error });
     return { success: false, error: getErrorMessage(error) };
+  }
+}
+
+export interface TrashedStockItem {
+  id: string;
+  sku: string | null;
+  name: string | null;
+  category: string | null;
+  account_details: string | null;
+  capital_price: number;
+  status: string;
+  purchase_payment_status: string | null;
+  purchase_date: string | null;
+  deleted_at: string;
+  deleted_by: string | null;
+  deleted_by_name: string | null;
+  refund_amount: number | null;
+  refund_account_name: string | null;
+  created_at: string;
+}
+
+export async function getTrashedPurchases(): Promise<{
+  data: TrashedStockItem[];
+  error: string | null;
+}> {
+  try {
+    const supabase = await createClient();
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session?.user?.id) {
+      return { data: [], error: "Sesi admin tidak ditemukan. Silakan login kembali." };
+    }
+
+    const { data, error } = await supabase.rpc("get_trashed_stocks");
+    if (error) throw error;
+
+    return { data: (data as unknown as TrashedStockItem[]) || [], error: null };
+  } catch (error: unknown) {
+    logger.error("Error fetching trashed stocks", { error });
+    return { data: [], error: getErrorMessage(error) };
   }
 }
 

@@ -1423,6 +1423,8 @@ export type Database = {
           category: string;
           created_at: string;
           current_price: number;
+          deleted_at: string | null;
+          deleted_by: string | null;
           id: string;
           images: string[] | null;
           internal_notes: string | null;
@@ -1456,6 +1458,8 @@ export type Database = {
           category: string;
           created_at?: string;
           current_price?: number;
+          deleted_at?: string | null;
+          deleted_by?: string | null;
           id?: string;
           images?: string[] | null;
           internal_notes?: string | null;
@@ -1489,6 +1493,8 @@ export type Database = {
           category?: string;
           created_at?: string;
           current_price?: number;
+          deleted_at?: string | null;
+          deleted_by?: string | null;
           id?: string;
           images?: string[] | null;
           internal_notes?: string | null;
@@ -1737,6 +1743,14 @@ export type Database = {
       sync_digiflazz_products: { Args: { payload: Json }; Returns: undefined };
       validate_promo: {
         Args: { p_code: string; p_subtotal: number };
+        Returns: Json;
+      };
+      void_stock_purchase: {
+        Args: { p_stock_id: string };
+        Returns: Json;
+      };
+      get_trashed_stocks: {
+        Args: Record<PropertyKey, never>;
         Returns: Json;
       };
     };

@@ -159,6 +159,29 @@ export async function updateStockStatus(
   });
 }
 
+// Pemetaan field yang berbeda nama antara model Stock (frontend) dan skema tabel stocks (database)
+const STOCK_UPDATE_ALIAS_MAP: Partial<Record<keyof Stock, keyof StockUpdate>> = {
+  account_details: "account_detail",
+  username: "login_info",
+  password: "password_info",
+  internal_notes: "notes",
+  admin_id: "managed_by",
+};
+
+function mapStockUpdate(stockData: Partial<Stock>): StockUpdate {
+  const updateData: StockUpdate = {};
+
+  for (const [key, value] of Object.entries(stockData)) {
+    if (value === undefined) continue;
+    if (key === "id" || key === "created_at") continue;
+
+    const dbField = (STOCK_UPDATE_ALIAS_MAP[key as keyof Stock] ?? key) as keyof StockUpdate;
+    (updateData as Record<string, unknown>)[dbField] = value;
+  }
+
+  return updateData;
+}
+
 export async function updateStock(
   id: string,
   stockData: Partial<Stock>,
@@ -167,25 +190,7 @@ export async function updateStock(
     try {
       const supabase = await createClient();
 
-      const dbUpdateData: StockUpdate = {};
-      if (stockData.category !== undefined) dbUpdateData.category = stockData.category;
-      if (stockData.name !== undefined) dbUpdateData.name = stockData.name;
-      if (stockData.account_details !== undefined)
-        dbUpdateData.account_detail = stockData.account_details;
-      if (stockData.username !== undefined) dbUpdateData.login_info = stockData.username;
-      if (stockData.password !== undefined) dbUpdateData.password_info = stockData.password;
-      if (stockData.backup_code !== undefined) dbUpdateData.backup_code = stockData.backup_code;
-      if (stockData.capital_price !== undefined)
-        dbUpdateData.capital_price = stockData.capital_price;
-      if (stockData.post_price !== undefined) dbUpdateData.post_price = stockData.post_price;
-      if (stockData.current_price !== undefined)
-        dbUpdateData.current_price = stockData.current_price;
-      if (stockData.status !== undefined) dbUpdateData.status = stockData.status;
-      if (stockData.seller_info !== undefined) dbUpdateData.seller_info = stockData.seller_info;
-      if (stockData.internal_notes !== undefined) dbUpdateData.notes = stockData.internal_notes;
-      if (stockData.admin_id !== undefined) dbUpdateData.managed_by = stockData.admin_id;
-      if (stockData.images !== undefined) dbUpdateData.images = stockData.images;
-
+      const dbUpdateData = mapStockUpdate(stockData);
       dbUpdateData.updated_at = new Date().toISOString();
 
       const { data, error } = await supabase
@@ -214,36 +219,22 @@ export async function deleteStock(id: string): Promise<{ success: boolean; error
     try {
       const supabase = await createClient();
 
-      // First check the stock's status
-      const { data: stock, error: fetchError } = await supabase
-        .from("stocks")
-        .select("status")
-        .eq("id", id)
-        .single();
+      const { error: rpcError } = await supabase.rpc("void_stock_purchase", {
+        p_stock_id: id,
+      });
 
-      if (fetchError) throw fetchError;
-
-      if (stock.status === "SOLD") {
-        return {
-          success: false,
-          error: "Cannot delete a stock that has already been sold (TERJUAL).",
-        };
-      }
-
-      const { error } = await supabase.from("stocks").delete().eq("id", id);
-
-      if (error) {
-        if (error.code === "23503") {
-          // Foreign key constraint violation
-          return {
-            success: false,
-            error: "Cannot delete this stock because it is already linked to a Deal/Transaction.",
-          };
-        }
-        throw error;
+      if (rpcError) {
+        logger.error("RPC void_stock_purchase error in deleteStock", {
+          error: rpcError,
+          stockId: id,
+        });
+        return { success: false, error: rpcError.message || "Gagal membatalkan stok." };
       }
 
       revalidatePath("/dashboard/inventory");
+      revalidatePath("/dashboard/stock");
+      revalidatePath("/dashboard/purchases");
+      revalidatePath("/dashboard/ledger");
       purgeStorefront(STOREFRONT_TAGS.marketplace);
       return { success: true, error: null };
     } catch (error: unknown) {
