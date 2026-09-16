@@ -67,9 +67,10 @@ export function TrashStockModal({ isOpen, onClose }: TrashStockModalProps) {
               <Trash2 className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-foreground text-lg font-bold">Tong Sampah & Pembatalan Stok</h2>
+              <h2 className="text-foreground text-lg font-bold">Tong Sampah Stok</h2>
               <p className="text-muted-foreground text-xs">
-                Daftar stok yang di-void beserta rekam jejak jurnal balik kas dan admin penghapus.
+                Daftar stok yang telah dihapus dari etalase, lengkap dengan status asal dan rekam
+                jejak kas.
               </p>
             </div>
           </div>
@@ -104,8 +105,8 @@ export function TrashStockModal({ isOpen, onClose }: TrashStockModalProps) {
             />
           </div>
           <div className="text-muted-foreground text-xs font-medium">
-            Total Dibatalkan:{" "}
-            <span className="text-foreground font-bold">{trashedItems.length}</span> unit
+            Total Dihapus: <span className="text-foreground font-bold">{trashedItems.length}</span>{" "}
+            unit
           </div>
         </div>
 
@@ -115,7 +116,7 @@ export function TrashStockModal({ isOpen, onClose }: TrashStockModalProps) {
             <div className="flex flex-col items-center justify-center py-20">
               <RefreshCw className="text-muted-foreground h-8 w-8 animate-spin" />
               <p className="text-muted-foreground mt-3 text-xs">
-                Memuat riwayat pembatalan stok...
+                Memuat riwayat stok yang dihapus...
               </p>
             </div>
           ) : error ? (
@@ -135,7 +136,7 @@ export function TrashStockModal({ isOpen, onClose }: TrashStockModalProps) {
               <p className="text-muted-foreground mt-1 max-w-sm text-xs">
                 {searchQuery
                   ? "Coba kata kunci pencarian yang lain."
-                  : "Belum ada riwayat pembelian stok yang dibatalkan (di-void) dari sistem."}
+                  : "Belum ada riwayat stok yang dihapus dari sistem."}
               </p>
             </div>
           ) : (
@@ -145,10 +146,11 @@ export function TrashStockModal({ isOpen, onClose }: TrashStockModalProps) {
                   <tr>
                     <th className="px-6 py-3">SKU & Kategori</th>
                     <th className="px-6 py-3">Nama Akun</th>
+                    <th className="px-6 py-3">Status</th>
                     <th className="px-6 py-3">Modal Pembelian</th>
                     <th className="px-6 py-3">Jurnal Balik (Refund)</th>
-                    <th className="px-6 py-3">Dibatalkan Oleh</th>
-                    <th className="px-6 py-3">Waktu Batal</th>
+                    <th className="px-6 py-3">Dihapus Oleh</th>
+                    <th className="px-6 py-3">Waktu Hapus</th>
                   </tr>
                 </thead>
                 <tbody className="divide-border divide-y text-xs">
@@ -178,6 +180,23 @@ export function TrashStockModal({ isOpen, onClose }: TrashStockModalProps) {
                         </div>
                       </td>
 
+                      {/* Status Asal */}
+                      <td className="px-6 py-3.5 whitespace-nowrap">
+                        {item.status === "SOLD" ? (
+                          <span className="inline-flex items-center rounded-md bg-purple-500/10 px-2 py-0.5 text-[11px] font-semibold text-purple-600 dark:bg-purple-500/20 dark:text-purple-400">
+                            Terjual
+                          </span>
+                        ) : item.status === "BOOKED" ? (
+                          <span className="inline-flex items-center rounded-md bg-amber-500/10 px-2 py-0.5 text-[11px] font-semibold text-amber-600 dark:bg-amber-500/20 dark:text-amber-400">
+                            Dipesan
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center rounded-md bg-rose-500/10 px-2 py-0.5 text-[11px] font-semibold text-rose-600 dark:bg-rose-500/20 dark:text-rose-400">
+                            Dibatalkan
+                          </span>
+                        )}
+                      </td>
+
                       {/* Capital Price */}
                       <td className="text-foreground px-6 py-3.5 font-medium whitespace-nowrap">
                         {formatRupiah(Number(item.capital_price) || 0)}
@@ -197,7 +216,7 @@ export function TrashStockModal({ isOpen, onClose }: TrashStockModalProps) {
                           </div>
                         ) : (
                           <span className="text-muted-foreground text-[11px]">
-                            Tidak ada refund
+                            {item.status === "SOLD" ? "- (Sudah Terjual)" : "Tidak ada refund"}
                           </span>
                         )}
                       </td>
@@ -230,7 +249,7 @@ export function TrashStockModal({ isOpen, onClose }: TrashStockModalProps) {
         {/* Modal Footer */}
         <div className="border-border bg-muted/20 text-muted-foreground flex items-center justify-between border-t px-6 py-3 text-xs">
           <span>
-            ℹ️ Stok yang dibatalkan tidak dapat dikembalikan langsung untuk menjaga integritas buku
+            ℹ️ Data di tong sampah diarsipkan untuk menjaga integritas riwayat transaksi dan buku
             kas.
           </span>
           <button
