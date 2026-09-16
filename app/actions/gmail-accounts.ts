@@ -11,6 +11,30 @@ function revalidate() {
   revalidatePath("/dashboard/gmail-accounts", "page");
 }
 
+/**
+ * Mendapatkan user ID admin saat ini jika terdaftar di tabel public.users
+ * untuk memenuhi foreign key constraint.
+ */
+async function resolveCurrentAdminId(supabase: any): Promise<string | null> {
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.id) return null;
+
+    const { data: userRecord } = await (supabase as any)
+      .from("users")
+      .select("id")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    return userRecord ? user.id : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function getGmailAccounts(): Promise<GmailAccount[]> {
   return runAction("getGmailAccounts", async () => {
     const supabase = await createClient();
@@ -49,7 +73,9 @@ export async function getGmailAccounts(): Promise<GmailAccount[]> {
   });
 }
 
-export async function createGmailAccount(formData: FormData) {
+export async function createGmailAccount(
+  formData: FormData,
+): Promise<{ success: boolean; error?: string }> {
   return runAction("createGmailAccount", async () => {
     const email = String(formData.get("email") || "")
       .trim()
@@ -61,13 +87,11 @@ export async function createGmailAccount(formData: FormData) {
       "Belum diamankan") as GmailAccountStatus;
 
     if (!email) {
-      throw new Error("Alamat email Gmail wajib diisi.");
+      return { success: false, error: "Alamat email Gmail wajib diisi." };
     }
 
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const adminId = await resolveCurrentAdminId(supabase);
 
     const encryptedPassword = encryptCredential(rawPassword);
     const encryptedBackupCodes = encryptCredential(rawBackupCodes);
@@ -78,21 +102,32 @@ export async function createGmailAccount(formData: FormData) {
       backup_codes: encryptedBackupCodes,
       notes,
       status,
-      managed_by: user?.id || null,
+      managed_by: adminId,
     });
 
     if (error) {
       logger.error("Error creating gmail account", { error });
-      throw new Error(`Gagal menambahkan akun Gmail: ${error.message}`);
+      return {
+        success: false,
+        error: error.message.includes("relation")
+          ? "Tabel database belum siap. Pastikan migrasi telah diterapkan."
+          : `Gagal menambahkan akun Gmail: ${error.message}`,
+      };
     }
 
     revalidate();
+    return { success: true };
   });
 }
 
-export async function updateGmailAccount(id: string, formData: FormData) {
+export async function updateGmailAccount(
+  id: string,
+  formData: FormData,
+): Promise<{ success: boolean; error?: string }> {
   return runAction("updateGmailAccount", async () => {
-    if (!id) throw new Error("ID akun wajib diisi.");
+    if (!id) {
+      return { success: false, error: "ID akun wajib diisi." };
+    }
 
     const email = String(formData.get("email") || "")
       .trim()
@@ -104,13 +139,11 @@ export async function updateGmailAccount(id: string, formData: FormData) {
       "Belum diamankan") as GmailAccountStatus;
 
     if (!email) {
-      throw new Error("Alamat email Gmail wajib diisi.");
+      return { success: false, error: "Alamat email Gmail wajib diisi." };
     }
 
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const adminId = await resolveCurrentAdminId(supabase);
 
     const encryptedPassword = encryptCredential(rawPassword);
     const encryptedBackupCodes = encryptCredential(rawBackupCodes);
@@ -123,17 +156,18 @@ export async function updateGmailAccount(id: string, formData: FormData) {
         backup_codes: encryptedBackupCodes,
         notes,
         status,
-        managed_by: user?.id || null,
+        managed_by: adminId,
         updated_at: new Date().toISOString(),
       })
       .eq("id", id);
 
     if (error) {
       logger.error("Error updating gmail account", { error });
-      throw new Error(`Gagal memperbarui akun Gmail: ${error.message}`);
+      return { success: false, error: `Gagal memperbarui akun Gmail: ${error.message}` };
     }
 
     revalidate();
+    return { success: true };
   });
 }
 
@@ -141,18 +175,18 @@ export async function updateGmailAccountStatus(
   id: string,
   newStatus: GmailAccountStatus,
   statusNotes?: string,
-) {
+): Promise<{ success: boolean; error?: string }> {
   return runAction("updateGmailAccountStatus", async () => {
-    if (!id) throw new Error("ID akun wajib diisi.");
+    if (!id) {
+      return { success: false, error: "ID akun wajib diisi." };
+    }
 
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const adminId = await resolveCurrentAdminId(supabase);
 
     const updatePayload: Record<string, any> = {
       status: newStatus,
-      managed_by: user?.id || null,
+      managed_by: adminId,
       updated_at: new Date().toISOString(),
     };
 
@@ -167,26 +201,32 @@ export async function updateGmailAccountStatus(
 
     if (error) {
       logger.error("Error updating gmail account status", { error });
-      throw new Error(`Gagal mengubah status akun Gmail: ${error.message}`);
+      return { success: false, error: `Gagal mengubah status akun Gmail: ${error.message}` };
     }
 
     revalidate();
+    return { success: true };
   });
 }
 
-export async function deleteGmailAccount(id: string) {
+export async function deleteGmailAccount(
+  id: string,
+): Promise<{ success: boolean; error?: string }> {
   return runAction("deleteGmailAccount", async () => {
-    if (!id) throw new Error("ID akun wajib diisi.");
+    if (!id) {
+      return { success: false, error: "ID akun wajib diisi." };
+    }
 
     const supabase = await createClient();
     const { error } = await (supabase as any).from("gmail_accounts").delete().eq("id", id);
 
     if (error) {
       logger.error("Error deleting gmail account", { error });
-      throw new Error("Gagal menghapus akun Gmail.");
+      return { success: false, error: "Gagal menghapus akun Gmail." };
     }
 
     revalidate();
+    return { success: true };
   });
 }
 

@@ -10,8 +10,8 @@ import { decryptCredential } from "./crypto";
 const mockInsert = vi.fn();
 const mockUpdate = vi.fn();
 const mockDelete = vi.fn();
-const mockSelect = vi.fn();
 const mockEq = vi.fn();
+const mockMaybeSingle = vi.fn();
 
 vi.mock("@/lib/supabase/server", () => ({
   createClient: vi.fn().mockResolvedValue({
@@ -24,7 +24,11 @@ vi.mock("@/lib/supabase/server", () => ({
       insert: mockInsert,
       update: mockUpdate,
       delete: mockDelete,
-      select: mockSelect,
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          maybeSingle: mockMaybeSingle,
+        })),
+      })),
     })),
   }),
 }));
@@ -40,15 +44,18 @@ describe("Gmail Accounts Server Actions Unit Tests", () => {
     mockUpdate.mockReturnValue({ eq: mockEq });
     mockDelete.mockReturnValue({ eq: mockEq });
     mockEq.mockResolvedValue({ error: null });
+    mockMaybeSingle.mockResolvedValue({ data: { id: "admin-user-uuid" }, error: null });
   });
 
   describe("createGmailAccount", () => {
-    it("melempar error jika email kosong", async () => {
+    it("mengembalikan error jika email kosong", async () => {
       const formData = new FormData();
       formData.set("email", "");
       formData.set("google_password", "pass123");
 
-      await expect(createGmailAccount(formData)).rejects.toThrow("Alamat email Gmail wajib diisi.");
+      const result = await createGmailAccount(formData);
+      expect(result.success).toBe(false);
+      expect(result.error).toBe("Alamat email Gmail wajib diisi.");
     });
 
     it("berhasil mengenkripsi kata sandi & kode cadangan sebelum disimpan", async () => {
@@ -59,7 +66,8 @@ describe("Gmail Accounts Server Actions Unit Tests", () => {
       formData.set("status", "Diproses");
       formData.set("notes", "Akun baru");
 
-      await createGmailAccount(formData);
+      const result = await createGmailAccount(formData);
+      expect(result.success).toBe(true);
 
       expect(mockInsert).toHaveBeenCalledTimes(1);
       const insertedPayload = mockInsert.mock.calls[0][0];
@@ -80,11 +88,13 @@ describe("Gmail Accounts Server Actions Unit Tests", () => {
   });
 
   describe("updateGmailAccount", () => {
-    it("melempar error jika ID akun kosong", async () => {
+    it("mengembalikan error jika ID akun kosong", async () => {
       const formData = new FormData();
       formData.set("email", "test@gmail.com");
 
-      await expect(updateGmailAccount("", formData)).rejects.toThrow("ID akun wajib diisi.");
+      const result = await updateGmailAccount("", formData);
+      expect(result.success).toBe(false);
+      expect(result.error).toBe("ID akun wajib diisi.");
     });
 
     it("memperbarui akun dengan enkripsi kredensial baru", async () => {
@@ -94,7 +104,8 @@ describe("Gmail Accounts Server Actions Unit Tests", () => {
       formData.set("backup_codes", "99887766");
       formData.set("status", "Stok Permanen");
 
-      await updateGmailAccount("account-uuid-1", formData);
+      const result = await updateGmailAccount("account-uuid-1", formData);
+      expect(result.success).toBe(true);
 
       expect(mockUpdate).toHaveBeenCalledTimes(1);
       const updatePayload = mockUpdate.mock.calls[0][0];
@@ -108,11 +119,12 @@ describe("Gmail Accounts Server Actions Unit Tests", () => {
 
   describe("updateGmailAccountStatus", () => {
     it("memperbarui status akun dan mencatat admin yang mengubah", async () => {
-      await updateGmailAccountStatus(
+      const result = await updateGmailAccountStatus(
         "account-uuid-1",
         "Diserahkan ke Customer",
         "Serah terima buyer",
       );
+      expect(result.success).toBe(true);
 
       expect(mockUpdate).toHaveBeenCalledTimes(1);
       const updatePayload = mockUpdate.mock.calls[0][0];
@@ -125,12 +137,15 @@ describe("Gmail Accounts Server Actions Unit Tests", () => {
   });
 
   describe("deleteGmailAccount", () => {
-    it("melempar error jika ID akun tidak ada", async () => {
-      await expect(deleteGmailAccount("")).rejects.toThrow("ID akun wajib diisi.");
+    it("mengembalikan error jika ID akun tidak ada", async () => {
+      const result = await deleteGmailAccount("");
+      expect(result.success).toBe(false);
+      expect(result.error).toBe("ID akun wajib diisi.");
     });
 
     it("menghapus akun dengan id yang sesuai", async () => {
-      await deleteGmailAccount("account-uuid-to-delete");
+      const result = await deleteGmailAccount("account-uuid-to-delete");
+      expect(result.success).toBe(true);
 
       expect(mockDelete).toHaveBeenCalledTimes(1);
       expect(mockEq).toHaveBeenCalledWith("id", "account-uuid-to-delete");

@@ -139,10 +139,15 @@ export function useGmailAccounts() {
       payload.set("notes", form.notes.trim());
       payload.set("status", form.status);
 
+      let result: { success: boolean; error?: string };
       if (editing) {
-        await updateGmailAccount(editing.id, payload);
+        result = await updateGmailAccount(editing.id, payload);
       } else {
-        await createGmailAccount(payload);
+        result = await createGmailAccount(payload);
+      }
+
+      if (result && !result.success) {
+        throw new Error(result.error || "Gagal menyimpan akun Gmail.");
       }
 
       closeModal();
@@ -162,7 +167,11 @@ export function useGmailAccounts() {
     if (acc.status === newStatus) return;
 
     try {
-      await updateGmailAccountStatus(acc.id, newStatus, reason);
+      const res = await updateGmailAccountStatus(acc.id, newStatus, reason);
+      if (res && !res.success) {
+        alert(`Gagal mengubah status: ${res.error || "Terjadi kesalahan"}`);
+        return;
+      }
       loadData();
       if (selectedAccountForLogs && selectedAccountForLogs.id === acc.id) {
         const updatedLogs = await getGmailAccountStatusLogs(acc.id);
@@ -183,7 +192,10 @@ export function useGmailAccounts() {
     }
 
     try {
-      await deleteGmailAccount(acc.id);
+      const res = await deleteGmailAccount(acc.id);
+      if (res && !res.success) {
+        throw new Error(res.error || "Gagal menghapus akun.");
+      }
       loadData();
     } catch (err) {
       setError(getErrorMessage(err));
