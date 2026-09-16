@@ -30,6 +30,7 @@ import { StockFormDrawer } from "@/components/stock/StockFormDrawer";
 import { CaptionGeneratorModal } from "@/components/features/CaptionGeneratorModal";
 import { getTemplates } from "@/app/actions/templates";
 import { TemplateItem } from "@/lib/hooks/features/useTemplates";
+import { TrashStockModal } from "@/components/stock/TrashStockModal";
 
 export default function UnifiedStockPage() {
   const {
@@ -86,6 +87,9 @@ export default function UnifiedStockPage() {
     null,
   );
 
+  // Trash / Tong Sampah Modal State
+  const [isTrashOpen, setIsTrashOpen] = useState(false);
+
   const { data: templates = [] } = useSWR<TemplateItem[]>("promotional-templates", async () => {
     const res = await getTemplates();
     return (res as unknown as TemplateItem[]) || [];
@@ -129,6 +133,14 @@ export default function UnifiedStockPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <button
+            onClick={() => setIsTrashOpen(true)}
+            className="border-border bg-card text-foreground hover:bg-muted inline-flex items-center justify-center gap-2 rounded-xl border px-3.5 py-2.5 text-sm font-medium shadow-xs transition-colors hover:border-rose-300 dark:hover:border-rose-800"
+            title="Lihat riwayat stok yang dibatalkan / di-void"
+          >
+            <Trash2 className="h-4 w-4 text-rose-500" />
+            Tong Sampah
+          </button>
           <button
             onClick={handleExportData}
             className="border-border bg-card text-foreground hover:bg-muted inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium shadow-xs transition-colors"
@@ -848,6 +860,9 @@ export default function UnifiedStockPage() {
           }}
         />
       )}
+
+      {/* 11. Trash / Tong Sampah Modal */}
+      <TrashStockModal isOpen={isTrashOpen} onClose={() => setIsTrashOpen(false)} />
     </div>
   );
 }
