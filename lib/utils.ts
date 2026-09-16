@@ -28,3 +28,22 @@ export function getBasePath(): string {
   const routePrefix = process.env.NEXT_PUBLIC_BASE_PATH?.trim();
   return routePrefix && routePrefix !== "/" ? `/${routePrefix.replace(/^\/+|\/+$/g, "")}` : "";
 }
+
+/**
+ * Mem-parsing kode cadangan Google (10 kode × 8 digit).
+ * Mendukung format:
+ * - 8 digit dengan spasi di tengah: "1234 5678"
+ * - 8 digit tanpa spasi: "12345678"
+ * - Multiline, spasi, atau dipisahkan koma
+ */
+export function parseBackupCodes(raw: string | null | undefined): string[] {
+  if (!raw) return [];
+  const matches = raw.match(/\b\d{4}\s*\d{4}\b|\b\d{8}\b/g);
+  if (matches && matches.length > 0) {
+    return matches.map((m) => m.replace(/\s+/g, ""));
+  }
+  return raw
+    .split(/[\r\n,]+/)
+    .map((s) => s.trim().replace(/\s+/g, ""))
+    .filter((s) => s.length > 0);
+}

@@ -20,8 +20,9 @@ describe("AES-256-GCM Credential Encryption & Decryption", () => {
     expect(decrypted).toBe(originalPassword);
   });
 
-  it("mendukung enkripsi & dekripsi multiline (backup codes 2FA)", () => {
-    const backupCodes = "12345678\n87654321\n11223344\n55667788\n99001122";
+  it("mendukung enkripsi & dekripsi multiline (10 kode cadangan Google 8 digit)", () => {
+    const backupCodes =
+      "12345678\n87654321\n11223344\n55667788\n99001122\n33445566\n77889900\n22334455\n66778899\n44556677";
     const encrypted = encryptCredential(backupCodes);
     const decrypted = decryptCredential(encrypted);
 

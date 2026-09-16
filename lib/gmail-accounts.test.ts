@@ -6,6 +6,7 @@ import {
   deleteGmailAccount,
 } from "@/app/actions/gmail-accounts";
 import { decryptCredential } from "./crypto";
+import { parseBackupCodes } from "./utils";
 
 const mockInsert = vi.fn();
 const mockUpdate = vi.fn();
@@ -149,6 +150,57 @@ describe("Gmail Accounts Server Actions Unit Tests", () => {
 
       expect(mockDelete).toHaveBeenCalledTimes(1);
       expect(mockEq).toHaveBeenCalledWith("id", "account-uuid-to-delete");
+    });
+  });
+
+  describe("parseBackupCodes (Google 10 Kode × 8 Digit)", () => {
+    it("berhasil mem-parsing 10 kode Google dengan format spasi (4-4 digit)", () => {
+      const raw = `1234 5678
+2345 6789
+3456 7890
+4567 8901
+5678 9012
+6789 0123
+7890 1234
+8901 2345
+9012 3456
+0123 4567`;
+
+      const parsed = parseBackupCodes(raw);
+      expect(parsed).toHaveLength(10);
+      expect(parsed[0]).toBe("12345678");
+      expect(parsed[9]).toBe("01234567");
+      expect(parsed.every((code) => code.length === 8)).toBe(true);
+    });
+
+    it("berhasil mem-parsing 10 kode Google tanpa spasi (8 digit langsung)", () => {
+      const raw = `11223344
+22334455
+33445566
+44556677
+55667788
+66778899
+77889900
+88990011
+99001122
+00112233`;
+
+      const parsed = parseBackupCodes(raw);
+      expect(parsed).toHaveLength(10);
+      expect(parsed[0]).toBe("11223344");
+      expect(parsed[9]).toBe("00112233");
+    });
+
+    it("menangani input kosong atau null dengan aman", () => {
+      expect(parseBackupCodes("")).toEqual([]);
+      expect(parseBackupCodes(null)).toEqual([]);
+      expect(parseBackupCodes(undefined)).toEqual([]);
+    });
+
+    it("menangani kode yang dipisahkan dengan koma atau campuran spasi", () => {
+      const raw = "1234 5678, 8765 4321, 9988 7766";
+      const parsed = parseBackupCodes(raw);
+      expect(parsed).toEqual(["12345678", "87654321", "99887766"]);
     });
   });
 });

@@ -25,7 +25,7 @@ import {
 import { useGmailAccounts } from "@/lib/hooks/features/useGmailAccounts";
 import { Pagination } from "@/components/ui/Pagination";
 import { GmailStatusBadge } from "@/components/ui/StatusBadge";
-import { formatDate } from "@/lib/utils";
+import { formatDate, parseBackupCodes } from "@/lib/utils";
 import type { GmailAccount, GmailAccountStatus } from "@/types/database";
 
 const STATUS_OPTIONS: GmailAccountStatus[] = [
@@ -77,6 +77,8 @@ export default function GmailAccountsPage() {
     },
   } = useGmailAccounts();
 
+  const formBackupCodesList = parseBackupCodes(form.backup_codes);
+
   const handleCopy = (text: string, identifier: string) => {
     if (!text) return;
     navigator.clipboard.writeText(text);
@@ -104,8 +106,8 @@ export default function GmailAccountsPage() {
             <h1 className="text-foreground text-2xl font-bold tracking-tight">Inventori Gmail</h1>
           </div>
           <p className="text-muted-foreground mt-1 text-sm">
-            Kelola akun Google, kata sandi, kode cadangan (backup codes), dan pantau siklus hidup
-            akun operasional.
+            Kelola akun Google, kata sandi, kode cadangan (10 kode × 8 digit), dan pantau siklus
+            hidup akun operasional.
           </p>
         </div>
         <button
@@ -319,6 +321,7 @@ export default function GmailAccountsPage() {
           {pageItems.map((acc: GmailAccount) => {
             const isPasswordRevealed = revealedPasswords[acc.id] ?? false;
             const isBackupCodeRevealed = revealedBackupCodes[acc.id] ?? false;
+            const parsedCodes = parseBackupCodes(acc.backup_codes);
 
             return (
               <div
@@ -409,52 +412,98 @@ export default function GmailAccountsPage() {
                     </div>
 
                     {/* Backup Codes */}
-                    <div className="border-border/40 flex items-start justify-between gap-2 border-t pt-2 text-xs">
-                      <div className="text-muted-foreground flex items-center gap-1.5 font-medium">
-                        <Shield className="h-3.5 w-3.5" />
-                        <span>Kode Cadangan:</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <div className="text-foreground max-w-50 truncate text-right font-mono font-semibold">
-                          {acc.backup_codes
-                            ? isBackupCodeRevealed
-                              ? acc.backup_codes
-                              : "••••••••••••"
-                            : "(Belum ada)"}
+                    <div className="border-border/40 border-t pt-2 text-xs">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="text-muted-foreground flex items-center gap-1.5 font-medium">
+                          <Shield className="h-3.5 w-3.5" />
+                          <span>Kode Cadangan:</span>
                         </div>
-                        {acc.backup_codes && (
-                          <>
-                            <button
-                              type="button"
-                              onClick={() => toggleBackupCodeReveal(acc.id)}
-                              className="text-muted-foreground hover:text-foreground rounded p-1 transition-colors"
-                              title={
-                                isBackupCodeRevealed
-                                  ? "Sembunyikan Kode"
-                                  : "Tampilkan Kode Cadangan"
-                              }
-                            >
-                              {isBackupCodeRevealed ? (
-                                <EyeOff className="h-3.5 w-3.5" />
-                              ) : (
-                                <Eye className="h-3.5 w-3.5" />
-                              )}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleCopy(acc.backup_codes || "", `codes-${acc.id}`)}
-                              className="text-muted-foreground hover:text-foreground rounded p-1 transition-colors"
-                              title="Salin Kode Cadangan"
-                            >
-                              {copiedId === `codes-${acc.id}` ? (
-                                <Check className="h-3.5 w-3.5 text-emerald-600" />
-                              ) : (
-                                <Copy className="h-3.5 w-3.5" />
-                              )}
-                            </button>
-                          </>
-                        )}
+                        <div className="flex items-center gap-1.5">
+                          {acc.backup_codes ? (
+                            <>
+                              <span className="text-foreground font-mono text-[11px] font-semibold">
+                                {isBackupCodeRevealed
+                                  ? `${parsedCodes.length} Kode Tersedia`
+                                  : `${parsedCodes.length || "•"} Kode Tersimpan`}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => toggleBackupCodeReveal(acc.id)}
+                                className="text-muted-foreground hover:text-foreground rounded p-1 transition-colors"
+                                title={
+                                  isBackupCodeRevealed
+                                    ? "Sembunyikan Kode"
+                                    : "Tampilkan Kode Cadangan"
+                                }
+                              >
+                                {isBackupCodeRevealed ? (
+                                  <EyeOff className="h-3.5 w-3.5" />
+                                ) : (
+                                  <Eye className="h-3.5 w-3.5" />
+                                )}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleCopy(acc.backup_codes || "", `codes-${acc.id}`)
+                                }
+                                className="text-muted-foreground hover:text-foreground rounded p-1 transition-colors"
+                                title="Salin Semua Kode Cadangan"
+                              >
+                                {copiedId === `codes-${acc.id}` ? (
+                                  <Check className="h-3.5 w-3.5 text-emerald-600" />
+                                ) : (
+                                  <Copy className="h-3.5 w-3.5" />
+                                )}
+                              </button>
+                            </>
+                          ) : (
+                            <span className="text-muted-foreground font-mono text-[11px]">
+                              (Belum ada)
+                            </span>
+                          )}
+                        </div>
                       </div>
+
+                      {/* Expanded View when Revealed */}
+                      {acc.backup_codes && isBackupCodeRevealed && (
+                        <div className="bg-muted/40 border-border/50 mt-2.5 rounded-lg border p-2">
+                          <div className="text-muted-foreground mb-1.5 flex items-center justify-between text-[10px] font-medium">
+                            <span>Klik salah satu kode untuk menyalin:</span>
+                            <span className="text-foreground font-semibold">
+                              {parsedCodes.length}/10 kode
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-1.5">
+                            {parsedCodes.map((code, idx) => {
+                              const formatted =
+                                code.length === 8 ? `${code.slice(0, 4)} ${code.slice(4)}` : code;
+                              const isCodeCopied = copiedId === `code-${acc.id}-${idx}`;
+                              return (
+                                <button
+                                  key={idx}
+                                  type="button"
+                                  onClick={() => handleCopy(code, `code-${acc.id}-${idx}`)}
+                                  className="border-border/40 hover:bg-background hover:border-border group bg-background/70 flex items-center justify-between rounded-md border px-2 py-1 font-mono text-[11px] transition-colors"
+                                  title={`Klik untuk menyalin kode #${idx + 1}`}
+                                >
+                                  <span className="text-muted-foreground mr-1 text-[10px]">
+                                    {idx + 1}.
+                                  </span>
+                                  <span className="text-foreground font-semibold tracking-wider">
+                                    {formatted}
+                                  </span>
+                                  {isCodeCopied ? (
+                                    <Check className="ml-1 h-3 w-3 shrink-0 text-emerald-600" />
+                                  ) : (
+                                    <Copy className="text-muted-foreground group-hover:text-foreground ml-1 h-3 w-3 shrink-0 opacity-40 group-hover:opacity-100" />
+                                  )}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -631,16 +680,34 @@ export default function GmailAccountsPage() {
                   />
                 </div>
 
-                {/* Kode Cadangan (Backup Codes) */}
+                {/* Kode Cadangan (Google Backup Codes) */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-foreground text-xs font-semibold">
-                    Kode Cadangan (Backup Codes 2FA)
-                  </label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-foreground text-xs font-semibold">
+                      Kode Cadangan (10 Kode × 8 Digit)
+                    </label>
+                    {formBackupCodesList.length > 0 && (
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                          formBackupCodesList.length === 10
+                            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                            : "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                        }`}
+                      >
+                        {formBackupCodesList.length}/10 kode terdeteksi
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-muted-foreground text-[11px] leading-relaxed">
+                    Ditemukan di Akun Google: <strong>Keamanan &amp; Login</strong> &gt;{" "}
+                    <strong>Kode Cadangan</strong>. Berisi 10 kode cadangan yang masing-masing 8
+                    digit angka.
+                  </p>
                   <textarea
-                    rows={4}
+                    rows={5}
                     value={form.backup_codes}
                     onChange={(e) => setField("backup_codes", e.target.value)}
-                    placeholder="Masukkan kode cadangan 8-digit (pisahkan dengan koma, spasi, atau baris baru)..."
+                    placeholder={`Tempel 10 kode cadangan dari Google (format 8 digit):\n1234 5678\n2345 6789\n3456 7890\n...`}
                     className="border-border bg-background text-foreground w-full rounded-xl border px-3 py-2.5 font-mono text-xs outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                   />
                 </div>
