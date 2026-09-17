@@ -7,11 +7,13 @@ import { useDebouncedValue } from "@/lib/hooks/useDebouncedValue";
 import {
   getGmailAccounts,
   createGmailAccount,
+  createBulkGmailAccounts,
   updateGmailAccount,
   updateGmailAccountStatus,
   deleteGmailAccount,
   getGmailAccountStatusLogs,
 } from "@/app/actions/gmail-accounts";
+import { generateRandomPassword } from "@/lib/utils";
 import type { GmailAccount, GmailAccountStatus, GmailAccountStatusLog } from "@/types/database";
 
 export type GmailAccountForm = {
@@ -30,6 +32,18 @@ export const emptyGmailAccountForm: GmailAccountForm = {
   status: "Belum diamankan",
 };
 
+export type GmailBulkAddForm = {
+  rawEmails: string;
+  notes: string;
+  status: GmailAccountStatus;
+};
+
+export const emptyGmailBulkAddForm: GmailBulkAddForm = {
+  rawEmails: "",
+  notes: "",
+  status: "Belum diamankan",
+};
+
 export function useGmailAccounts() {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebouncedValue(search, 300);
@@ -42,6 +56,11 @@ export function useGmailAccounts() {
   const [isAddClosing, setIsAddClosing] = useState(false);
   const [editing, setEditing] = useState<GmailAccount | null>(null);
   const [form, setForm] = useState<GmailAccountForm>(emptyGmailAccountForm);
+
+  // Modal Bulk Add
+  const [isBulkAddOpen, setIsBulkAddOpen] = useState(false);
+  const [isBulkAddClosing, setIsBulkAddClosing] = useState(false);
+  const [bulkForm, setBulkForm] = useState<GmailBulkAddForm>(emptyGmailBulkAddForm);
 
   // Status Logs Drawer / Modal
   const [isLogsOpen, setIsLogsOpen] = useState(false);
@@ -151,6 +170,70 @@ export function useGmailAccounts() {
       }
 
       closeModal();
+      loadData();
+    } catch (err) {
+      setError(getErrorMessage(err));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleGeneratePasswordForSingle = () => {
+    const pwd = generateRandomPassword(16);
+    setField("google_password", pwd);
+    return pwd;
+  };
+
+  const openBulkAdd = () => {
+    setError("");
+    setBulkForm(emptyGmailBulkAddForm);
+    setIsBulkAddOpen(true);
+  };
+
+  const closeBulkAddModal = () => {
+    if (isBulkAddClosing || isSubmitting) return;
+    setIsBulkAddClosing(true);
+    setTimeout(() => {
+      setIsBulkAddClosing(false);
+      setIsBulkAddOpen(false);
+    }, 200);
+  };
+
+  const setBulkField = (k: keyof GmailBulkAddForm, v: string) =>
+    setBulkForm((prev) => ({ ...prev, [k]: v }));
+
+  const handleBulkSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setIsSubmitting(true);
+
+    try {
+      const emailList = Array.from(
+        new Set(
+          bulkForm.rawEmails
+            .split(/[\r\n,;\s]+/)
+            .map((em) => em.trim().toLowerCase())
+            .filter((em) => em.length > 0 && em.includes("@")),
+        ),
+      );
+
+      if (emailList.length === 0) {
+        throw new Error("Masukkan setidaknya satu alamat email yang valid (harus mengandung '@').");
+      }
+
+      const payload = emailList.map((email) => ({
+        email,
+        google_password: generateRandomPassword(16),
+        notes: bulkForm.notes.trim() || undefined,
+        status: bulkForm.status,
+      }));
+
+      const result = await createBulkGmailAccounts(payload);
+      if (result && !result.success) {
+        throw new Error(result.error || "Gagal menyimpan akun Gmail massal.");
+      }
+
+      closeBulkAddModal();
       loadData();
     } catch (err) {
       setError(getErrorMessage(err));
@@ -302,6 +385,9 @@ export function useGmailAccounts() {
       isAddClosing,
       editing,
       form,
+      isBulkAddOpen,
+      isBulkAddClosing,
+      bulkForm,
       isLogsOpen,
       selectedAccountForLogs,
     },
@@ -312,6 +398,11 @@ export function useGmailAccounts() {
       openAdd,
       openEdit,
       closeModal,
+      openBulkAdd,
+      closeBulkAddModal,
+      setBulkField,
+      handleGeneratePasswordForSingle,
+      handleBulkSave,
       openStatusLogs,
       closeStatusLogs,
       handleSave,

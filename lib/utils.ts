@@ -57,3 +57,24 @@ export function maskBackupCodes(raw: string | null | undefined): string {
   if (!raw) return "";
   return raw.replace(/[^,\s\r\n;]/g, "•");
 }
+
+/**
+ * Menghasilkan rekomendasi kata sandi acak dengan panjang tertentu (default 16 karakter),
+ * berformat huruf kapital dan angka (A-Z, 0-9), contoh: "SKDMWKKENC2I3XJ2".
+ */
+export function generateRandomPassword(length: number = 16): string {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let result = "";
+  if (typeof crypto !== "undefined" && typeof crypto.getRandomValues === "function") {
+    const randomBytes = new Uint8Array(length);
+    crypto.getRandomValues(randomBytes);
+    for (let i = 0; i < length; i++) {
+      result += chars[randomBytes[i] % chars.length];
+    }
+  } else {
+    for (let i = 0; i < length; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+  }
+  return result;
+}

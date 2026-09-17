@@ -120,6 +120,67 @@ export async function createGmailAccount(
   });
 }
 
+export async function createBulkGmailAccounts(
+  accounts: Array<{
+    email: string;
+    google_password?: string;
+    backup_codes?: string;
+    notes?: string;
+    status?: GmailAccountStatus;
+  }>,
+): Promise<{ success: boolean; count?: number; error?: string }> {
+  return runAction("createBulkGmailAccounts", async () => {
+    if (!accounts || !Array.isArray(accounts) || accounts.length === 0) {
+      return { success: false, error: "Daftar akun Gmail tidak boleh kosong." };
+    }
+
+    const supabase = await createClient();
+    const adminId = await resolveCurrentAdminId(supabase);
+
+    const rowsToInsert = [];
+    for (const item of accounts) {
+      const email = String(item.email || "")
+        .trim()
+        .toLowerCase();
+      if (!email) continue;
+
+      const rawPassword = String(item.google_password || "").trim();
+      const rawBackupCodes = String(item.backup_codes || "").trim();
+      const notes = String(item.notes || "").trim() || null;
+      const status = (String(item.status || "Belum diamankan").trim() ||
+        "Belum diamankan") as GmailAccountStatus;
+
+      rowsToInsert.push({
+        email,
+        google_password: encryptCredential(rawPassword),
+        backup_codes: encryptCredential(rawBackupCodes),
+        notes,
+        status,
+        managed_by: adminId,
+      });
+    }
+
+    if (rowsToInsert.length === 0) {
+      return { success: false, error: "Tidak ada alamat email valid yang dapat disimpan." };
+    }
+
+    const { error } = await (supabase as any).from("gmail_accounts").insert(rowsToInsert);
+
+    if (error) {
+      logger.error("Error bulk creating gmail accounts", { error });
+      return {
+        success: false,
+        error: error.message.includes("relation")
+          ? "Tabel database belum siap. Pastikan migrasi telah diterapkan."
+          : `Gagal menambahkan akun Gmail massal: ${error.message}`,
+      };
+    }
+
+    revalidate();
+    return { success: true, count: rowsToInsert.length };
+  });
+}
+
 export async function updateGmailAccount(
   id: string,
   formData: FormData,

@@ -1,12 +1,13 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import {
   createGmailAccount,
+  createBulkGmailAccounts,
   updateGmailAccount,
   updateGmailAccountStatus,
   deleteGmailAccount,
 } from "@/app/actions/gmail-accounts";
 import { decryptCredential } from "./crypto";
-import { parseBackupCodes, maskBackupCodes } from "./utils";
+import { parseBackupCodes, maskBackupCodes, generateRandomPassword } from "./utils";
 
 const mockInsert = vi.fn();
 const mockUpdate = vi.fn();
@@ -85,6 +86,65 @@ describe("Gmail Accounts Server Actions Unit Tests", () => {
       // Verifikasi kode cadangan tersimpan dalam keadaan terenkripsi
       expect(insertedPayload.backup_codes).not.toBe("11223344, 55667788");
       expect(decryptCredential(insertedPayload.backup_codes)).toBe("11223344, 55667788");
+    });
+  });
+
+  describe("createBulkGmailAccounts", () => {
+    it("mengembalikan error jika daftar akun kosong atau bukan array", async () => {
+      const res1 = await createBulkGmailAccounts([]);
+      expect(res1.success).toBe(false);
+      expect(res1.error).toBe("Daftar akun Gmail tidak boleh kosong.");
+
+      const res2 = await createBulkGmailAccounts(null as any);
+      expect(res2.success).toBe(false);
+      expect(res2.error).toBe("Daftar akun Gmail tidak boleh kosong.");
+    });
+
+    it("mengembalikan error jika semua email dalam daftar kosong", async () => {
+      const res = await createBulkGmailAccounts([{ email: "" }, { email: "   " }]);
+      expect(res.success).toBe(false);
+      expect(res.error).toBe("Tidak ada alamat email valid yang dapat disimpan.");
+    });
+
+    it("berhasil menyimpan banyak akun dengan sandi terenkripsi dan filter email valid", async () => {
+      const accountsToInsert = [
+        {
+          email: "bulk1@gmail.com",
+          google_password: "PASS_FOR_BULK_1",
+          notes: "Batch 1",
+          status: "Diproses" as const,
+        },
+        {
+          email: "bulk2@gmail.com",
+          google_password: "PASS_FOR_BULK_2",
+          notes: "Batch 2",
+          status: "Stok Permanen" as const,
+        },
+        {
+          email: "   ", // Harus diabaikan
+          google_password: "PASS_EMPTY",
+        },
+      ];
+
+      const res = await createBulkGmailAccounts(accountsToInsert);
+      expect(res.success).toBe(true);
+      expect(res.count).toBe(2);
+
+      expect(mockInsert).toHaveBeenCalledTimes(1);
+      const insertedRows = mockInsert.mock.calls[0][0];
+
+      expect(insertedRows).toHaveLength(2);
+
+      expect(insertedRows[0].email).toBe("bulk1@gmail.com");
+      expect(insertedRows[0].status).toBe("Diproses");
+      expect(insertedRows[0].notes).toBe("Batch 1");
+      expect(decryptCredential(insertedRows[0].google_password)).toBe("PASS_FOR_BULK_1");
+      expect(insertedRows[0].managed_by).toBe("admin-user-uuid");
+
+      expect(insertedRows[1].email).toBe("bulk2@gmail.com");
+      expect(insertedRows[1].status).toBe("Stok Permanen");
+      expect(insertedRows[1].notes).toBe("Batch 2");
+      expect(decryptCredential(insertedRows[1].google_password)).toBe("PASS_FOR_BULK_2");
     });
   });
 
@@ -237,6 +297,34 @@ describe("Gmail Accounts Server Actions Unit Tests", () => {
       expect(maskBackupCodes("")).toBe("");
       expect(maskBackupCodes(null)).toBe("");
       expect(maskBackupCodes(undefined)).toBe("");
+    });
+  });
+
+  describe("generateRandomPassword (Rekomendasi Sandi 16 Karakter Kapital & Angka)", () => {
+    it("menghasilkan kata sandi string dengan panjang default 16 karakter", () => {
+      const pwd = generateRandomPassword();
+      expect(typeof pwd).toBe("string");
+      expect(pwd).toHaveLength(16);
+    });
+
+    it("menghasilkan kata sandi dengan panjang kustom jika diminta", () => {
+      expect(generateRandomPassword(8)).toHaveLength(8);
+      expect(generateRandomPassword(24)).toHaveLength(24);
+    });
+
+    it("hanya mengandung karakter huruf kapital (A-Z) dan angka (0-9)", () => {
+      for (let i = 0; i < 20; i++) {
+        const pwd = generateRandomPassword(16);
+        expect(pwd).toMatch(/^[A-Z0-9]+$/);
+      }
+    });
+
+    it("menghasilkan kata sandi yang berbeda dan acak pada setiap pemanggilan", () => {
+      const passwords = new Set();
+      for (let i = 0; i < 25; i++) {
+        passwords.add(generateRandomPassword(16));
+      }
+      expect(passwords.size).toBe(25);
     });
   });
 });

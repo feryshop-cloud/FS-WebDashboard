@@ -21,6 +21,8 @@ import {
   Clock,
   User,
   Filter,
+  Sparkles,
+  Users,
 } from "lucide-react";
 import { useGmailAccounts } from "@/lib/hooks/features/useGmailAccounts";
 import { Pagination } from "@/components/ui/Pagination";
@@ -59,6 +61,9 @@ export default function GmailAccountsPage() {
       isAddClosing,
       editing,
       form,
+      isBulkAddOpen,
+      isBulkAddClosing,
+      bulkForm,
       isLogsOpen,
       selectedAccountForLogs,
     },
@@ -69,6 +74,11 @@ export default function GmailAccountsPage() {
       openAdd,
       openEdit,
       closeModal,
+      openBulkAdd,
+      closeBulkAddModal,
+      setBulkField,
+      handleGeneratePasswordForSingle,
+      handleBulkSave,
       openStatusLogs,
       closeStatusLogs,
       handleSave,
@@ -78,6 +88,17 @@ export default function GmailAccountsPage() {
       setItemsPerPage,
     },
   } = useGmailAccounts();
+
+  const parsedBulkEmails = React.useMemo(() => {
+    return Array.from(
+      new Set(
+        bulkForm.rawEmails
+          .split(/[\r\n,;\s]+/)
+          .map((em) => em.trim().toLowerCase())
+          .filter((em) => em.length > 0 && em.includes("@")),
+      ),
+    );
+  }, [bulkForm.rawEmails]);
 
   const handleOpenAdd = () => {
     setShowPasswordInForm(false);
@@ -130,13 +151,24 @@ export default function GmailAccountsPage() {
             hidup akun operasional.
           </p>
         </div>
-        <button
-          onClick={handleOpenAdd}
-          className="inline-flex items-center justify-center gap-2 rounded-xl border border-transparent bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 active:scale-[0.98]"
-        >
-          <Plus className="h-4 w-4" />
-          Tambah Akun Gmail
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={openBulkAdd}
+            className="border-border bg-card text-foreground hover:bg-muted inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-semibold shadow-xs transition-colors active:scale-[0.98]"
+          >
+            <Users className="h-4 w-4 text-blue-500" />
+            Tambah Massal
+          </button>
+          <button
+            type="button"
+            onClick={handleOpenAdd}
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-transparent bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white shadow-xs transition-colors hover:bg-blue-700 active:scale-[0.98]"
+          >
+            <Plus className="h-4 w-4" />
+            Tambah Akun Gmail
+          </button>
+        </div>
       </div>
 
       {/* Error Banner */}
@@ -683,13 +715,28 @@ export default function GmailAccountsPage() {
                     <label className="text-foreground text-xs font-semibold">
                       Kata Sandi Google
                     </label>
-                    <button
-                      type="button"
-                      onClick={() => setShowPasswordInForm(!showPasswordInForm)}
-                      className="text-muted-foreground hover:text-foreground text-[11px] font-medium"
-                    >
-                      {showPasswordInForm ? "Sembunyikan" : "Tampilkan"}
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleGeneratePasswordForSingle();
+                          setShowPasswordInForm(true);
+                        }}
+                        className="inline-flex items-center gap-1 text-[11px] font-medium text-blue-600 transition-colors hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                        title="Buat rekomendasi sandi acak 16 karakter (huruf kapital & angka)"
+                      >
+                        <Sparkles className="h-3 w-3" />
+                        <span>Generate Sandi</span>
+                      </button>
+                      <span className="text-muted-foreground text-[10px]">•</span>
+                      <button
+                        type="button"
+                        onClick={() => setShowPasswordInForm(!showPasswordInForm)}
+                        className="text-muted-foreground hover:text-foreground text-[11px] font-medium"
+                      >
+                        {showPasswordInForm ? "Sembunyikan" : "Tampilkan"}
+                      </button>
+                    </div>
                   </div>
                   <input
                     type={showPasswordInForm ? "text" : "password"}
@@ -829,7 +876,163 @@ export default function GmailAccountsPage() {
         </div>
       )}
 
-      {/* Drawer 2: Timeline Riwayat Perubahan Status (Status Logs) */}
+      {/* Drawer 2: Tambah Massal Akun Gmail */}
+      {(isBulkAddOpen || isBulkAddClosing) && (
+        <div
+          className={`fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm ${
+            isBulkAddClosing ? "fs-overlay-out" : "fs-overlay-in"
+          }`}
+          onClick={closeBulkAddModal}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={`bg-card flex h-full w-full max-w-md flex-col shadow-2xl ${
+              isBulkAddClosing ? "fs-drawer-out" : "fs-drawer-in"
+            }`}
+          >
+            {/* Drawer Header */}
+            <div className="border-border-soft flex items-center justify-between border-b px-6 py-5">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-foreground text-base font-bold">Tambah Massal Akun Gmail</h2>
+                  <span className="rounded-full bg-blue-500/10 px-2 py-0.5 text-[11px] font-semibold text-blue-600 dark:text-blue-400">
+                    Bulk
+                  </span>
+                </div>
+                <p className="text-muted-foreground mt-0.5 text-xs">
+                  Daftarkan banyak akun Google sekaligus dengan kata sandi unik otomatis.
+                </p>
+              </div>
+              <button
+                onClick={closeBulkAddModal}
+                className="text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg p-1 transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Drawer Body */}
+            <form
+              onSubmit={handleBulkSave}
+              className="fs-rise-in flex flex-1 flex-col overflow-hidden"
+            >
+              <div className="flex flex-1 flex-col gap-4.5 overflow-y-auto px-6 py-5">
+                {/* Inline error */}
+                {error && (
+                  <div className="flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs font-medium text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-400">
+                    <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                    <span>{error}</span>
+                  </div>
+                )}
+
+                {/* Info Rekomendasi Kata Sandi */}
+                <div className="rounded-xl border border-blue-500/20 bg-blue-500/10 p-3 text-xs leading-relaxed text-blue-700 dark:text-blue-300">
+                  <div className="flex items-center gap-1.5 font-semibold">
+                    <Sparkles className="h-3.5 w-3.5 shrink-0 text-blue-500" />
+                    <span>Sandi Unik Otomatis Dibuat</span>
+                  </div>
+                  <p className="text-muted-foreground mt-1 text-[11px]">
+                    Setiap email yang didaftarkan akan otomatis mendapatkan kata sandi rekomendasi
+                    16 karakter unik (huruf kapital & angka) yang berbeda-beda.
+                  </p>
+                </div>
+
+                {/* Textarea Emails */}
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-foreground text-xs font-semibold">
+                      Daftar Email Google <span className="text-rose-500">*</span>
+                    </label>
+                    {parsedBulkEmails.length > 0 && (
+                      <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
+                        {parsedBulkEmails.length} email terdeteksi
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-muted-foreground text-[11px] leading-relaxed">
+                    Tempel daftar email Google. Pisahkan dengan <strong>baris baru (Enter)</strong>,
+                    koma (,), atau titik koma (;).
+                  </p>
+                  <textarea
+                    rows={8}
+                    required
+                    value={bulkForm.rawEmails}
+                    onChange={(e) => setBulkField("rawEmails", e.target.value)}
+                    placeholder={`contoh1@gmail.com\ncontoh2@gmail.com\ncontoh3@gmail.com`}
+                    className="border-border bg-background text-foreground w-full resize-none rounded-xl border px-3 py-2.5 font-mono text-xs leading-relaxed outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
+
+                {/* Status Akun */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-foreground text-xs font-semibold">
+                    Status Akun (Berlaku untuk semua) <span className="text-rose-500">*</span>
+                  </label>
+                  <select
+                    value={bulkForm.status}
+                    onChange={(e) => setBulkField("status", e.target.value as GmailAccountStatus)}
+                    className="border-border bg-background text-foreground w-full rounded-xl border px-3 py-2.5 text-xs font-medium outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                  >
+                    {STATUS_OPTIONS.map((st) => (
+                      <option key={st} value={st}>
+                        {st}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Catatan Tambahan */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-foreground text-xs font-semibold">
+                    Catatan Internal (Opsional)
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={bulkForm.notes}
+                    onChange={(e) => setBulkField("notes", e.target.value)}
+                    placeholder="Contoh: Stok batch impor Google accounts..."
+                    className="border-border bg-background text-foreground w-full rounded-xl border px-3 py-2.5 text-xs outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
+              </div>
+
+              {/* Drawer Footer */}
+              <div className="border-border-soft bg-muted/20 flex items-center justify-end gap-2.5 border-t px-6 py-4">
+                <button
+                  type="button"
+                  onClick={closeBulkAddModal}
+                  disabled={isSubmitting}
+                  className="border-border text-foreground hover:bg-muted rounded-xl border px-4 py-2 text-xs font-semibold transition-colors disabled:opacity-50"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting || parsedBulkEmails.length === 0}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      <span>Menyimpan...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-3.5 w-3.5" />
+                      <span>
+                        Simpan{" "}
+                        {parsedBulkEmails.length > 0 ? `${parsedBulkEmails.length} Akun` : "Massal"}
+                      </span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Drawer 3: Timeline Riwayat Perubahan Status (Status Logs) */}
       {isLogsOpen && selectedAccountForLogs && (
         <div
           className="fs-overlay-in fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm"
