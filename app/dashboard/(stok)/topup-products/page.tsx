@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import {
   Search,
   ShoppingBag,
@@ -17,6 +17,7 @@ import { AddTopupProductModal } from "@/components/topup/TopupProductModals";
 import { TopupProductRowActions } from "@/components/topup/TopupProductRowActions";
 import { Pagination } from "@/components/ui/Pagination";
 import { DataTable, type DataTableColumn } from "@/components/ui/DataTable";
+import { getTopupGameSlugs } from "@/app/actions/topup-products";
 
 function TopupProductsContent() {
   const {
@@ -28,6 +29,7 @@ function TopupProductsContent() {
       searchQuery,
       sortBy,
       sortOrder,
+      gameSlugFilter,
       isActiveFilter,
       isGangguanFilter,
       hasActiveFilters,
@@ -41,6 +43,14 @@ function TopupProductsContent() {
       loadProducts,
     },
   } = useTopupProducts();
+
+  const [gameSlugs, setGameSlugs] = useState<string[]>([]);
+
+  useEffect(() => {
+    getTopupGameSlugs().then((res) => {
+      if (res.data) setGameSlugs(res.data);
+    });
+  }, []);
 
   const sortOptions = [
     { value: "game_slug", label: "Game" },
@@ -156,6 +166,23 @@ function TopupProductsContent() {
               onChange={(e) => handleFilterChange("search", e.target.value)}
               className="border-border bg-muted w-full rounded-lg border py-2 pr-4 pl-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
             />
+          </div>
+
+          {/* Game Filter */}
+          <div className="relative min-w-40">
+            <select
+              value={gameSlugFilter}
+              onChange={(e) => handleFilterChange("gameSlug", e.target.value)}
+              className="border-border bg-muted w-full appearance-none rounded-lg border py-2 pr-8 pl-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+            >
+              <option value="">Semua Game</option>
+              {gameSlugs.map((slug) => (
+                <option key={slug} value={slug}>
+                  {slug}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="text-faint-foreground pointer-events-none absolute top-1/2 right-2 h-4 w-4 -translate-y-1/2" />
           </div>
 
           {/* Sort By */}

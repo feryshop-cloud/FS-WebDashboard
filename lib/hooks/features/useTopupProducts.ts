@@ -53,11 +53,13 @@ export function useTopupProducts() {
   const sortOrder = (searchParams.get("sortOrder") || "asc") as "asc" | "desc";
   const isActiveFilter = searchParams.get("isActive") || "";
   const isGangguanFilter = searchParams.get("isGangguan") || "";
+  const gameSlugFilter = searchParams.get("gameSlug") || "";
 
   const queryKey = {
     page: currentPage,
     limit: itemsPerPage,
     search: searchQuery,
+    gameSlug: gameSlugFilter,
     sortBy,
     sortOrder,
     isActive: isActiveFilter,
@@ -128,6 +130,7 @@ export function useTopupProducts() {
 
   const hasActiveFilters =
     searchQuery ||
+    gameSlugFilter ||
     isActiveFilter ||
     isGangguanFilter ||
     sortBy !== "game_slug" ||
@@ -147,6 +150,7 @@ export function useTopupProducts() {
       searchQuery: localSearch,
       sortBy,
       sortOrder,
+      gameSlugFilter,
       isActiveFilter,
       isGangguanFilter,
       hasActiveFilters,

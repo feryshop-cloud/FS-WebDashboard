@@ -19,6 +19,7 @@ export type TopupProductInput = {
 
 export type TopupProductsFilters = {
   search?: string;
+  gameSlug?: string;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
   isActive?: string;
@@ -31,6 +32,7 @@ export async function getTopupProducts(filters: TopupProductsFilters = {}) {
   return runAction("getTopupProducts", async () => {
     const {
       search = "",
+      gameSlug = "",
       sortBy = "game_slug",
       sortOrder = "asc",
       isActive = "",
@@ -46,6 +48,10 @@ export async function getTopupProducts(filters: TopupProductsFilters = {}) {
     if (search.trim()) {
       const term = `%${search.trim()}%`;
       query = query.or(`title.ilike.${term},game_slug.ilike.${term},sku.ilike.${term}`);
+    }
+
+    if (gameSlug) {
+      query = query.eq("game_slug", gameSlug);
     }
 
     if (isActive === "true") {
@@ -167,5 +173,24 @@ export async function deleteTopupProduct(id: string) {
     revalidatePath("/dashboard/topup-products");
     purgeStorefront(STOREFRONT_TAGS.products);
     return { success: true };
+  });
+}
+
+export async function getTopupGameSlugs() {
+  return runAction("getTopupGameSlugs", async () => {
+    const supabase = await createClient();
+
+    const { data, error } = await (supabase as any)
+      .from("products")
+      .select("game_slug")
+      .not("game_slug", "is", null);
+
+    if (error) {
+      logger.error("Error fetching game slugs", { error });
+      return { data: null, error: error.message };
+    }
+
+    const unique = [...new Set((data as { game_slug: string }[]).map((r) => r.game_slug))].sort();
+    return { data: unique, error: null };
   });
 }
