@@ -132,11 +132,13 @@ export function normalizeStockStatus(status?: string | null): string {
   const s = (status || "").trim().toUpperCase().replace(/\s+/g, "_");
   if (!s || s === "AVAILABLE" || s === "TERSEDIA") return "AVAILABLE";
   if (s === "DRAFT" || s === "UNPOSTED") return "DRAFT";
-  if (s === "WAITING_PAYMENT" || s === "PENDING_PAYMENT" || s === "MENUNGGU_PEMBAYARAN") return "WAITING_PAYMENT";
+  if (s === "WAITING_PAYMENT" || s === "PENDING_PAYMENT" || s === "MENUNGGU_PEMBAYARAN")
+    return "WAITING_PAYMENT";
   if (s === "BOOKED" || s === "BOOKING") return "BOOKED";
   if (s === "LIMITED_ACCESS" || s === "AKSES_TERBATAS") return "LIMITED_ACCESS";
   if (s === "ON_HOLD") return "ON_HOLD";
-  if (s === "PROBLEM" || s === "BERMASALAH" || s === "PROBLEM_ACTION" || s === "PROBLEM_PERMANENT") return "PROBLEM";
+  if (s === "PROBLEM" || s === "BERMASALAH" || s === "PROBLEM_ACTION" || s === "PROBLEM_PERMANENT")
+    return "PROBLEM";
   if (s === "ARCHIVED" || s === "ARCHIVE" || s === "ARSIP") return "ARCHIVED";
   if (s === "SOLD" || s === "TERJUAL") return "SOLD";
   return s;
@@ -149,4 +151,3 @@ export function isMatchingStockStatus(
   if (!filter || filter === "ALL") return true;
   return normalizeStockStatus(itemStatus) === normalizeStockStatus(filter);
 }
-
