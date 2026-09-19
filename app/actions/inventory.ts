@@ -268,7 +268,6 @@ export async function updateInventoryItem(id: string, formData: FormData) {
     const screenshot_url = final_image_urls.length > 0 ? final_image_urls[0] : "";
 
     const updatePayload: {
-      game_id: string;
       title_reference: string;
       account_specs: string;
       capital_price: number;
@@ -278,7 +277,6 @@ export async function updateInventoryItem(id: string, formData: FormData) {
       updated_at: string;
       status?: "UNPOSTED" | "AVAILABLE" | "SOLD";
     } = {
-      game_id,
       title_reference,
       account_specs,
       capital_price,

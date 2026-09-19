@@ -8,6 +8,7 @@ import { revalidatePath } from "next/cache";
 import { purgeStorefront, STOREFRONT_TAGS } from "@/lib/store-revalidate";
 import { logger } from "@/lib/logger";
 import { runAction } from "@/lib/logging/server-action";
+import { generateStockName, getGameCodeFromName } from "@/lib/utils";
 
 type StockRow = Database["public"]["Tables"]["stocks"]["Row"];
 type StockInsert = Database["public"]["Tables"]["stocks"]["Insert"];
@@ -97,9 +98,26 @@ export async function createStock(
       const supabase = await createClient();
       const stockWithSku = stockData as Partial<Stock> & { sku?: string };
 
+      let generatedSku: string = stockWithSku.sku || "";
+      if (!generatedSku || generatedSku.startsWith("STK-")) {
+        const { data: rpcSku } = await (supabase.rpc as any)("generate_stock_sku", {
+          p_category: stockData.category || "",
+        });
+        generatedSku = (rpcSku as string) || `${getGameCodeFromName(stockData.category || "")}-3000`;
+      }
+
+      let finalName = (stockData.name || "").trim();
+      if (
+        !finalName ||
+        finalName.startsWith("AUTO | ") ||
+        /^[A-Z0-9]+-(?:AUTO|\d{4,}) \| /.test(finalName)
+      ) {
+        finalName = generateStockName(generatedSku, stockData.account_details || "");
+      }
+
       const dbInsertData: StockInsert = {
         category: stockData.category || "",
-        name: stockData.name || "",
+        name: finalName,
         account_detail: stockData.account_details || null,
         login_info: stockData.username || null,
         password_info: stockData.password || null,
@@ -111,7 +129,7 @@ export async function createStock(
         seller_info: stockData.seller_info || null,
         notes: stockData.internal_notes || null,
         managed_by: stockData.admin_id || null,
-        sku: stockWithSku.sku || `STK-${Date.now()}`,
+        sku: generatedSku,
         images: stockData.images || [],
       };
 
@@ -173,7 +191,8 @@ function mapStockUpdate(stockData: Partial<Stock>): StockUpdate {
 
   for (const [key, value] of Object.entries(stockData)) {
     if (value === undefined) continue;
-    if (key === "id" || key === "created_at") continue;
+    // Disallow altering immutable fields (id, created_at, category, sku)
+    if (key === "id" || key === "created_at" || key === "category" || key === "sku") continue;
 
     const dbField = (STOCK_UPDATE_ALIAS_MAP[key as keyof Stock] ?? key) as keyof StockUpdate;
     (updateData as Record<string, unknown>)[dbField] = value;
@@ -242,4 +261,22 @@ export async function deleteStock(id: string): Promise<{ success: boolean; error
       return { success: false, error: getErrorMessage(error) };
     }
   });
+}
+
+export async function getNextStockSku(category: string): Promise<string> {
+  if (!category) return "AUTO";
+  try {
+    const supabase = await createClient();
+    const { data, error } = await (supabase.rpc as any)("peek_next_stock_sku", {
+      p_category: category,
+    });
+    if (error || !data) {
+      const code = getGameCodeFromName(category);
+      return `${code}-3000`;
+    }
+    return data as string;
+  } catch {
+    const code = getGameCodeFromName(category);
+    return `${code}-3000`;
+  }
 }

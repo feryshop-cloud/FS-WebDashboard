@@ -12,12 +12,14 @@ import {
   AlertCircle,
   PackagePlus,
   Edit3,
+  Sparkles,
 } from "lucide-react";
 import { SlideOverDrawer } from "@/components/ui/SlideOverDrawer";
-import { formatRupiah } from "@/lib/utils";
+import { formatRupiah, generateStockName, getGameCodeFromName } from "@/lib/utils";
 import { UnifiedStockItem, GameItem, AccountItem } from "@/lib/hooks/features/useUnifiedStock";
 import { PurchasePaymentStatus } from "@/types/database";
 import { STOCK_FORM_STATUS_OPTIONS, normalizeStockStatus } from "@/types/status";
+import { getNextStockSku } from "@/actions/stocks";
 
 interface StockFormDrawerProps {
   mode: "create" | "edit";
@@ -80,10 +82,28 @@ export function StockFormDrawer({
   // Images State
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [newImageFiles, setNewImageFiles] = useState<File[]>([]);
+  const [previewSku, setPreviewSku] = useState<string>("");
 
   // Feedback State
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+
+  // Fetch next preview SKU when category changes (in create mode)
+  useEffect(() => {
+    if (isEdit || !category) {
+      setPreviewSku("");
+      return;
+    }
+    let isMounted = true;
+    getNextStockSku(category).then((sku) => {
+      if (isMounted && sku) {
+        setPreviewSku(sku);
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, [category, isEdit]);
 
   // Sync state when drawer opens or mode/stockItem changes
   useEffect(() => {
@@ -122,6 +142,7 @@ export function StockFormDrawer({
               : [];
       setExistingImages(imgs);
       setNewImageFiles([]);
+      setPreviewSku(stockItem.sku || "");
     } else {
       // Create defaults
       setCategory("");
@@ -138,10 +159,44 @@ export function StockFormDrawer({
       setPaymentAccountId(accounts.length > 0 ? accounts[0].id : "");
       setExistingImages([]);
       setNewImageFiles([]);
+      setPreviewSku("");
     }
   }, [open, isEdit, stockItem, accounts]);
 
   const totalImageCount = existingImages.length + newImageFiles.length;
+
+  const getTargetKodeStok = (cat = category, overrideSku?: string) => {
+    if (overrideSku) return overrideSku;
+    if (stockItem?.sku) return stockItem.sku;
+    if (previewSku && (!cat || cat === category)) return previewSku;
+    if (cat) return `${getGameCodeFromName(cat)}-3000`;
+    if (name && name.includes(" | ")) {
+      const codePart = name.split(" | ")[0].trim();
+      if (codePart) return codePart;
+    }
+    return "AUTO";
+  };
+
+  const handleAutoGenerateName = (
+    customSpecs?: string,
+    customCat?: string,
+    customSku?: string,
+  ) => {
+    const text = customSpecs !== undefined ? customSpecs : specs;
+    const cat = customCat !== undefined ? customCat : category;
+    if (!text || !text.trim()) {
+      return;
+    }
+    const targetCode = getTargetKodeStok(cat, customSku);
+    const generated = generateStockName(targetCode, text);
+    setName(generated);
+  };
+
+  useEffect(() => {
+    if (!isEdit && previewSku && specs.trim()) {
+      handleAutoGenerateName(specs, category, previewSku);
+    }
+  }, [previewSku]);
 
   const handleRemoveExistingImage = (indexToRemove: number) => {
     setExistingImages((prev) => prev.filter((_, idx) => idx !== indexToRemove));
@@ -268,14 +323,39 @@ export function StockFormDrawer({
             </h3>
 
             <div>
-              <label className="text-foreground mb-1 block text-xs font-semibold">
-                Kategori Game <span className="text-rose-500">*</span>
-              </label>
+              <div className="mb-1 flex items-center justify-between">
+                <label className="text-foreground block text-xs font-semibold">
+                  Kategori Game <span className="text-rose-500">*</span>
+                </label>
+                {isEdit && (
+                  <span className="text-[10px] font-medium text-amber-600 dark:text-amber-400">
+                    Terkunci Permanen
+                  </span>
+                )}
+              </div>
               <select
                 required
+                disabled={isEdit}
                 value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="border-border bg-card text-foreground w-full rounded-xl border px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                onChange={(e) => {
+                  const newCat = e.target.value;
+                  setCategory(newCat);
+                  if (newCat) {
+                    getNextStockSku(newCat).then((sku) => {
+                      setPreviewSku(sku);
+                      if (specs.trim()) {
+                        handleAutoGenerateName(specs, newCat, sku);
+                      }
+                    });
+                  } else if (specs.trim()) {
+                    handleAutoGenerateName(specs, newCat);
+                  }
+                }}
+                className={`border-border bg-card text-foreground w-full rounded-xl border px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 ${
+                  isEdit
+                    ? "cursor-not-allowed bg-muted/70 text-muted-foreground opacity-75"
+                    : ""
+                }`}
               >
                 <option value="">-- Pilih Kategori Game --</option>
                 {games.map((g) => (
@@ -284,18 +364,34 @@ export function StockFormDrawer({
                   </option>
                 ))}
               </select>
+              {isEdit && (
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  Kategori game tidak dapat diubah setelah stok dibuat untuk menjaga konsistensi kode SKU ({stockItem?.sku || "SKU"}).
+                </p>
+              )}
             </div>
 
             <div>
-              <label className="text-foreground mb-1 block text-xs font-semibold">
-                Nama / Judul Akun <span className="text-rose-500">*</span>
-              </label>
+              <div className="mb-1 flex items-center justify-between">
+                <label className="text-foreground block text-xs font-semibold">
+                  Nama / Judul Akun <span className="text-rose-500">*</span>
+                </label>
+                <button
+                  type="button"
+                  onClick={() => handleAutoGenerateName()}
+                  className="inline-flex items-center gap-1 text-[11px] font-medium text-blue-600 transition-colors hover:text-blue-700 active:scale-95 dark:text-blue-400 dark:hover:text-blue-300 cursor-pointer"
+                  title="Generate nama otomatis dari Kode Stok dan baris awal, tengah, akhir rincian akun"
+                >
+                  <Sparkles className="h-3 w-3" />
+                  <span>Auto-Generate Judul</span>
+                </button>
+              </div>
               <input
                 required
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Contoh: MLBB Mythic Glory 150 Skin (Collector+Legend)"
+                placeholder="Contoh: FF-1100 | Legend Alucard Collector Haya Tas2 Biru Permanent"
                 className="border-border bg-card text-foreground w-full rounded-xl border px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
               />
             </div>
@@ -312,7 +408,11 @@ export function StockFormDrawer({
               <textarea
                 rows={3}
                 value={specs}
-                onChange={(e) => setSpecs(e.target.value)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setSpecs(val);
+                  handleAutoGenerateName(val);
+                }}
                 placeholder={
                   "Rank: Mythic Glory 100*\nLogin: Moonton Sepaket Gmail Monsep\nSkin: 180 (Collector, Legend, Epic Limit)\nEmblem: Max All, Winrate 68%"
                 }

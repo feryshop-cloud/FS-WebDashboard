@@ -234,7 +234,7 @@ export async function getGamesList() {
   const { data, error } = await supabase
     .from("games")
     .select(
-      "id, name, slug, logo, image_url, is_active, is_popular, sort_order, instructions, created_at",
+      "id, name, slug, code, logo, image_url, is_active, is_popular, sort_order, instructions, created_at",
     )
     .order("sort_order", { ascending: true });
 

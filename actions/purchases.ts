@@ -6,6 +6,7 @@ import { logger } from "@/lib/logger";
 import { revalidatePath } from "next/cache";
 import { purgeStorefront, STOREFRONT_TAGS } from "@/lib/store-revalidate";
 import { Game, PurchasePaymentStatus, PurchaseWithRelations } from "@/types/database";
+import { generateStockName, getGameCodeFromName } from "@/lib/utils";
 
 async function uploadScreenshots(
   supabase: Awaited<ReturnType<typeof createClient>>,
@@ -116,6 +117,11 @@ export async function purchaseStock(
 
     if (purchase_payment_status === "LUNAS" && !payment_account_id) {
       return { success: false, error: "Target Account must be selected for LUNAS payments" };
+    }
+
+    if (!name.trim() || name.startsWith("AUTO | ") || /^[A-Z0-9]+-AUTO \| /.test(name)) {
+      const gameCode = getGameCodeFromName(category);
+      name = generateStockName(gameCode, account_details);
     }
 
     const { data: stockId, error } = await supabase.rpc("process_stock_purchase", {
@@ -387,7 +393,7 @@ export async function updatePurchase(
 
     const stockUpdates: Record<string, unknown> = {};
     if (data.name !== undefined) stockUpdates.name = data.name;
-    if (data.category !== undefined) stockUpdates.category = data.category;
+    // Category cannot be changed after creation to preserve SKU and ledger integrity
     if (data.account_details !== undefined) stockUpdates.account_details = data.account_details;
     if (data.username !== undefined) stockUpdates.username = data.username;
     if (data.password !== undefined) stockUpdates.password = data.password;
@@ -409,7 +415,6 @@ export async function updatePurchase(
 
     // Synchronize update in inventory table
     const inventoryUpdates: {
-      game_id?: string;
       title_reference?: string;
       account_specs?: string;
       capital_price?: number;
@@ -431,18 +436,6 @@ export async function updatePurchase(
       inventoryUpdates.screenshot_url = finalImages.length > 0 ? finalImages[0] : null;
     }
 
-    if (data.category) {
-      const { data: matchedGame } = await supabase
-        .from("games")
-        .select("id")
-        .ilike("name", data.category)
-        .limit(1)
-        .maybeSingle();
-      if (matchedGame?.id) {
-        inventoryUpdates.game_id = matchedGame.id;
-      }
-    }
-
     if (Object.keys(inventoryUpdates).length > 0) {
       const { data: existingInv } = await supabase
         .from("inventory")
@@ -460,7 +453,14 @@ export async function updatePurchase(
           .maybeSingle();
 
         if (stockRow) {
-          let resolvedGameId = inventoryUpdates.game_id;
+          const { data: matchedGame } = await supabase
+            .from("games")
+            .select("id")
+            .ilike("name", stockRow.category || "")
+            .limit(1)
+            .maybeSingle();
+
+          let resolvedGameId = matchedGame?.id;
           if (!resolvedGameId) {
             const { data: defaultGame } = await supabase
               .from("games")

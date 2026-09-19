@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { DynamicInputBuilder, DynamicField } from "@/components/features/DynamicInputBuilder";
 import { GameTable } from "./GameTable";
+import { getGameCodeFromName } from "@/lib/utils";
 
 type Game = Database["public"]["Tables"]["games"]["Row"];
 
@@ -63,6 +64,7 @@ export function GameManager({
   // Form state
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
+  const [code, setCode] = useState("");
   const [logo, setLogo] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [banner, setBanner] = useState("");
@@ -103,6 +105,7 @@ export function GameManager({
   const resetFields = () => {
     setName("");
     setSlug("");
+    setCode("");
     setLogo("");
     setImageUrl("");
     setBanner("");
@@ -123,6 +126,7 @@ export function GameManager({
           .replace(/[^a-z0-9]+/g, "-")
           .replace(/(^-|-$)/g, ""),
       );
+      setCode(getGameCodeFromName(val));
     }
   };
 
@@ -131,6 +135,7 @@ export function GameManager({
     setEditingId(game.id);
     setName(game.name);
     setSlug(game.slug);
+    setCode(game.code || "");
     setLogo(game.logo || "");
     setImageUrl(game.image_url || "");
     setBanner(game.banner || "");
@@ -328,6 +333,36 @@ export function GameManager({
                     placeholder="auto dari nama game"
                     className="border-border bg-card text-foreground placeholder:text-faint-foreground w-full rounded-[10px] border px-3.5 py-2.5 font-mono text-sm transition-colors placeholder:font-sans focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-none"
                   />
+                </div>
+
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label
+                      className="text-muted-foreground block text-xs font-semibold tracking-wide uppercase"
+                      htmlFor="game-code"
+                    >
+                      Kode Game (Prefix SKU / Stok)
+                    </label>
+                    <span className="text-muted-foreground text-[11px]">
+                      {editingId ? "Tersimpan di database" : "Otomatis di-generate"}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <input
+                      id="game-code"
+                      type="text"
+                      readOnly
+                      value={code || (name ? getGameCodeFromName(name) : "-")}
+                      className="border-border bg-muted/60 text-foreground font-mono font-bold w-24 rounded-[10px] border px-3 py-2 text-sm text-center"
+                    />
+                    <span className="text-xs text-muted-foreground leading-relaxed">
+                      Digunakan sebagai prefix kode inventori & SKU stok (contoh:{" "}
+                      <strong className="font-mono text-foreground">
+                        {code || (name ? getGameCodeFromName(name) : "ML")}-1100
+                      </strong>
+                      ).
+                    </span>
+                  </div>
                 </div>
 
                 {/* Bagian Pengaturan Gambar Game */}

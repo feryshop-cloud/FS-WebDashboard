@@ -158,14 +158,19 @@ export function EditInventoryModal({
             )}
 
             <div>
-              <label className="text-foreground mb-1 block text-sm font-medium">
-                Kategori Game
-              </label>
+              <div className="mb-1 flex items-center justify-between">
+                <label className="text-foreground block text-sm font-medium">
+                  Kategori Game
+                </label>
+                <span className="text-[11px] font-medium text-amber-600 dark:text-amber-400">
+                  Terkunci Permanen
+                </span>
+              </div>
+              <input type="hidden" name="game_id" value={item.game_id} />
               <select
-                name="game_id"
-                required
+                disabled
                 defaultValue={item.game_id}
-                className="border-border bg-muted text-foreground w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="border-border bg-muted/60 text-muted-foreground w-full rounded-lg border px-3 py-2 text-sm cursor-not-allowed opacity-80 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               >
                 <option value="">Pilih Kategori Game...</option>
                 {games.map((game) => (
@@ -174,6 +179,9 @@ export function EditInventoryModal({
                   </option>
                 ))}
               </select>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Kategori game tidak dapat diubah setelah item dibuat untuk menjaga integritas nomor SKU.
+              </p>
             </div>
 
             <div>

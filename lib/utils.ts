@@ -78,3 +78,69 @@ export function generateRandomPassword(length: number = 16): string {
   }
   return result;
 }
+
+/**
+ * Menghasilkan Nama / Judul Stok secara otomatis berdasarkan Kode Stok
+ * dan ekstraksi baris pertama, tengah, dan akhir dari detail akun.
+ */
+export function generateStockName(kodeStok: string, detailAkun: string): string {
+  const cleanKode = (kodeStok || "").trim();
+
+  if (!detailAkun || !detailAkun.trim()) {
+    return cleanKode;
+  }
+
+  const lines = detailAkun
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+
+  if (lines.length === 0) {
+    return cleanKode;
+  }
+
+  let spesifikasi = "";
+
+  if (lines.length === 1) {
+    spesifikasi = lines[0];
+  } else if (lines.length === 2) {
+    spesifikasi = `${lines[0]} ${lines[1]}`;
+  } else {
+    const firstLine = lines[0];
+    const middleIndex = Math.floor(lines.length / 2);
+    const middleLine = lines[middleIndex];
+    const lastLine = lines[lines.length - 1];
+    spesifikasi = [firstLine, middleLine, lastLine].filter(Boolean).join(" ");
+  }
+
+  if (!cleanKode) {
+    return spesifikasi;
+  }
+
+  return spesifikasi ? `${cleanKode} | ${spesifikasi}` : cleanKode;
+}
+
+/**
+ * Menghasilkan singkatan / kode inisial game berdasarkan namanya.
+ * Contoh: "Free Fire" -> "FF", "Mobile Legends" -> "ML", "Roblox" -> "RO"
+ */
+export function getGameCodeFromName(name: string): string {
+  if (!name || !name.trim()) return "GAME";
+  const words = name
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .split(" ")
+    .filter(Boolean);
+
+  let code = "";
+  for (const word of words) {
+    code += word.charAt(0).toUpperCase();
+  }
+
+  if (code.length < 2 && words.length > 0) {
+    code = words[0].slice(0, 2).toUpperCase();
+  }
+
+  return code.slice(0, 4) || "GAME";
+}

@@ -76,6 +76,9 @@ export function GameTable({
                 <th scope="col" className="px-5 py-3.5">
                   Nama Game
                 </th>
+                <th scope="col" className="px-5 py-3.5 text-center">
+                  Kode
+                </th>
                 <th scope="col" className="px-5 py-3.5">
                   Slug
                 </th>
@@ -132,6 +135,11 @@ export function GameTable({
                           )}
                         </div>
                       </div>
+                    </td>
+                    <td className="px-5 py-3.5 text-center">
+                      <span className="inline-flex items-center rounded-[6px] border border-violet-200 bg-violet-50 px-2 py-0.5 font-mono text-xs font-bold text-violet-700 dark:border-violet-800 dark:bg-violet-950/40 dark:text-violet-300">
+                        {game.code || "—"}
+                      </span>
                     </td>
                     <td className="px-5 py-3.5">
                       <span className="text-muted-foreground font-mono text-xs">{game.slug}</span>
