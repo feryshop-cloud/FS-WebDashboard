@@ -145,13 +145,22 @@ export async function purchaseStock(
 
     if (stockId) {
       const screenshot_url = finalImageUrls.length > 0 ? finalImageUrls[0] : null;
+      const desiredStatus =
+        input instanceof FormData ? (input.get("status") as string) : (input as any).status;
+
+      const stockUpdatePayload: Record<string, any> = { images: finalImageUrls };
+      if (desiredStatus && desiredStatus !== "AVAILABLE") {
+        stockUpdatePayload.status = desiredStatus;
+      }
+
       await Promise.all([
-        (supabase.from("stocks").update as any)({ images: finalImageUrls }).eq("id", stockId),
+        (supabase.from("stocks").update as any)(stockUpdatePayload).eq("id", stockId),
         supabase
           .from("inventory")
           .update({
             screenshot_url: screenshot_url,
             image_urls: finalImageUrls,
+            ...(desiredStatus && desiredStatus !== "AVAILABLE" ? { status: "UNPOSTED" } : {}),
           })
           .eq("id", stockId),
       ]);
@@ -413,7 +422,10 @@ export async function updatePurchase(
     if (data.account_details !== undefined) inventoryUpdates.account_specs = data.account_details;
     if (data.capital_price !== undefined) inventoryUpdates.capital_price = data.capital_price;
     if (data.post_price !== undefined) inventoryUpdates.asking_price = data.post_price;
-    if (data.status !== undefined) inventoryUpdates.status = data.status;
+    if (data.status !== undefined) {
+      inventoryUpdates.status =
+        data.status === "AVAILABLE" ? "AVAILABLE" : data.status === "SOLD" ? "SOLD" : "UNPOSTED";
+    }
     if (data.images !== undefined || (newImageFiles && newImageFiles.length > 0)) {
       inventoryUpdates.image_urls = finalImages;
       inventoryUpdates.screenshot_url = finalImages.length > 0 ? finalImages[0] : null;
@@ -466,7 +478,12 @@ export async function updatePurchase(
               account_specs: data.account_details || stockRow.account_details || stockRow.name,
               capital_price: data.capital_price ?? stockRow.capital_price,
               asking_price: data.post_price ?? stockRow.post_price ?? stockRow.current_price,
-              status: (data.status || stockRow.status || "AVAILABLE") as any,
+              status:
+                (data.status || stockRow.status) === "AVAILABLE"
+                  ? "AVAILABLE"
+                  : (data.status || stockRow.status) === "SOLD"
+                    ? "SOLD"
+                    : "UNPOSTED",
               screenshot_url: finalImages.length > 0 ? finalImages[0] : null,
               image_urls: finalImages,
               public_id: stockRow.sku || `STK-${id.slice(0, 8).toUpperCase()}`,

@@ -16,6 +16,7 @@ import { getAccounts } from "@/app/actions/accounts";
 import { useFocusTrap } from "@/lib/hooks/useFocusTrap";
 import { useDebouncedValue } from "@/lib/hooks/useDebouncedValue";
 import { PurchasePaymentStatus } from "@/types/database";
+import { isMatchingStockStatus } from "@/types/status";
 
 export interface UnifiedStockItem {
   id: string;
@@ -194,8 +195,8 @@ export function useUnifiedStock() {
     let totalPendingDebt = 0;
 
     for (const item of stocks) {
-      const isAvailable = (item.status || "AVAILABLE").toUpperCase() === "AVAILABLE";
-      const isSold = (item.status || "").toUpperCase() === "SOLD";
+      const isAvailable = isMatchingStockStatus(item.status, "AVAILABLE");
+      const isSold = isMatchingStockStatus(item.status, "SOLD");
       const isPendingPayment = item.purchase_payment_status === "PENDING";
       const capital = Number(item.capital_price) || 0;
 
@@ -252,10 +253,9 @@ export function useUnifiedStock() {
         }
       }
 
-      // 3. Stock Status Filter (AVAILABLE / SOLD)
+      // 3. Stock Status Filter
       if (stockStatusFilter !== "ALL") {
-        const itemStatus = String(stock.status || "AVAILABLE").toUpperCase();
-        if (itemStatus !== stockStatusFilter) {
+        if (!isMatchingStockStatus(stock.status, stockStatusFilter)) {
           return false;
         }
       }

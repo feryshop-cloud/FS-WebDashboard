@@ -4,11 +4,16 @@
 
 export type UserRole = "OWNER" | "ADMIN" | "VIEWER";
 export type StockStatus =
+  | "DRAFT"
+  | "WAITING_PAYMENT"
   | "AVAILABLE"
   | "BOOKED"
   | "LIMITED_ACCESS"
-  | "SOLD"
   | "ON_HOLD"
+  | "PROBLEM"
+  | "ARCHIVED"
+  | "SOLD"
+  | "UNPOSTED"
   | "PROBLEM_ACTION"
   | "PROBLEM_PERMANENT"
   | "CANCELLED";

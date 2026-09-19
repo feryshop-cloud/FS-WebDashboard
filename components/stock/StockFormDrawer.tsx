@@ -17,6 +17,7 @@ import { SlideOverDrawer } from "@/components/ui/SlideOverDrawer";
 import { formatRupiah } from "@/lib/utils";
 import { UnifiedStockItem, GameItem, AccountItem } from "@/lib/hooks/features/useUnifiedStock";
 import { PurchasePaymentStatus } from "@/types/database";
+import { STOCK_FORM_STATUS_OPTIONS, normalizeStockStatus } from "@/types/status";
 
 interface StockFormDrawerProps {
   mode: "create" | "edit";
@@ -107,7 +108,7 @@ export function StockFormDrawer({
       );
       setSellerInfo(stockItem.seller_info || "");
       setInternalNotes(stockItem.internal_notes || "");
-      setStatus(stockItem.status || "AVAILABLE");
+      setStatus(stockItem.status ? normalizeStockStatus(stockItem.status) : "AVAILABLE");
       setPaymentStatus((stockItem.purchase_payment_status as PurchasePaymentStatus) || "LUNAS");
       setPaymentAccountId("");
 
@@ -204,6 +205,7 @@ export function StockFormDrawer({
         formData.append("current_price", String(Number(askingPrice) || 0));
         formData.append("seller_info", sellerInfo.trim());
         formData.append("internal_notes", internalNotes.trim());
+        formData.append("status", status);
         formData.append("purchase_payment_status", paymentStatus);
         if (paymentStatus === "LUNAS" && paymentAccountId) {
           formData.append("payment_account_id", paymentAccountId);
@@ -552,9 +554,11 @@ export function StockFormDrawer({
                     onChange={(e) => setStatus(e.target.value)}
                     className="border-border bg-card text-foreground w-full rounded-xl border px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                   >
-                    <option value="AVAILABLE">AVAILABLE (Tersedia di Etalase)</option>
-                    <option value="UNPOSTED">UNPOSTED (Draft / Belum Tayang)</option>
-                    <option value="SOLD">SOLD (Terjual)</option>
+                    {STOCK_FORM_STATUS_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -615,7 +619,7 @@ export function StockFormDrawer({
                     <input
                       type="checkbox"
                       checked={status === "AVAILABLE"}
-                      onChange={(e) => setStatus(e.target.checked ? "AVAILABLE" : "UNPOSTED")}
+                      onChange={(e) => setStatus(e.target.checked ? "AVAILABLE" : "DRAFT")}
                       className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                     />
                     <div className="text-xs">
@@ -624,8 +628,8 @@ export function StockFormDrawer({
                       </span>
                       <p className="text-muted-foreground mt-0.5">
                         {status === "AVAILABLE"
-                          ? "Akun akan langsung berstatus AVAILABLE dan muncul di etalase web pembeli."
-                          : "Akun akan berstatus UNPOSTED (dapat dipublikasikan kemudian)."}
+                          ? "Akun akan langsung berstatus Tersedia (AVAILABLE) dan muncul di etalase web pembeli."
+                          : "Akun akan berstatus Draft (dapat dipublikasikan kemudian)."}
                       </p>
                     </div>
                   </label>

@@ -1793,11 +1793,16 @@ export type Database = {
         | "CANCEL";
       purchase_payment_status: "LUNAS" | "PENDING";
       stock_status:
+        | "DRAFT"
+        | "WAITING_PAYMENT"
         | "AVAILABLE"
         | "BOOKED"
         | "LIMITED_ACCESS"
-        | "SOLD"
         | "ON_HOLD"
+        | "PROBLEM"
+        | "ARCHIVED"
+        | "SOLD"
+        | "UNPOSTED"
         | "PROBLEM_ACTION"
         | "PROBLEM_PERMANENT"
         | "CANCELLED";
@@ -1965,11 +1970,16 @@ export const Constants = {
       ],
       purchase_payment_status: ["LUNAS", "PENDING"],
       stock_status: [
+        "DRAFT",
+        "WAITING_PAYMENT",
         "AVAILABLE",
         "BOOKED",
         "LIMITED_ACCESS",
-        "SOLD",
         "ON_HOLD",
+        "PROBLEM",
+        "ARCHIVED",
+        "SOLD",
+        "UNPOSTED",
         "PROBLEM_ACTION",
         "PROBLEM_PERMANENT",
         "CANCELLED",

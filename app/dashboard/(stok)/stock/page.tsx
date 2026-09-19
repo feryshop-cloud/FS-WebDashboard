@@ -31,6 +31,85 @@ import { CaptionGeneratorModal } from "@/components/features/CaptionGeneratorMod
 import { getTemplates } from "@/app/actions/templates";
 import { TemplateItem } from "@/lib/hooks/features/useTemplates";
 import { TrashStockModal } from "@/components/stock/TrashStockModal";
+import { STOCK_STATUS_LIST, StockStatusLabel, normalizeStockStatus } from "@/types/status";
+
+function getStockStatusBadge(rawStatus?: string | null) {
+  const norm = normalizeStockStatus(rawStatus);
+  const label = StockStatusLabel[norm] || rawStatus || "Tersedia";
+
+  switch (norm) {
+    case "DRAFT":
+      return {
+        label,
+        badgeClass:
+          "border border-slate-200 bg-slate-100 text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300",
+        dotClass: "bg-slate-400",
+      };
+    case "WAITING_PAYMENT":
+      return {
+        label,
+        badgeClass:
+          "border border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-300",
+        dotClass: "bg-amber-500",
+      };
+    case "AVAILABLE":
+      return {
+        label,
+        badgeClass:
+          "border border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300",
+        dotClass: "bg-emerald-500",
+      };
+    case "BOOKED":
+      return {
+        label,
+        badgeClass:
+          "border border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950/50 dark:text-blue-300",
+        dotClass: "bg-blue-500",
+      };
+    case "LIMITED_ACCESS":
+      return {
+        label,
+        badgeClass:
+          "border border-purple-200 bg-purple-50 text-purple-700 dark:border-purple-800 dark:bg-purple-950/50 dark:text-purple-300",
+        dotClass: "bg-purple-500",
+      };
+    case "ON_HOLD":
+      return {
+        label,
+        badgeClass:
+          "border border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-800 dark:bg-orange-950/50 dark:text-orange-300",
+        dotClass: "bg-orange-500",
+      };
+    case "PROBLEM":
+      return {
+        label,
+        badgeClass:
+          "border border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-800 dark:bg-rose-950/50 dark:text-rose-300",
+        dotClass: "bg-rose-500",
+      };
+    case "ARCHIVED":
+      return {
+        label,
+        badgeClass:
+          "border border-zinc-200 bg-zinc-100 text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400",
+        dotClass: "bg-zinc-400",
+      };
+    case "SOLD":
+      return {
+        label,
+        badgeClass:
+          "border border-indigo-200 bg-indigo-50 text-indigo-700 dark:border-indigo-800 dark:bg-indigo-950/50 dark:text-indigo-300",
+        dotClass: "bg-indigo-500",
+      };
+    default:
+      return {
+        label: rawStatus || "Tersedia",
+        badgeClass:
+          "border border-slate-200 bg-slate-100 text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300",
+        dotClass: "bg-slate-400",
+      };
+  }
+}
 
 export default function UnifiedStockPage() {
   const {
@@ -251,10 +330,12 @@ export default function UnifiedStockPage() {
             onChange={(e) => setStockStatusFilter(e.target.value)}
             className="border-border bg-muted/50 text-foreground rounded-xl border px-3 py-2 text-xs font-medium outline-none focus:border-blue-500"
           >
-            <option value="ALL">Semua Stok</option>
-            <option value="AVAILABLE">Tersedia (Ready)</option>
-            <option value="UNPOSTED">Belum Tayang (Draft)</option>
-            <option value="SOLD">Terjual (Sold)</option>
+            <option value="ALL">Semua Status Stok</option>
+            {STOCK_STATUS_LIST.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
           </select>
 
           {/* Payment Status Filter */}
@@ -303,8 +384,6 @@ export default function UnifiedStockPage() {
                 </tr>
               ) : (
                 pageItems.map((item) => {
-                  const isAvailable = (item.status || "AVAILABLE").toUpperCase() === "AVAILABLE";
-                  const isUnposted = (item.status || "").toUpperCase() === "UNPOSTED";
                   const isPending = item.purchase_payment_status === "PENDING";
                   const sellingPrice = Number(item.current_price || item.post_price) || 0;
                   const capitalPrice = Number(item.capital_price) || 0;
@@ -438,26 +517,17 @@ export default function UnifiedStockPage() {
 
                       {/* Stock Status */}
                       <td className="px-5 py-4 whitespace-nowrap">
-                        <span
-                          className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold ${
-                            isAvailable
-                              ? "border border-emerald-200 bg-emerald-50 text-emerald-700"
-                              : isUnposted
-                                ? "border border-slate-200 bg-slate-100 text-slate-700"
-                                : "border border-blue-200 bg-blue-50 text-blue-700"
-                          }`}
-                        >
-                          <span
-                            className={`h-1.5 w-1.5 rounded-full ${
-                              isAvailable
-                                ? "bg-emerald-500"
-                                : isUnposted
-                                  ? "bg-slate-400"
-                                  : "bg-blue-500"
-                            }`}
-                          />
-                          {item.status || "AVAILABLE"}
-                        </span>
+                        {(() => {
+                          const badge = getStockStatusBadge(item.status);
+                          return (
+                            <span
+                              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold ${badge.badgeClass}`}
+                            >
+                              <span className={`h-1.5 w-1.5 rounded-full ${badge.dotClass}`} />
+                              {badge.label}
+                            </span>
+                          );
+                        })()}
                       </td>
 
                       {/* Actions */}
